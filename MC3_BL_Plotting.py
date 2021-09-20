@@ -1,14 +1,9 @@
+# %% -*- coding: utf-8 -*-
+""" Created on February 11, 2021 // @author: Sarah Shi """
+
 # %% 
 
-__all__ = [
-    'trace',
-    'histogram',
-    'pairwise',
-    'rms',
-    'modelfit',
-    'subplotter',
-    'themes',
-    ]
+__all__ = ['trace', 'histogram', 'pairwise', 'rms', 'modelfit', 'subplotter', 'themes',]
 
 import os
 import sys
@@ -27,31 +22,15 @@ import mc3.stats as ms
 
 # Color themes for histogram plots:
 themes = {
-    'blue':{
-        'edgecolor':'navy',
-        'facecolor':'royalblue',
-        'color':'navy'},
-    'red': {
-        'edgecolor':'crimson',
-        'facecolor':'orangered',
-        'color':'darkred'},
-    'black':{
-        'edgecolor':'0.3',
-        'facecolor':'0.3',
-        'color':'black'},
-    'green':{
-        'edgecolor':'forestgreen',
-        'facecolor':'limegreen',
-        'color':'darkgreen'},
-    'orange':{
-        'edgecolor':'darkorange',
-        'facecolor':'gold',
-        'color':'darkgoldenrod'},
-    }
+    'blue':{'edgecolor':'navy','facecolor':'royalblue','color':'navy'},
+    'red': {'edgecolor':'crimson','facecolor':'orangered','color':'darkred'},
+    'black':{'edgecolor':'0.3','facecolor':'0.3','color':'black'},
+    'green':{'edgecolor':'forestgreen','facecolor':'limegreen','color':'darkgreen'},
+    'orange':{'edgecolor':'darkorange','facecolor':'gold','color':'darkgoldenrod'},}
 
 # %% 
 
-def trace(posterior, title, zchain=None, pnames=None, thinning=1,
+def trace(posterior, title, zchain=None, pnames=None, thinning=25,
     burnin=0, fignum=1000, savefile=None, fmt=".", ms=2.5, fs=11):
     """
     Plot parameter trace MCMC sampling.
@@ -150,11 +129,11 @@ def trace(posterior, title, zchain=None, pnames=None, thinning=1,
                     ylow = 9.479-0.862*np.amin([npanels-1,npars-npanels*page-1])
                     bbox = mpl.transforms.Bbox([[0.0, ylow], [8.5, 11]])
 
-                fig.savefig(f"{sf[0]}_page{page:02d}{sf[1]}", bbox_inches=bbox)
+                fig.savefig(f"{sf[0]}_page{page:02d}{sf[1]}", bbox_inches=bbox, backend='pgf')
             else:
                 fig.suptitle(title)
                 plt.ioff()
-                fig.savefig(savefile, bbox_inches='tight', dpi = 300)
+                fig.savefig(savefile, bbox_inches='tight', backend='pgf') # dpi = 100)
 
     return axes
 
@@ -333,18 +312,17 @@ def histogram(posterior, title, pnames=None, thinning=1, fignum=1100,
         for page, fig in enumerate(figs):
             if npages > 1:
                 sf = os.path.splitext(savefile)
-                fig.savefig(
-                    f"{sf[0]}_page{page:02d}{sf[1]}", bbox_inches='tight')
+                fig.savefig(f"{sf[0]}_page{page:02d}{sf[1]}", bbox_inches='tight', backend='pgf')
             else:
                 fig.suptitle(title)
                 plt.ioff()
-                fig.savefig(savefile, bbox_inches='tight')
+                fig.savefig(savefile, bbox_inches='tight', backend='pgf')
     
     return axes
 
 # %% 
 
-def pairwise(posterior, title, pnames=None, thinning=1, fignum=1200,
+def pairwise(posterior, title, pnames=None, thinning=25, fignum=1200,
     savefile=None, bestp=None, nbins=25, nlevels=20,
     absolute_dens=False, ranges=None, fs=11, rect=None, margin=0.01):
     """
@@ -402,9 +380,7 @@ def pairwise(posterior, title, pnames=None, thinning=1, fignum=1200,
     else: # Set default ranges if necessary:
         for i in range(npars):
             if ranges[i] is None:
-                ranges[i] = (
-                    np.nanmin(posterior[0::thinning,i]),
-                    np.nanmax(posterior[0::thinning,i]))
+                ranges[i] = (np.nanmin(posterior[0::thinning,i]), np.nanmax(posterior[0::thinning,i]))
 
     # Set default parameter names:
     if pnames is None:
@@ -458,10 +434,9 @@ def pairwise(posterior, title, pnames=None, thinning=1, fignum=1200,
             else:
                 ax.set_xticklabels([])
             # The plot:
-            cont = ax.contourf(
-                hist[k], cmap=palette, vmin=1, origin='lower',
+            cont = ax.contourf(hist[k], cmap=palette, rasterized = True, vmin=1, origin='lower',
                 levels=[0]+list(np.linspace(1,lmax[k], nlevels)),
-                extent=(xran[k][0], xran[k][-1], yran[k][0], yran[k][-1])) #, rasterized = True)
+                extent=(xran[k][0], xran[k][-1], yran[k][0], yran[k][-1]))
             for c in cont.collections:
                 c.set_edgecolor("face")
             if bestp is not None:
@@ -498,7 +473,7 @@ def pairwise(posterior, title, pnames=None, thinning=1, fignum=1200,
     if savefile is not None:
         plt.suptitle(title)
         plt.ioff()
-        plt.savefig(savefile, dpi = 300)
+        plt.savefig(savefile, dpi = 50)
     return axes, cb
 
 # %% 
@@ -591,7 +566,7 @@ def rms(binsz, rms, stderr, rmslo, rmshi, cadence=None, binstep=1,
 
     if savefile is not None:
         plt.ioff()
-        plt.savefig(savefile)
+        plt.savefig(savefile, backend='pgf')
     return ax
 
 
@@ -659,7 +634,7 @@ def modelfit(data, uncert, indparams, model, title, nbins=75,
     if savefile is not None:
         plt.suptitle(title)
         plt.ioff()
-        plt.savefig(savefile)
+        plt.savefig(savefile, backend='pgf')
     return ax, rax
 
 # %% 
