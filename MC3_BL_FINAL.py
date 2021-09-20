@@ -1,3 +1,6 @@
+# %% -*- coding: utf-8 -*-
+""" Created on June 12, 2021 // @author: Sarah Shi and Henry Towbin """
+
 # %% Import packages
 
 import numpy as np
@@ -19,10 +22,7 @@ from matplotlib import rc
 
 %matplotlib inline
 %config InlineBackend.figure_format = 'retina'
-
-%matplotlib inline
-%config InlineBackend.figure_format = 'retina'
-rc('font',**{'family':'Avenir', 'size': 12})
+rc('font',**{'family':'Avenir', 'size': 14})
 plt.rcParams['pdf.fonttype'] = 42
 
 # %% Create directories for export file sorting. 
@@ -45,7 +45,6 @@ H2O_wn_low  = 1000
 CO2_wn_high = 2200 # 2400
 CO2_wn_low  = 1275 # 1275
 PCA_DF = pd.read_csv("Baseline_Avg+PCA.csv", index_col= "Wavenumber")
-# PCA_DF = pd.read_csv("Smoothed_Baselines_H2O_Free_Avg+PCA-5-20-21.csv", index_col= "Wavenumber")
 
 PCA_DF = PCA_DF[CO2_wn_low:CO2_wn_high]
 PCAmatrix = np.matrix(PCA_DF.to_numpy())
@@ -53,38 +52,8 @@ Wavenumber = np.array(PCA_DF.index)
 x = Wavenumber
 
 Peak_1635_PCA = pd.read_csv("Water_Peak_1635_All.csv", index_col= "Wavenumber")
-# Peak_1635_PCA = pd.read_csv("Water_Peak_1635_5-20-21.csv", index_col= "Wavenumber")
-# Peak_1635_PCA['1630_Peak_PCA_3'] = 0
 Peak_1635_PCA = Peak_1635_PCA[CO2_wn_low:CO2_wn_high]
 Peak_1635_PCAmatrix = np.matrix(Peak_1635_PCA.to_numpy())
-# baselines = pd.read_csv("CO2_free_baselines_Water_removed_5-19-21.csv", index_col = "Wavenumber")
-
-# %%
-
-plt.figure(figsize = (12, 8))
-plt.plot(PCA_DF.index, PCA_DF['Average_Baseline'])
-plt.plot(PCA_DF.index, PCA_DF['Average_Baseline'] + PCA_DF['PCA_1'])
-plt.plot(PCA_DF.index, PCA_DF['Average_Baseline'] - PCA_DF['PCA_1'])
-plt.xlim([2200, 1200])
-
-plt.figure(figsize = (12, 8))
-plt.plot(PCA_DF.index, PCA_DF['Average_Baseline'])
-plt.plot(PCA_DF.index, PCA_DF['Average_Baseline'] + PCA_DF['PCA_2'])
-plt.plot(PCA_DF.index, PCA_DF['Average_Baseline'] - PCA_DF['PCA_2'])
-plt.xlim([2200, 1200])
-
-plt.figure(figsize = (12, 8))
-plt.plot(PCA_DF.index, PCA_DF['Average_Baseline'])
-plt.plot(PCA_DF.index, PCA_DF['Average_Baseline'] + PCA_DF['PCA_3'])
-plt.plot(PCA_DF.index, PCA_DF['Average_Baseline'] - PCA_DF['PCA_3'])
-plt.xlim([2200, 1200])
-
-plt.figure(figsize = (12, 8))
-plt.plot(PCA_DF.index, PCA_DF['Average_Baseline'])
-plt.plot(PCA_DF.index, PCA_DF['Average_Baseline'] + PCA_DF['PCA_4'])
-plt.plot(PCA_DF.index, PCA_DF['Average_Baseline'] - PCA_DF['PCA_4'])
-plt.xlim([2200, 1200])
-
 
 # %% Define Functions
 
@@ -258,24 +227,11 @@ params = np.float64(np.array(P))
 
 # Most Recent
 pmin = np.array([0.00, -5.0, -1.0, -1.0, -0.5, 
-                1420.0, 22.5, 0.001, 
-                1505.0, 22.5, 0.001,  
+                1420.0, 22.5, 0.001, 1505.0, 22.5, 0.001,  
                 0.0, -1.0, -1.0, -5e-2, -10.0])
 pmax = np.array([10.0,  5.0,  1.0,  1.0,  0.5, 
-                1440.0, 35.0, 0.600, 
-                1525.0, 35.0, 0.600, 
+                1440.0, 35.0, 0.600, 1525.0, 35.0, 0.600, 
                 5.0,  1.0,  1.0,  5e-2,  10.0])
-
-# SEVENTH
-# pmin = np.array([0.00, -5.0, -0.3, -0.2, -0.05, 
-#                 1420.0, 22.5, 0.001, 
-#                 1505.0, 22.5, 0.001,  
-#                 0.0, -1.0, -1.0, -5e-2, -10.0])
-# pmax = np.array([10.0,  5.0,  0.3,  0.2,  0.05, 
-#                 1440.0, 35.0, 0.600, 
-#                 1525.0, 35.0, 0.600, 
-#                 5.0,  1.0,  1.0,  5e-2,  10.0])
-
 
 # Parameters' stepping behavior:
 pstep = 0.01 * params
@@ -471,7 +427,7 @@ def Run_All_Spectra(dfs_dict, exportpath):
                 krige_output_4500_3.index, krige_output_4500_3['Absorbance'] - np.min(krige_output_4500_3['Absorbance']), label = 'Gaussian 4500')
             ax2.set_xlabel('Wavenumber $cm^{-1}$')    
             ax2.set_ylabel('Absorbance')
-            ax2.legend(['Subtracted 5200','_','_','Subtracted 4500','_','_','_','_','Gaussian 5200','_','_','Gaussian 4500'], prop={'size': 12})
+            ax2.legend(['Subtracted 5200','_','_','Subtracted 4500','_','_','_','_','Gaussian 5200','_','_','Gaussian 4500'])
             warnings.filterwarnings("ignore", category = UserWarning)
             ax2.set_xlim([4200, 5400])
             ax2.set_ylim([0, plotmax+0.05])
@@ -594,14 +550,18 @@ def Run_All_Spectra(dfs_dict, exportpath):
             ax4.legend(loc = 'upper right', prop={'size': 12})
             ax4.invert_xaxis()
             plt.tight_layout()
-            plt.savefig(figurepath + files + '.pdf')
+            plt.savefig(figurepath + files + '.pdf', backend='pgf')
             plt.close('all')
 
             ifree = np.where(pstep > 0)[0]
             fig1 = mc3plots.trace(mc3_output['posterior'], title = files, zchain=mc3_output['zchain'], burnin=mc3_output['burnin'], pnames=texnames, savefile = plotpath+'/TRACE/'+files+'_trace.pdf')
+            plt.close('all')
             fig2 = mc3plots.histogram(mc3_output['posterior'], title = files, pnames=texnames, bestp=mc3_output['bestp'], savefile = plotpath+'/HISTOGRAM/'+files+'_histogram.pdf', quantile=0.683)
+            plt.close('all')
             fig3 = mc3plots.pairwise(mc3_output['posterior'], title = files, pnames=texnames, bestp=mc3_output['bestp'], savefile = plotpath+'/PAIRWISE/'+files+'_pairwise.pdf')
+            plt.close('all')
             fig4 = mc3plots.modelfit(spec, uncert, indparams[0], mc3_output['best_model'], title = files, savefile=plotpath+'/MODELFIT/'+files+'_modelfit.pdf')
+            plt.close('all')
 
             # Create dataframe of best fit parameters and their standard deviations
             DF_Output.loc[files] = pd.Series({'P_H1635_BP':H2OmP1635_BP[0],'P_H1635_STD':H2OmP1635_STD[0],'H2Om_1635_MAX':MAX_1635_ABS,
@@ -891,11 +851,7 @@ FFILES_ALL.sort()
 FTHICKNESS = pd.read_csv('Inputs/FuegoThickness.csv')
 FTHICKNESS.set_index('Sample', inplace = True)
 
-# F_MI_Composition = Load_MIComposition('Inputs/FuegoChemistry_OLD.csv')
-# F_MI_Composition_H2O = Load_MIComposition('Inputs/FuegoChemistry_NEW_H2O.csv')
 F_MI_Composition_H2O = Load_MIComposition('Inputs/FuegoChemistry_NEW_H2O_Fe2O3.csv')
-
-# F_MI_Composition_RAW = Load_MIComposition('Inputs/FuegoChemistry_NEW_Raw.csv')
 
 # Load all sample CSVs into this dictionary
 FUEGO_FILES, FUEGO_DFS_DICT = Load_SampleCSV(FFILES_ALL, H2O_wn_high, H2O_wn_low)
@@ -903,13 +859,13 @@ FUEGO_FILES, FUEGO_DFS_DICT = Load_SampleCSV(FFILES_ALL, H2O_wn_high, H2O_wn_low
 # %% 
 
 plt.close('all')
-FUEGO_DF_OUTPUT, FUEGO_VOLATILES_PH, FUEGO_NEAR_IR, FFAILURES = Run_All_Spectra(FUEGO_DFS_DICT, 'FUEGO_OF_Fe2O3')
+FUEGO_DF_OUTPUT, FUEGO_VOLATILES_PH, FUEGO_NEAR_IR, FFAILURES = Run_All_Spectra(FUEGO_DFS_DICT, 'FUEGO_OF_F')
 
 # %%
 
-FUEGO_DF_OUTPUT.to_csv('Fuego_DF_Output_OF_Fe2O3.csv')
-FUEGO_VOLATILES_PH.to_csv('Fuego_Volatiles_PH_OF_Fe2O3.csv')
-FUEGO_NEAR_IR.to_csv('Fuego_NIR_OF_Fe2O3.csv')
+FUEGO_DF_OUTPUT.to_csv('Fuego_DF_Output_OF_F.csv')
+FUEGO_VOLATILES_PH.to_csv('Fuego_Volatiles_PH_OF_F.csv')
+FUEGO_NEAR_IR.to_csv('Fuego_NIR_OF_F.csv')
 
 # FUEGO_DF_OUTPUT = pd.read_csv('./FINALDATA/F18_DF_Output_OF_Fe2O3.csv', index_col=0)
 # FUEGO_VOLATILES_PH = pd.read_csv('./FINALDATA/F18_Volatiles_PH_OF_Fe2O3.csv', index_col=0)
@@ -922,12 +878,12 @@ N = 500000
 FUEGO_EPSILON, FUEGO_MEGA_SPREADSHEET = Concentration_Output(FUEGO_VOLATILES_PH, N, FTHICKNESS, F_MI_Composition_H2O)
 FUEGO_MEGA_SPREADSHEET
 
-FUEGO_MEGA_SPREADSHEET.to_csv('./FINALDATA/F18_H2OCO2_OF_Fe2O3.csv')
-FUEGO_EPSILON.to_csv('./FINALDATA/F18_Epsilon_OF_1.csv')
+FUEGO_MEGA_SPREADSHEET.to_csv('./FINALDATA/F18_H2OCO2_OF_F.csv')
+FUEGO_EPSILON.to_csv('./FINALDATA/F18_Epsilon_OF_F.csv')
 
 FUEGO_EPSILON_2, FUEGO_MEGA_SPREADSHEET_2 = H2O_Concentration_Output(FUEGO_NEAR_IR, FUEGO_MEGA_SPREADSHEET, FUEGO_DF_OUTPUT, N, FTHICKNESS, F_MI_Composition_H2O, FUEGO_EPSILON['Density'])
-FUEGO_MEGA_SPREADSHEET_2.to_csv('./FINALDATA/F18_5200_4500_H2O_OF_Fe2O3.csv')
-FUEGO_EPSILON_2.to_csv('./FINALDATA/F18_5200_4500_Epsilon_OF_Fe2O3.csv')
+FUEGO_MEGA_SPREADSHEET_2.to_csv('./FINALDATA/F18_5200_4500_H2O_OF_F.csv')
+FUEGO_EPSILON_2.to_csv('./FINALDATA/F18_5200_4500_Epsilon_OF_F.csv')
 
 
 
@@ -948,14 +904,14 @@ STD_FILES, STD_DFS_DICT = Load_SampleCSV(STD_ALL, H2O_wn_high, H2O_wn_low)
 # %%
 
 plt.close('all')
-STD_DF_OUTPUT, STD_VOLATILES_PH, STD_NEAR_IR, STDFAILURES = Run_All_Spectra(STD_DFS_DICT, 'STD_OF_Fe2O3')
+STD_DF_OUTPUT, STD_VOLATILES_PH, STD_NEAR_IR, STDFAILURES = Run_All_Spectra(STD_DFS_DICT, 'STD_OF_F')
 
 
 # %%
 
-STD_DF_OUTPUT.to_csv('STD_DF_Output_OF_Fe2O3.csv')
-STD_VOLATILES_PH.to_csv('STD_Volatiles_OF_Fe2O3.csv')
-STD_NEAR_IR.to_csv('STD_NIR_OF_Fe2O3.csv')
+STD_DF_OUTPUT.to_csv('STD_DF_Output_OF_F.csv')
+STD_VOLATILES_PH.to_csv('STD_Volatiles_OF_F.csv')
+STD_NEAR_IR.to_csv('STD_NIR_OF_F.csv')
 
 # STD_DF_OUTPUT = pd.read_csv('STD_DF_Output_OF.csv', index_col=0)
 # STD_VOLATILES_PH = pd.read_csv('STD_Volatiles_OF.csv', index_col=0)
@@ -967,12 +923,12 @@ N = 500000
 STD_EPSILON, STD_MEGA_SPREADSHEET = Concentration_Output(STD_VOLATILES_PH, N, STDTHICKNESS, STD_MI_Composition)
 STD_MEGA_SPREADSHEET
 
-STD_MEGA_SPREADSHEET.to_csv('STD_H2OCO2_OF_Fe2O3.csv')
-STD_EPSILON.to_csv('STD_Epsilon_OF_Fe2O3.csv')
+STD_MEGA_SPREADSHEET.to_csv('STD_H2OCO2_OF_F.csv')
+STD_EPSILON.to_csv('STD_Epsilon_OF_F.csv')
 
 STD_EPSILON_2, STD_MEGA_SPREADSHEET_2 = H2O_Concentration_Output(STD_NEAR_IR, STD_MEGA_SPREADSHEET, STD_DF_OUTPUT, N, STDTHICKNESS, STD_MI_Composition, STD_EPSILON['Density'])
-STD_MEGA_SPREADSHEET_2.to_csv('STD_5200_4500_H2O_OF_Fe2O3.csv')
-STD_EPSILON_2.to_csv('STD_5200_4500_Epsilon_OF_Fe2O3.csv')
+STD_MEGA_SPREADSHEET_2.to_csv('STD_5200_4500_H2O_OF_F.csv')
+STD_EPSILON_2.to_csv('STD_5200_4500_Epsilon_OF_F.csv')
 
 
 # %%
@@ -995,14 +951,14 @@ DAN_FILES, DAN_DFS_DICT = Load_SampleCSV(DAN_ALL, H2O_wn_high, H2O_wn_low)
 # %%
 
 plt.close('all')
-DAN_DF_OUTPUT, DAN_VOLATILES_PH, DAN_NEAR_IR, DANFAILURES = Run_All_Spectra(DAN_DFS_DICT, 'DAN_RH_OF_Fe2O3')
+DAN_DF_OUTPUT, DAN_VOLATILES_PH, DAN_NEAR_IR, DANFAILURES = Run_All_Spectra(DAN_DFS_DICT, 'DAN_RH_OF_F')
 
 
 # %%
 
-DAN_DF_OUTPUT.to_csv('DANRH_DF_Output_OF.csv')
-DAN_VOLATILES_PH.to_csv('DANRH_Volatiles_OF.csv')
-DAN_NEAR_IR.to_csv('DANRH_NIR_OF.csv')
+DAN_DF_OUTPUT.to_csv('DANRH_DF_Output_OF_F.csv')
+DAN_VOLATILES_PH.to_csv('DANRH_Volatiles_OF_F.csv')
+DAN_NEAR_IR.to_csv('DANRH_NIR_OF_F.csv')
 
 # DAN_DF_OUTPUT = pd.read_csv('DAN_DF_Output_OF.csv', index_col=0)
 # DAN_VOLATILES_PH = pd.read_csv('DAN_Volatiles_OF.csv', index_col=0)
@@ -1014,11 +970,11 @@ N = 500000
 DAN_EPSILON, DAN_MEGA_SPREADSHEET = Concentration_Output(DAN_VOLATILES_PH, N, DANTHICKNESS, DAN_MI_Composition)
 DAN_MEGA_SPREADSHEET
 
-DAN_MEGA_SPREADSHEET.to_csv('DANRH_H2OCO2_OF.csv')
-DAN_EPSILON.to_csv('DANRH_Epsilon_OF.csv')
+DAN_MEGA_SPREADSHEET.to_csv('DANRH_H2OCO2_OF_F.csv')
+DAN_EPSILON.to_csv('DANRH_Epsilon_OF_F.csv')
 
 DAN_EPSILON_2, DAN_MEGA_SPREADSHEET_2 = H2O_Concentration_Output(DAN_NEAR_IR, DAN_MEGA_SPREADSHEET, DAN_DF_OUTPUT, N, DANTHICKNESS, DAN_MI_Composition, DAN_EPSILON['Density'])
-DAN_MEGA_SPREADSHEET_2.to_csv('DANRH_5200_4500_H2O_OF.csv')
-DAN_EPSILON_2.to_csv('DANRH_5200_4500_Epsilon_OF.csv')
+DAN_MEGA_SPREADSHEET_2.to_csv('DANRH_5200_4500_H2O_OF_F.csv')
+DAN_EPSILON_2.to_csv('DANRH_5200_4500_Epsilon_OF_F.csv')
 
 # %%
