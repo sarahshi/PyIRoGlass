@@ -873,11 +873,11 @@ def Run_All_Spectra(dfs_dict, paths):
 
     path_parent = os.path.dirname(os.getcwd())
     path_grandparent = os.path.dirname(path_parent)
-    path_beg = path_parent + '/BCB/'
 
     PCAmatrix = Load_PCA(paths[0])
     Peak_1635_PCAmatrix = Load_PCA(paths[1])
     Wavenumber = Load_Wavenumber(paths[0])
+    path_beg = paths[-2]
     exportpath = paths[-1]
     Nvectors = 5
     indparams = [Wavenumber, PCAmatrix, Peak_1635_PCAmatrix, Nvectors]

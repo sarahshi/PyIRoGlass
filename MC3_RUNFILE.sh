@@ -22,7 +22,7 @@
 
 #----- Specify your command(s)/script(s)/job(s)/task(s) below:
 source  ~/.bashrc
-source activate General_Science
+source activate generic_science
  
 my_parallel="parallel $SLURM_NTASKS"
 my_srun="srun --export=all --exclusive -n1 --cpus-per-task=1 "
