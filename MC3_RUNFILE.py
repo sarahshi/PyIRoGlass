@@ -20,6 +20,7 @@ import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib import rc, cm
 
+
 # %% Create directories for export file sorting. 
 # Load FTIR Baseline Dictionary of decarbonated MIs from Aleutian volcanoes. 
 # The average baseline and PCA vectors, determining the components of greatest 
