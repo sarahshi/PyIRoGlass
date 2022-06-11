@@ -100,7 +100,10 @@ def Load_ChemistryThickness(ChemistryThickness_Path):
     ChemistryThickness = pd.read_csv(ChemistryThickness_Path)
     ChemistryThickness.set_index('Sample', inplace = True)
 
-    return ChemistryThickness
+    Chemistry = ChemistryThickness.loc[:, ['SiO2', 'TiO2', 'Al2O3', 'Fe2O3', 'FeO', 'MnO', 'MgO', 'CaO', 'Na2O', 'K2O', 'P2O5']]
+    Thickness = ChemistryThickness.loc[:, ['Thickness']]
+
+    return Chemistry, Thickness
 
 def Gauss(x, mu, sd, A=1):
 
@@ -241,8 +244,7 @@ def NearIR_Process(data, H2O_wn_low, H2O_wn_high, peak):
     krige_output['STD'] = np.asarray(np.squeeze(krige_std))
 
     if peak == 'OH': # 4500 peak
-        PR_4500_low = 4400
-        PR_4500_high = 4600
+        PR_4500_low, PR_4500_high = 4400, 4600
         PH_max = np.max(data_output['Subtracted_Peak'][PR_4500_low:PR_4500_high])
         PH = np.max(data_output['Subtracted_Peak'][PR_4500_low:PR_4500_high])
         PH_krige = np.max(krige_output['Absorbance'][PR_4500_low:PR_4500_high]) - np.min(krige_output['Absorbance'])
@@ -250,8 +252,7 @@ def NearIR_Process(data, H2O_wn_low, H2O_wn_high, peak):
         PH_std = np.std(data_output['Subtracted_Peak'][PH_krige_index-50:PH_krige_index+50])
         STN = PH_krige / PH_std
     elif peak == 'H2O': # 5200 peak
-        PR_5200_low = 5100
-        PR_5200_high = 5300
+        PR_5200_low, PR_5200_high = 5100, 5300
         PH_max = np.max(data_output['Subtracted_Peak'][PR_5200_low:PR_5200_high])
         PH = np.max(data_output['Subtracted_Peak'][PR_5200_low:PR_5200_high])
         PH_krige = np.max(krige_output['Absorbance'][PR_5200_low:PR_5200_high]) - np.min(krige_output['Absorbance'])
@@ -275,8 +276,7 @@ def MidIR_Process(data, H2O_wn_low, H2O_wn_high):
     data_output['Subtracted_Peak'] = data_H2O3550['Absorbance'] - data_output['BL_MIR_3550']
     data_output['Subtracted_Peak_Hat'] = signal.medfilt(data_output['Subtracted_Peak'], 21)
 
-    peak_wn_low = 3300
-    peak_wn_high = 3600
+    peak_wn_low, peak_wn_high = 3300, 3600
     plot_output = data_output[peak_wn_low:peak_wn_high]
     plotindex = np.argmax(plot_output['Absorbance'].index.to_numpy() > 3400)
     PH_3550 = np.max(plot_output['Subtracted_Peak_Hat'])
@@ -842,20 +842,22 @@ def MCMC(data, uncert, indparams, log, savefile):
     mc3_output which contains all of the best fit parameters and standard deviations."""
 
     func = Carbonate
-    params = np.array([1.0, 0.5, 0.0001, 0.0001, 0.00001, 1430.0, 25, 0.01, 1515, 25, 0.01, 0.5, 0.10, 0.01, 5e-4, 0.65])
-    pstep = 0.01 * params
-    pmin = np.array([0.00, -5.0, -1.0, -1.0, -0.5, 1420.0, 22.5, 0.001, 1505.0, 22.5, 0.001, 0.0, -1.0, -1.0, -5e-2, -10.0])
-    pmax = np.array([10.0,  5.0,  1.0,  1.0,  0.5, 1440.0, 35.0, 2.000, 1525.0, 35.0, 2.000, 5.0,  1.0,  1.0,  5e-2,  10.0])
-    priorlow = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 5.0, 2.5, 0.0, 5.0, 2.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-    priorup  = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 5.0, 2.5, 0.0, 5.0, 2.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+    params   =  np.array([1.25,  2.00,  0.25,  0.01,  0.01, 1430, 25.0, 0.0100, 1510, 25.0, 0.0100, 0.10,  0.02,  0.01,  5e-4,  0.70])
+    pmin     =  np.array([0.00, -5.00, -1.00, -0.75, -0.75, 1415, 22.5, 0.0000, 1500, 22.5, 0.0000, 0.00, -0.50, -0.50, -5e-2, -1.00])
+    pmax     =  np.array([5.00,  8.00,  1.00,  0.75,  0.75, 1445, 40.0, 2.0000, 1535, 40.0, 2.0000, 3.00,  0.50,  0.50,  5e-2,  3.00])
+    pstep    =  np.array([0.30,  0.50,  0.20,  0.20,  0.20, 3.25, 2.25, 0.0005, 6.0, 2.25, 0.0005, 0.25,  0.75,  0.75,  0.002, 0.20])
+
+
+    priorlow =  np.array([0.00,  0.00,  0.00,  0.00,  0.00, 0.0, 2.5, 0.0, 0.0, 2.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+    priorup  =  np.array([0.00,  0.00,  0.00,  0.00,  0.00, 0.0, 2.5, 0.0, 0.0, 2.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 
     pnames   = ['Avg_BL',"PCA1","PCA2","PCA3","PCA4",'peak_G1430','std_G1430','G1430_amplitude','peak_G1515','std_G1515','G1515_amplitude','Average_1635Peak','1635PeakPCA1','1635PeakPCA2','m','b']
-    texnames = ['$\overline{BL}$',"$PCA_1$","$PCA_2$","$PCA_3$",'$PCA_4$','$P_{1430}$','$S_{1430}$','$A_{1430}$','$P_{1515}$','$S_{1515}$','$A_{1515}$','$\overline{H_{1635}}$','${H_{1635,PCA_1}}$','${H_{1635,PCA_2}}$','m','b']
+    texnames = ['$\overline{BL}$',"$PCA_1$","$PCA_2$","$PCA_3$",'$PCA_4$','$P_{1430}$','$S_{1430}$','$PH_{1430}$','$P_{1515}$','$S_{1515}$','$PH_{1515}$','$\overline{H_{1635}}$','${H_{1635,PCA_1}}$','${H_{1635,PCA_2}}$','m','b']
 
     mc3_output = mc3.sample(data, uncert, func=func, params=params, indparams=indparams, 
-        pstep=pstep, pmin=pmin, pmax=pmax, priorlow=priorlow, priorup=priorup, 
+        pmin=pmin, pmax=pmax, priorlow=priorlow, priorup=priorup, 
         pnames=pnames, texnames=texnames, sampler='snooker', rms=False,
-        nsamples=1e6, nchains=9, ncpu=3, burnin=5000, thinning=1,
+        nsamples=1e6, nchains=9, ncpu=3, burnin=5000, thinning=1, # 1e6, 5000
         leastsq='trf', chisqscale=False, grtest=True, grbreak=1.01, grnmin=0.5,
         hsize=10, kickoff='normal', wlike=False, plots=False, log=log, savefile=savefile)
 
@@ -872,13 +874,11 @@ def Run_All_Spectra(dfs_dict, paths):
     exported in a csv file and figures are created for each individual sample."""
 
     path_parent = os.path.dirname(os.getcwd())
-    path_grandparent = os.path.dirname(path_parent)
 
     PCAmatrix = Load_PCA(paths[0])
     Peak_1635_PCAmatrix = Load_PCA(paths[1])
     Wavenumber = Load_Wavenumber(paths[0])
-    path_beg = paths[-2]
-    exportpath = paths[-1]
+    path_beg, exportpath = paths[-2], paths[-1]
     Nvectors = 5
     indparams = [Wavenumber, PCAmatrix, Peak_1635_PCAmatrix, Nvectors]
 
@@ -914,34 +914,26 @@ def Run_All_Spectra(dfs_dict, paths):
 
     try: 
         for files, data in dfs_dict.items(): 
-            
-            H2O4500_wn_low_1 = 4250
-            H2O4500_wn_high_1 = 4675
+
+            H2O4500_wn_low_1, H2O4500_wn_high_1 = 4250, 4675
             data_H2O4500_1, krige_output_4500_1, PH_4500_krige_1, STN_4500_1 = NearIR_Process(data, H2O4500_wn_low_1, H2O4500_wn_high_1, 'OH')
-            H2O4500_wn_low_2 = 4225
-            H2O4500_wn_high_2 = 4650
+            H2O4500_wn_low_2, H2O4500_wn_high_2 = 4225, 4650
             data_H2O4500_2, krige_output_4500_2, PH_4500_krige_2, STN_4500_2 = NearIR_Process(data, H2O4500_wn_low_2, H2O4500_wn_high_2, 'OH')
-            H2O4500_wn_low_3 = 4275
-            H2O4500_wn_high_3 = 4700
+            H2O4500_wn_low_3, H2O4500_wn_high_3 = 4275, 4700
             data_H2O4500_3, krige_output_4500_3, PH_4500_krige_3, STN_4500_3 = NearIR_Process(data, H2O4500_wn_low_3, H2O4500_wn_high_3, 'OH')
 
             # Three repeat baselines for the H2Om_{5200}
-            H2O5200_wn_low_1 = 4875
-            H2O5200_wn_high_1 = 5400
+            H2O5200_wn_low_1, H2O5200_wn_high_1 = 4875, 5400
             data_H2O5200_1, krige_output_5200_1, PH_5200_krige_1, STN_5200_1 = NearIR_Process(data, H2O5200_wn_low_1, H2O5200_wn_high_1, 'H2O')
-            H2O5200_wn_low_2 = 4850
-            H2O5200_wn_high_2 = 5375
+            H2O5200_wn_low_2, H2O5200_wn_high_2  = 4850, 5375
             data_H2O5200_2, krige_output_5200_2, PH_5200_krige_2, STN_5200_2 = NearIR_Process(data, H2O5200_wn_low_2, H2O5200_wn_high_2, 'H2O')
-            H2O5200_wn_low_3 = 4900
-            H2O5200_wn_high_3 = 5425
+            H2O5200_wn_low_3, H2O5200_wn_high_3 = 4900, 5425
             data_H2O5200_3, krige_output_5200_3, PH_5200_krige_3, STN_5200_3 = NearIR_Process(data, H2O5200_wn_low_3, H2O5200_wn_high_3, 'H2O')
 
             PH_4500_krige = np.array([PH_4500_krige_1, PH_4500_krige_2, PH_4500_krige_3])
-            PH_4500_krige_M = np.mean(PH_4500_krige)
-            PH_4500_krige_STD = np.std(PH_4500_krige)
+            PH_4500_krige_M, PH_4500_krige_STD = np.mean(PH_4500_krige), np.std(PH_4500_krige)
             PH_5200_krige = np.array([PH_5200_krige_1, PH_5200_krige_2, PH_5200_krige_3])
-            PH_5200_krige_M = np.mean(PH_5200_krige)
-            PH_5200_krige_STD = np.std(PH_5200_krige)
+            PH_5200_krige_M, PH_5200_krige_STD = np.mean(PH_5200_krige), np.std(PH_5200_krige)
 
             STN_4500 = np.array([STN_4500_1, STN_4500_2, STN_4500_3])
             STN_4500_M = np.average(STN_4500)
@@ -1046,19 +1038,18 @@ def Run_All_Spectra(dfs_dict, paths):
             CO2_wn_low  = 1275 
 
             spec = data[CO2_wn_low:CO2_wn_high]
-            spec_abs = data[CO2_wn_low:CO2_wn_high]
 
             if spec.shape[0] != df_length:              
                 interp_wn = np.linspace(spec.index[0], spec.index[-1], df_length)
                 interp_abs = interpolate.interp1d(spec.index, spec['Absorbance'])(interp_wn)
                 spec = spec.reindex(index = interp_wn)
                 spec['Absorbance'] = interp_abs
-                spec = spec['Absorbance'].to_numpy()
+                spec_mc3 = spec['Absorbance'].to_numpy()
             elif spec.shape[0] == df_length: 
-                spec = spec['Absorbance'].to_numpy()
+                spec_mc3 = spec['Absorbance'].to_numpy()
 
-            uncert = np.ones_like(spec) * 0.01
-            mc3_output = MCMC(data = spec, uncert = uncert, indparams = indparams, log = path_beg+logpath+files+'.log', savefile=path_beg+savefilepath+files+'.npz')
+            uncert = np.ones_like(spec_mc3) * 0.01
+            mc3_output = MCMC(data = spec_mc3, uncert = uncert, indparams = indparams, log = path_beg+logpath+files+'.log', savefile=path_beg+savefilepath+files+'.npz')
 
             PCA_BP = mc3_output['bestp'][0:Nvectors]
             CO2P_BP = mc3_output['bestp'][-11:-5]
@@ -1086,26 +1077,26 @@ def Run_All_Spectra(dfs_dict, paths):
             CO2P1515_SOLVE = CO2P1515_BP + Baseline_Solve_BP
             CO2P1430_SOLVE = CO2P1430_BP + Baseline_Solve_BP
 
-            MAX_1515_ABS = spec_abs['Absorbance'].to_numpy()[np.argmax((spec_abs['Absorbance'].index.to_numpy() > 1510) & (spec_abs['Absorbance'].index.to_numpy() < 1530))]
-            MAX_1430_ABS = spec_abs['Absorbance'].to_numpy()[np.argmax((spec_abs['Absorbance'].index.to_numpy() > 1410) & (spec_abs['Absorbance'].index.to_numpy() < 1450))]
+            MAX_1515_ABS = spec['Absorbance'].to_numpy()[np.argmax((spec.index.to_numpy() > 1510) & (spec.index.to_numpy() < 1530))]
+            MAX_1430_ABS = spec['Absorbance'].to_numpy()[np.argmax((spec.index.to_numpy() > 1410) & (spec.index.to_numpy() < 1440))]
 
-            BL_MAX_1515_ABS = Baseline_Solve_BP[np.argmax((spec_abs['Absorbance'].index.to_numpy() > 1510) & (spec_abs['Absorbance'].index.to_numpy() < 1530))]
-            BL_MAX_1430_ABS = Baseline_Solve_BP[np.argmax((spec_abs['Absorbance'].index.to_numpy() > 1410) & (spec_abs['Absorbance'].index.to_numpy() < 1450))]
+            BL_MAX_1515_ABS = Baseline_Solve_BP[np.argmax((spec.index.to_numpy() > 1510) & (spec.index.to_numpy() < 1530))]
+            BL_MAX_1430_ABS = Baseline_Solve_BP[np.argmax((spec.index.to_numpy() > 1410) & (spec.index.to_numpy() < 1450))]
 
             posteriorerror = np.load(path_beg+savefilepath+files+'.npz')
             samplingerror = posteriorerror['posterior'][:, 0:5]
-            samplingerror = samplingerror[0:np.shape(posteriorerror['posterior'][:, :])[0]:2000, :]
+            samplingerror = samplingerror[0: np.shape(posteriorerror['posterior'][:, :])[0] :int(np.shape(posteriorerror['posterior'][:, :])[0] / 200), :]
             lineerror = posteriorerror['posterior'][:, -2:None]
-            lineerror = lineerror[0:np.shape(posteriorerror['posterior'][:, :])[0]:2000, :]
+            lineerror = lineerror[0:np.shape(posteriorerror['posterior'][:, :])[0]:int(np.shape(posteriorerror['posterior'][:, :])[0] / 200), :]
             Baseline_Array = np.array(samplingerror * PCAmatrix[:, :].T)
             Baseline_Array_Plot = Baseline_Array
 
             ax4 = plt.subplot2grid((2, 3), (0, 2), rowspan = 2)
             for i in range(np.shape(Baseline_Array)[0]):
-                linearray = Linear(Wavenumber, lineerror[i, 0], lineerror[i, 1])
-                Baseline_Array_Plot[i, :] = Baseline_Array[i, :] + linearray
+                Linearray = Linear(Wavenumber, lineerror[i, 0], lineerror[i, 1])
+                Baseline_Array_Plot[i, :] = Baseline_Array[i, :] + Linearray
                 plt.plot(Wavenumber, Baseline_Array_Plot[i, :], 'dimgray', linewidth = 0.25)
-            ax4.plot(Wavenumber, spec, 'tab:blue', linewidth = 2.5, label = 'FTIR Spectrum')
+            ax4.plot(Wavenumber, spec_mc3, 'tab:blue', linewidth = 2.5, label = 'FTIR Spectrum')
             ax4.plot(Wavenumber, H1635_SOLVE, 'tab:orange', linewidth = 1.5, label = '1635')
             ax4.plot(Wavenumber, CO2P1515_SOLVE, 'tab:green', linewidth = 2.5, label = '1515')
             ax4.plot(Wavenumber, CO2P1430_SOLVE, 'tab:red', linewidth = 2.5, label = '1430')
@@ -1134,14 +1125,14 @@ def Run_All_Spectra(dfs_dict, paths):
             plt.close('all')
             fig3 = pairwise(mc3_output['posterior'], title = files, pnames=texnames, bestp=mc3_output['bestp'], savefile=path_beg+plotpath+'PAIRWISE/'+files+'_pairwise.pdf')
             plt.close('all')
-            fig4 = modelfit(spec, uncert, indparams[0], mc3_output['best_model'], title = files, savefile=path_beg+plotpath+'MODELFIT/'+files+'_modelfit.pdf')
+            fig4 = modelfit(spec_mc3, uncert, indparams[0], mc3_output['best_model'], title = files, savefile=path_beg+plotpath+'MODELFIT/'+files+'_modelfit.pdf')
             plt.close('all')
 
             # Create dataframe of best fit parameters and their standard deviations
             DF_Output.loc[files] = pd.Series({'PH_1635_BP':H2OmP1635_BP[0],'PH_1635_STD':H2OmP1635_STD[0],'H2Om_1635_MAX': MAX_1635_ABS, 'BL_H2Om_1635_MAX': BL_MAX_1635_ABS,
             'PH_1515_BP':CO2P_BP[5],'PH_1515_STD':CO2P_STD[5],'P_1515_BP':CO2P_BP[3],'P_1515_STD':CO2P_STD[3],'STD_1515_BP':CO2P_BP[4],'STD_1515_STD':CO2P_STD[4], 
+            'PH_1430_BP':CO2P_BP[2],'PH_1430_STD':CO2P_STD[2],'P_1430_BP':CO2P_BP[0],'P_1430_STD':CO2P_STD[0],'STD_1430_BP':CO2P_BP[1],'STD_1430_STD':CO2P_STD[1], 
             'MAX_1515_ABS': MAX_1515_ABS, 'BL_MAX_1515_ABS': BL_MAX_1515_ABS,
-            'PH_1430_BP':CO2P_BP[2],'PH_1430_STD':CO2P_STD[2],'P_1430_BP':CO2P_BP[0],'P_1430_STD':CO2P_STD[0],'STD_1430_BP':CO2P_BP[1],'STD_1430_STD':CO2P_STD[1],
             'MAX_1430_ABS': MAX_1430_ABS, 'BL_MAX_1430_ABS': BL_MAX_1430_ABS})
 
             PCA_Output.loc[files] = pd.Series({'AVG_BL_BP':PCA_BP[0],'AVG_BL_STD':PCA_STD[0],'PCA1_BP':PCA_BP[1],'PCA1_STD':PCA_STD[1],'PCA2_BP':PCA_BP[2],'PCA2_STD':PCA_STD[2], 
@@ -1167,14 +1158,8 @@ def Beer_Lambert(molar_mass, absorbance, sigma_absorbance, density, sigma_densit
 
     # https://sites.fas.harvard.edu/~scphys/nsta/error_propagation.pdf
 
-    # concentration_std = pd.DataFrame(columns = ['STD'])
-
     concentration = pd.Series()
-    concentration_std = pd.Series()
     concentration = (1e6 * molar_mass * absorbance) / (density * thickness * epsilon)
-
-    # sigma_concentration_mult = pd.Series()
-    # sigma_concentration_mult = np.sqrt((sigma_absorbance/absorbance)**2 + (sigma_density/density)**2 + (sigma_thickness/thickness)**2 + (sigma_epsilon/epsilon)**2)
 
     return concentration
 
@@ -1372,39 +1357,41 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition):
 
         elif Volatiles_DF['H2OT_3550_SAT?'][l] == '*':
             for m in range(20):
+                H2Om_1635_BP = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_1635_BP'][l], Volatiles_DF['PH_1635_STD'][l],
+                    density[l], density[l] * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_H2Om_1635'][l], epsilon['sigma_epsilon_H2Om_1635'][l])
                 OH_4500_M = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_4500_M'][l], Volatiles_DF['PH_4500_STD'][l],
                     density[l], density[l] * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_OH_4500'][l], epsilon['sigma_epsilon_OH_4500'][l])
-                MI_Composition['H2O'][l] = mega_spreadsheet['H2Om_1635_BP'][l] + OH_4500_M
+                MI_Composition['H2O'][l] = H2Om_1635_BP + OH_4500_M
                 mol_sat, density_sat = Density_Calculation(MI_Composition)
             density_sat = density_sat[l]
 
             H2OT_3550_M = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_3550_M'][l], Volatiles_DF['PH_3550_STD'][l],
-                density_df['Density'][l], density_df['Density'][l] * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_H2OT_3550'][l], epsilon['sigma_epsilon_H2OT_3550'][l])
+                density_sat, density_sat * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_H2OT_3550'][l], epsilon['sigma_epsilon_H2OT_3550'][l])
             H2Om_1635_BP = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_1635_BP'][l], Volatiles_DF['PH_1635_STD'][l],
-                density_df['Density'][l], density_df['Density'][l] * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_H2Om_1635'][l], epsilon['sigma_epsilon_H2Om_1635'][l])
+                density_sat, density_sat * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_H2Om_1635'][l], epsilon['sigma_epsilon_H2Om_1635'][l])
             CO2_1515_BP = Beer_Lambert(molar_mass['CO2'], Volatiles_DF['PH_1515_BP'][l], Volatiles_DF['PH_1515_STD'][l],
-                density_df['Density'][l], density_df['Density'][l] * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_CO2'][l], epsilon['sigma_epsilon_CO2'][l])
+                density_sat, density_sat * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_CO2'][l], epsilon['sigma_epsilon_CO2'][l])
             CO2_1430_BP = Beer_Lambert(molar_mass['CO2'], Volatiles_DF['PH_1430_BP'][l], Volatiles_DF['PH_1430_STD'][l],
-                density_df['Density'][l], density_df['Density'][l] * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_CO2'][l], epsilon['sigma_epsilon_CO2'][l])
+                density_sat, density_sat * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_CO2'][l], epsilon['sigma_epsilon_CO2'][l])
             H2Om_5200_M = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_5200_M'][l], Volatiles_DF['PH_5200_STD'][l],
-                density_df['Density'][l], density_df['Density'][l] * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_H2Om_5200'][l], epsilon['sigma_epsilon_H2Om_5200'][l])
+                density_sat, density_sat * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_H2Om_5200'][l], epsilon['sigma_epsilon_H2Om_5200'][l])
             OH_4500_M = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_4500_M'][l], Volatiles_DF['PH_4500_STD'][l],
-                density_df['Density'][l], density_df['Density'][l] * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_OH_4500'][l], epsilon['sigma_epsilon_OH_4500'][l])
+                density_sat, density_sat * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_OH_4500'][l], epsilon['sigma_epsilon_OH_4500'][l])
             CO2_1515_BP *= 10000
             CO2_1430_BP *= 10000
             
             H2OT_3550_M_STD = Beer_Lambert_Error(N, molar_mass['H2O'], Volatiles_DF['PH_3550_M'][l], Volatiles_DF['PH_3550_STD'][l],
-                density_df['Density'][l], density_df['Density'][l] * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_H2OT_3550'][l], epsilon['sigma_epsilon_H2OT_3550'][l])
+                density_sat, density_sat * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_H2OT_3550'][l], epsilon['sigma_epsilon_H2OT_3550'][l])
             H2Om_1635_BP_STD = Beer_Lambert_Error(N, molar_mass['H2O'], Volatiles_DF['PH_1635_BP'][l], Volatiles_DF['PH_1635_STD'][l],
-                density_df['Density'][l], density_df['Density'][l] * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_H2Om_1635'][l], epsilon['sigma_epsilon_H2Om_1635'][l])
+                density_sat, density_sat * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_H2Om_1635'][l], epsilon['sigma_epsilon_H2Om_1635'][l])
             CO2_1515_BP_STD = Beer_Lambert_Error(N, molar_mass['CO2'], Volatiles_DF['PH_1515_BP'][l], Volatiles_DF['PH_1515_STD'][l],
-                density_df['Density'][l], density_df['Density'][l] * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_CO2'][l], epsilon['sigma_epsilon_CO2'][l])
+                density_sat, density_sat * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_CO2'][l], epsilon['sigma_epsilon_CO2'][l])
             CO2_1430_BP_STD = Beer_Lambert_Error(N, molar_mass['CO2'], Volatiles_DF['PH_1430_BP'][l], Volatiles_DF['PH_1430_STD'][l],
-                density_df['Density'][l], density_df['Density'][l] * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_CO2'][l], epsilon['sigma_epsilon_CO2'][l])
+                density_sat, density_sat * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_CO2'][l], epsilon['sigma_epsilon_CO2'][l])
             H2Om_5200_M_STD = Beer_Lambert_Error(N, molar_mass['H2O'], Volatiles_DF['PH_5200_M'][l], Volatiles_DF['PH_5200_STD'][l],
-                density_df['Density'][l], density_df['Density'][l] * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_H2Om_5200'][l], epsilon['sigma_epsilon_H2Om_5200'][l])
+                density_sat, density_sat * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_H2Om_5200'][l], epsilon['sigma_epsilon_H2Om_5200'][l])
             OH_4500_M_STD = Beer_Lambert_Error(N, molar_mass['H2O'], Volatiles_DF['PH_4500_M'][l], Volatiles_DF['PH_4500_STD'][l],
-                density_df['Density'][l], density_df['Density'][l] * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_OH_4500'][l], epsilon['sigma_epsilon_OH_4500'][l])
+               density_sat, density_sat * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_OH_4500'][l], epsilon['sigma_epsilon_OH_4500'][l])
             CO2_1515_BP_STD *= 10000
             CO2_1430_BP_STD *= 10000
 
@@ -1421,7 +1408,7 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition):
     for m in mega_spreadsheet.index: 
         if mega_spreadsheet['H2OT_3550_SAT'][m] == '*': 
             H2O_mean = mega_spreadsheet['H2Om_1635_BP'][m] + mega_spreadsheet['OH_4500_M'][m]
-            H2O_std = mega_spreadsheet['H2Om_1635_BP'][m] + mega_spreadsheet['OH_4500_M'][m]
+            H2O_std = mega_spreadsheet['H2Om_1635_STD'][m] + mega_spreadsheet['OH_4500_STD'][m]
         elif mega_spreadsheet['H2OT_3550_SAT'][m] == '-': 
             H2O_mean = mega_spreadsheet['H2OT_3550_M'][m] 
             H2O_std = mega_spreadsheet['H2OT_3550_STD'][m] 
