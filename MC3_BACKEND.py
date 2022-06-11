@@ -1409,13 +1409,14 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition):
     for m in mega_spreadsheet.index: 
         if mega_spreadsheet['H2OT_3550_SAT'][m] == '*': 
             H2O_mean = mega_spreadsheet['H2Om_1635_BP'][m] + mega_spreadsheet['OH_4500_M'][m]
-            H2O_std = mega_spreadsheet['H2Om_1635_STD'][m] + mega_spreadsheet['OH_4500_STD'][m]
+            H2O_std = np.sqrt((mega_spreadsheet['H2Om_1635_STD'][m]**2) + (mega_spreadsheet['OH_4500_STD'][m]**2)) / 2
+
         elif mega_spreadsheet['H2OT_3550_SAT'][m] == '-': 
             H2O_mean = mega_spreadsheet['H2OT_3550_M'][m] 
             H2O_std = mega_spreadsheet['H2OT_3550_STD'][m] 
         mean_vol.loc[m] = pd.Series({'H2OT_MEAN': H2O_mean, 'H2OT_STD': H2O_std})
     mean_vol['CO2_MEAN'] = (mega_spreadsheet['CO2_1515_BP'] + mega_spreadsheet['CO2_1430_BP']) / 2
-    mean_vol['CO2_STD'] = (((mega_spreadsheet['CO2_1515_STD']**2) + (mega_spreadsheet['CO2_1430_STD']**2))**(0.5))/2
+    mean_vol['CO2_STD'] = np.sqrt((mega_spreadsheet['CO2_1515_STD']**2) + (mega_spreadsheet['CO2_1430_STD']**2)) / 2
 
     mega_spreadsheet_f['H2OT_MEAN'] = mean_vol['H2OT_MEAN']
     mega_spreadsheet_f['H2OT_STD'] = mean_vol['H2OT_STD']
