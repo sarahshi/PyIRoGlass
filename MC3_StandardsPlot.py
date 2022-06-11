@@ -271,3 +271,14 @@ ax[1].set_ylabel('CO2 Measured by FTIR (ppm)')
 plt.tight_layout()
 plt.savefig('FTIRSIMS_Comparison_H2O.pdf')
 plt.show()
+
+# %%
+
+fig, ax = plt.subplots(1, 1, figsize = (8, 8))
+
+CO2_ratio = CO2_stdmean / CO2_stdexpmean
+ax.scatter(H2O_stdmean, CO2_ratio, s = sz, lw = 0.5, c = 'k', zorder = 10)
+
+
+
+# %%
