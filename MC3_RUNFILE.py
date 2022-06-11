@@ -59,12 +59,12 @@ DFS_FILES, DFS_DICT = baselines.Load_SampleCSV(FILES, H2O_wn_high = 5500, H2O_wn
 # DF_OUTPUT, FAILURES = baselines.Run_All_Spectra(DFS_DICT, INPUT_PATHS[simsno])
 # DF_OUTPUT.to_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[simsno] + '_DF_F.csv')
 
-DF_OUTPUT = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[simsno] + '_DF_F.csv', index_col = 0)
+# DF_OUTPUT = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[simsno] + '_DF_F.csv', index_col = 0)
 
-N = 500000
-DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP)
-MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[simsno] + '_H2OCO2_F.csv')
-DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[simsno] + '_DensityEpsilon_F.csv')
+# N = 500000
+# DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP)
+# MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[simsno] + '_H2OCO2_F.csv')
+# DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[simsno] + '_DensityEpsilon_F.csv')
 
  # %% 
 
@@ -80,12 +80,12 @@ DFS_FILES, DFS_DICT = baselines.Load_SampleCSV(FILES, H2O_wn_high = 5500, H2O_wn
 # DF_OUTPUT, FAILURES = baselines.Run_All_Spectra(DFS_DICT, INPUT_PATHS[stdno])
 # DF_OUTPUT.to_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_DF_F.csv')
 
-DF_OUTPUT = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_DF_F.csv', index_col = 0)
+# DF_OUTPUT = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_DF_F.csv', index_col = 0)
 
-N = 500000
-DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP)
-MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_H2OCO2_F.csv')
-DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_DensityEpsilon_F.csv')
+# N = 500000
+# DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP)
+# MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_H2OCO2_F.csv')
+# DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_DensityEpsilon_F.csv')
 
 
 def STD_DF_MOD(MEGA_SPREADSHEET):
@@ -195,9 +195,9 @@ def STD_DF_MOD(MEGA_SPREADSHEET):
 
     return MEGA_SPREADSHEET_STD
 
-MEGA_SPREADSHEET_STD = STD_DF_MOD(MEGA_SPREADSHEET)
+# MEGA_SPREADSHEET_STD = STD_DF_MOD(MEGA_SPREADSHEET)
 
-MEGA_SPREADSHEET_STD.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_H2OCO2_FwSTD.csv')
+# MEGA_SPREADSHEET_STD.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_H2OCO2_FwSTD.csv')
 
 
 # %%
@@ -214,12 +214,12 @@ MICOMP, THICKNESS = baselines.Load_ChemistryThickness(CHEMTHICK_PATH[fuegono])
 # DF_OUTPUT, FAILURES = baselines.Run_All_Spectra(DFS_DICT, INPUT_PATHS[fuegono])
 # DF_OUTPUT.to_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[fuegono] + '_DF_F.csv')
 
-DF_OUTPUT = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[fuegono] + '_DF_F.csv', index_col = 0)
+# DF_OUTPUT = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[fuegono] + '_DF_F.csv', index_col = 0)
 
-N = 500000
-DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP)
-MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[fuegono] + '_H2OCO2_F.csv')
-DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[fuegono] + '_DensityEpsilon_F.csv')
+# N = 500000
+# DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP)
+# MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[fuegono] + '_H2OCO2_F.csv')
+# DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[fuegono] + '_DensityEpsilon_F.csv')
 
 # %%
 
@@ -235,12 +235,12 @@ MICOMP, THICKNESS = baselines.Load_ChemistryThickness(CHEMTHICK_PATH[fuegorhno])
 # DF_OUTPUT, FAILURES = baselines.Run_All_Spectra(DFS_DICT, INPUT_PATHS[fuegorhno])
 # DF_OUTPUT.to_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[fuegorhno] + '_DF_F.csv')
 
-DF_OUTPUT = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[fuegorhno] + '_DF_F.csv', index_col = 0)
+# DF_OUTPUT = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[fuegorhno] + '_DF_F.csv', index_col = 0)
 
-N = 500000
-DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP)
-MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[fuegorhno] + '_H2OCO2_F.csv')
-DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[fuegorhno] + '_DensityEpsilon_F.csv')
+# N = 500000
+# DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP)
+# MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[fuegorhno] + '_H2OCO2_F.csv')
+# DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[fuegorhno] + '_DensityEpsilon_F.csv')
 
 
 
