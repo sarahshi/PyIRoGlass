@@ -27,6 +27,10 @@ from matplotlib import rc, cm
 # variability are isolated in CSV. These baselines and PCA vectors are 
 # inputted into the Monte Carlo-Markov Chain and the best fits are found. 
 
+# Structure directory to be called BASELINES with subdirectory named Inputs. 
+# Inputs should contain a subdirectory named SampleSpectra. 
+# Inputs also needs the Baseline_AvgPCA.csv and Water_Peak_1635_All.csv files. 
+
 path_parent = os.path.dirname(os.getcwd())
 path_beg = path_parent + '/BASELINES/'
 path_input = path_parent + '/BASELINES/Inputs/'
@@ -36,13 +40,21 @@ for ii in range(len(output_dir)):
     if not os.path.exists(path_beg + output_dir[ii]):
        os.makedirs(path_beg + output_dir[ii], exist_ok=True)
 
-PATHS = [path_input+'SampleSpectra/Fuego/', path_input+'SampleSpectra/Standards/', path_input+'SampleSpectra/Fuego1974RH/', path_input+'SampleSpectra/SIMS/']
-CHEMTHICK_PATH = [path_input+'FuegoChemThick.csv', path_input+'StandardChemThick.csv', path_input+'DanRHChemThick.csv', path_input+'SIMSChemThick.csv']
+# Change paths to direct to folder with SampleSpectra -- last bit should be whatever your folder with spectra is called. 
+PATHS = [path_input+'SampleSpectra/Fuego/', path_input+'SampleSpectra/Standards/', path_input+'SampleSpectra/Fuego1974RH/', path_input+'SampleSpectra/SIMS/', path_input+'SampleSpectra/SIMSStd_2/']
+
+# Put ChemThick file in Inputs. Direct to what your ChemThick file is called. 
+CHEMTHICK_PATH = [path_input+'FuegoChemThick.csv', path_input+'StandardChemThick.csv', path_input+'DanRHChemThick.csv', path_input+'SIMSChemThick.csv', path_input+'SIMSChemThick_2.csv']
+
+# Change last value in list to be what you want your output directory to be called. 
 INPUT_PATHS = [[path_input+'Baseline_AvgPCA.csv', path_input+"Water_Peak_1635_All.csv", path_beg, 'FUEGO_F'],
                 [path_input+'Baseline_AvgPCA.csv', path_input+"Water_Peak_1635_All.csv", path_beg, 'STD_F'], 
                 [path_input+'Baseline_AvgPCA.csv', path_input+"Water_Peak_1635_All.csv", path_beg, 'FRH_F'],
-                [path_input+'Baseline_AvgPCA.csv', path_input+"Water_Peak_1635_All.csv", path_beg, 'SIMS_F']]
-OUTPUT_PATH = ['F18', 'STD', 'FRH', 'SIMSSTD']
+                [path_input+'Baseline_AvgPCA.csv', path_input+"Water_Peak_1635_All.csv", path_beg, 'SIMS_F'],
+                [path_input+'Baseline_AvgPCA.csv', path_input+"Water_Peak_1635_All.csv", path_beg, 'SIMS2_F']]
+
+# Change to be what you want the prefix of your output files to be. 
+OUTPUT_PATH = ['F18', 'STD', 'FRH', 'SIMSSTD', 'SIMSSTD2']
 
 
 # %% 
@@ -59,12 +71,34 @@ DFS_FILES, DFS_DICT = baselines.Load_SampleCSV(FILES, H2O_wn_high = 5500, H2O_wn
 # DF_OUTPUT, FAILURES = baselines.Run_All_Spectra(DFS_DICT, INPUT_PATHS[simsno])
 # DF_OUTPUT.to_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[simsno] + '_DF_F.csv')
 
-# DF_OUTPUT = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[simsno] + '_DF_F.csv', index_col = 0)
+DF_OUTPUT = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[simsno] + '_DF_F.csv', index_col = 0)
 
-# N = 500000
-# DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP)
-# MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[simsno] + '_H2OCO2_F.csv')
-# DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[simsno] + '_DensityEpsilon_F.csv')
+N = 500000
+DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP)
+MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[simsno] + '_H2OCO2_F.csv')
+DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[simsno] + '_DensityEpsilon_F.csv')
+
+# %% 
+
+simsno2 = 4
+
+PATH = PATHS[simsno2]
+FILES = glob.glob(PATH + "*")
+FILES.sort()
+
+MICOMP, THICKNESS = baselines.Load_ChemistryThickness(CHEMTHICK_PATH[simsno2])
+
+DFS_FILES, DFS_DICT = baselines.Load_SampleCSV(FILES, H2O_wn_high = 5500, H2O_wn_low = 1000)
+# DF_OUTPUT, FAILURES = baselines.Run_All_Spectra(DFS_DICT, INPUT_PATHS[simsno2])
+# DF_OUTPUT.to_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[simsno2] + '_DF_F.csv')
+
+DF_OUTPUT = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[simsno2] + '_DF_F.csv', index_col = 0)
+
+N = 500000
+DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP)
+MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[simsno2] + '_H2OCO2_F.csv')
+DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[simsno2] + '_DensityEpsilon_F.csv')
+MEGA_SPREADSHEET
 
  # %% 
 
@@ -80,13 +114,12 @@ DFS_FILES, DFS_DICT = baselines.Load_SampleCSV(FILES, H2O_wn_high = 5500, H2O_wn
 # DF_OUTPUT, FAILURES = baselines.Run_All_Spectra(DFS_DICT, INPUT_PATHS[stdno])
 # DF_OUTPUT.to_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_DF_F.csv')
 
-# DF_OUTPUT = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_DF_F.csv', index_col = 0)
+DF_OUTPUT = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_DF_F.csv', index_col = 0)
 
-# N = 500000
-# DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP)
-# MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_H2OCO2_F.csv')
-# DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_DensityEpsilon_F.csv')
-
+N = 500000
+DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP)
+MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_H2OCO2_F.csv')
+DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_DensityEpsilon_F.csv')
 
 def STD_DF_MOD(MEGA_SPREADSHEET):
     STD_VAL = pd.DataFrame(index = MEGA_SPREADSHEET.index, columns = ['H2O_EXP', 'H2O_EXP_STD', 'CO2_EXP', 'CO2_EXP_STD'])
@@ -210,16 +243,16 @@ fuegono = 0
 
 MICOMP, THICKNESS = baselines.Load_ChemistryThickness(CHEMTHICK_PATH[fuegono])
 
-# DFS_FILES, DFS_DICT = baselines.Load_SampleCSV(FILES, H2O_wn_high = 5500, H2O_wn_low = 1000)
+DFS_FILES, DFS_DICT = baselines.Load_SampleCSV(FILES, H2O_wn_high = 5500, H2O_wn_low = 1000)
 # DF_OUTPUT, FAILURES = baselines.Run_All_Spectra(DFS_DICT, INPUT_PATHS[fuegono])
 # DF_OUTPUT.to_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[fuegono] + '_DF_F.csv')
 
-# DF_OUTPUT = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[fuegono] + '_DF_F.csv', index_col = 0)
+DF_OUTPUT = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[fuegono] + '_DF_F.csv', index_col = 0)
 
-# N = 500000
-# DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP)
-# MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[fuegono] + '_H2OCO2_F.csv')
-# DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[fuegono] + '_DensityEpsilon_F.csv')
+N = 500000
+DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP)
+MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[fuegono] + '_H2OCO2_F.csv')
+DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[fuegono] + '_DensityEpsilon_F.csv')
 
 # %%
 
@@ -231,16 +264,16 @@ fuegorhno = 2
 
 MICOMP, THICKNESS = baselines.Load_ChemistryThickness(CHEMTHICK_PATH[fuegorhno])
 
-# DFS_FILES, DFS_DICT = baselines.Load_SampleCSV(FILES, H2O_wn_high = 5500, H2O_wn_low = 1000)
+DFS_FILES, DFS_DICT = baselines.Load_SampleCSV(FILES, H2O_wn_high = 5500, H2O_wn_low = 1000)
 # DF_OUTPUT, FAILURES = baselines.Run_All_Spectra(DFS_DICT, INPUT_PATHS[fuegorhno])
 # DF_OUTPUT.to_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[fuegorhno] + '_DF_F.csv')
 
-# DF_OUTPUT = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[fuegorhno] + '_DF_F.csv', index_col = 0)
+DF_OUTPUT = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[fuegorhno] + '_DF_F.csv', index_col = 0)
 
-# N = 500000
-# DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP)
-# MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[fuegorhno] + '_H2OCO2_F.csv')
-# DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[fuegorhno] + '_DensityEpsilon_F.csv')
+N = 500000
+DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP)
+MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[fuegorhno] + '_H2OCO2_F.csv')
+DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[fuegorhno] + '_DensityEpsilon_F.csv')
 
 
 

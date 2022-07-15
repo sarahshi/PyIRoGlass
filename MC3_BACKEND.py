@@ -1336,8 +1336,10 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition):
         density_df.loc[k] = pd.Series({'Density': density[k]})
         mega_spreadsheet.loc[k] = pd.Series({'H2OT_3550_M': H2OT_3550_M, 'H2OT_3550_STD': H2OT_3550_M_STD, 'H2OT_3550_SAT': Volatiles_DF['H2OT_3550_SAT?'][k], 
             'H2Om_1635_BP': H2Om_1635_BP, 'H2Om_1635_STD': H2Om_1635_BP_STD, 
-            'CO2_1515_BP': CO2_1515_BP, 'CO2_1515_STD': CO2_1515_BP_STD, 'CO2_1430_BP': CO2_1430_BP, 'CO2_1430_STD': CO2_1430_BP_STD, 
-            'H2Om_5200_M': H2Om_5200_M, 'H2Om_5200_STD': H2Om_5200_M_STD, 'OH_4500_M': OH_4500_M, 'OH_4500_STD': OH_4500_M_STD})
+            'CO2_1515_BP': CO2_1515_BP, 'CO2_1515_STD': CO2_1515_BP_STD, 
+            'CO2_1430_BP': CO2_1430_BP, 'CO2_1430_STD': CO2_1430_BP_STD, 
+            'H2Om_5200_M': H2Om_5200_M, 'H2Om_5200_STD': H2Om_5200_M_STD, 
+            'OH_4500_M': OH_4500_M, 'OH_4500_STD': OH_4500_M_STD})
 
     for l in Volatiles_DF.index: 
         if Volatiles_DF['H2OT_3550_SAT?'][l] == '-': 
@@ -1351,7 +1353,7 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition):
             H2OT_3550_M_STD = mega_spreadsheet['H2OT_3550_STD'][l]
             H2Om_1635_BP_STD = mega_spreadsheet['H2Om_1635_STD'][l]
             CO2_1515_BP_STD = mega_spreadsheet['CO2_1515_STD'][l]
-            CO2_1515_BP_STD = mega_spreadsheet['CO2_1430_STD'][l]
+            CO2_1430_BP_STD = mega_spreadsheet['CO2_1430_STD'][l]
             H2Om_5200_M_STD = mega_spreadsheet['H2Om_5200_STD'][l]
             OH_4500_M_STD = mega_spreadsheet['OH_4500_STD'][l]
             density_sat = density_df['Density'][l]
