@@ -95,9 +95,9 @@ DFS_FILES, DFS_DICT = baselines.Load_SampleCSV(FILES, H2O_wn_high = 5500, H2O_wn
 DF_OUTPUT = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[simsno2] + '_DF_F.csv', index_col = 0)
 
 N = 500000
-DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP)
-MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[simsno2] + '_H2OCO2_F.csv')
-DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[simsno2] + '_DensityEpsilon_F.csv')
+DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP, sigma_thickness = 3)
+# MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[simsno2] + '_H2OCO2_F.csv')
+# DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[simsno2] + '_DensityEpsilon_F.csv')
 MEGA_SPREADSHEET
 
  # %% 

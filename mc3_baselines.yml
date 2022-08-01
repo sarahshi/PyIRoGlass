@@ -20,5 +20,6 @@ dependencies:
         - mc3
         - pykrige
         - uncertainties
+        - peakdetect
     - scikit-learn
     - pathlib

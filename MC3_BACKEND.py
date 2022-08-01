@@ -1225,7 +1225,7 @@ def Density_Calculation(MI_Composition):
 # %% 
 
 
-def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition):
+def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, sigma_thickness = 3):
 
     """The Concentration_Output function inputs a dictionary with the peak heights for the total H2O peak (3550 cm^-1), molecular H2O peak (1635 cm^-1), 
     and carbonate peaks (1515 and 1430 cm^-1), number of samples for the Monte Carlo, thickness information, and MI composition, and 
@@ -1257,7 +1257,7 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition):
     covm_est_3550, covm_est_1635, covm_est_CO2 = np.diag([38.4640, 77.8597]), np.diag([20.8503, 39.3875]), np.diag([103.7645, 379.9891])
     mest_4500, mest_5200 = np.array([-1.632730, 3.532522]), np.array([-2.291420, 4.675528])
     covm_est_4500, covm_est_5200 = np.diag([0.0329, 0.0708]), np.diag([0.0129, 0.0276])
-    sigma_thickness = 3
+    sigma_thickness = sigma_thickness
 
     G_SiAl, G_NaCa = np.ones((2, 1)),  np.ones((2, 1))
     covz_error_SiAl, covz_error_NaCa = np.zeros((2, 2)), np.zeros((2, 2))
