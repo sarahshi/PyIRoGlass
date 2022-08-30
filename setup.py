@@ -5,29 +5,44 @@
 
 from filecmp import dircmp
 from setuptools import setup, find_packages
-from os import path
-
-from MC3_BASELINES import __version__
+import os, codecs
+# from MC3_BASELINES import __version__
 
 # %% 
 
 
-dir = path.abspath(path.dirname(__file__))
+dir = os.path.abspath(os.path.dirname(__file__))
 
-with open(path.join(dir, 'README.md'), encoding='utf-8') as description:
+with open(os.path.join(dir, 'README.md'), encoding='utf-8') as description:
     ext_description = description.read()
+
+
+def read(rel_path):
+    here = os.path.abspath(os.path.dirname(__file__))
+    with codecs.open(os.path.join(here, rel_path), 'r') as fp:
+        return fp.read()
+
+def get_version(rel_path):
+    for line in read(rel_path).splitlines():
+        if line.startswith('__version__'):
+            delim = '"' if '"' in line else "'"
+            return line.split(delim)[1]
+    else:
+        raise RuntimeError("Unable to find version string.")
+
 
 setup(
     name='MC3_BASELINES',
-    version=__version__,
+    version=get_version('MC3_BASELINES/__init__.py'),
     author='Sarah Shi and Henry Towbin',
-    description='MC3_BASELINES',
-    long_description = ext_description,
-
-    url='https://github.com/sarahshi/BASELINES',
     author_email='sarah.c.shi@gmail.com',
 
-    packages=find_packages(),
+    description='MC3_BASELINES',
+    long_description = ext_description,
+    long_description_content_type="text/markdown",
+    url='https://github.com/sarahshi/BASELINES',
+
+    packages=find_packages(where='src'),
 
     install_requires=[
             'numpy',
@@ -35,13 +50,14 @@ setup(
             'scipy',
             'matplotlib',
             'scikit-learn',
-            'mc3',
             'pykrige',
+            'mc3',
             'peakdetect',
             ],
 
     classifiers=[
         "Programming Language :: Python :: 3",
     ],
+    
     python_requires='>=3.6',
 )
