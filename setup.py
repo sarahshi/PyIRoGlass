@@ -6,7 +6,6 @@
 from filecmp import dircmp
 from setuptools import setup, find_packages
 import os, codecs
-# from MC3_BASELINES import __version__
 
 # %% 
 
