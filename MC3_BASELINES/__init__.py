@@ -33,7 +33,7 @@ themes = {
     'green':{'edgecolor':'forestgreen','facecolor':'limegreen','color':'darkgreen'},
     'orange':{'edgecolor':'darkorange','facecolor':'gold','color':'darkgoldenrod'},}
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 # %%
 
