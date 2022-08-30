@@ -7,7 +7,7 @@ from filecmp import dircmp
 from setuptools import setup, find_packages
 from os import path
 
-from MC3_BACKEND import __version__
+from MC3_BASELINES import __version__
 
 # %% 
 
