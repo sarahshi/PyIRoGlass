@@ -1,3 +1,5 @@
 .DS_Store
 MC3_BASELINES.egg-info/
 dist/
+OldRegressions/
+PEAKFIT_FINAL/Old/
