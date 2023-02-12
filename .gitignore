@@ -3,3 +3,5 @@ MC3_BASELINES.egg-info/
 dist/
 OldRegressions/
 PEAKFIT_FINAL/Old/
+__pycache__
+ThicknessFunction_Old.py
