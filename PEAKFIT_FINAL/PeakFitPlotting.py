@@ -8,7 +8,7 @@ import sys
 import time
 import glob
 import warnings 
-import MC$\mathregular{{^3}}$
+import mc3
 import numpy as np
 import pandas as pd
 
@@ -36,6 +36,7 @@ plt.rcParams["axes.labelsize"] = 20 # Axes labels
 
 BaselinePCA = pd.read_csv('./InputData/Baseline_Avg+PCA.csv')
 H2OPCA = pd.read_csv('./InputData/Water_Peak_1635_All.csv')
+H2OPCA_Plot = pd.read_csv('./InputData/Water_Peak_1635_Plotting.csv')
 
 sz = 150
 fig, ax = plt.subplots(1, 1, figsize = (8, 8))
@@ -73,6 +74,7 @@ plt.tight_layout()
 
 BaselinePCA = pd.read_csv('./InputData/Baseline_Avg+PCA.csv')
 H2OPCA = pd.read_csv('./InputData/Water_Peak_1635_All.csv')
+H2OPCA_Plot = pd.read_csv('./InputData/Water_Peak_1635_Plotting.csv')
 
 sz = 150
 fig, ax = plt.subplots(1, 1, figsize = (8, 8))
@@ -100,25 +102,26 @@ plt.tight_layout()
 
 BaselinePCA = pd.read_csv('./InputData/Baseline_Avg+PCA.csv')
 H2OPCA = pd.read_csv('./InputData/Water_Peak_1635_All.csv')
+H2OPCA_Plot = pd.read_csv('./InputData/Water_Peak_1635_Plotting.csv')
 
 sz = 150
 fig, ax = plt.subplots(2, 2, figsize = (14, 14))
 ax = ax.flatten()
-ax[0].plot(BaselinePCA.Wavenumber, BaselinePCA.Average_Baseline, c = '#171008', lw = 2, label = 'Baseline')
-ax[0].plot(BaselinePCA.Wavenumber[0::10], BaselinePCA.Average_Baseline[0::10] + BaselinePCA.PCA_1[0::10], c = '#0C7BDC', marker = '+', markersize = 7.5, linestyle = 'None', label = 'Baseline + PC1', zorder = 20)
-ax[0].plot(BaselinePCA.Wavenumber, BaselinePCA.Average_Baseline - BaselinePCA.PCA_1, c = '#0C7BDC', lw = 2, ls = '--', label = 'Baseline \N{MINUS SIGN} PC1',)
+ax[0].plot(BaselinePCA.Wavenumber, BaselinePCA.Average_Baseline, c = '#171008', lw = 2, label = '$\mathregular{\overline{Baseline}}$')
+ax[0].plot(BaselinePCA.Wavenumber[0::n1], BaselinePCA.Average_Baseline[0::n1] + BaselinePCA.PCA_1[0::n1], c = '#0C7BDC', marker = '+', markersize = 7.5, linestyle = 'None', label = '$\mathregular{\overline{Baseline}}$ + PC1', zorder = 20)
+ax[0].plot(BaselinePCA.Wavenumber, BaselinePCA.Average_Baseline - BaselinePCA.PCA_1, c = '#0C7BDC', lw = 2, ls = '--', label = '$\mathregular{\overline{Baseline}}$ \N{MINUS SIGN} PC1',)
 
-ax[1].plot(BaselinePCA.Wavenumber, BaselinePCA.Average_Baseline, c = '#171008', lw = 2, label = 'Baseline')
-ax[1].plot(BaselinePCA.Wavenumber[0::10], BaselinePCA.Average_Baseline[0::10] + BaselinePCA.PCA_2[0::10], c = '#E42211', marker = '+', markersize = 7.5, linestyle = 'None', label = 'Baseline + PC2', zorder = 15)
-ax[1].plot(BaselinePCA.Wavenumber, BaselinePCA.Average_Baseline - BaselinePCA.PCA_2, c = '#E42211', lw = 2, ls = '--', label = 'Baseline \N{MINUS SIGN} PC2',)
+ax[1].plot(BaselinePCA.Wavenumber, BaselinePCA.Average_Baseline, c = '#171008', lw = 2, label = '$\mathregular{\overline{Baseline}}$')
+ax[1].plot(BaselinePCA.Wavenumber[0::n1], BaselinePCA.Average_Baseline[0::n1] + BaselinePCA.PCA_2[0::n1], c = '#E42211', marker = '+', markersize = 7.5, linestyle = 'None', label = '$\mathregular{\overline{Baseline}}$ + PC2', zorder = 15)
+ax[1].plot(BaselinePCA.Wavenumber, BaselinePCA.Average_Baseline - BaselinePCA.PCA_2, c = '#E42211', lw = 2, ls = '--', label = '$\mathregular{\overline{Baseline}}$ \N{MINUS SIGN} PC2',)
 
-ax[2].plot(BaselinePCA.Wavenumber, BaselinePCA.Average_Baseline, c = '#171008', lw = 2, label = 'Baseline')
-ax[2].plot(BaselinePCA.Wavenumber[0::10], BaselinePCA.Average_Baseline[0::10] + BaselinePCA.PCA_3[0::10], c = '#5DB147', marker = '+', markersize = 7.5, linestyle = 'None', label = 'Baseline + PC3', zorder = 10)
-ax[2].plot(BaselinePCA.Wavenumber, BaselinePCA.Average_Baseline - BaselinePCA.PCA_3, c = '#5DB147', lw = 2, ls = '--', label = 'Baseline \N{MINUS SIGN} PC3',)
+ax[2].plot(BaselinePCA.Wavenumber, BaselinePCA.Average_Baseline, c = '#171008', lw = 2, label = '$\mathregular{\overline{Baseline}}$')
+ax[2].plot(BaselinePCA.Wavenumber[0::n1], BaselinePCA.Average_Baseline[0::n1] + BaselinePCA.PCA_3[0::n1], c = '#5DB147', marker = '+', markersize = 7.5, linestyle = 'None', label = '$\mathregular{\overline{Baseline}}$ + PC3', zorder = 10)
+ax[2].plot(BaselinePCA.Wavenumber, BaselinePCA.Average_Baseline - BaselinePCA.PCA_3, c = '#5DB147', lw = 2, ls = '--', label = '$\mathregular{\overline{Baseline}}$ \N{MINUS SIGN} PC3',)
 
-ax[3].plot(BaselinePCA.Wavenumber, BaselinePCA.Average_Baseline, c = '#171008', lw = 2, label = 'Baseline')
-ax[3].plot(BaselinePCA.Wavenumber[0::10], BaselinePCA.Average_Baseline[0::10] + BaselinePCA.PCA_4[0::10], c = '#F9C300', marker = '+', markersize = 7.5, linestyle = 'None', label = 'Baseline + PC4', zorder = 5)
-ax[3].plot(BaselinePCA.Wavenumber, BaselinePCA.Average_Baseline - BaselinePCA.PCA_4, c = '#F9C300', lw = 2, ls = '--', label = 'Baseline \N{MINUS SIGN} PC4',)
+ax[3].plot(BaselinePCA.Wavenumber, BaselinePCA.Average_Baseline, c = '#171008', lw = 2, label = '$\mathregular{\overline{Baseline}}$')
+ax[3].plot(BaselinePCA.Wavenumber[0::n1], BaselinePCA.Average_Baseline[0::n1] + BaselinePCA.PCA_4[0::n1], c = '#F9C300', marker = '+', markersize = 7.5, linestyle = 'None', label = '$\mathregular{\overline{Baseline}}$ + PC4', zorder = 5)
+ax[3].plot(BaselinePCA.Wavenumber, BaselinePCA.Average_Baseline - BaselinePCA.PCA_4, c = '#F9C300', lw = 2, ls = '--', label = '$\mathregular{\overline{Baseline}}$ \N{MINUS SIGN} PC4',)
 
 ax[0].set_xlim([1125, 2475])
 ax[1].set_xlim([1125, 2475])
@@ -150,13 +153,18 @@ ax[1].legend(loc = 'upper left', labelspacing = 0.4, handletextpad = 0.5, handle
 ax[2].legend(loc = 'upper left', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 14}, frameon=False)
 ax[3].legend(loc = 'upper left', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 14}, frameon=False)
 
-ax[2].set_xlabel('Wavenumber ($\mathregular{cm^{-1}}$)')
-ax[3].set_xlabel('Wavenumber ($\mathregular{cm^{-1}}$)')
-ax[0].set_ylabel('Absorbance')
-ax[2].set_ylabel('Absorbance')
+ax[0].set_title('A.', fontweight='bold')
+ax[1].set_title('B.', fontweight='bold')
+ax[2].set_title('C.', fontweight='bold')
+ax[3].set_title('D.', fontweight='bold')
+
+ax[2].set_xlabel('Wavenumber ($\mathregular{cm^{-1}}$)', fontweight='bold')
+ax[3].set_xlabel('Wavenumber ($\mathregular{cm^{-1}}$)', fontweight='bold')
+ax[0].set_ylabel('Absorbance', fontweight='bold')
+ax[2].set_ylabel('Absorbance', fontweight='bold')
 
 plt.tight_layout()
-# plt.savefig('BL+PCVectors_Subplot.pdf')
+plt.savefig('BL+PCVectors_Subplot.pdf')
 
 
 # %%
@@ -180,32 +188,31 @@ plt.tight_layout()
 
 # %%
 
+H2OPCA_Plot = pd.read_csv('./InputData/Water_Peak_1635_Plotting.csv')
 
 fig, ax = plt.subplots(1, 2, figsize = (14, 7))
 ax = ax.flatten()
-ax[0].plot(H2OPCA.Wavenumber, H2OPCA.Average_1630_Peak, c = '#171008', lw = 2, label = '$\mathregular{H_2O_{m, 1635}}$')
-ax[0].plot(H2OPCA.Wavenumber[H2OPCA.Wavenumber < 1570][0::10], H2OPCA.Average_1630_Peak[H2OPCA.Wavenumber < 1570][0::10] + H2OPCA['1630_Peak_PCA_1'][H2OPCA.Wavenumber < 1570][0::10], c = '#0C7BDC', marker = '+', markersize = 7.5,  linestyle = 'None', label = '$\mathregular{H_2O_{m, 1635}}$ + PC1', zorder = 20)
-ax[0].plot(H2OPCA.Wavenumber[H2OPCA.Wavenumber > 1700][0::10], H2OPCA.Average_1630_Peak[H2OPCA.Wavenumber > 1700][0::10] + H2OPCA['1630_Peak_PCA_1'][H2OPCA.Wavenumber > 1700][0::10], c = '#0C7BDC', marker = '+', markersize = 7.5,  linestyle = 'None', zorder = 20)
-ax[0].plot(H2OPCA.Wavenumber[(H2OPCA.Wavenumber > 1525) & (H2OPCA.Wavenumber < 1705)][0::1], H2OPCA.Average_1630_Peak[(H2OPCA.Wavenumber > 1525) & (H2OPCA.Wavenumber < 1705)][0::1] + H2OPCA['1630_Peak_PCA_1'][(H2OPCA.Wavenumber > 1525) & (H2OPCA.Wavenumber < 1705)][0::1], c = '#0C7BDC', marker = '+', markersize = 7.5,  linestyle = 'None', zorder = 20)
-ax[0].plot(H2OPCA.Wavenumber, H2OPCA.Average_1630_Peak - H2OPCA['1630_Peak_PCA_1'], c = '#0C7BDC', lw = 2, ls = '--', zorder = 20, label = '$\mathregular{H_2O_{m, 1635}}$ \N{MINUS SIGN} PC1')
+ax[0].plot(H2OPCA.Wavenumber, H2OPCA.Average_1630_Peak, c = '#171008', lw = 2, label = '$\mathregular{\overline{H_2O_{m, 1635}}}$')
+ax[0].plot(H2OPCA_Plot.Wavenumber, H2OPCA_Plot.Average_1630_Peak + H2OPCA_Plot['1630_Peak_PCA_1'], c = '#0C7BDC', marker = '+', markersize = 7.5,  linestyle = 'None', label = '$\mathregular{\overline{H_2O_{m, 1635}}}$ + PC1', zorder = 20)
+ax[0].plot(H2OPCA.Wavenumber, H2OPCA.Average_1630_Peak - H2OPCA['1630_Peak_PCA_1'], c = '#0C7BDC',  lw = 1.5, ls='--', label = '$\mathregular{\overline{H_2O_{m, 1635}}}$ + PC1', zorder = 20)
 
-ax[1].plot(H2OPCA.Wavenumber, H2OPCA.Average_1630_Peak, c = '#171008', lw = 2, label = '$\mathregular{H_2O_{m, 1635}}$')
-ax[1].plot(H2OPCA.Wavenumber[H2OPCA.Wavenumber < 1570][0::10], H2OPCA.Average_1630_Peak[H2OPCA.Wavenumber < 1570][0::10] + H2OPCA['1630_Peak_PCA_2'][H2OPCA.Wavenumber < 1570][0::10], c = '#E42211', marker = '+', markersize = 7.5,  linestyle = 'None', label = '$\mathregular{H_2O_{m, 1635}}$ + PC2', zorder = 20)
-ax[1].plot(H2OPCA.Wavenumber[H2OPCA.Wavenumber > 1700][0::10], H2OPCA.Average_1630_Peak[H2OPCA.Wavenumber > 1700][0::10] + H2OPCA['1630_Peak_PCA_2'][H2OPCA.Wavenumber > 1700][0::10], c = '#E42211', marker = '+', markersize = 7.5,  linestyle = 'None', zorder = 20)
-ax[1].plot(H2OPCA.Wavenumber[(H2OPCA.Wavenumber > 1525) & (H2OPCA.Wavenumber < 1705)][0::1], H2OPCA.Average_1630_Peak[(H2OPCA.Wavenumber > 1525) & (H2OPCA.Wavenumber < 1705)][0::1] + H2OPCA['1630_Peak_PCA_2'][(H2OPCA.Wavenumber > 1525) & (H2OPCA.Wavenumber < 1705)][0::1], c = '#E42211', marker = '+', markersize = 7.5,  linestyle = 'None', zorder = 20)
-ax[1].plot(H2OPCA.Wavenumber, H2OPCA.Average_1630_Peak - H2OPCA['1630_Peak_PCA_2'], c = '#E42211', lw = 2, ls = '--', zorder = 10, label = '$\mathregular{H_2O_{m, 1635}}$ \N{MINUS SIGN} PC1')
-
+ax[1].plot(H2OPCA.Wavenumber, H2OPCA.Average_1630_Peak, c = '#171008', lw = 2, label = '$\mathregular{\overline{H_2O_{m, 1635}}}$')
+ax[1].plot(H2OPCA_Plot.Wavenumber, H2OPCA_Plot.Average_1630_Peak + H2OPCA_Plot['1630_Peak_PCA_2'], c = '#E42211', marker = '+', markersize = 7.5,  linestyle = 'None', label = '$\mathregular{\overline{H_2O_{m, 1635}}}$ + PC2', zorder = 20)
+ax[1].plot(H2OPCA.Wavenumber, H2OPCA.Average_1630_Peak - H2OPCA['1630_Peak_PCA_2'], c = '#E42211',  lw = 1.5, ls='--', label = '$\mathregular{\overline{H_2O_{m, 1635}}}$ + PC2', zorder = 20)
 ax[0].legend(loc = 'upper left', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 14}, frameon=False)
 ax[1].legend(loc = 'upper left', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 14}, frameon=False)
 
 ax[0].set_xlim([1125, 2475])
 ax[1].set_xlim([1125, 2475])
-ax[0].set_ylim([-0.4, 1.2])
-ax[1].set_ylim([-0.4, 1.2])
+ax[0].set_ylim([-0.15, 1.15])
+ax[1].set_ylim([-0.15, 1.15])
 
 ax[0].set_xlabel('Wavenumber ($\mathregular{cm^{-1}}$)')
 ax[1].set_xlabel('Wavenumber ($\mathregular{cm^{-1}}$)')
 ax[0].set_ylabel('Absorbance')
+ax[0].set_title('A.', fontweight='bold')
+ax[1].set_title('B.', fontweight='bold')
+
 ax[0].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[1].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[0].tick_params(axis="y", direction='in', length=5, pad = 6.5)
@@ -213,7 +220,65 @@ ax[1].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 ax[0].invert_xaxis()
 ax[1].invert_xaxis()
 plt.tight_layout()
-# plt.savefig('H2Om1635+PCVectors_Subplot.pdf')
+plt.savefig('H2Om1635+PCVectors_Subplot.pdf')
+
+# %% 
+
+
+H2OPCA_Plot = pd.read_csv('./InputData/Water_Peak_1635_Plotting.csv')
+
+fig, ax = plt.subplots(2, 2, figsize = (14, 14))
+ax = ax.flatten()
+ax[0].plot(H2OPCA.Wavenumber, H2OPCA.Average_1630_Peak, c = '#171008', lw = 2, label = '$\mathregular{\overline{H_2O_{m, 1635}}}$')
+ax[0].plot(H2OPCA_Plot.Wavenumber, H2OPCA_Plot.Average_1630_Peak + H2OPCA_Plot['1630_Peak_PCA_1'], c = '#0C7BDC', marker = '+', markersize = 7.5,  linestyle = 'None', label = '$\mathregular{\overline{H_2O_{m, 1635}}}$ + PC1', zorder = 20)
+
+ax[2].plot(H2OPCA.Wavenumber, H2OPCA.Average_1630_Peak, c = '#171008', lw = 2, label = '$\mathregular{\overline{H_2O_{m, 1635}}}$')
+ax[2].plot(H2OPCA.Wavenumber, H2OPCA.Average_1630_Peak - H2OPCA['1630_Peak_PCA_1'], c = '#0C7BDC',  lw = 2.0, ls='--', label = '$\mathregular{\overline{H_2O_{m, 1635}}}$ - PC1', zorder = 20)
+
+ax[1].plot(H2OPCA.Wavenumber, H2OPCA.Average_1630_Peak, c = '#171008', lw = 2, label = '$\mathregular{\overline{H_2O_{m, 1635}}}$')
+ax[1].plot(H2OPCA_Plot.Wavenumber, H2OPCA_Plot.Average_1630_Peak + H2OPCA_Plot['1630_Peak_PCA_2'], c = '#E42211', marker = '+', markersize = 7.5,  linestyle = 'None', label = '$\mathregular{\overline{H_2O_{m, 1635}}}$ + PC2', zorder = 20)
+
+ax[3].plot(H2OPCA.Wavenumber, H2OPCA.Average_1630_Peak, c = '#171008', lw = 2, label = '$\mathregular{\overline{H_2O_{m, 1635}}}$')
+ax[3].plot(H2OPCA.Wavenumber, H2OPCA.Average_1630_Peak - H2OPCA['1630_Peak_PCA_2'], c = '#E42211',  lw = 2.0, ls='--', label = '$\mathregular{\overline{H_2O_{m, 1635}}}$ - PC2', zorder = 20)
+
+
+ax[0].legend(loc = 'upper left', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 14}, frameon=False)
+ax[1].legend(loc = 'upper left', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 14}, frameon=False)
+ax[2].legend(loc = 'upper left', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 14}, frameon=False)
+ax[3].legend(loc = 'upper left', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 14}, frameon=False)
+
+ax[0].set_xlim([1125, 2475])
+ax[1].set_xlim([1125, 2475])
+ax[2].set_xlim([1125, 2475])
+ax[3].set_xlim([1125, 2475])
+ax[0].set_ylim([-0.15, 1.15])
+ax[1].set_ylim([-0.15, 1.15])
+ax[2].set_ylim([-0.15, 1.15])
+ax[3].set_ylim([-0.15, 1.15])
+
+ax[2].set_xlabel('Wavenumber ($\mathregular{cm^{-1}}$)')
+ax[3].set_xlabel('Wavenumber ($\mathregular{cm^{-1}}$)')
+ax[0].set_ylabel('Absorbance')
+ax[2].set_ylabel('Absorbance')
+ax[0].set_title('A.', fontweight='bold')
+ax[1].set_title('B.', fontweight='bold')
+ax[2].set_title('C.', fontweight='bold')
+ax[3].set_title('D.', fontweight='bold')
+
+ax[0].tick_params(axis="x", direction='in', length=5, pad = 6.5)
+ax[1].tick_params(axis="x", direction='in', length=5, pad = 6.5)
+ax[2].tick_params(axis="x", direction='in', length=5, pad = 6.5)
+ax[3].tick_params(axis="x", direction='in', length=5, pad = 6.5)
+ax[0].tick_params(axis="y", direction='in', length=5, pad = 6.5)
+ax[1].tick_params(axis="y", direction='in', length=5, pad = 6.5)
+ax[2].tick_params(axis="y", direction='in', length=5, pad = 6.5)
+ax[3].tick_params(axis="y", direction='in', length=5, pad = 6.5)
+ax[0].invert_xaxis()
+ax[1].invert_xaxis()
+ax[2].invert_xaxis()
+ax[3].invert_xaxis()
+plt.tight_layout()
+plt.savefig('H2Om1635+PCVectors_Subplot+.pdf')
 
 
 # %%

@@ -20,6 +20,7 @@ plt.rcParams['pdf.fonttype'] = 42
 
 # %% 
 
+
 def Load_SampleCSV(paths, wn_high, wn_low): 
 
     """The Load_SampleCSV function takes the inputs of the path to a directory with all sample CSVs, wavenumber high, wavenumber low values. The function outputs a dictionary of each sample's associated wavenumbers and absorbances."""
@@ -48,7 +49,7 @@ def PeakID(ref_spec, wn_high, wn_low, peak_heigh_min_delta, peak_search_width, s
     """Identifies peaks based on the peakdetect package which identifies local maxima and minima in noisy signals.
     Based on: https://github.com/avhn/peakdetect"""
 
-    spec = ref_spec[wn_low:wn_high] # dataframe indexed by wavenumber
+    spec = ref_spec[wn_low:wn_high].copy() # dataframe indexed by wavenumber
     spec_filt = pd.DataFrame(columns = ['Wavenumber', 'Absorbance']) 
     baseline = 0
 
@@ -63,6 +64,7 @@ def PeakID(ref_spec, wn_high, wn_low, peak_heigh_min_delta, peak_search_width, s
 
     spec_filt['Absorbance'] = spec_filter
     spec_filt.index = spec.index
+    spec['Subtracted'] = spec['Absorbance'] - baseline
 
     pandt = peakdetect(spec_filt.Absorbance, spec_filt.index, lookahead = peak_search_width, delta = peak_heigh_min_delta)
     peaks = np.array(pandt[0])
@@ -70,7 +72,7 @@ def PeakID(ref_spec, wn_high, wn_low, peak_heigh_min_delta, peak_search_width, s
 
     if plotting == True: 
         fig, ax = plt.subplots(1, 1, figsize = (8, 6))
-        ax.plot(spec.index, spec.Absorbance-baseline, linewidth = 1)
+        ax.plot(spec.index, spec['Subtracted'], linewidth = 1)
         ax.plot(spec_filt.index, spec_filt.Absorbance)
         ax.plot(peaks[:,0], peaks[:,1], 'ro')
         ax.plot(troughs[:,0], troughs[:,1], 'ko')
@@ -78,6 +80,11 @@ def PeakID(ref_spec, wn_high, wn_low, peak_heigh_min_delta, peak_search_width, s
         ax.set_xlabel('Wavenumber')
         ax.set_ylabel('Absorbance')
         ax.invert_xaxis()
+
+    # spec.to_csv(filename + '_spec.csv')
+    # spec_filt.to_csv(filename + '_specfilt.csv')
+    # pd.DataFrame(peaks).to_csv(filename + '_peaks.csv')
+    # pd.DataFrame(troughs).to_csv(filename + '_troughs.csv')
 
     return peaks, troughs
 
@@ -153,7 +160,7 @@ def ReflectanceIndex(XFo):
 
 
 path_parent = os.path.dirname(os.getcwd())
-path_input = os.getcwd() + '/Inputs'
+path_input = path_parent + '/Inputs'
 
 # Change paths to direct to folder with SampleSpectra -- last bit should be whatever your folder with spectra is called. 
 PATH = path_input + '/ReflectanceSpectra/FuegoOl/'
@@ -184,8 +191,6 @@ Fuego1
 
 micro = pd.read_csv('FuegoOlMicrometer.csv')
 
-# %% 
-
 range = [0, 90]
 
 sz = 150
@@ -208,7 +213,7 @@ plt.savefig('OlThicknessTest.pdf')
 # %% 
 
 path_parent = os.path.dirname(os.getcwd())
-path_input = os.getcwd() + '/Inputs'
+path_input = path_parent + '/Inputs'
 
 # Change paths to direct to folder with SampleSpectra -- last bit should be whatever your folder with spectra is called. 
 PATH = path_input + '/ReflectanceSpectra/rf_ND70/'
@@ -233,16 +238,16 @@ HighThickDF
 
 # %% 
 
-HighThickDF.to_csv('ND70_Thickness_HighQuality_test.csv')
+HighThickDF.to_csv('ND70_Thickness_HighQuality.csv')
 
 # %%
 
 
 path_parent = os.path.dirname(os.getcwd())
-path_input = os.getcwd() + '/Inputs'
+path_input = path_parent + '/Inputs'
 
 # Change paths to direct to folder with SampleSpectra -- last bit should be whatever your folder with spectra is called. 
-PATH = path_input + '/ReflectanceSpectra/rf_ND70_lowq/'
+PATH = path_input + '/ReflectanceSpectra/rf_ND70/'
 FILES = glob.glob(PATH + "*")
 FILES.sort()
 

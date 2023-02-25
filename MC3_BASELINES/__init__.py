@@ -5,34 +5,29 @@
 
 import os
 import copy
-import warnings
-
-import mc3
 import numpy as np
 import pandas as pd
-
-import scipy.signal as signal
-import scipy.interpolate as interpolate
-from scipy.linalg import solveh_banded
-
-from pykrige import OrdinaryKriging
+import mc3
+import warnings
 
 import matplotlib as mpl
 if os.environ.get('DISPLAY','') == '':
     mpl.use('Agg')
 from matplotlib import pyplot as plt
-import scipy.interpolate as si
 import mc3.utils as mu
 import mc3.stats as ms
 
+from pykrige import OrdinaryKriging
+import scipy.signal as signal
+from scipy.linalg import solveh_banded
+import scipy.interpolate as interpolate
+
 __all__ = ['trace', 'histogram', 'pairwise', 'rms', 'modelfit', 'subplotter', 'themes',]
-themes = {
-    'blue':{'edgecolor':'navy','facecolor':'royalblue','color':'navy'},
+themes = {'blue':{'edgecolor':'navy','facecolor':'royalblue','color':'navy'},
     'red': {'edgecolor':'crimson','facecolor':'orangered','color':'darkred'},
     'black':{'edgecolor':'0.3','facecolor':'0.3','color':'black'},
     'green':{'edgecolor':'forestgreen','facecolor':'limegreen','color':'darkgreen'},
     'orange':{'edgecolor':'darkorange','facecolor':'gold','color':'darkgoldenrod'},}
-
 __version__ = "0.1.1"
 
 # %%
@@ -40,12 +35,23 @@ __version__ = "0.1.1"
 
 def Load_SampleCSV(paths, wn_high, wn_low): 
 
-    """The Load_SampleCSV function takes the inputs of the path to a directory with all sample CSVs, 
-    wavenumber high, wavenumber low values. The function outputs a dictionary of each sample's associated 
-    wavenumbers and absorbances."""
+    """
+    The Load_SampleCSV function takes the inputs of the path to a directory with all sample CSVs, 
+    wavenumber high, and wavenumber low values. 
 
-    CO2_dfs = []
-    H2O_dfs = []
+    Parameters:
+        paths (list): A list of file paths to CSV files containing spectral data.
+        wn_high (float): The highest wavenumber to include in the output dictionary.
+        wn_low (float): The lowest wavenumber to include in the output dictionary.
+
+    Returns:
+        A tuple of two items:
+        - A list of file names for each sample in the directory.
+        - A dictionary where each key is a file name, and the corresponding value is a pandas dataframe containing
+        wavenumbers and absorbances for the given sample.
+    """
+
+    dfs = []
     files = []
 
     for path in paths:
@@ -54,20 +60,29 @@ def Load_SampleCSV(paths, wn_high, wn_low):
 
         df = pd.read_csv(path, names= ['Wavenumber', 'Absorbance'])
         df.set_index('Wavenumber', inplace = True)
-        H2O_spec = df.loc[wn_low:wn_high]
-        H2O_dfs.append(H2O_spec)
+        spectrum = df.loc[wn_low:wn_high]
+        dfs.append(spectrum)
         files.append(file)
 
-    H2O_zipobj = zip(files, H2O_dfs)
-    H2O_dfs_dict = dict(H2O_zipobj)
+    zipobj = zip(files, dfs)
+    dfs_dict = dict(zipobj)
 
-    return files, H2O_dfs_dict
+    return files, dfs_dict
+
+
+
 
 
 def Load_PCA(PCA_Path):
 
     """The Load_PCA function takes the input of a path to a CSV of predetermined PCA components. 
-    The function returns a dataframe with the PCA components."""
+
+    Parameters:
+        PCA_Path (str): The path to a CSV file containing PCA components.
+
+    Returns:
+        A numpy matrix containing the PCA components.
+    """
 
     wn_high = 2200
     wn_low = 1275
@@ -79,10 +94,20 @@ def Load_PCA(PCA_Path):
     return PCA_matrix
 
 
+
+
+
 def Load_Wavenumber(Wavenumber_Path):
 
-    """The Load_PCA function takes the input of a path to a CSV of the wavenumbers associated with PCA components. 
-    The function returns a dataframe with the wavenumbers."""
+    """
+    Loads the wavenumbers associated with PCA components from a CSV file.
+
+    Parameters:
+        Wavenumber_Path (str): Path to a CSV file containing wavenumbers.
+
+    Returns:
+        numpy.ndarray: An array of wavenumbers.
+    """
 
     wn_high = 2200
     wn_low = 1275
@@ -94,47 +119,108 @@ def Load_Wavenumber(Wavenumber_Path):
     return Wavenumber
 
 
+
+
+
 def Load_ChemistryThickness(ChemistryThickness_Path):
 
-    """The Load_ChemistryThickness function takes the input of a path to a CSV with MI chemistry or thickness. 
-    The function returns dataframes with these data."""
+    """
+    The Load_ChemistryThickness function takes the input of a path to a CSV with MI chemistry or thickness. 
+    The function returns dataframes with these data.
+
+    Parameters:
+        ChemistryThickness_Path (str): The path to a CSV file containing the chemistry and thickness data.
+    
+    Returns:
+        A tuple of two pandas dataframes:
+        - The first dataframe contains the MI chemistry data for each sample.
+        - The second dataframe contains the thickness and standard deviation data for each sample.
+    """
 
     ChemistryThickness = pd.read_csv(ChemistryThickness_Path)
     ChemistryThickness.set_index('Sample', inplace = True)
 
     Chemistry = ChemistryThickness.loc[:, ['SiO2', 'TiO2', 'Al2O3', 'Fe2O3', 'FeO', 'MnO', 'MgO', 'CaO', 'Na2O', 'K2O', 'P2O5']]
-    Thickness = ChemistryThickness.loc[:, ['Thickness']]
+    Thickness = ChemistryThickness.loc[:, ['Thickness', 'Sigma_Thickness']]
+
 
     return Chemistry, Thickness
 
+
+
+
+
 def Gauss(x, mu, sd, A=1):
 
-    """The Gauss function takes the inputs of the wavenumbers of interest, center of peak, 
-    standard deviation (or width of peak), and amplitude. The function outputs a Gaussian fit 
-    for the CO3^{2-} doublet peaks at 1515 and 1430 cm^-1 peaks."""
+    """Return a Gaussian fit for the CO3^{2-} doublet peaks at 1515 and 1430 cm^-1 peaks.
+
+    Args:
+        x (numeric): The wavenumbers of interest.
+        mu (numeric): The center of the peak.
+        sd (numeric): The standard deviation (or width of peak).
+        A (numeric, optional): The amplitude. Defaults to 1.
+
+    Returns:
+        numpy.ndarray: The Gaussian fit.
+    """
 
     G = A * np.exp(-(x - mu) ** 2 / (2 * sd ** 2))
 
     return G
 
 
+
+
+
 def Linear(x, m, b):
 
-    """The Linear function takes the inputs of wavenumbers of interest, tilt, and offset for 
-    adjusting the model data. The function returns a linear offset taking the form of y = mx+b."""
+    """
+    
+    Calculate a linear offset for adjusting model data. 
+    
+    Parameters:
+    x (numpy.ndarray): Input values.
+    m (float): Tilt of the linear offset.
+    b (float): Offset of the linear offset.
 
-    b = np.ones_like(x) * b
-    m = np.arange(0, max(x.shape)) * m 
-    tilt_offset = m + b 
+    Returns:
+    numpy.ndarray: Linear offset.
+    
+    """
+
+    tilt_offset = m * np.arange(0, x.size) + b
 
     return tilt_offset
 
 
+
 def Carbonate(P, x, PCAmatrix, Peak_1635_PCAmatrix, Nvectors = 5): 
 
-    """The Carbonate function takes in the inputs of fitting parameters P, wavenumbers x, PCA matrix, 
+    """
+    
+    The Carbonate function takes in the inputs of fitting parameters P, wavenumbers x, PCA matrix, 
     number of PCA vectors of interest. The function calculates the molecular H2O_{1635} peak, 
-    CO3^{2-} Gaussian peaks, linear offset, and baseline. The function then returns the model data."""
+    CO3^{2-} Gaussian peaks, linear offset, and baseline. The function then returns the model data.
+
+    Args:
+    ----
+    P : array_like
+        Fitting parameters including PCA and peak weights, Gaussian parameters, 
+        linear offset slope and intercept.
+    x : array_like
+        Wavenumbers of interest.
+    PCAmatrix : array_like
+        PCA matrix.
+    Peak_1635_PCAmatrix : array_like
+        PCA matrix for the 1635 peak.
+    Nvectors : int, optional
+        Number of PCA vectors of interest. Default is 5.
+
+    Returns:
+    -------
+    model_data : ndarray
+        Model data for the carbonate spectra.
+    """
 
     PCA_Weights = np.array([P[0:Nvectors]])
     Peak_Weights = np.array([P[-5:-2]])
@@ -155,14 +241,25 @@ def Carbonate(P, x, PCAmatrix, Peak_1635_PCAmatrix, Nvectors = 5):
     return model_data
 
 
-def als_baseline(intensities,
-    asymmetry_param=0.05, smoothness_param=5e5,
-    max_iters=10, conv_thresh=1e-5, verbose=False):
+
+
+
+def als_baseline(intensities, asymmetry_param=0.05, smoothness_param=5e5, max_iters=10, conv_thresh=1e-5, verbose=False):
+
     """ Computes the asymmetric least squares baseline.
     http://www.science.uva.nl/~hboelens/publications/draftpub/Eilers_2005.pdf
-    Smoothness_param: Relative importance of smoothness of the predicted response.
-    Asymmetry_param (p): if y > z, w = p, otherwise w = 1-p.
-    Setting p=1 is effectively a hinge loss. """
+    
+    Args:
+        intensities (array-like): The input signal to baseline.
+        asymmetry_param (float): The asymmetry parameter (p) that controls the weights. Defaults to 0.05.
+        smoothness_param (float): The smoothness parameter (s) that controls the smoothness of the baseline. Defaults to 5e5.
+        max_iters (int): The maximum number of iterations to run. Defaults to 10.
+        conv_thresh (float): The convergence threshold. The iteration stops when the change in the weights is less than this value. Defaults to 1e-5.
+        verbose (bool): If True, prints the iteration number and convergence at each iteration. Defaults to False.
+
+    Returns:
+        array-like: The baseline of the input signal.
+    """
 
     smoother = WhittakerSmoother(intensities, smoothness_param, deriv_order=2)
     # Rename p to be concise.
@@ -188,6 +285,26 @@ def als_baseline(intensities,
 
 
 class WhittakerSmoother(object):
+
+    """
+    Implements the Whittaker smoother for smoothing a signal.
+
+    Parameters
+    ----------
+    signal : array-like of shape (n_samples,)
+        The input signal to be smoothed.
+    smoothness_param : float
+        Relative importance of smoothness of the predicted response.
+    deriv_order : int, default=1
+        The order of the derivative of the identity matrix used in the smoothing.
+
+    Attributes
+    ----------
+    y : array-like of shape (n_samples,)
+        The input signal to be smoothed.
+    upper_bands : array-like of shape (2 * deriv_order + 1, n_samples)
+        The upper triangular bands of the matrix used for smoothing.
+    """
 
     def __init__(self, signal, smoothness_param, deriv_order=1):
 
@@ -219,6 +336,10 @@ class WhittakerSmoother(object):
         return solveh_banded(foo, w * self.y, overwrite_ab=True, overwrite_b=True)
 
 
+
+
+
+
 def NearIR_Process(data, wn_low, wn_high, peak): 
 
     """The NearIR_Process function inputs the dictionary data, the Near-IR H2O (5200 peak) or OH (4500 peak) wavenumbers of interest, 
@@ -229,7 +350,22 @@ def NearIR_Process(data, wn_low, wn_high, peak):
     peak absorbance. The baseline-subtracted peak is then kriged, to further reduce noise and to obtain peak height. 
     The signal to noise ratio is then determined and if the ratio is high, a warning is outputted and the 
     user can consider the usefulness of these peaks. This function is used three times with slightly different 
-    H2O wavenumber ranges, so that uncertainty can be assessed."""
+    H2O wavenumber ranges, so that uncertainty can be assessed.
+    
+    Args:
+        data (pd.DataFrame): A dataframe of absorbance data.
+        wn_low (int): The Near-IR H2O or OH wavenumber of interest lower bound.
+        wn_high (int): The Near-IR H2O or OH wavenumber of interest upper bound.
+        peak (str): The H2O or OH peak of interest.
+
+    Returns:
+        A tuple containing:
+        - data_output (pd.DataFrame): A dataframe of the absorbance data in the region of interest, median filtered data, 
+          baseline subtracted absorbance, and the subtracted peak.
+        - krige_output (pd.DataFrame): A dataframe of the kriged data output, including the absorbance and standard deviation.
+        - PH_krige (float): The peak height obtained after kriging.
+        - STN (float): The signal to noise ratio.
+    """
 
     data_H2O = data[wn_low:wn_high]
     data_output = pd.DataFrame(columns = ['Absorbance', 'Absorbance_Hat', 'BL_NIR_H2O', 'Subtracted_Peak'], index = data_H2O.index)
@@ -237,30 +373,26 @@ def NearIR_Process(data, wn_low, wn_high, peak):
     data_output['Absorbance_Hat'] = signal.medfilt(data_H2O['Absorbance'], 5)
     data_output['BL_NIR_H2O'] = als_baseline(data_output['Absorbance_Hat'], asymmetry_param=0.001, smoothness_param=1e9, max_iters=10, conv_thresh=1e-5)
     data_output['Subtracted_Peak'] = data_output['Absorbance_Hat'] - data_output['BL_NIR_H2O']
-    
+
+
     krige_wn_range = np.linspace(wn_low-5, wn_high+5, wn_high-wn_low+11)
     krige_peak = OrdinaryKriging(data_H2O.index, np.zeros(data_output['Subtracted_Peak'].shape), data_output['Subtracted_Peak'], variogram_model = 'gaussian')
     krige_abs, krige_std = krige_peak.execute("grid", krige_wn_range, np.array([0.0]))
-    krige_output = pd.DataFrame(columns = ['Absorbance', 'STD'], index = krige_wn_range)
-    krige_output['Absorbance'] = np.asarray(np.squeeze(krige_abs))
-    krige_output['STD'] = np.asarray(np.squeeze(krige_std))
+    krige_output = pd.DataFrame({'Absorbance': krige_abs.squeeze(), 'STD': krige_std.squeeze()}, index=krige_wn_range)
 
     if peak == 'OH': # 4500 peak
-        PR_4500_low, PR_4500_high = 4400, 4600
-        PH_max = np.max(data_output['Subtracted_Peak'][PR_4500_low:PR_4500_high])
-        PH = np.max(data_output['Subtracted_Peak'][PR_4500_low:PR_4500_high])
-        PH_krige = np.max(krige_output['Absorbance'][PR_4500_low:PR_4500_high]) - np.min(krige_output['Absorbance'])
-        PH_krige_index = int(data_output['Subtracted_Peak'][data_output['Subtracted_Peak'] == PH_max].index.to_numpy())
-        PH_std = np.std(data_output['Subtracted_Peak'][PH_krige_index-50:PH_krige_index+50])
-        STN = PH_krige / PH_std
+        pr_low, pr_high = 4400, 4600
+        # STN = PH_krige / PH_std
     elif peak == 'H2O': # 5200 peak
-        PR_5200_low, PR_5200_high = 5100, 5300
-        PH_max = np.max(data_output['Subtracted_Peak'][PR_5200_low:PR_5200_high])
-        PH = np.max(data_output['Subtracted_Peak'][PR_5200_low:PR_5200_high])
-        PH_krige = np.max(krige_output['Absorbance'][PR_5200_low:PR_5200_high]) - np.min(krige_output['Absorbance'])
-        PH_krige_index = int(data_output['Subtracted_Peak'][data_output['Subtracted_Peak'] == PH_max].index.to_numpy())
-        PH_std = np.std(data_output['Subtracted_Peak'][PH_krige_index-50:PH_krige_index+50])
-        STN = PH_krige / PH_std
+        pr_low, pr_high = 5100, 5300
+    else:
+        raise ValueError(f'Invalid peak type: {peak}')
+
+    PH_max = data_output['Subtracted_Peak'][pr_low:pr_high].max()
+    PH_krige = krige_output['Absorbance'][pr_low:pr_high].max() - krige_output['Absorbance'][pr_low:pr_high].min()
+    PH_krige_index = data_output['Subtracted_Peak'][data_output['Subtracted_Peak'] == PH_max].index[0]
+    PH_std = data_output['Subtracted_Peak'][PH_krige_index - 50:PH_krige_index + 50].std()
+    STN = PH_krige / PH_std
 
     return data_output, krige_output, PH_krige, STN
 
@@ -286,118 +418,6 @@ def MidIR_Process(data, wn_low, wn_high):
     return data_output, plot_output, PH_3550, plotindex
 
 
-# %% Reflectance FTIR - Interference Fringe Processing for Thicknesses
-
-
-def PeakID(ref_spec, wn_high, wn_low, smoothing_wn_width = None, remove_baseline = False, 
-    peak_heigh_min_delta = 0.008, peak_search_width = 50, plotting = False, filename = None):
-    
-    """Identifies peaks based on the peakdetect package which identifies local 
-    maxima and minima in noisy signals.
-    Based on: https://github.com/avhn/peakdetect"""
-
-    spec = ref_spec[wn_low:wn_high] # dataframe indexed by wavenumber
-    spec_filt = pd.DataFrame(columns = ['Wavenumber', 'Absorbance']) 
-    baseline = 0
- 
-    spec_filter = signal.medfilt(spec.Absorbance, 3)
-    
-    if remove_baseline == True:
-        baseline = signal.savgol_filter(spec_filter, 450, 3)
-        spec_filter = spec_filter - baseline
-
-    if smoothing_wn_width is not None:
-        spec_filter = signal.savgol_filter(spec_filter, smoothing_wn_width, 3)
-
-
-    spec_filt['Absorbance'] = spec_filter
-    spec_filt.index = spec.index
-
-    pandt = peakdetect(spec_filt.Absorbance, spec_filt.index, lookahead=peak_search_width, delta = peak_heigh_min_delta)
-    peaks = np.array(pandt[0])
-    troughs = np.array(pandt[1])
-
-    if plotting == True: 
-        fig, ax = plt.subplots(1, 1, figsize = (8, 6))
-        ax.plot(spec.index, spec.Absorbance- baseline, linewidth = 1)
-        ax.plot(spec_filt.index, spec_filt.Absorbance)
-        ax.plot(peaks[:,0], peaks[:,1], 'ro')
-        ax.plot(troughs[:,0], troughs[:,1], 'ko')
-        ax.set_title(filename)
-        ax.set_xlabel('Wavenumber')
-        ax.set_ylabel('Absorbance')
-        ax.invert_xaxis()
-
-    return peaks, troughs
-
-
-def ThicknessCalc(n, positions):
-
-    """Calculates thicknesses of glass wafers based on the refractive index of the 
-    glass and the positions of the peaks or troughs in the FTIR spectrum."""
-
-    return 1/(2 * n * np.abs(np.diff(positions)))
-
-
-def ThicknessProcessing(dfs_dict, n, wn_high, wn_low, smoothing_wn_width = None, 
-peak_heigh_min_delta = 0.008, peak_search_width = 50, remove_baseline = False, plotting=False):
-
-    """Calculates thickness of glass wafers based on the refractive index of the glass and the positions 
-    of the peaks or troughs in the FTIR spectrum. Thicknesses for each interference fringe, starting at 
-    both the peaks and troughs of the fringes are determined. These thicknesses are then averaged over the 
-    interval of interest."""
-
-    ThickDF = pd.DataFrame(columns=['Peak_Thicknesses', 'Peak_Thickness_M', 'Peak_Thickness_STD', 
-                                    'Trough_Thicknesses', 'Trough_Thickness_M', 'Trough_Thickness_STD', 
-                                    'Thickness_M', 'Thickness_STD'])
-    failures = []
-
-    for filename, data in dfs_dict.items(): 
-        try:
-            peaks, troughs = PeakID(data, wn_high, wn_low,  filename=filename, plotting=plotting, 
-                smoothing_wn_width = smoothing_wn_width, remove_baseline = remove_baseline, 
-                peak_heigh_min_delta = peak_heigh_min_delta, peak_search_width = peak_search_width)
-            
-            t_peaks = (ThicknessCalc(n, peaks[:,0]) * 1e4).round(2)
-            mean_t_peaks = np.mean(t_peaks).round(2)
-            std_t_peaks = np.std(t_peaks).round(2)
-
-            t_troughs = (ThicknessCalc(n, troughs[:,0]) * 1e4).round(2)
-            mean_t_troughs = np.mean(t_troughs).round(2)
-            std_t_troughs = np.std(t_troughs).round(2)
-
-            mean_t = np.mean(np.concatenate([t_peaks, t_troughs])).round(2)
-            std_t = np.std(np.concatenate([t_peaks, t_troughs])).round(2)
-
-            ThickDF.loc[f"{filename}"] = pd.Series({'Peak_Thicknesses': t_peaks, 'Peak_Thickness_M': mean_t_peaks, 'Peak_Thickness_STD': std_t_peaks, 
-            'Trough_Thicknesses': t_troughs, 'Trough_Thickness_M': mean_t_troughs, 'Trough_Thickness_STD': std_t_troughs, 
-            'Thickness_M': mean_t, 'Thickness_STD': std_t})
-            
-    
-        except Exception as e:
-            print(f"Error: {e}")
-            print(e)
-            failures.append(filename)
-            ThickDF.loc[filename] = pd.Series({'V1':np.nan,'V2':np.nan,'Thickness':np.nan})
-
-    return ThickDF
-
-
-def ReflectanceIndex(XFo):
-    
-    """Calculates reflectance index for given forsterite composition. 
-    Values based on those from Deer, Howie, and Zussman, 3rd Edition.
-    Input forsterite in mole fraction."""
-
-    n_alpha = 1.827 - 0.192*XFo
-    n_beta = 1.869 - 0.218*XFo
-    n_gamma = 1.879 - 0.209*XFo
-    n = (n_alpha+n_beta+n_gamma) / 3
-
-    return n
-
-
-
 # %% 
 
 
@@ -406,35 +426,28 @@ def ReflectanceIndex(XFo):
 
 def trace(posterior, title, zchain=None, pnames=None, thinning=25,
     burnin=0, fignum=1000, savefile=None, fmt=".", ms=2.5, fs=11):
+    
     """
+
     Plot parameter trace MCMC sampling.
-    Parameters
-    ----------
-    posterior: 2D float ndarray
-        An MCMC posterior sampling with dimension: [nsamples, npars].
-    zchain: 1D integer ndarray
-        the chain index for each posterior sample.
-    pnames: Iterable (strings)
-        Label names for parameters.
-    thinning: Integer
-        Thinning factor for plotting (plot every thinning-th value).
-    burnin: Integer
-        Thinned burn-in number of iteration (only used when zchain is not None).
-    fignum: Integer
-        The figure number.
-    savefile: Boolean
-        If not None, name of file to save the plot.
-    fmt: String
-        The format string for the line and marker.
-    ms: Float
-        Marker size.
-    fs: Float
-        Fontsize of texts.
-    Returns
-    -------
-    axes: 1D list of matplotlib.axes.Axes
-        List of axes containing the marginal posterior distributions.
+
+    Parameters: 
+    posterior (2D ndarray): MCMC posterior sampling with dimension: [nsamples, npars].
+    zchain (1D ndarray): Chain index for each posterior sample.
+    pnames (strings): Label names for parameters.
+    thinning (int): Thinning factor for plotting (plot every thinning-th value).
+    burnin (int): Thinned burn-in number of iteration (only used when zchain is not None).
+    fignum (int): The figure number.
+    savefile (boolean): Name of file to save the plot if not none
+    fmt (string): The format string for the line and marker.
+    ms (float): Marker size.
+    fs (float): Fontsize of texts.
+    
+    Returns: 
+    axes (1D list of matplotlib.axes.Axes): List of axes containing the marginal posterior distributions.
+    
     """
+    
     # Get indices for samples considered in final analysis:
     if zchain is not None:
         nchains = np.amax(zchain) + 1
@@ -515,6 +528,7 @@ def histogram(posterior, title, pnames=None, thinning=1, fignum=1100,
     savefile=None, bestp=None, quantile=None, pdf=None,
     xpdf=None, ranges=None, axes=None, lw=2.0, fs=11,
     theme='blue', yscale=False, orientation='vertical'):
+    
     """
     Plot parameter marginal posterior distributions
     Parameters
@@ -562,6 +576,7 @@ def histogram(posterior, title, pnames=None, thinning=1, fignum=1100,
     axes: 1D list of matplotlib.axes.Axes
         List of axes containing the marginal posterior distributions.
     """
+
     if isinstance(theme, str):
         theme = themes[theme]
 
@@ -649,7 +664,7 @@ def histogram(posterior, title, pnames=None, thinning=1, fignum=1100,
             vals = np.r_[0, vals, 0]
             bins = np.r_[bins[0] - (bins[1]-bins[0]), bins]
             # Interpolate xpdf into the histogram:
-            f = si.interp1d(bins+0.5*(bins[1]-bins[0]), vals, kind='nearest')
+            f = interpolate.interp1d(bins+0.5*(bins[1]-bins[0]), vals, kind='nearest')
             # Plot the HPD region as shaded areas:
             if ranges[ipar] is not None:
                 xran = np.argwhere((Xpdf>ranges[ipar][0]) & (Xpdf<ranges[ipar][1]))
@@ -685,48 +700,36 @@ def histogram(posterior, title, pnames=None, thinning=1, fignum=1100,
 def pairwise(posterior, title, pnames=None, thinning=25, fignum=1200,
     savefile=None, bestp=None, nbins=25, nlevels=20,
     absolute_dens=False, ranges=None, fs=11, rect=None, margin=0.01):
+    
     """
     Plot parameter pairwise posterior distributions.
-    Parameters
-    ----------
-    posterior: 2D ndarray
-        An MCMC posterior sampling with dimension: [nsamples, nparameters].
-    pnames: Iterable (strings)
-        Label names for parameters.
-    thinning: Integer
-        Thinning factor for plotting (plot every thinning-th value).
-    fignum: Integer
-        The figure number.
-    savefile: Boolean
-        If not None, name of file to save the plot.
-    bestp: 1D float ndarray
-        If not None, plot the best-fitting values for each parameter given by bestp.
-    nbins: Integer
-        The number of grid bins for the 2D histograms.
-    nlevels: Integer
-        The number of contour color levels.
-    ranges: List of 2-element arrays
-        List with custom (lower,upper) x-ranges for each parameter.
+    
+    Parameters: 
+    posterior (2D ndarray): An MCMC posterior sampling with dimension: [nsamples, nparameters].
+    pnames (strings): Label names for parameters.
+    thinning (int): Thinning factor for plotting (plot every thinning-th value).
+    fignum (int): The figure number.
+    savefile (boolean): Name of file to save the plot, if not none
+    bestp (1D ndarray): Plot the best-fitting values for each parameter given by bestp, if not none
+    nbins (int): Number of grid bins for the 2D histograms.
+    nlevels (int): Number of contour color levels.
+    ranges (2D ndarray): List with custom (lower,upper) x-ranges for each parameter.
         Leave None for default, e.g., ranges=[(1.0,2.0), None, (0, 1000)].
-    fs: Float
-        Fontsize of texts.
-    rect: 1D list/ndarray
-        If not None, plot the pairwise plots in current figure, within the
-        ranges defined by rect (xleft, ybottom, xright, ytop).
-    margin: Float
-        Margins between panels (when rect is not None).
-    Returns
-    -------
-    axes: 2D ndarray of matplotlib.axes.Axes
-        Array of axes containing the marginal posterior distributions.
-    cb: matplotlib.axes.Axes
-        The colorbar axes.
-    Notes
-    -----
+    fs (float): Fontsize of texts.
+    rect (1D ndarray): Plot pairwise plots in current figure, if not None
+    margin (float):  Margins between panels (when rect is not None).
+
+    Returns:
+    axes (2D ndarray): Array of axes containing the marginal posterior distributions.
+    cb (matplotlib.axes.Axes): The colorbar axes.
+    
+    Notes:
     rect delimits the boundaries of the panels. The labels and
     ticklabels will appear outside rect, so the user needs to leave
     some wiggle room for them.
+    
     """
+
     # Get number of parameters and length of chain:
     nsamples, npars = np.shape(posterior)
 
@@ -835,35 +838,31 @@ def pairwise(posterior, title, pnames=None, thinning=25, fignum=1200,
         plt.savefig(savefile, dpi = 50)
     return axes, cb
 
+
 def modelfit(data, uncert, indparams, model, title, nbins=75,
     fignum=1400, savefile=None, fmt="."):
+    
     """
+    
     Plot the binned dataset with given uncertainties and model curves
     as a function of indparams.
     In a lower panel, plot the residuals bewteen the data and model.
-    Parameters
-    ----------
-    data: 1D float ndarray
-        Input data set.
-    uncert: 1D float ndarray
-        One-sigma uncertainties of the data points.
-    indparams: 1D float ndarray
-        Independent variable (X axis) of the data points.
-    model: 1D float ndarray
-        Model of data.
-    nbins: Integer
-        Number of bins in the output plot.
-    fignum: Integer
-        The figure number.
-    savefile: Boolean
-        If not None, name of file to save the plot.
-    fmt: String
-        Format of the plotted markers.
-    Returns
-    -------
-    ax: matplotlib.axes.Axes
-        Axes instance containing the marginal posterior distributions.
+    
+    Parameters: 
+    data (1D ndarray): Input data set.
+    uncert (1D ndarray): One-sigma uncertainties of the data points.
+    indparams (1D ndarray): Independent variable (X axis) of the data points.
+    model (1D ndarray): Model of data.
+    nbins (int): Number of bins in the output plot.
+    fignum (int): Figure number.
+    savefile (boolean): Name of file to save the plot, if not none. 
+    fmt (string): Format of the plotted markers.
+
+    Returns: 
+    ax (matplotlib.axes.Axes): Axes instance containing the marginal posterior distributions.
+
     """
+
     # Bin down array:
     binsize = int((np.size(data)-1)/nbins + 1)
     binindp  = ms.bin_array(indparams, binsize)
@@ -900,29 +899,25 @@ def modelfit(data, uncert, indparams, model, title, nbins=75,
         plt.savefig(savefile, backend='pgf')
     return ax, rax
 
+
 def subplotter(rect, margin, ipan, nx, ny=None, ymargin=None):
+    
     """
     Create an axis instance for one panel (with index ipan) of a grid
     of npanels, where the grid located inside rect (xleft, ybottom,
     xright, ytop).
-    Parameters
-    ----------
-    rect: 1D List/ndarray
-        Rectangle with xlo, ylo, xhi, yhi positions of the grid boundaries.
-    margin: Float
-        Width of margin between panels.
-    ipan: Integer
-        Index of panel to create (as in plt.subplots).
-    nx: Integer
-        Number of panels along the x axis.
-    ny: Integer
-        Number of panels along the y axis. If None, assume ny=nx.
-    ymargin: Float
-        Width of margin between panels along y axes (if None, adopt margin).
-    Returns
-    -------
-    axes: Matplotlib.axes.Axes
-        An Axes instance at the specified position.
+    
+    Parameters: 
+    rect (1D ndarray): Rectangle with xlo, ylo, xhi, yhi positions of the grid boundaries.
+    margin (float): Width of margin between panels.
+    ipan (int): Index of panel to create (as in plt.subplots).
+    nx (int): Number of panels along the x axis.
+    ny (int): Number of panels along the y axis. If None, assume ny=nx.
+    ymargin (float): Width of margin between panels along y axes (if None, adopt margin).
+    
+    Returns: 
+    ax (matplotlib.axes.Axes): Axes instance at the specified position.
+    
     """
     if ny is None:
         ny = nx
@@ -969,7 +964,7 @@ def MCMC(data, uncert, indparams, log, savefile):
     mc3_output = mc3.sample(data, uncert, func=func, params=params, indparams=indparams, 
         pmin=pmin, pmax=pmax, priorlow=priorlow, priorup=priorup, 
         pnames=pnames, texnames=texnames, sampler='snooker', rms=False,
-        nsamples=1e6, nchains=9, ncpu=3, burnin=5000, thinning=1, # 1e6, 5000
+        nsamples=5e5, nchains=9, ncpu=3, burnin=5000, thinning=1, # 1e6, 5000
         leastsq='trf', chisqscale=False, grtest=True, grbreak=1.01, grnmin=0.5,
         hsize=10, kickoff='normal', wlike=False, plots=False, log=log, savefile=savefile)
 
@@ -984,6 +979,16 @@ def Run_All_Spectra(dfs_dict, paths):
     for all of the samples to be batched and run through the function. The function exports the best fit and standard deviations 
     of peak locations, peak widths, and peak heights, as well as the PCA vectors used to fit the spectra. These values are 
     exported in a csv file and figures are created for each individual sample."""
+
+    import numpy as np
+    import pandas as pd 
+    from matplotlib import pyplot as plt
+    import scipy.interpolate as interpolate
+    from scipy.linalg import solveh_banded
+
+    import os 
+    import time
+    import warnings
 
     path_parent = os.path.dirname(os.getcwd())
 
@@ -1290,25 +1295,19 @@ def Beer_Lambert_Error(N, molar_mass, absorbance, sigma_absorbance, density, sig
     return concentration_std
 
 
-def Density_Calculation(MI_Composition):
+def Density_Calculation(MI_Composition, T_room, P_room):
 
     """The Density_Calculation function inputs the MI composition file and outputs the glass density at room temperature and pressure. 
     The mole fraction is calculated. The total molar volume xivibari is determined from sum of the mole fractions of each oxide * partial molar volume 
     at room temperature and pressure of analysis. The gram formula weight gfw is then determined by summing the mole fractions*molar masses. 
     The density is finally determined by dividing gram formula weight by total molar volume."""
 
+
     molar_mass = {'SiO2': 60.08, 'TiO2': 79.866, 'Al2O3': 101.96, 'Fe2O3': 159.69, 'FeO': 71.844, 'MnO': 70.9374, 
         'MgO': 40.3044, 'CaO': 56.0774, 'Na2O': 61.9789, 'K2O': 94.2, 'P2O5': 141.9445, 'H2O': 18.01528, 'CO2': 44.01}
 
-    T_room = 25 # during analysis (deg. C)
-    P_room = 1  # during analysis (bars)
-
     # Partial Molar Volumes from Lesher and Spera, 2015
-    par_molar_vol = {'SiO2': (26.86-1.89*P_room/1000), 'TiO2': (23.16+7.24*(T_room+273-1673)/1000-2.31*P_room/1000), 'Al2O3': (37.42-2.26*P_room/1000), 
-        'Fe2O3': (42.13+9.09*(T_room+273-1673)/1000-2.53*P_room/1000), 'FeO': (13.65+2.92*(T_room+273-1673)/1000-0.45*P_room/1000),
-        'MgO': (11.69+3.27*(T_room+273-1673)/1000+0.27*P_room/1000), 'CaO': (16.53+3.74*(T_room+273-1673)/1000+0.34*P_room/1000), 
-        'Na2O': (28.88+7.68*(T_room+273-1673)/1000-2.4*P_room/1000), 'K2O': (45.07+12.08*(T_room+273-1673)/1000-6.75*P_room/1000), 
-        'H2O': (26.27+9.46*(T_room+273-1673)/1000-3.15*P_room/1000)}
+    par_molar_vol = {'SiO2': (26.86-1.89*P_room/1000), 'TiO2': (23.16+7.24*(T_room+273-1673)/1000-2.31*P_room/1000), 'Al2O3': (37.42-2.26*P_room/1000), 'Fe2O3': (42.13+9.09*(T_room+273-1673)/1000-2.53*P_room/1000), 'FeO': (13.65+2.92*(T_room+273-1673)/1000-0.45*P_room/1000), 'MgO': (11.69+3.27*(T_room+273-1673)/1000+0.27*P_room/1000), 'CaO': (16.53+3.74*(T_room+273-1673)/1000+0.34*P_room/1000), 'Na2O': (28.88+7.68*(T_room+273-1673)/1000-2.4*P_room/1000), 'K2O': (45.07+12.08*(T_room+273-1673)/1000-6.75*P_room/1000), 'H2O': (26.27+9.46*(T_room+273-1673)/1000-3.15*P_room/1000)}
 
     mol = pd.DataFrame()
     for oxide in MI_Composition:
@@ -1336,19 +1335,16 @@ def Density_Calculation(MI_Composition):
 # %% 
 
 
-def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, sigma_thickness = 3):
+def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, T_room, P_room):
 
     """The Concentration_Output function inputs a dictionary with the peak heights for the total H2O peak (3550 cm^-1), molecular H2O peak (1635 cm^-1), 
     and carbonate peaks (1515 and 1430 cm^-1), number of samples for the Monte Carlo, thickness information, and MI composition, and 
     outputs the concentrations and uncertainties for each peak. Both the best fit parameter and mean from the MC3 code are used to calculate 
     concentration."""
 
-    mega_spreadsheet = pd.DataFrame(columns = ['H2OT_MEAN', 'H2OT_STD','H2OT_3550_M', 'H2OT_3550_STD', 'H2OT_3550_SAT', 'H2Om_1635_BP', 'H2Om_1635_STD', 'CO2_MEAN', 'CO2_STD',
-        'CO2_1515_BP', 'CO2_1515_STD', 'CO2_1430_BP', 'CO2_1430_STD', 'H2Om_5200_M', 'H2Om_5200_STD', 'OH_4500_M', 'OH_4500_STD'])
-    mega_spreadsheet_sat = pd.DataFrame(columns = ['H2OT_MEAN', 'H2OT_STD','H2OT_3550_M', 'H2OT_3550_STD', 'H2OT_3550_SAT', 'H2Om_1635_BP', 'H2Om_1635_STD', 'CO2_MEAN', 'CO2_STD',
-        'CO2_1515_BP', 'CO2_1515_STD', 'CO2_1430_BP', 'CO2_1430_STD', 'H2Om_5200_M', 'H2Om_5200_STD', 'OH_4500_M', 'OH_4500_STD'])
-    epsilon = pd.DataFrame(columns=['Tau', 'Na/Na+Ca', 'epsilon_H2OT_3550', 'sigma_epsilon_H2OT_3550', 'epsilon_H2Om_1635', 'sigma_epsilon_H2Om_1635', 
-        'epsilon_CO2', 'sigma_epsilon_CO2', 'epsilon_H2Om_5200', 'sigma_epsilon_H2Om_5200', 'epsilon_OH_4500', 'sigma_epsilon_OH_4500'])
+    mega_spreadsheet = pd.DataFrame(columns = ['H2OT_MEAN', 'H2OT_STD','H2OT_3550_M', 'H2OT_3550_STD', 'H2OT_3550_SAT', 'H2Om_1635_BP', 'H2Om_1635_STD', 'CO2_MEAN', 'CO2_STD', 'CO2_1515_BP', 'CO2_1515_STD', 'CO2_1430_BP', 'CO2_1430_STD', 'H2Om_5200_M', 'H2Om_5200_STD', 'OH_4500_M', 'OH_4500_STD'])
+    mega_spreadsheet_sat = pd.DataFrame(columns = ['H2OT_MEAN', 'H2OT_STD','H2OT_3550_M', 'H2OT_3550_STD', 'H2OT_3550_SAT', 'H2Om_1635_BP', 'H2Om_1635_STD', 'CO2_MEAN', 'CO2_STD', 'CO2_1515_BP', 'CO2_1515_STD', 'CO2_1430_BP', 'CO2_1430_STD', 'H2Om_5200_M', 'H2Om_5200_STD', 'OH_4500_M', 'OH_4500_STD'])
+    epsilon = pd.DataFrame(columns=['Tau', 'Na/Na+Ca', 'epsilon_H2OT_3550', 'sigma_epsilon_H2OT_3550', 'epsilon_H2Om_1635', 'sigma_epsilon_H2Om_1635', 'epsilon_CO2', 'sigma_epsilon_CO2', 'epsilon_H2Om_5200', 'sigma_epsilon_H2Om_5200', 'epsilon_OH_4500', 'sigma_epsilon_OH_4500'])
     density_df = pd.DataFrame(columns=['Density'])
     density_sat_df = pd.DataFrame(columns=['Density_Sat'])
     mean_vol = pd.DataFrame(columns = ['H2OT_MEAN', 'H2OT_STD', 'CO2_MEAN', 'CO2_STD'])
@@ -1358,7 +1354,7 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, sigma_thick
         'MgO': 40.3044, 'CaO': 56.0774, 'Na2O': 61.9789, 'K2O': 94.2, 'P2O5': 141.9445, 'H2O': 18.01528, 'CO2': 44.01}
 
     MI_Composition['H2O'] = 0
-    mol, density = Density_Calculation(MI_Composition)
+    mol, density = Density_Calculation(MI_Composition, T_room, P_room)
 
     cation_tot = mol.sum(axis = 1) + mol['Al2O3'] + mol['Na2O'] + mol['K2O'] + mol['P2O5']
     Na_NaCa = (2*mol['Na2O']) / ((2*mol['Na2O']) + mol['CaO'])
@@ -1368,7 +1364,6 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, sigma_thick
     covm_est_3550, covm_est_1635, covm_est_CO2 = np.diag([38.4640, 77.8597]), np.diag([20.8503, 39.3875]), np.diag([103.7645, 379.9891])
     mest_4500, mest_5200 = np.array([-1.632730, 3.532522]), np.array([-2.291420, 4.675528])
     covm_est_4500, covm_est_5200 = np.diag([0.0329, 0.0708]), np.diag([0.0129, 0.0276])
-    sigma_thickness = sigma_thickness
 
     G_SiAl, G_NaCa = np.ones((2, 1)),  np.ones((2, 1))
     covz_error_SiAl, covz_error_NaCa = np.zeros((2, 2)), np.zeros((2, 2))
@@ -1400,57 +1395,38 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, sigma_thick
         CT_int_4500 = (G_SiAl*covm_est_4500*np.transpose(G_SiAl)) + (mest_4500*covz_error_SiAl*np.transpose(mest_4500))
         CT68_4500 = np.sqrt(np.mean(np.diag(CT_int_4500)))
 
-        epsilon.loc[i] = pd.Series({'Tau': SiAl_tot[i], 'Na/Na+Ca': Na_NaCa[i], 'epsilon_H2OT_3550': epsilon_H2OT_3550, 'sigma_epsilon_H2OT_3550': CT68_3550, 
-        'epsilon_H2Om_1635': epsilon_H2Om_1635, 'sigma_epsilon_H2Om_1635': CT68_1635, 'epsilon_CO2': epsilon_CO2, 'sigma_epsilon_CO2': CT68_CO2, 
-        'epsilon_H2Om_5200': epsilon_H2Om_5200, 'sigma_epsilon_H2Om_5200': CT68_5200, 'epsilon_OH_4500': epsilon_OH_4500, 'sigma_epsilon_OH_4500': CT68_4500})
+        epsilon.loc[i] = pd.Series({'Tau': SiAl_tot[i], 'Na/Na+Ca': Na_NaCa[i], 'epsilon_H2OT_3550': epsilon_H2OT_3550, 'sigma_epsilon_H2OT_3550': CT68_3550, 'epsilon_H2Om_1635': epsilon_H2Om_1635, 'sigma_epsilon_H2Om_1635': CT68_1635, 'epsilon_CO2': epsilon_CO2, 'sigma_epsilon_CO2': CT68_CO2, 'epsilon_H2Om_5200': epsilon_H2Om_5200, 'sigma_epsilon_H2Om_5200': CT68_5200, 'epsilon_OH_4500': epsilon_OH_4500, 'sigma_epsilon_OH_4500': CT68_4500})
 
     # Doing density-H2O iterations:
     for j in range(10):
         H2OT_3550_I = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_3550_M'], Volatiles_DF['PH_3550_STD'],
-            density, density * 0.025, thickness['Thickness'], sigma_thickness, epsilon['epsilon_H2OT_3550'], epsilon['sigma_epsilon_H2OT_3550'])
+            density, density * 0.025, thickness['Thickness'], thickness['Sigma_Thickness'], epsilon['epsilon_H2OT_3550'], epsilon['sigma_epsilon_H2OT_3550'])
         MI_Composition['H2O'] = H2OT_3550_I
-        mol, density = Density_Calculation(MI_Composition)
+        mol, density = Density_Calculation(MI_Composition, T_room, P_room)
 
     # Doing density-H2O iterations:
     for k in Volatiles_DF.index: 
         # if Volatiles_DF['H2OT_3550_SAT?'][k] == '-': 
-        H2OT_3550_M = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_3550_M'][k], Volatiles_DF['PH_3550_STD'][k],
-            density[k], density[k] * 0.025, thickness['Thickness'][k], sigma_thickness, epsilon['epsilon_H2OT_3550'][k], epsilon['sigma_epsilon_H2OT_3550'][k])
-        H2Om_1635_BP = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_1635_BP'][k], Volatiles_DF['PH_1635_STD'][k],
-            density[k], density[k] * 0.025, thickness['Thickness'][k], sigma_thickness, epsilon['epsilon_H2Om_1635'][k], epsilon['sigma_epsilon_H2Om_1635'][k])
-        CO2_1515_BP = Beer_Lambert(molar_mass['CO2'], Volatiles_DF['PH_1515_BP'][k], Volatiles_DF['PH_1515_STD'][k],
-            density[k], density[k] * 0.025, thickness['Thickness'][k], sigma_thickness, epsilon['epsilon_CO2'][k], epsilon['sigma_epsilon_CO2'][k])
-        CO2_1430_BP = Beer_Lambert(molar_mass['CO2'], Volatiles_DF['PH_1430_BP'][k], Volatiles_DF['PH_1430_STD'][k],
-            density[k], density[k] * 0.025, thickness['Thickness'][k], sigma_thickness, epsilon['epsilon_CO2'][k], epsilon['sigma_epsilon_CO2'][k])
-        H2Om_5200_M = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_5200_M'][k], Volatiles_DF['PH_5200_STD'][k],
-            density[k], density[k] * 0.025, thickness['Thickness'][k], sigma_thickness, epsilon['epsilon_H2Om_5200'][k], epsilon['sigma_epsilon_H2Om_5200'][k])
-        OH_4500_M = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_4500_M'][k], Volatiles_DF['PH_4500_STD'][k],
-            density[k], density[k] * 0.025, thickness['Thickness'][k], sigma_thickness, epsilon['epsilon_OH_4500'][k], epsilon['sigma_epsilon_OH_4500'][k])
+        H2OT_3550_M = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_3550_M'][k], Volatiles_DF['PH_3550_STD'][k], density[k], density[k] * 0.025, thickness['Thickness'][k], thickness['Sigma_Thickness'][k], epsilon['epsilon_H2OT_3550'][k], epsilon['sigma_epsilon_H2OT_3550'][k])
+        H2Om_1635_BP = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_1635_BP'][k], Volatiles_DF['PH_1635_STD'][k], density[k], density[k] * 0.025, thickness['Thickness'][k], thickness['Sigma_Thickness'][k], epsilon['epsilon_H2Om_1635'][k], epsilon['sigma_epsilon_H2Om_1635'][k])
+        CO2_1515_BP = Beer_Lambert(molar_mass['CO2'], Volatiles_DF['PH_1515_BP'][k], Volatiles_DF['PH_1515_STD'][k], density[k], density[k] * 0.025, thickness['Thickness'][k], thickness['Sigma_Thickness'][k], epsilon['epsilon_CO2'][k], epsilon['sigma_epsilon_CO2'][k])
+        CO2_1430_BP = Beer_Lambert(molar_mass['CO2'], Volatiles_DF['PH_1430_BP'][k], Volatiles_DF['PH_1430_STD'][k], density[k], density[k] * 0.025, thickness['Thickness'][k], thickness['Sigma_Thickness'][k], epsilon['epsilon_CO2'][k], epsilon['sigma_epsilon_CO2'][k])
+        H2Om_5200_M = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_5200_M'][k], Volatiles_DF['PH_5200_STD'][k], density[k], density[k] * 0.025, thickness['Thickness'][k], thickness['Sigma_Thickness'][k], epsilon['epsilon_H2Om_5200'][k], epsilon['sigma_epsilon_H2Om_5200'][k])
+        OH_4500_M = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_4500_M'][k], Volatiles_DF['PH_4500_STD'][k], density[k], density[k] * 0.025, thickness['Thickness'][k], thickness['Sigma_Thickness'][k], epsilon['epsilon_OH_4500'][k], epsilon['sigma_epsilon_OH_4500'][k])
         CO2_1515_BP *= 10000
         CO2_1430_BP *= 10000
         
-        H2OT_3550_M_STD = Beer_Lambert_Error(N, molar_mass['H2O'], Volatiles_DF['PH_3550_M'][k], Volatiles_DF['PH_3550_STD'][k],
-            density[k], density[k] * 0.025, thickness['Thickness'][k], sigma_thickness, epsilon['epsilon_H2OT_3550'][k], epsilon['sigma_epsilon_H2OT_3550'][k])
-        H2Om_1635_BP_STD = Beer_Lambert_Error(N, molar_mass['H2O'], Volatiles_DF['PH_1635_BP'][k], Volatiles_DF['PH_1635_STD'][k],
-            density[k], density[k] * 0.025, thickness['Thickness'][k], sigma_thickness, epsilon['epsilon_H2Om_1635'][k], epsilon['sigma_epsilon_H2Om_1635'][k])
-        CO2_1515_BP_STD = Beer_Lambert_Error(N, molar_mass['CO2'], Volatiles_DF['PH_1515_BP'][k], Volatiles_DF['PH_1515_STD'][k],
-            density[k], density[k] * 0.025, thickness['Thickness'][k], sigma_thickness, epsilon['epsilon_CO2'][k], epsilon['sigma_epsilon_CO2'][k])
-        CO2_1430_BP_STD = Beer_Lambert_Error(N, molar_mass['CO2'], Volatiles_DF['PH_1430_BP'][k], Volatiles_DF['PH_1430_STD'][k],
-            density[k], density[k] * 0.025, thickness['Thickness'][k], sigma_thickness, epsilon['epsilon_CO2'][k], epsilon['sigma_epsilon_CO2'][k])
-        H2Om_5200_M_STD = Beer_Lambert_Error(N, molar_mass['H2O'], Volatiles_DF['PH_5200_M'][k], Volatiles_DF['PH_5200_STD'][k],
-            density[k], density[k] * 0.025, thickness['Thickness'][k], sigma_thickness, epsilon['epsilon_H2Om_5200'][k], epsilon['sigma_epsilon_H2Om_5200'][k])
-        OH_4500_M_STD = Beer_Lambert_Error(N, molar_mass['H2O'], Volatiles_DF['PH_4500_M'][k], Volatiles_DF['PH_4500_STD'][k],
-            density[k], density[k] * 0.025, thickness['Thickness'][k], sigma_thickness, epsilon['epsilon_OH_4500'][k], epsilon['sigma_epsilon_OH_4500'][k])
+        H2OT_3550_M_STD = Beer_Lambert_Error(N, molar_mass['H2O'], Volatiles_DF['PH_3550_M'][k], Volatiles_DF['PH_3550_STD'][k], density[k], density[k] * 0.025, thickness['Thickness'][k], thickness['Sigma_Thickness'][k], epsilon['epsilon_H2OT_3550'][k], epsilon['sigma_epsilon_H2OT_3550'][k])
+        H2Om_1635_BP_STD = Beer_Lambert_Error(N, molar_mass['H2O'], Volatiles_DF['PH_1635_BP'][k], Volatiles_DF['PH_1635_STD'][k], density[k], density[k] * 0.025, thickness['Thickness'][k], thickness['Sigma_Thickness'][k], epsilon['epsilon_H2Om_1635'][k], epsilon['sigma_epsilon_H2Om_1635'][k])
+        CO2_1515_BP_STD = Beer_Lambert_Error(N, molar_mass['CO2'], Volatiles_DF['PH_1515_BP'][k], Volatiles_DF['PH_1515_STD'][k], density[k], density[k] * 0.025, thickness['Thickness'][k], thickness['Sigma_Thickness'][k], epsilon['epsilon_CO2'][k], epsilon['sigma_epsilon_CO2'][k])
+        CO2_1430_BP_STD = Beer_Lambert_Error(N, molar_mass['CO2'], Volatiles_DF['PH_1430_BP'][k], Volatiles_DF['PH_1430_STD'][k], density[k], density[k] * 0.025, thickness['Thickness'][k], thickness['Sigma_Thickness'][k], epsilon['epsilon_CO2'][k], epsilon['sigma_epsilon_CO2'][k])
+        H2Om_5200_M_STD = Beer_Lambert_Error(N, molar_mass['H2O'], Volatiles_DF['PH_5200_M'][k], Volatiles_DF['PH_5200_STD'][k], density[k], density[k] * 0.025, thickness['Thickness'][k], thickness['Sigma_Thickness'][k], epsilon['epsilon_H2Om_5200'][k], epsilon['sigma_epsilon_H2Om_5200'][k])
+        OH_4500_M_STD = Beer_Lambert_Error(N, molar_mass['H2O'], Volatiles_DF['PH_4500_M'][k], Volatiles_DF['PH_4500_STD'][k], density[k], density[k] * 0.025, thickness['Thickness'][k], thickness['Sigma_Thickness'][k], epsilon['epsilon_OH_4500'][k], epsilon['sigma_epsilon_OH_4500'][k])
         CO2_1515_BP_STD *= 10000
         CO2_1430_BP_STD *= 10000
 
         density_df.loc[k] = pd.Series({'Density': density[k]})
-        mega_spreadsheet.loc[k] = pd.Series({'H2OT_3550_M': H2OT_3550_M, 'H2OT_3550_STD': H2OT_3550_M_STD, 'H2OT_3550_SAT': Volatiles_DF['H2OT_3550_SAT?'][k], 
-            'H2Om_1635_BP': H2Om_1635_BP, 'H2Om_1635_STD': H2Om_1635_BP_STD, 
-            'CO2_1515_BP': CO2_1515_BP, 'CO2_1515_STD': CO2_1515_BP_STD, 
-            'CO2_1430_BP': CO2_1430_BP, 'CO2_1430_STD': CO2_1430_BP_STD, 
-            'H2Om_5200_M': H2Om_5200_M, 'H2Om_5200_STD': H2Om_5200_M_STD, 
-            'OH_4500_M': OH_4500_M, 'OH_4500_STD': OH_4500_M_STD})
+        mega_spreadsheet.loc[k] = pd.Series({'H2OT_3550_M': H2OT_3550_M, 'H2OT_3550_STD': H2OT_3550_M_STD, 'H2OT_3550_SAT': Volatiles_DF['H2OT_3550_SAT?'][k], 'H2Om_1635_BP': H2Om_1635_BP, 'H2Om_1635_STD': H2Om_1635_BP_STD, 'CO2_1515_BP': CO2_1515_BP, 'CO2_1515_STD': CO2_1515_BP_STD, 'CO2_1430_BP': CO2_1430_BP, 'CO2_1430_STD': CO2_1430_BP_STD, 'H2Om_5200_M': H2Om_5200_M, 'H2Om_5200_STD': H2Om_5200_M_STD, 'OH_4500_M': OH_4500_M, 'OH_4500_STD': OH_4500_M_STD})
 
     for l in Volatiles_DF.index: 
         if Volatiles_DF['H2OT_3550_SAT?'][l] == '-': 
@@ -1471,49 +1447,32 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, sigma_thick
 
         elif Volatiles_DF['H2OT_3550_SAT?'][l] == '*':
             for m in range(20):
-                H2Om_1635_BP = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_1635_BP'][l], Volatiles_DF['PH_1635_STD'][l],
-                    density[l], density[l] * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_H2Om_1635'][l], epsilon['sigma_epsilon_H2Om_1635'][l])
-                OH_4500_M = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_4500_M'][l], Volatiles_DF['PH_4500_STD'][l],
-                    density[l], density[l] * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_OH_4500'][l], epsilon['sigma_epsilon_OH_4500'][l])
+                H2Om_1635_BP = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_1635_BP'][l], Volatiles_DF['PH_1635_STD'][l], density[l], density[l] * 0.025, thickness['Thickness'][l], thickness['Sigma_Thickness'][l], epsilon['epsilon_H2Om_1635'][l], epsilon['sigma_epsilon_H2Om_1635'][l])
+                OH_4500_M = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_4500_M'][l], Volatiles_DF['PH_4500_STD'][l], density[l], density[l] * 0.025, thickness['Thickness'][l], thickness['Sigma_Thickness'][l], epsilon['epsilon_OH_4500'][l], epsilon['sigma_epsilon_OH_4500'][l])
                 MI_Composition['H2O'][l] = H2Om_1635_BP + OH_4500_M
-                mol_sat, density_sat = Density_Calculation(MI_Composition)
+                mol_sat, density_sat = Density_Calculation(MI_Composition, T_room, P_room)
             density_sat = density_sat[l]
 
-            H2OT_3550_M = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_3550_M'][l], Volatiles_DF['PH_3550_STD'][l],
-                density_sat, density_sat * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_H2OT_3550'][l], epsilon['sigma_epsilon_H2OT_3550'][l])
-            H2Om_1635_BP = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_1635_BP'][l], Volatiles_DF['PH_1635_STD'][l],
-                density_sat, density_sat * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_H2Om_1635'][l], epsilon['sigma_epsilon_H2Om_1635'][l])
-            CO2_1515_BP = Beer_Lambert(molar_mass['CO2'], Volatiles_DF['PH_1515_BP'][l], Volatiles_DF['PH_1515_STD'][l],
-                density_sat, density_sat * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_CO2'][l], epsilon['sigma_epsilon_CO2'][l])
-            CO2_1430_BP = Beer_Lambert(molar_mass['CO2'], Volatiles_DF['PH_1430_BP'][l], Volatiles_DF['PH_1430_STD'][l],
-                density_sat, density_sat * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_CO2'][l], epsilon['sigma_epsilon_CO2'][l])
-            H2Om_5200_M = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_5200_M'][l], Volatiles_DF['PH_5200_STD'][l],
-                density_sat, density_sat * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_H2Om_5200'][l], epsilon['sigma_epsilon_H2Om_5200'][l])
-            OH_4500_M = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_4500_M'][l], Volatiles_DF['PH_4500_STD'][l],
-                density_sat, density_sat * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_OH_4500'][l], epsilon['sigma_epsilon_OH_4500'][l])
+            H2OT_3550_M = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_3550_M'][l], Volatiles_DF['PH_3550_STD'][l], density_sat, density_sat * 0.025, thickness['Thickness'][l], thickness['Sigma_Thickness'][l], epsilon['epsilon_H2OT_3550'][l], epsilon['sigma_epsilon_H2OT_3550'][l])
+            H2Om_1635_BP = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_1635_BP'][l], Volatiles_DF['PH_1635_STD'][l], density_sat, density_sat * 0.025, thickness['Thickness'][l], thickness['Sigma_Thickness'][l], epsilon['epsilon_H2Om_1635'][l], epsilon['sigma_epsilon_H2Om_1635'][l])
+            CO2_1515_BP = Beer_Lambert(molar_mass['CO2'], Volatiles_DF['PH_1515_BP'][l], Volatiles_DF['PH_1515_STD'][l], density_sat, density_sat * 0.025, thickness['Thickness'][l], thickness['Sigma_Thickness'][l], epsilon['epsilon_CO2'][l], epsilon['sigma_epsilon_CO2'][l])
+            CO2_1430_BP = Beer_Lambert(molar_mass['CO2'], Volatiles_DF['PH_1430_BP'][l], Volatiles_DF['PH_1430_STD'][l], density_sat, density_sat * 0.025, thickness['Thickness'][l], thickness['Sigma_Thickness'][l], epsilon['epsilon_CO2'][l], epsilon['sigma_epsilon_CO2'][l])
+            H2Om_5200_M = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_5200_M'][l], Volatiles_DF['PH_5200_STD'][l], density_sat, density_sat * 0.025, thickness['Thickness'][l], thickness['Sigma_Thickness'][l], epsilon['epsilon_H2Om_5200'][l], epsilon['sigma_epsilon_H2Om_5200'][l])
+            OH_4500_M = Beer_Lambert(molar_mass['H2O'], Volatiles_DF['PH_4500_M'][l], Volatiles_DF['PH_4500_STD'][l], density_sat, density_sat * 0.025, thickness['Thickness'][l], thickness['Sigma_Thickness'][l], epsilon['epsilon_OH_4500'][l], epsilon['sigma_epsilon_OH_4500'][l])
             CO2_1515_BP *= 10000
             CO2_1430_BP *= 10000
             
-            H2OT_3550_M_STD = Beer_Lambert_Error(N, molar_mass['H2O'], Volatiles_DF['PH_3550_M'][l], Volatiles_DF['PH_3550_STD'][l],
-                density_sat, density_sat * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_H2OT_3550'][l], epsilon['sigma_epsilon_H2OT_3550'][l])
-            H2Om_1635_BP_STD = Beer_Lambert_Error(N, molar_mass['H2O'], Volatiles_DF['PH_1635_BP'][l], Volatiles_DF['PH_1635_STD'][l],
-                density_sat, density_sat * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_H2Om_1635'][l], epsilon['sigma_epsilon_H2Om_1635'][l])
-            CO2_1515_BP_STD = Beer_Lambert_Error(N, molar_mass['CO2'], Volatiles_DF['PH_1515_BP'][l], Volatiles_DF['PH_1515_STD'][l],
-                density_sat, density_sat * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_CO2'][l], epsilon['sigma_epsilon_CO2'][l])
-            CO2_1430_BP_STD = Beer_Lambert_Error(N, molar_mass['CO2'], Volatiles_DF['PH_1430_BP'][l], Volatiles_DF['PH_1430_STD'][l],
-                density_sat, density_sat * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_CO2'][l], epsilon['sigma_epsilon_CO2'][l])
-            H2Om_5200_M_STD = Beer_Lambert_Error(N, molar_mass['H2O'], Volatiles_DF['PH_5200_M'][l], Volatiles_DF['PH_5200_STD'][l],
-                density_sat, density_sat * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_H2Om_5200'][l], epsilon['sigma_epsilon_H2Om_5200'][l])
-            OH_4500_M_STD = Beer_Lambert_Error(N, molar_mass['H2O'], Volatiles_DF['PH_4500_M'][l], Volatiles_DF['PH_4500_STD'][l],
-               density_sat, density_sat * 0.025, thickness['Thickness'][l], sigma_thickness, epsilon['epsilon_OH_4500'][l], epsilon['sigma_epsilon_OH_4500'][l])
+            H2OT_3550_M_STD = Beer_Lambert_Error(N, molar_mass['H2O'], Volatiles_DF['PH_3550_M'][l], Volatiles_DF['PH_3550_STD'][l], density_sat, density_sat * 0.025, thickness['Thickness'][l], thickness['Sigma_Thickness'][l], epsilon['epsilon_H2OT_3550'][l], epsilon['sigma_epsilon_H2OT_3550'][l])
+            H2Om_1635_BP_STD = Beer_Lambert_Error(N, molar_mass['H2O'], Volatiles_DF['PH_1635_BP'][l], Volatiles_DF['PH_1635_STD'][l], density_sat, density_sat * 0.025, thickness['Thickness'][l], thickness['Sigma_Thickness'][l], epsilon['epsilon_H2Om_1635'][l], epsilon['sigma_epsilon_H2Om_1635'][l])
+            CO2_1515_BP_STD = Beer_Lambert_Error(N, molar_mass['CO2'], Volatiles_DF['PH_1515_BP'][l], Volatiles_DF['PH_1515_STD'][l], density_sat, density_sat * 0.025, thickness['Thickness'][l], thickness['Sigma_Thickness'][l], epsilon['epsilon_CO2'][l], epsilon['sigma_epsilon_CO2'][l])
+            CO2_1430_BP_STD = Beer_Lambert_Error(N, molar_mass['CO2'], Volatiles_DF['PH_1430_BP'][l], Volatiles_DF['PH_1430_STD'][l], density_sat, density_sat * 0.025, thickness['Thickness'][l], thickness['Sigma_Thickness'][l], epsilon['epsilon_CO2'][l], epsilon['sigma_epsilon_CO2'][l])
+            H2Om_5200_M_STD = Beer_Lambert_Error(N, molar_mass['H2O'], Volatiles_DF['PH_5200_M'][l], Volatiles_DF['PH_5200_STD'][l], density_sat, density_sat * 0.025, thickness['Thickness'][l], thickness['Sigma_Thickness'][l], epsilon['epsilon_H2Om_5200'][l], epsilon['sigma_epsilon_H2Om_5200'][l])
+            OH_4500_M_STD = Beer_Lambert_Error(N, molar_mass['H2O'], Volatiles_DF['PH_4500_M'][l], Volatiles_DF['PH_4500_STD'][l], density_sat, density_sat * 0.025, thickness['Thickness'][l], thickness['Sigma_Thickness'][l], epsilon['epsilon_OH_4500'][l], epsilon['sigma_epsilon_OH_4500'][l])
             CO2_1515_BP_STD *= 10000
             CO2_1430_BP_STD *= 10000
 
         density_sat_df.loc[l] = pd.Series({'Density_Sat': density_sat})
-        mega_spreadsheet_sat.loc[l] = pd.Series({'H2OT_3550_M': H2OT_3550_M, 'H2OT_3550_SAT': Volatiles_DF['H2OT_3550_SAT?'][l], 'H2OT_3550_STD': H2OT_3550_M_STD, 
-            'H2Om_1635_BP': H2Om_1635_BP, 'H2Om_1635_STD': H2Om_1635_BP_STD, 
-            'CO2_1515_BP': CO2_1515_BP, 'CO2_1515_STD': CO2_1515_BP_STD, 'CO2_1430_BP': CO2_1430_BP, 'CO2_1430_STD': CO2_1430_BP_STD, 
-            'H2Om_5200_M': H2Om_5200_M, 'H2Om_5200_STD': H2Om_5200_M_STD, 'OH_4500_M': OH_4500_M, 'OH_4500_STD': OH_4500_M_STD})
+        mega_spreadsheet_sat.loc[l] = pd.Series({'H2OT_3550_M': H2OT_3550_M, 'H2OT_3550_SAT': Volatiles_DF['H2OT_3550_SAT?'][l], 'H2OT_3550_STD': H2OT_3550_M_STD, 'H2Om_1635_BP': H2Om_1635_BP, 'H2Om_1635_STD': H2Om_1635_BP_STD, 'CO2_1515_BP': CO2_1515_BP, 'CO2_1515_STD': CO2_1515_BP_STD, 'CO2_1430_BP': CO2_1430_BP, 'CO2_1430_STD': CO2_1430_BP_STD, 'H2Om_5200_M': H2Om_5200_M, 'H2Om_5200_STD': H2Om_5200_M_STD, 'OH_4500_M': OH_4500_M, 'OH_4500_STD': OH_4500_M_STD})
         s2nerror.loc[l] = pd.Series({'PH_5200_S2N': Volatiles_DF['S2N_P5200'][l], 'PH_4500_S2N': Volatiles_DF['S2N_P4500'][l], 'ERR_5200': Volatiles_DF['ERR_5200'][l], 'ERR_4500': Volatiles_DF['ERR_4500'][l]})
 
     mega_spreadsheet_f = pd.concat([mega_spreadsheet_sat, s2nerror], axis = 1)
@@ -1537,3 +1496,182 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, sigma_thick
     mega_spreadsheet_f['CO2_STD'] = mean_vol['CO2_STD']
 
     return density_epsilon, mega_spreadsheet_f
+
+
+# %% 
+
+# %% Reflectance FTIR - Interference Fringe Processing for Thicknesses
+
+
+def PeakID(ref_spec, wn_high, wn_low, peak_heigh_min_delta, peak_search_width, savgol_filter_width, smoothing_wn_width = None, remove_baseline = False, plotting = False, filename = None):
+    
+    """Identifies peaks based on the peakdetect package which identifies local 
+    maxima and minima in noisy signals. Based on: https://github.com/avhn/peakdetect
+
+    Args:
+        ref_spec (pd.DataFrame): A Pandas DataFrame indexed by wavenumber and containing absorbance values.
+        wn_high (int): The upper wavenumber limit for the analysis.
+        wn_low (int): The lower wavenumber limit for the analysis.
+        smoothing_wn_width (int): The window size for the Savitzky-Golay smoothing filter. Default is None.
+        remove_baseline (bool): Whether to remove the baseline from the spectrum. Default is False.
+        peak_heigh_min_delta (float): Minimum difference between a peak and its neighboring points for it to be
+            considered a peak. Default is 0.008.
+        peak_search_width (int): The size of the region around each point to search for a peak. Default is 50.
+        plotting (bool): Whether to create a plot of the spectrum with identified peaks and troughs. Default is False.
+        filename (str): The name of the plot file. If None, the plot is not saved. Default is None.
+
+    Returns:
+        tuple: A tuple containing the peaks and troughs identified as local maxima and minima, respectively.
+    """
+
+    from peakdetect import peakdetect
+
+
+    spec = ref_spec[wn_low:wn_high].copy() # dataframe indexed by wavenumber
+    spec_filt = pd.DataFrame(columns = ['Wavenumber', 'Absorbance']) 
+    baseline = 0
+
+    spec_filter = signal.medfilt(spec.Absorbance, 3)
+
+    if remove_baseline == True:
+        baseline = signal.savgol_filter(spec_filter, savgol_filter_width, 3)
+        spec_filter = spec_filter - baseline
+
+    if smoothing_wn_width is not None:
+        spec_filter = signal.savgol_filter(spec_filter, smoothing_wn_width, 3)
+
+    spec_filt['Absorbance'] = spec_filter
+    spec_filt.index = spec.index
+    spec['Subtracted'] = spec['Absorbance'] - baseline
+
+    pandt = peakdetect(spec_filt.Absorbance, spec_filt.index, lookahead = peak_search_width, delta = peak_heigh_min_delta)
+    peaks = np.array(pandt[0])
+    troughs = np.array(pandt[1])
+
+    if plotting == False: 
+        pass
+    else: 
+        fig, ax = plt.subplots(1, 1, figsize = (8, 6))
+        ax.plot(spec.index, spec['Subtracted'], linewidth = 1)
+        ax.plot(spec_filt.index, spec_filt.Absorbance)
+        ax.plot(peaks[:,0], peaks[:,1], 'ro')
+        ax.plot(troughs[:,0], troughs[:,1], 'ko')
+        ax.set_title(filename)
+        ax.set_xlabel('Wavenumber')
+        ax.set_ylabel('Absorbance')
+        ax.invert_xaxis()
+
+    return peaks, troughs
+
+
+
+def ThicknessCalc(n, positions):
+
+    """Calculates thicknesses of glass wafers based on the refractive index of the 
+    glass and the positions of the peaks or troughs in the FTIR spectrum.
+    
+    Parameters:
+    n (float): Refractive index of the glass.
+    positions (np.ndarray): Array of positions of the peaks or troughs in the FTIR spectrum.
+
+    Returns:
+    np.ndarray: Array of thicknesses of glass wafers.
+
+    """
+
+    return 1/(2 * n * np.abs(np.diff(positions)))
+
+
+
+def ThicknessProcessing(dfs_dict, n, wn_high, wn_low, savgol_filter_width, smoothing_wn_width=None, peak_heigh_min_delta=0.008, peak_search_width=50, remove_baseline=False, plotting=False):
+
+    """
+    Calculates thickness of glass wafers based on the refractive index of the glass and the positions of the
+    peaks or troughs in the FTIR spectrum. Thicknesses for each interference fringe, starting at both the peaks
+    and troughs of the fringes are determined. These thicknesses are then averaged over the interval of interest.
+
+    Parameters: 
+    dfs_dict (dictionary): dictionary containing FTIR data for each file
+    n (float): refractive index of the glass
+    wn_high (float): the high wavenumber cutoff for the analysis
+    wn_low (float): the low wavenumber cutoff for the analysis
+    smoothing_wn_width (float): width of the Savitzky-Golay smoothing window, if not used, set to None
+    peak_heigh_min_delta (float): minimum height difference between a peak and its surrounding points
+    peak_search_width (float): the distance (in wavenumbers) to look on either side of a peak to find the
+                              corresponding trough
+    remove_baseline (boolean): whether or not to remove the baseline from the data
+    plotting (boolean): whether or not to plot the data and detected peaks and troughs
+    
+    Returns:
+    ThickDF (dataframe): a dataframe containing the thickness calculations for each file
+    """
+
+    ThickDF = pd.DataFrame(columns=['Peak_Thicknesses', 'Peak_Thickness_M', 'Peak_Thickness_STD',
+                                    'Trough_Thicknesses', 'Trough_Thickness_M', 'Trough_Thickness_STD',
+                                    'Thickness_M', 'Thickness_STD'])
+
+    failures = []
+
+    for filename, data in dfs_dict.items(): 
+        try:
+            peaks, troughs = PeakID(data, wn_high, wn_low,  filename=filename, plotting=plotting, savgol_filter_width=savgol_filter_width, smoothing_wn_width = smoothing_wn_width, remove_baseline = True, peak_heigh_min_delta = peak_heigh_min_delta, peak_search_width = peak_search_width)
+            peaks_loc = peaks[:, 0].round(2)
+            troughs_loc = troughs[:, 0].round(2)
+            peaks_diff = np.diff(peaks[:, 0]).round(2)
+            troughs_diff = np.diff(troughs[:, 0]).round(2)
+
+            peaks_loc_filt = np.array([x for x in peaks_loc if abs(x - np.mean(peaks_loc)) < 2 * np.std(peaks_loc)])
+            troughs_loc_filt = np.array([x for x in troughs_loc if abs(x - np.mean(troughs_loc)) < 2 * np.std(troughs_loc)])
+            peaks_diff_filt = np.array([x for x in peaks_diff if abs(x - np.mean(peaks_diff)) < 2 * np.std(peaks_diff)])
+            troughs_diff_filt = np.array([x for x in troughs_diff if abs(x - np.mean(troughs_diff)) < 2 * np.std(troughs_diff)])
+
+            t_peaks = (ThicknessCalc(n, peaks[:,0]) * 1e4).round(2)
+            mean_t_peaks = np.mean(t_peaks)
+            std_t_peaks = np.std(t_peaks)
+            t_peaks_filt = np.array([x for x in t_peaks if abs(x - np.mean(t_peaks)) < np.std(t_peaks)])
+            mean_t_peaks_filt = np.mean(t_peaks_filt).round(2)
+            std_t_peaks_filt = np.std(t_peaks_filt).round(2)
+
+            t_troughs = (ThicknessCalc(n, troughs[:,0]) * 1e4).round(2)
+            mean_t_troughs = np.mean(t_troughs)
+            std_t_troughs = np.std(t_troughs)
+            t_troughs_filt = [x for x in t_troughs if abs(x - np.mean(t_troughs)) < np.std(t_troughs)]
+            mean_t_troughs_filt = np.mean(t_troughs_filt).round(2)
+            std_t_troughs_filt = np.std(t_troughs_filt).round(2)
+
+            mean_t = np.mean(np.concatenate([t_peaks_filt, t_troughs_filt])).round(2)
+            std_t = np.std(np.concatenate([t_peaks_filt, t_troughs_filt])).round(2)
+
+            ThickDF.loc[f"{filename}"] = pd.Series({'Peak_Thicknesses': t_peaks_filt, 'Peak_Thickness_M': mean_t_peaks_filt, 'Peak_Thickness_STD': std_t_peaks_filt, 'Peak_Loc': peaks_loc_filt, 'Peak_Diff': peaks_diff_filt, 'Trough_Thicknesses': t_troughs_filt, 'Trough_Thickness_M': mean_t_troughs_filt, 'Trough_Thickness_STD': std_t_troughs_filt, 'Trough_Loc': troughs_loc_filt, 'Trough_Diff': troughs_diff_filt, 'Thickness_M': mean_t, 'Thickness_STD': std_t})
+
+        except Exception as e:
+            print(f"Error: {e}")
+            print(e)
+            failures.append(filename)
+            ThickDF.loc[filename] = pd.Series({'V1':np.nan,'V2':np.nan,'Thickness':np.nan})
+
+
+    return ThickDF
+
+
+def ReflectanceIndex(XFo):
+
+    """
+    Calculates the reflectance index for a given forsterite composition.
+
+    The reflectance index is calculated based on values from Deer, Howie, and Zussman, 3rd Edition.
+    Input: forsterite composition in mole fraction.
+
+    Parameters:
+        XFo (float): The mole fraction of forsterite in the sample.
+
+    Returns:
+        float: The calculated reflectance index.
+    """
+
+    n_alpha = 1.827 - 0.192*XFo
+    n_beta = 1.869 - 0.218*XFo
+    n_gamma = 1.879 - 0.209*XFo
+    n = (n_alpha+n_beta+n_gamma) / 3
+
+    return n

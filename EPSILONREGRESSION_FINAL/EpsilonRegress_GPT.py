@@ -34,59 +34,92 @@ plt.rcParams["axes.labelsize"] = 20 # Axes labels
 
 # %% 
 
-def inversion(comp, sigma_comp, epsilon, sigma_epsilon): 
+def inversion(comp, epsilon, sigma_comp, sigma_epsilon):
 
-    M = 2
-    N = len(comp)
+    """Perform a Newtonian inversion on a given set of composition and absorbance coefficient data.
 
+    Parameters:
+        comp (ndarray): A 1D array containing the composition data.
+        epsilon (ndarray): A 1D array containing the absorbance coefficient data.
+        sigma_comp (float): The standard deviation of the composition data.
+        sigma_epsilon (float): The standard deviation of the absorbance coefficient data.
+
+    Returns:
+        tuple: A tuple containing the following elements:
+            - mls (ndarray): A 1D array of the least squares estimate of the coefficients.
+            - mest_f (ndarray): A 1D array of the final estimate of the coefficients.
+            - covls (ndarray): The covariance matrix of the least squares estimate.
+            - covm_est_f (ndarray): The covariance matrix of the final estimate.
+            - covepsilon_est_f (ndarray): The covariance matrix of the final estimate of the absorbance coefficients.
+            - comp_pre (ndarray): A 1D array of the predicted composition values based on the final estimate.
+            - epsilon_pre (ndarray): A 1D array of the predicted absorbance coefficient values based on the final estimate.
+            - epsilon_linear (ndarray): A 1D array of the predicted absorbance coefficient values based on the linear regression estimate.
+
+    """
+
+    M = 2  # Number of calibration parameters
+    N = len(comp)  # Number of data points
+
+    # Create a matrix with the composition and a column of ones for intercept calculation
     G = np.array([np.ones(N), comp]).T
-    mls = np.linalg.solve(np.dot(G.T, G), np.dot(G.T, epsilon)) 
 
-    # Regular least squares for starting value. 
+    # Solve for calibration parameters using regular least squares
+    mls = np.linalg.solve(np.dot(G.T, G), np.dot(G.T, epsilon))
+
+    # Compute covariance matrix for regular least squares solution
     covls = np.linalg.inv(np.linalg.multi_dot([G.T, np.diag(sigma_epsilon**-2), G]))
 
-    # A priori solution is least squares solution. xbar is the prior solution of x. 
-    # For Tobs, zobs, it is the data. For m, it is the least squares solution. 
+    # Combine all parameters into a single vector for use in optimization
     xbar = np.concatenate([epsilon, comp, mls])
 
-    # Trial solution based on least squares 
+    # Trial solution based on regular least squares solution
     xg = xbar
 
-    # Gradient vector, needs to change for multiple parameters. 
+    # Initialize gradient vector
     Fg = np.zeros([N, M*N+M])
 
-    # Covariance, large for model parameters 
+    # Initialize covariance matrix
     covx = np.zeros([M*N+M, M*N+M])
 
+    # Set covariance matrix for measurement uncertainties
     covx[0*N:1*N, 0*N:1*N] = np.diag(sigma_epsilon**2)
     covx[1*N:2*N, 1*N:2*N] = np.diag(sigma_comp**2)
 
+    # Set large covariance matrix for model parameters
     scale = 1
     covx[M*N+0, M*N+0] = scale * covls[0, 0]
     covx[M*N+1, M*N+1] = scale * covls[1, 1]
 
+    # Set number of iterations for optimization
     Nit = 100
+
+    # Initialize arrays to store calculated values at each iteration
     epsilon_pre_all = np.zeros([N, Nit])
     epsilon_linear_all = np.zeros([N, Nit])
     mest_all = np.zeros([2, Nit])
 
-    for i in range(0, Nit): 
+    # Perform optimization
+    for i in range(0, Nit):
+        # Calculate residual vector and its squared norm
         f = -xg[0:N] + (xg[M*N+1]*xg[1*N:2*N]) + (xg[M*N+0]*np.ones(N))
         Ef = np.dot(f.T, f)
 
-        if (i == 0): 
+        # Print error at first iteration and every 10th iteration
+        if (i == 0):
             print('Initial error in implicit equation = ' + str(Ef))
-        elif (i%10 == 0): 
+        elif (i%10 == 0):
             print('Final error in implicit equation = ', Ef)
 
+        # Compute gradient vector
         Fg[0:N, 0:N] = -np.eye(N, N)
         Fg[0:N, N:2*N] = xg[M*N+1] * np.eye(N, N)
-
         Fg[0:N, M*N+0] = np.ones([N])
         Fg[0:N, M*N+1] = xg[1*N:2*N]
 
+        # Set regularization parameter
         epsi = 0
-        
+
+        # Solve linear system
         left = Fg.T
         right = np.linalg.multi_dot([Fg, covx, Fg.T]) + (epsi*np.eye(N, N))
         solve = np.linalg.solve(right.conj().T, left.conj().T).conj().T
@@ -94,6 +127,7 @@ def inversion(comp, sigma_comp, epsilon, sigma_epsilon):
         xg2 = xbar + np.dot(MO, (np.dot(Fg,(xg-xbar))-f))
         xg = xg2
 
+        # Store some variables for later use
         mest = xg[M*N+0:M*N+M]
         epsilon_pre = xg[0:N]
         epsilon_linear = mest[0] + mest[1]*comp
@@ -101,6 +135,7 @@ def inversion(comp, sigma_comp, epsilon, sigma_epsilon):
         mest_all[0:N, i] = mest
         epsilon_linear_all[0:N, i] = epsilon_linear[0:N]
 
+    # Compute some additional statistics
     MO2 = np.dot(MO, Fg)
     covx_est = np.linalg.multi_dot([MO2, covx, MO2.T])
 
@@ -120,71 +155,225 @@ def inversion(comp, sigma_comp, epsilon, sigma_epsilon):
     epsilon_linear = mest_f[0] + mest_f[1]*comp
     epsilon_ls = mls[0] + mls[1]*comp
 
-    print('mls ' + str(mls))
-    print('95% CI ' + str(2*np.sqrt(np.diag(covls))))
-    print('mest ' + str(mest_f))
-    print('95% CI final ' + str(2*np.sqrt(np.diag(covm_est_f))))
+    # Print final results
+    # print('mls ' + str(mls))
+    # print('95% CI ' + str(2*np.sqrt(np.diag(covls))))
+    # print('mest ' + str(mest_f))
+    # print('95% CI final ' + str(2*np.sqrt(np.diag(covm_est_f))))
 
+    # Return relevant variables
     return mls, mest_f, covls, covm_est_f, covepsilon_est_f, comp_pre, epsilon_pre, epsilon_linear
 
+def calculate_calibration_error(covariance_matrix):
+    """
+    Calculate the calibration error based on the diagonal elements of a covariance matrix.
+
+    Parameters:
+        covariance_matrix (ndarray): A covariance matrix.
+
+    Returns:
+        A float representing the calibration error.
+    """
+    diagonal = np.diag(covariance_matrix)
+    return 2 * np.sqrt(np.mean(diagonal))
+
+def calculate_epsilon_values(coefficients, composition):
+    """
+    Calculate epsilon values using coefficients and composition.
+
+    Parameters:
+        coefficients (ndarray): An array of coefficients.
+        composition (ndarray): An array of composition data.
+
+    Returns:
+        A 1D array of calculated epsilon values.
+    """
+    return coefficients[0] + coefficients[1] * composition
+
+def calculate_standard_error_of_estimate(residuals):
+    """
+    Calculate the standard error of estimate given an array of residuals.
+
+    Parameters:
+        residuals (ndarray): An array of residuals.
+
+    Returns:
+        A float representing the standard error of estimate.
+    """
+    return np.sqrt(np.sum(residuals ** 2)) / (len(residuals) - 2)
+
+def calculate_coefficient_of_determination(actual_values, predicted_values):
+    """
+    Calculate the coefficient of determination given actual and predicted values.
+
+    Parameters:
+        actual_values (ndarray): An array of actual values.
+        predicted_values (ndarray): An array of predicted values.
+
+    Returns:
+        A float representing the coefficient of determination.
+    """
+    y_bar = np.mean(actual_values)
+    total_sum_of_squares = np.sum((actual_values - y_bar) ** 2)
+    residual_sum_of_squares = np.sum((actual_values - predicted_values) ** 2)
+    return 1 - (residual_sum_of_squares / total_sum_of_squares)
+
+def calculate_root_mean_squared_error(residuals):
+    """
+    Calculate the root mean squared error given an array of residuals.
+
+    Parameters:
+        residuals (ndarray): An array of residuals.
+
+    Returns:
+        A float representing the root mean squared error.
+    """
+    return np.sqrt(np.mean(residuals ** 2))
 
 def errors(comp, epsilon, mls, mest_f, covls, covm_est_f, covepsilon_est_f):
+    """
+    Calculate error metrics for a given set of data.
 
-    vepsilon = np.diag(covepsilon_est_f)
-    E_calib = 2*np.sqrt(np.mean(vepsilon))
+    Parameters:
+        comp (ndarray): A 1D array containing the composition data.
+        epsilon: A 1D array containing the absorbance coefficient data.
+        mls (ndarray): A 1D array of the least squares estimate of the coefficients.
+        mest_f (ndarray): A 1D array of the final estimate of the coefficients.
+        covls (ndarray): The covariance matrix of the least squares estimate.
+        covm_est_f (ndarray): The covariance matrix of the final estimate.
+        covepsilon_est_f (ndarray): The covariance matrix of the final estimate of the absorbance coefficients.
 
-    epsilon_ls = mls[0] + mls[1]*comp
-    epsilon_linear = mest_f[0] + mest_f[1]*comp
+    Returns:
+        A tuple containing the following elements:
+            - E_calib: A float representing the error in calibration.
+            - see_inv: A float representing the standard error of estimate.
+            - r2_inv: A float representing the coefficient of determination.
+            - rmse_inv: A float representing the root mean squared error.
+    """
+    epsilon_final_estimate = calculate_epsilon_values(mest_f, comp)
+    residuals = epsilon_final_estimate - epsilon
+    E_calib = calculate_calibration_error(covepsilon_est_f)
+    see_inv = calculate_standard_error_of_estimate(residuals)
+    r2_inv = calculate_coefficient_of_determination(epsilon, epsilon_final_estimate)
+    rmse_inv = calculate_root_mean_squared_error(residuals)
 
-    res_inv = epsilon_linear - epsilon
-    see_inv = np.sqrt(np.sum(res_inv**2)) / (len(res_inv)-1-1)
-
-    yhat_inv = epsilon_linear 
-    ybar_inv = np.mean(epsilon)
-
-    totalsumsq_inv = np.sum((epsilon_linear-ybar_inv)**2)
-    ssregress_inv = np.sum((yhat_inv-ybar_inv)**2)
-    ssresid_inv = np.sum((epsilon-yhat_inv)**2)
-    sstotal_inv = ssregress_inv + ssresid_inv
-    r2_inv = 1-(ssresid_inv/sstotal_inv)
-    rmse_inv = np.sqrt(np.sum(res_inv**2) / len(res_inv))
-    
     return E_calib, see_inv, r2_inv, rmse_inv
 
 
-def errors_plotting(comp, epsilon, mest_f): 
 
+
+
+
+
+
+# %% 
+
+
+
+# def errors(comp, epsilon, mls, mest_f, covls, covm_est_f, covepsilon_est_f):
+
+#     """
+#     Calculate error metrics for a given set of data.
+
+#     Parameters:
+#         comp (ndarray): A 1D array containing the composition data.
+#         epsilon: A 1D array containing the absorbance coefficient data.
+#         mls (ndarray): A 1D array of the least squares estimate of the coefficients.
+#         mest_f (ndarray): A 1D array of the final estimate of the coefficients.
+#         covls (ndarray): The covariance matrix of the least squares estimate.
+#         covm_est_f (ndarray): The covariance matrix of the final estimate.
+#         covepsilon_est_f (ndarray): The covariance matrix of the final estimate of the absorbance coefficients.
+
+#     Returns:
+#         A tuple containing the following elements:
+#             - E_calib: A float representing the error in calibration.
+#             - see_inv: A float representing the standard error of estimate.
+#             - r2_inv: A float representing the coefficient of determination.
+#             - rmse_inv: A float representing the root mean squared error.
+#     """
+
+#     vepsilon = np.diag(covepsilon_est_f)  # get diagonal elements of covariance matrix of final estimate of epsilon
+#     E_calib = 2 * np.sqrt(np.mean(vepsilon))  # calculate calibration error based on the mean of these elements
+
+#     epsilon_ls = mls[0] + mls[1] * comp  # calculate epsilon values using the least squares estimate of coefficients
+#     epsilon_linear = mest_f[0] + mest_f[1] * comp  # calculate epsilon values using the final estimate of coefficients
+
+#     res_inv = epsilon_linear - epsilon  # calculate residuals between final estimate and actual epsilon values
+#     see_inv = np.sqrt(np.sum(res_inv ** 2)) / (len(res_inv) - 1 - 1)  # calculate standard error of estimate
+
+#     yhat_inv = epsilon_linear  # predicted values of epsilon using the final estimate
+#     ybar_inv = np.mean(epsilon)  # mean of actual epsilon values
+
+#     totalsumsq_inv = np.sum((epsilon_linear - ybar_inv) ** 2)  # total sum of squares
+#     ssregress_inv = np.sum((yhat_inv - ybar_inv) ** 2)  # regression sum of squares
+#     ssresid_inv = np.sum((epsilon - yhat_inv) ** 2)  # residual sum of squares
+#     sstotal_inv = ssregress_inv + ssresid_inv  # total sum of squares
+#     r2_inv = 1 - (ssresid_inv / sstotal_inv)  # calculate coefficient of determination
+#     rmse_inv = np.sqrt(np.sum(res_inv ** 2) / len(res_inv))  # calculate root mean squared error
+
+#     return E_calib, see_inv, r2_inv, rmse_inv
+
+
+
+def errors_plotting(comp, epsilon, mest_f):
+    
+    """
+    This function generates a plot of the error for a given model.
+
+    Parameters:
+        comp (ndarray): The independent variable values.
+        epsilon (ndarray): The error values corresponding to the independent variable values.
+        mest_f (tuple): A tuple of two values representing the slope and intercept of the linear regression line.
+
+    Returns:
+        comp_arr (ndarray): An array of 100 evenly spaced values between 0 and 1.
+        liney (ndarray): The predicted values of the dependent variable for the given model.
+        conf_lower (ndarray): The lower confidence bound for the predicted values.
+        conf_upper (ndarray): The upper confidence bound for the predicted values.
+        pred_lower (ndarray): The lower prediction bound for the predicted values.
+        pred_upper (ndarray): The upper prediction bound for the predicted values.
+    """
+
+    import numpy as np
     from scipy import stats
 
-    n = len(epsilon); 
-    comp_arr = np.linspace(0, 1, 100)
+    n = len(epsilon)  # Number of observations
+    comp_arr = np.linspace(0, 1, 100)  # Create an array of 100 evenly spaced values between 0 and 1
     linex = comp_arr
-    liney = mest_f[0] + mest_f[1]*comp_arr
+    liney = mest_f[0] + mest_f[1] * comp_arr  # Predicted values of the dependent variable for the given model
 
-    epsilon_linear = mest_f[0] + mest_f[1]*comp
+    # Calculate various statistics
+    epsilon_linear = mest_f[0] + mest_f[1] * comp
     epsilon_mean = np.mean(epsilon)
     xm = np.mean(comp)
 
-    yhat = epsilon_linear 
+    yhat = epsilon_linear
     ybar = np.mean(epsilon)
-    totalsumsq = np.sum((epsilon-ybar)**2)
-    ssregress = np.sum((yhat-ybar)**2)
-    ssresid = np.sum((epsilon-yhat)**2) 
+    totalsumsq = np.sum((epsilon - ybar) ** 2)
+    ssregress = np.sum((yhat - ybar) ** 2)
+    ssresid = np.sum((epsilon - yhat) ** 2)
     sstotal = ssregress + ssresid
-    r2 = 1-(ssresid/sstotal)
+    r2 = 1 - (ssresid / sstotal)
 
-    ssxx = sum((comp - xm)**2); 
+    ssxx = np.sum((comp - xm) ** 2)
 
-    ttest = stats.t.ppf(((1-0.68)/2), n-2)
-    se = np.sqrt(ssresid / (n-2))
+    # Calculate confidence and prediction intervals
+    ttest = stats.t.ppf(0.16, n - 2)  # Two-tailed t-test value for 68% confidence level
+    se = np.sqrt(ssresid / (n - 2))  # Standard error of the regression
+    factor = ttest * se * np.sqrt(1 / n + (linex - xm) ** 2 / ssxx)
 
-    conf_upper = liney + (ttest*se*np.sqrt(1/n+(linex-xm)**2/ssxx))
-    conf_lower = liney - (ttest*se*np.sqrt(1/n+(linex-xm)**2/ssxx))
+    conf_upper = liney + factor
+    conf_lower = liney - factor
 
-    pred_upper = liney + (ttest*se*np.sqrt(1 + 1/n+(linex-xm)**2/ssxx))
-    pred_lower = liney - (ttest*se*np.sqrt(1 + 1/n+(linex-xm)**2/ssxx))
+    factor = ttest * se * np.sqrt(1 + 1 / n + (linex - xm) ** 2 / ssxx)
 
+    pred_upper = liney + factor
+    pred_lower = liney - factor
+
+    # Return the required arrays
     return comp_arr, liney, conf_lower, conf_upper, pred_lower, pred_upper
+
+
 
 # %% 
 

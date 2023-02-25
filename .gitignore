@@ -4,4 +4,11 @@ dist/
 OldRegressions/
 PEAKFIT_FINAL/Old/
 __pycache__
-ThicknessFunction_Old.py
+Inputs/FuegoChemistry_NEW_H2O_Fe2O3.csv
+THICKNESS/FuegoOlMicrometer.csv
+THICKNESS/FuegoOlThickness.csv
+THICKNESS/ND70_Micrometer.csv
+THICKNESS/ND70_Thickness_HighQuality.csv
+THICKNESS/ND70_Thickness_LowQuality.csv
+THICKNESS/ThicknessFunction_Old.py
+THICKNESS/ThicknessFunction_Plotting.py

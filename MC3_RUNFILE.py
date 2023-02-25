@@ -4,22 +4,20 @@
 # %% Import packages
 
 import os
-import sys
-import time
 import glob
-import warnings 
-import mc3
 import numpy as np
 import pandas as pd
-
-import scipy.signal as signal
-import scipy.interpolate as interpolate
-import MC3_BACKEND as baselines
+import mc3
+import MC3_BASELINES as baselines
 
 import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib import rc, cm
 
+%matplotlib inline
+%config InlineBackend.figure_format = 'retina'
+rc('font',**{'family':'Avenir', 'size': 18})
+plt.rcParams['pdf.fonttype'] = 42
 
 # %% Create directories for export file sorting. 
 # Load FTIR Baseline Dictionary of decarbonated MIs from Aleutian volcanoes. 
@@ -56,6 +54,31 @@ INPUT_PATHS = [[path_input+'Baseline_AvgPCA.csv', path_input+"Water_Peak_1635_Al
 # Change to be what you want the prefix of your output files to be. 
 OUTPUT_PATH = ['F18', 'STD', 'FRH', 'SIMSSTD', 'SIMSSTD2']
 
+# %% 
+
+path_parent = os.path.dirname(os.getcwd())
+path_input = os.getcwd() + '/Inputs'
+
+# Change paths to direct to folder with SampleSpectra -- last bit should be whatever your folder with spectra is called. 
+PATH = path_input + '/ReflectanceSpectra/FuegoOl/'
+FILES = glob.glob(PATH + "*")
+FILES.sort()
+
+DFS_FILES, DFS_DICT = baselines.Load_SampleCSV(FILES, wn_high = 2800, wn_low = 2000)
+
+# n=1.546 in the range of 2000-2700 cm^-1 following Nichols and Wysoczanski, 2007 for basaltic glass
+# Provide a wavenumber buffer in these applications. Assess if the range is appropriate by looking at
+# the standard deviations associated with each thickness. 
+
+smoothing_wn_width = 15 # lower smoothing 
+peak_heigh_min_delta = 0.002
+peak_search_width = 10
+
+n_ol = baselines.ReflectanceIndex(0.72)
+
+Fuego1 = baselines.ThicknessProcessing(DFS_DICT, n = n_ol, wn_high = 2700, wn_low = 2100, savgol_filter_width = 99, smoothing_wn_width = smoothing_wn_width, peak_heigh_min_delta = peak_heigh_min_delta, peak_search_width = 10, remove_baseline = True, plotting = True)
+
+
 
 # %% 
 
@@ -67,17 +90,23 @@ FILES.sort()
 
 MICOMP, THICKNESS = baselines.Load_ChemistryThickness(CHEMTHICK_PATH[simsno])
 
-DFS_FILES, DFS_DICT = baselines.Load_SampleCSV(FILES, H2O_wn_high = 5500, H2O_wn_low = 1000)
-# DF_OUTPUT, FAILURES = baselines.Run_All_Spectra(DFS_DICT, INPUT_PATHS[simsno])
-# DF_OUTPUT.to_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[simsno] + '_DF_F.csv')
+DFS_FILES, DFS_DICT = baselines.Load_SampleCSV(FILES, wn_high = 5500, wn_low = 1000)
+DF_OUTPUT, FAILURES = baselines.Run_All_Spectra(DFS_DICT, INPUT_PATHS[simsno])
+
+
+DF_OUTPUT.to_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[simsno] + '_DF_F.csv')
 
 DF_OUTPUT = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[simsno] + '_DF_F.csv', index_col = 0)
 
+T_ROOM = 25 # C
+P_ROOM = 1 # Bar
+
 N = 500000
-DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP)
+DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP, T_ROOM, P_ROOM)
 MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[simsno] + '_H2OCO2_F.csv')
 DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[simsno] + '_DensityEpsilon_F.csv')
 
+# %%
 # %% 
 
 simsno2 = 4
@@ -88,14 +117,17 @@ FILES.sort()
 
 MICOMP, THICKNESS = baselines.Load_ChemistryThickness(CHEMTHICK_PATH[simsno2])
 
-DFS_FILES, DFS_DICT = baselines.Load_SampleCSV(FILES, H2O_wn_high = 5500, H2O_wn_low = 1000)
+DFS_FILES, DFS_DICT = baselines.Load_SampleCSV(FILES, wn_high = 5500, wn_low = 1000)
 # DF_OUTPUT, FAILURES = baselines.Run_All_Spectra(DFS_DICT, INPUT_PATHS[simsno2])
 # DF_OUTPUT.to_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[simsno2] + '_DF_F.csv')
 
 DF_OUTPUT = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[simsno2] + '_DF_F.csv', index_col = 0)
 
+T_ROOM = 25 # C
+P_ROOM = 1 # Bar
+
 N = 500000
-DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP, sigma_thickness = 3)
+DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP, T_ROOM, P_ROOM)
 # MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[simsno2] + '_H2OCO2_F.csv')
 # DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[simsno2] + '_DensityEpsilon_F.csv')
 MEGA_SPREADSHEET
@@ -110,14 +142,17 @@ FILES.sort()
 
 MICOMP, THICKNESS = baselines.Load_ChemistryThickness(CHEMTHICK_PATH[stdno])
 
-DFS_FILES, DFS_DICT = baselines.Load_SampleCSV(FILES, H2O_wn_high = 5500, H2O_wn_low = 1000)
+DFS_FILES, DFS_DICT = baselines.Load_SampleCSV(FILES, wn_high = 5500, wn_low = 1000)
 # DF_OUTPUT, FAILURES = baselines.Run_All_Spectra(DFS_DICT, INPUT_PATHS[stdno])
 # DF_OUTPUT.to_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_DF_F.csv')
 
 DF_OUTPUT = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_DF_F.csv', index_col = 0)
 
+T_ROOM = 25 # C
+P_ROOM = 1 # Bar
+
 N = 500000
-DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP)
+DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP, T_ROOM, P_ROOM)
 MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_H2OCO2_F.csv')
 DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_DensityEpsilon_F.csv')
 
@@ -243,14 +278,17 @@ fuegono = 0
 
 MICOMP, THICKNESS = baselines.Load_ChemistryThickness(CHEMTHICK_PATH[fuegono])
 
-DFS_FILES, DFS_DICT = baselines.Load_SampleCSV(FILES, H2O_wn_high = 5500, H2O_wn_low = 1000)
+DFS_FILES, DFS_DICT = baselines.Load_SampleCSV(FILES, wn_high = 5500, wn_low = 1000)
 # DF_OUTPUT, FAILURES = baselines.Run_All_Spectra(DFS_DICT, INPUT_PATHS[fuegono])
 # DF_OUTPUT.to_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[fuegono] + '_DF_F.csv')
 
 DF_OUTPUT = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[fuegono] + '_DF_F.csv', index_col = 0)
 
+T_ROOM = 25 # C
+P_ROOM = 1 # Bar
+
 N = 500000
-DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP)
+DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP, T_ROOM, P_ROOM)
 MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[fuegono] + '_H2OCO2_F.csv')
 DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[fuegono] + '_DensityEpsilon_F.csv')
 
@@ -264,14 +302,17 @@ fuegorhno = 2
 
 MICOMP, THICKNESS = baselines.Load_ChemistryThickness(CHEMTHICK_PATH[fuegorhno])
 
-DFS_FILES, DFS_DICT = baselines.Load_SampleCSV(FILES, H2O_wn_high = 5500, H2O_wn_low = 1000)
+DFS_FILES, DFS_DICT = baselines.Load_SampleCSV(FILES, wn_high = 5500, wn_low = 1000)
 # DF_OUTPUT, FAILURES = baselines.Run_All_Spectra(DFS_DICT, INPUT_PATHS[fuegorhno])
 # DF_OUTPUT.to_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[fuegorhno] + '_DF_F.csv')
 
 DF_OUTPUT = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[fuegorhno] + '_DF_F.csv', index_col = 0)
 
+T_ROOM = 25 # C
+P_ROOM = 1 # Bar
+
 N = 500000
-DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP)
+DENSITY_EPSILON, MEGA_SPREADSHEET = baselines.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP, T_ROOM, P_ROOM)
 MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[fuegorhno] + '_H2OCO2_F.csv')
 DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[fuegorhno] + '_DensityEpsilon_F.csv')
 
