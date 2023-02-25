@@ -78,8 +78,6 @@ n_ol = baselines.ReflectanceIndex(0.72)
 
 Fuego1 = baselines.ThicknessProcessing(DFS_DICT, n = n_ol, wn_high = 2700, wn_low = 2100, savgol_filter_width = 99, smoothing_wn_width = smoothing_wn_width, peak_heigh_min_delta = peak_heigh_min_delta, peak_search_width = 10, remove_baseline = True, plotting = True)
 
-
-
 # %% 
 
 simsno = 3 
