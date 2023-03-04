@@ -533,11 +533,11 @@ def trace(posterior, title, zchain=None, pnames=None, thinning=25,
                     ylow = 9.479-0.862*np.amin([npanels-1,npars-npanels*page-1])
                     bbox = mpl.transforms.Bbox([[0.0, ylow], [8.5, 11]])
 
-                fig.savefig(f"{sf[0]}_page{page:02d}{sf[1]}", bbox_inches=bbox, backend='pgf')
+                fig.savefig(f"{sf[0]}_page{page:02d}{sf[1]}", bbox_inches=bbox)
             else:
                 fig.suptitle(title)
                 plt.ioff()
-                fig.savefig(savefile, bbox_inches='tight', backend='pgf') # dpi = 100)
+                fig.savefig(savefile, bbox_inches='tight') # dpi = 100)
 
     return axes
 
@@ -706,11 +706,11 @@ def histogram(posterior, title, pnames=None, thinning=1, fignum=1100,
         for page, fig in enumerate(figs):
             if npages > 1:
                 sf = os.path.splitext(savefile)
-                fig.savefig(f"{sf[0]}_page{page:02d}{sf[1]}", bbox_inches='tight', backend='pgf')
+                fig.savefig(f"{sf[0]}_page{page:02d}{sf[1]}", bbox_inches='tight')
             else:
                 fig.suptitle(title)
                 plt.ioff()
-                fig.savefig(savefile, bbox_inches='tight', backend='pgf')
+                fig.savefig(savefile, bbox_inches='tight')
     
     return axes
 
@@ -895,7 +895,7 @@ def modelfit(data, uncert, indparams, model, title, nbins=75,
     rax.errorbar(binindp, bindata-binmodel, binuncert, fmt='ko', ms=4)
     rax.plot([indparams[0], indparams[-1]], [0,0], 'k:', lw=1.5)
     rax.tick_params(labelsize=fs-1, direction='in', top=True, right=True)
-    rax.set_xlabel("Wavenumber $(cm^{-1})$", fontsize=fs)
+    rax.set_xlabel("Wavenumber $(\mathregular{cm^{-1}})$", fontsize=fs)
     rax.set_ylabel('Absorbance Residual', fontsize=fs)
     rax.invert_xaxis()
 
@@ -913,7 +913,7 @@ def modelfit(data, uncert, indparams, model, title, nbins=75,
     if savefile is not None:
         plt.suptitle(title)
         plt.ioff()
-        plt.savefig(savefile, backend='pgf')
+        plt.savefig(savefile)
     return ax, rax
 
 
@@ -982,7 +982,7 @@ def MCMC(data, uncert, indparams, log, savefile):
     func = Carbonate
     params = np.array([1.25, 2.00, 0.25, 0.01, 0.01, 1430, 25.0, 0.0100, 1510, 25.0, 0.0100, 0.10, 0.02, 0.01, 5e-4, 0.70])
     pmin = np.array([0.00, -5.00, -1.00, -0.75, -0.75, 1415, 22.5, 0.0000, 1500, 22.5, 0.0000, 0.00, -0.50, -0.50, -5e-2, -1.00])
-    pmax = np.array([5.00, 8.00, 1.00, 0.75, 0.75, 1445, 40.0, 2.0000, 1535, 40.0, 2.0000, 3.00, 0.50, 0.50, 5e-2, 3.00])
+    pmax = np.array([5.00, 8.00, 1.00, 0.75, 0.75, 1445, 40.0, 3.0000, 1535, 40.0, 3.0000, 3.00, 0.50, 0.50, 5e-2, 3.00])
     pstep = np.array([0.30, 0.50, 0.20, 0.20, 0.20, 3.25, 2.25, 0.0005, 6.0, 2.25, 0.0005, 0.25, 0.75, 0.75, 0.002, 0.20])
 
     # Define prior limits for parameters
@@ -990,12 +990,12 @@ def MCMC(data, uncert, indparams, log, savefile):
     priorup = np.array([0.00, 0.00, 0.00, 0.00, 0.00, 0.0, 2.5, 0.0, 0.0, 2.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 
     pnames   = ['Avg_BL',"PCA1","PCA2","PCA3","PCA4",'peak_G1430','std_G1430','G1430_amplitude','peak_G1515','std_G1515','G1515_amplitude','Average_1635Peak','1635PeakPCA1','1635PeakPCA2','m','b']
-    texnames = ['$\overline{BL}$',"$PCA_1$","$PCA_2$","$PCA_3$",'$PCA_4$','$P_{1430}$','$S_{1430}$','$PH_{1430}$','$P_{1515}$','$S_{1515}$','$PH_{1515}$','$\overline{H_{1635}}$','${H_{1635,PCA_1}}$','${H_{1635,PCA_2}}$','m','b']
+    texnames = ['$\overline{BL}$',"$PCA_1$","$PCA_2$","$PCA_3$",'$PCA_4$','$P_{1430}$','$S_{1430}$','$PH_{1430}$','$P_{1515}$','$S_{1515}$','$PH_{1515}$','$\overline{H_{1635}}$','${H_{1635,PCA_1}}$','${H_{1635,PCA_2}}$','$m$','$b$']
 
     mc3_output = mc3.sample(data=data, uncert=uncert, func=func, params=params, indparams=indparams,
                             pmin=pmin, pmax=pmax, priorlow=priorlow, priorup=priorup,
                             pnames=pnames, texnames=texnames, sampler='snooker', rms=False,
-                            nsamples=int(5e5), nchains=9, ncpu=3, burnin=5000, thinning=1,
+                            nsamples=1e6, nchains=9, ncpu=3, burnin=5000, thinning=1,
                             leastsq='trf', chisqscale=False, grtest=True, grbreak=1.01, grnmin=0.5,
                             hsize=10, kickoff='normal', wlike=False, plots=False, log=log, savefile=savefile)
 
@@ -1117,17 +1117,17 @@ def Run_All_Spectra(dfs_dict, paths):
             ax1.plot(data_H2O4500_1.index, data_H2O4500_1['Absorbance_Hat'], 
                     data_H2O4500_2.index, data_H2O4500_2['Absorbance_Hat'], 
                     data_H2O4500_3.index, data_H2O4500_3['Absorbance_Hat'])
-            ax1.plot(data_H2O5200_1.index, data_H2O5200_1['BL_NIR_H2O'], 
-                    data_H2O5200_2.index, data_H2O5200_2['BL_NIR_H2O'], 
-                    data_H2O5200_3.index, data_H2O5200_3['BL_NIR_H2O'])
-            ax1.plot(data_H2O4500_1.index, data_H2O4500_1['BL_NIR_H2O'], 
-                    data_H2O4500_2.index, data_H2O4500_2['BL_NIR_H2O'], 
-                    data_H2O4500_3.index, data_H2O4500_3['BL_NIR_H2O'])
-            ax1.annotate(f"5200 cm $^{{- 1}}$  Peak Height Gaussian: {PH_5200_krige_M:.4f} ± {PH_5200_krige_STD:.4f} $\ cm ^{{- 1}} $, S2N = {STN_5200_M:.2f}", (0.025, 0.90), xycoords = 'axes fraction')
-            ax1.annotate(f"4500 cm $^{{- 1}}$  Peak Height Gaussian: {PH_4500_krige_M:.4f} ± {PH_4500_krige_STD:.4f} $\ cm ^{{- 1}} $, S2N = {STN_4500_M:.2f}", (0.025, 0.80), xycoords = 'axes fraction')
+            ax1.plot(data_H2O5200_1.index, data_H2O5200_1['BL_NIR_H2O'], 'lightsteelblue',
+                    data_H2O5200_2.index, data_H2O5200_2['BL_NIR_H2O'], 'lightsteelblue',
+                    data_H2O5200_3.index, data_H2O5200_3['BL_NIR_H2O'], 'lightsteelblue')
+            ax1.plot(data_H2O4500_1.index, data_H2O4500_1['BL_NIR_H2O'], 'silver',
+                    data_H2O4500_2.index, data_H2O4500_2['BL_NIR_H2O'], 'silver',
+                    data_H2O4500_3.index, data_H2O4500_3['BL_NIR_H2O'], 'silver')
+            ax1.annotate("$\mathregular{H_2O_{m, 5200}}$  Peak Height: " + f"{PH_5200_krige_M:.4f} ± {PH_5200_krige_STD:.4f}, S2N={STN_5200_M:.2f}", (0.025, 0.90), xycoords = 'axes fraction')
+            ax1.annotate("$\mathregular{OH^{-}_{4500}}$  Peak Height: " + f"{PH_4500_krige_M:.4f} ± {PH_4500_krige_STD:.4f}, S2N={STN_4500_M:.2f}", (0.025, 0.80), xycoords = 'axes fraction')
             ax1.set_ylabel('Absorbance')
             warnings.filterwarnings("ignore", category = UserWarning)
-            ax1.legend(['Near IR Data','_','_','Median Filtered 5200','_','_','Median Filtered 4500','_','_','Baseline 5200','_','_','Baseline 4500'], prop={'size': 12})
+            ax1.legend(['NIR Spectrum','_','_','$\mathregular{H_2O_{m, 5200}}$ Median Filtered','_','_','$\mathregular{OH^{-}_{4500}}$ Median Filtered','_','_','$\mathregular{H_2O_{m, 5200}}$ Baseline','_','_','$\mathregular{OH^{-}_{4500}}$ Baseline'], prop={'size': 10})
             ax1.set_xlim([4200, 5400])
             ax1.set_ylim([plotmin-0.075, plotmax+0.075])
             ax1.invert_xaxis()
@@ -1136,20 +1136,20 @@ def Run_All_Spectra(dfs_dict, paths):
             ax2 = plt.subplot2grid((2, 3), (1, 0))
             ax2.plot(data_H2O5200_1.index, data_H2O5200_1['Subtracted_Peak'] - np.min(krige_output_5200_1['Absorbance']), 'k',
                     data_H2O5200_2.index, data_H2O5200_2['Subtracted_Peak'] - np.min(krige_output_5200_2['Absorbance']), 'k', 
-                    data_H2O5200_3.index, data_H2O5200_3['Subtracted_Peak'] - np.min(krige_output_5200_3['Absorbance']), 'k', label = 'Subtracted Baseline 5200')
+                    data_H2O5200_3.index, data_H2O5200_3['Subtracted_Peak'] - np.min(krige_output_5200_3['Absorbance']), 'k', label = '$\mathregular{H_2O_{m, 5200}}$ Baseline Subtracted')
             ax2.plot(data_H2O4500_1.index, data_H2O4500_1['Subtracted_Peak'] - np.min(krige_output_4500_1['Absorbance']), 'k', 
                     data_H2O4500_2.index, data_H2O4500_2['Subtracted_Peak'] - np.min(krige_output_4500_2['Absorbance']), 'k', 
-                    data_H2O4500_3.index, data_H2O4500_3['Subtracted_Peak'] - np.min(krige_output_4500_3['Absorbance']), 'k', label = 'Subtracted Baseline 4500')
+                    data_H2O4500_3.index, data_H2O4500_3['Subtracted_Peak'] - np.min(krige_output_4500_3['Absorbance']), 'k', label = '$\mathregular{OH^{-}_{4500}}$ Baseline Subtracted')
             ax2.plot(krige_output_5200_1.index, krige_output_5200_1['Absorbance'] - np.min(krige_output_5200_1['Absorbance']), 
                     krige_output_5200_2.index, krige_output_5200_2['Absorbance'] - np.min(krige_output_5200_2['Absorbance']),
-                    krige_output_5200_3.index, krige_output_5200_3['Absorbance'] - np.min(krige_output_5200_3['Absorbance']), label = 'Gaussian 5200')
+                    krige_output_5200_3.index, krige_output_5200_3['Absorbance'] - np.min(krige_output_5200_3['Absorbance']), label = '$\mathregular{H_2O_{m, 5200}}$ Kriged Peak')
             ax2.plot(krige_output_4500_1.index, krige_output_4500_1['Absorbance'] - np.min(krige_output_4500_1['Absorbance']), 
                     krige_output_4500_2.index, krige_output_4500_2['Absorbance'] - np.min(krige_output_4500_2['Absorbance']), 
-                    krige_output_4500_3.index, krige_output_4500_3['Absorbance'] - np.min(krige_output_4500_3['Absorbance']), label = 'Gaussian 4500')
-            ax2.set_xlabel('Wavenumber $cm^{-1}$')    
+                    krige_output_4500_3.index, krige_output_4500_3['Absorbance'] - np.min(krige_output_4500_3['Absorbance']), label = '$\mathregular{OH^{-}_{4500}}$ Kriged Peak')
+            ax2.set_xlabel('Wavenumber $(\mathregular{cm^{-1}})$')    
             ax2.set_ylabel('Absorbance')
             warnings.filterwarnings("ignore", category = UserWarning)
-            ax2.legend(['Subtracted 5200','_','_','Subtracted 4500','_','_','_','_','Gaussian 5200','_','_','Gaussian 4500'])
+            ax2.legend(['$\mathregular{H_2O_{m, 5200}}$ Baseline Subtracted','_','_','$\mathregular{OH^{-}_{4500}}$ Baseline Subtracted','_','_','_','_','$\mathregular{H_2O_{m, 5200}}$ Kriged','_','_','$\mathregular{OH^{-}_{4500}}$ Kriged'], prop={'size': 10})
             ax2.set_xlim([4200, 5400])
             ax2.set_ylim([0, plotmax+0.05])
             ax2.invert_xaxis()
@@ -1187,17 +1187,19 @@ def Run_All_Spectra(dfs_dict, paths):
             plotmin = np.round(np.min(data_H2O3550_1['Absorbance'].to_numpy()), decimals = 0)
             ax3 = plt.subplot2grid((2, 3), (0, 1), rowspan = 2)
             ax3.plot(data.index, data['Absorbance'], 'k')
-            ax3.plot(data_H2O3550_1['Absorbance'].index, data_H2O3550_1['BL_MIR_3550'], data_H2O3550_2['Absorbance'].index, 
-                data_H2O3550_2['BL_MIR_3550'], data_H2O3550_3['Absorbance'].index, data_H2O3550_3['BL_MIR_3550'])
+            ax3.plot(data_H2O3550_1['Absorbance'].index, data_H2O3550_1['BL_MIR_3550'], 'silver', label = '$\mathregular{H_2O_{t, 3550}}$ Baseline')
+            ax3.plot(data_H2O3550_2['Absorbance'].index, data_H2O3550_2['BL_MIR_3550'], 'silver') 
+            ax3.plot(data_H2O3550_3['Absorbance'].index, data_H2O3550_3['BL_MIR_3550'], 'silver')
             ax3.plot(plot_output_3550_1.index, (plot_output_3550_1['Subtracted_Peak_Hat']+plot_output_3550_1['BL_MIR_3550']), 'r', linewidth = 2)
             ax3.plot(plot_output_3550_2.index, (plot_output_3550_2['Subtracted_Peak_Hat']+plot_output_3550_2['BL_MIR_3550']), 'r', linewidth = 2)
             ax3.plot(plot_output_3550_3.index, (plot_output_3550_3['Subtracted_Peak_Hat']+plot_output_3550_3['BL_MIR_3550']), 'r', linewidth = 2)
             ax3.set_title(files)
-            ax3.annotate(f"3550 cm $^{{- 1}}$  Peak Height: {PH_3550_M:.4f} ± {PH_3550_STD:.4f} $\ cm ^{{- 1}}$", (0.025, 0.95), xycoords = 'axes fraction')
-            ax3.set_xlabel('Wavenumber $cm^{-1}$')
+            ax3.annotate("$\mathregular{H_2O_{t, 3550}}$  Peak Height: " + f"{PH_3550_M:.4f} ± {PH_3550_STD:.4f}", (0.025, 0.95), xycoords = 'axes fraction')
+            ax3.set_xlabel('Wavenumber $(\mathregular{cm^{-1}})$')
             ax3.set_xlim([1275, 4000])
             ax3.set_ylabel('Absorbance')
             ax3.set_ylim([plotmin-0.25, plotmax+0.5])
+            ax3.legend(loc = 'upper right', prop={'size': 10})
             ax3.invert_xaxis()
 
             # Save H2Om_{3550} peak heights and saturation information
@@ -1272,28 +1274,27 @@ def Run_All_Spectra(dfs_dict, paths):
                 Baseline_Array_Plot[i, :] = Baseline_Array[i, :] + Linearray
                 plt.plot(Wavenumber, Baseline_Array_Plot[i, :], 'dimgray', linewidth = 0.25)
             ax4.plot(Wavenumber, spec_mc3, 'tab:blue', linewidth = 2.5, label = 'FTIR Spectrum')
-            ax4.plot(Wavenumber, H1635_SOLVE, 'tab:orange', linewidth = 1.5, label = '1635')
-            ax4.plot(Wavenumber, CO2P1515_SOLVE, 'tab:green', linewidth = 2.5, label = '1515')
-            ax4.plot(Wavenumber, CO2P1430_SOLVE, 'tab:red', linewidth = 2.5, label = '1430')
-            ax4.plot(Wavenumber, Carbonate(mc3_output['meanp'], Wavenumber, PCAmatrix, Peak_1635_PCAmatrix, Nvectors), 'tab:purple', linewidth = 1.5, label = 'MC3 Fit')
+            ax4.plot(Wavenumber, H1635_SOLVE, 'tab:orange', linewidth = 1.5, label = '$\mathregular{H_2O_{m, 1635}}$')
+            ax4.plot(Wavenumber, CO2P1515_SOLVE, 'tab:green', linewidth = 2.5, label = '$\mathregular{CO_{3, 1515}^{2-}}$')
+            ax4.plot(Wavenumber, CO2P1430_SOLVE, 'tab:red', linewidth = 2.5, label = '$\mathregular{CO_{3, 1430}^{2-}}$')
+            ax4.plot(Wavenumber, Carbonate(mc3_output['meanp'], Wavenumber, PCAmatrix, Peak_1635_PCAmatrix, Nvectors), 'tab:purple', linewidth = 1.5, label = 'MC$^\mathregular{3}$ Fit')
             ax4.plot(Wavenumber, Baseline_Solve_BP, 'k', linewidth = 1.5, label = 'Baseline')
-            ax4.annotate(f"1635 cm $^{{- 1}}$  Peak Height: {H2OmP1635_BP[0]:.3f} ± {H2OmP1635_STD[0]:.3f} $\ cm ^{{- 1}} $ ", (0.025, 0.95), xycoords = 'axes fraction')
-            ax4.annotate(f"1515 cm $^{{- 1}}$  Peak Height: {CO2P_BP[5]:.3f} ± {CO2P_STD[5]:.3f} $\ cm ^{{- 1}} $ ", (0.025, 0.90), xycoords = 'axes fraction')
-            ax4.annotate(f"1430 cm $^{{- 1}}$  Peak Height: {CO2P_BP[2]:.3f} ± {CO2P_STD[2]:.3f} $\ cm ^{{- 1}} $ ", (0.025, 0.85), xycoords = 'axes fraction')
-            ax4.set_title(files)
+            ax4.annotate("$\mathregular{H_2O_{m, 1635}}$ Peak Height: " + f"{H2OmP1635_BP[0]:.3f} ± {H2OmP1635_STD[0]:.3f}", (0.025, 0.95), xycoords = 'axes fraction')
+            ax4.annotate("$\mathregular{CO_{3, 1515}^{2-}}$ Peak Height: " + f"{CO2P_BP[5]:.3f} ± {CO2P_STD[5]:.3f}", (0.025, 0.90), xycoords = 'axes fraction')
+            ax4.annotate("$\mathregular{CO_{3, 1430}^{2-}}$ Peak Height: " + f"{CO2P_BP[2]:.3f} ± {CO2P_STD[2]:.3f}", (0.025, 0.85), xycoords = 'axes fraction')
             ax4.set_xlim([1275, 2000])
-            ax4.set_xlabel('Wavenumber $cm^{-1}$')
+            ax4.set_xlabel('Wavenumber $(\mathregular{cm^{-1}})$')
             ax4.set_ylabel('Absorbance')
-            ax4.legend(loc = 'upper right', prop={'size': 12})
+            ax4.legend(loc = 'upper right', prop={'size': 10})
             ax4.invert_xaxis()
             plt.tight_layout()
-            plt.savefig(path_beg + figurepath + files + '.pdf', backend='pgf')
+            plt.savefig(path_beg + figurepath + files + '.pdf')
             plt.close('all')
 
             BL_MAX_1635_ABS = Baseline_Solve_BP[np.argmax(H1635_BP)]
 
             texnames = ['$\overline{BL}$',"$PCA_1$","$PCA_2$","$PCA_3$",'$PCA_4$','$P_{1430}$','$S_{1430}$','$A_{1430}$',
-                        '$P_{1515}$','$S_{1515}$','$A_{1515}$','$\overline{H_{1635}}$','${H_{1635,PCA_1}}$','${H_{1635,PCA_2}}$','m','b']
+                        '$P_{1515}$','$S_{1515}$','$A_{1515}$','$\overline{H_{1635}}$','${H_{1635,PCA_1}}$','${H_{1635,PCA_2}}$','$m$','$b$']
 
             fig1 = trace(mc3_output['posterior'], title = files, zchain=mc3_output['zchain'], burnin=mc3_output['burnin'], 
                         pnames=texnames, savefile=path_beg+plotpath+'TRACE/'+files+'_trace.pdf')
@@ -1358,7 +1359,7 @@ def Beer_Lambert(molar_mass, absorbance, sigma_absorbance, density, sigma_densit
 
     """
 
-    concentration = pd.Series()
+    concentration = pd.Series(dtype='float')
     concentration = (1e6 * molar_mass * absorbance) / (density * thickness * epsilon)
 
     return concentration
@@ -1568,18 +1569,18 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, T_room, P_r
         covz_error_NaCa[1, 1] = Na_NaCa[i] * 0.01
 
         CT_int_3550 = (G_SiAl*covm_est_3550*np.transpose(G_SiAl)) + (mest_3550*covz_error_SiAl*np.transpose(mest_3550))
-        CT68_3550 = np.sqrt(np.mean(np.diag(CT_int_3550)))
+        CT68_3550 = (np.mean(np.diag(CT_int_3550)))**(1/2)
 
         CT_int_1635 = (G_SiAl*covm_est_1635*np.transpose(G_SiAl)) + (mest_1635*covz_error_SiAl*np.transpose(mest_1635))
-        CT68_1635 = np.sqrt(np.mean(np.diag(CT_int_1635)))
+        CT68_1635 = (np.mean(np.diag(CT_int_1635)))**(1/2)
 
         CT_int_CO2 = (G_NaCa*covm_est_CO2*np.transpose(G_NaCa)) + (mest_CO2*covz_error_NaCa*np.transpose(mest_CO2))
-        CT68_CO2 = np.sqrt(np.mean(np.diag(CT_int_CO2)))
+        CT68_CO2 = (np.mean(np.diag(CT_int_CO2)))**(1/2)
 
         CT_int_5200 = (G_SiAl*covm_est_5200*np.transpose(G_SiAl)) + (mest_5200*covz_error_SiAl*np.transpose(mest_5200))
-        CT68_5200 = np.sqrt(np.mean(np.diag(CT_int_5200)))
+        CT68_5200 = (np.mean(np.diag(CT_int_5200)))**(1/2)
         CT_int_4500 = (G_SiAl*covm_est_4500*np.transpose(G_SiAl)) + (mest_4500*covz_error_SiAl*np.transpose(mest_4500))
-        CT68_4500 = np.sqrt(np.mean(np.diag(CT_int_4500)))
+        CT68_4500 = (np.mean(np.diag(CT_int_4500)))**(1/2)
 
         # Save outputs of extinction coefficients to dataframe epsilon 
         epsilon.loc[i] = pd.Series({
@@ -1703,6 +1704,7 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, T_room, P_r
             density_sat = density_df['Density'][l]
 
         elif Volatiles_DF['H2OT_3550_SAT?'][l] == '*':
+            Sat_MI_Composition = MI_Composition.copy()
             for m in range(20):
                 H2Om_1635_BP = Beer_Lambert(molar_mass['H2O'], 
                                             Volatiles_DF['PH_1635_BP'][l], Volatiles_DF['PH_1635_STD'][l], 
@@ -1714,8 +1716,8 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, T_room, P_r
                                             density[l], density[l] * 0.025, 
                                             thickness['Thickness'][l], thickness['Sigma_Thickness'][l], 
                                             epsilon['epsilon_OH_4500'][l], epsilon['sigma_epsilon_OH_4500'][l])
-                MI_Composition['H2O'][l] = H2Om_1635_BP + OH_4500_M
-                mol_sat, density_sat = Density_Calculation(MI_Composition, T_room, P_room)
+                Sat_MI_Composition.loc[l, 'H2O'] = H2Om_1635_BP + OH_4500_M
+                mol_sat, density_sat = Density_Calculation(Sat_MI_Composition, T_room, P_room)
             density_sat = density_sat[l]
 
             H2OT_3550_M = Beer_Lambert(molar_mass['H2O'], 
@@ -1803,14 +1805,14 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, T_room, P_r
     for m in mega_spreadsheet.index: 
         if mega_spreadsheet['H2OT_3550_SAT'][m] == '*': 
             H2O_mean = mega_spreadsheet['H2Om_1635_BP'][m] + mega_spreadsheet['OH_4500_M'][m]
-            H2O_std = np.sqrt((mega_spreadsheet['H2Om_1635_STD'][m]**2) + (mega_spreadsheet['OH_4500_STD'][m]**2)) / 2
+            H2O_std = ((mega_spreadsheet['H2Om_1635_STD'][m]**2) + (mega_spreadsheet['OH_4500_STD'][m]**2))**(1/2) / 2
 
         elif mega_spreadsheet['H2OT_3550_SAT'][m] == '-': 
             H2O_mean = mega_spreadsheet['H2OT_3550_M'][m] 
             H2O_std = mega_spreadsheet['H2OT_3550_STD'][m] 
         mean_vol.loc[m] = pd.Series({'H2OT_MEAN': H2O_mean, 'H2OT_STD': H2O_std})
     mean_vol['CO2_MEAN'] = (mega_spreadsheet['CO2_1515_BP'] + mega_spreadsheet['CO2_1430_BP']) / 2
-    mean_vol['CO2_STD'] = np.sqrt((mega_spreadsheet['CO2_1515_STD']**2) + (mega_spreadsheet['CO2_1430_STD']**2)) / 2
+    mean_vol['CO2_STD'] = ((mega_spreadsheet['CO2_1515_STD']**2) + (mega_spreadsheet['CO2_1430_STD']**2))**(1/2) / 2
 
     mega_spreadsheet_f['H2OT_MEAN'] = mean_vol['H2OT_MEAN']
     mega_spreadsheet_f['H2OT_STD'] = mean_vol['H2OT_STD']
@@ -1905,7 +1907,7 @@ def ThicknessCalc(n, positions):
 
 
 
-def ThicknessProcessing(dfs_dict, n, wn_high, wn_low, savgol_filter_width, smoothing_wn_width=None, peak_heigh_min_delta=0.008, peak_search_width=50, remove_baseline=False, plotting=False):
+def ThicknessProcessing(dfs_dict, n, wn_high, wn_low, remove_baseline=False, plotting=False, phaseol=True):
 
     """
     Calculates thickness of glass wafers based on the refractive index of the glass and the positions of the
@@ -1917,15 +1919,18 @@ def ThicknessProcessing(dfs_dict, n, wn_high, wn_low, savgol_filter_width, smoot
     n (float): refractive index of the glass
     wn_high (float): the high wavenumber cutoff for the analysis
     wn_low (float): the low wavenumber cutoff for the analysis
-    smoothing_wn_width (float): width of the Savitzky-Golay smoothing window, if not used, set to None
-    peak_heigh_min_delta (float): minimum height difference between a peak and its surrounding points
-    peak_search_width (float): the distance (in wavenumbers) to look on either side of a peak to find the
-                              corresponding trough
     remove_baseline (boolean): whether or not to remove the baseline from the data
     plotting (boolean): whether or not to plot the data and detected peaks and troughs
     
     Returns:
     ThickDF (dataframe): a dataframe containing the thickness calculations for each file
+
+    Notes: 
+    smoothing_wn_width (float): width of the Savitzky-Golay smoothing window, if not used, set to None
+    peak_heigh_min_delta (float): minimum height difference between a peak and its surrounding points
+    peak_search_width (float): the distance (in wavenumbers) to look on either side of a peak to find the
+                              corresponding trough
+
     """
 
     ThickDF = pd.DataFrame(columns=['Peak_Thicknesses', 'Peak_Thickness_M', 'Peak_Thickness_STD',
@@ -1933,6 +1938,19 @@ def ThicknessProcessing(dfs_dict, n, wn_high, wn_low, savgol_filter_width, smoot
                                     'Thickness_M', 'Thickness_STD'])
 
     failures = []
+
+    # If phase is olivine, set these parameters. If phase glass, set other parameters. 
+    if phaseol == True: 
+        savgol_filter_width = 99
+        smoothing_wn_width = 15 
+        peak_heigh_min_delta = 0.002
+        peak_search_width = 10
+    elif phaseol == False: 
+        savgol_filter_width = 449
+        smoothing_wn_width = 71
+        peak_heigh_min_delta = 0.008
+        peak_search_width = 50
+
 
     for filename, data in dfs_dict.items(): 
         try:
