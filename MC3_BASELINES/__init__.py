@@ -14,6 +14,7 @@ import matplotlib as mpl
 if os.environ.get('DISPLAY','') == '':
     mpl.use('Agg')
 from matplotlib import pyplot as plt
+mpl.use('pgf')
 import mc3.utils as mu
 import mc3.stats as ms
 
@@ -441,7 +442,7 @@ def MidIR_Process(data, wn_low, wn_high):
 # %% Plotting functions 
 
 
-def trace(posterior, title, zchain=None, pnames=None, thinning=25,
+def trace(posterior, title, zchain=None, pnames=None, thinning=50,
     burnin=0, fignum=1000, savefile=None, fmt=".", ms=2.5, fs=11):
     
     """
@@ -518,7 +519,7 @@ def trace(posterior, title, zchain=None, pnames=None, thinning=25,
             ipar += 1
             if ipar%npanels == 0:
                 break
-        ax.set_xlabel('MCMC sample', size=fs)
+        ax.set_xlabel('Thinned MCMC Sample', size=fs)
         ax.get_xaxis().set_visible(True)
 
         if savefile is not None:
@@ -537,7 +538,7 @@ def trace(posterior, title, zchain=None, pnames=None, thinning=25,
             else:
                 fig.suptitle(title)
                 plt.ioff()
-                fig.savefig(savefile, bbox_inches='tight') # dpi = 100)
+                fig.savefig(savefile, bbox_inches='tight')
 
     return axes
 
@@ -714,8 +715,8 @@ def histogram(posterior, title, pnames=None, thinning=1, fignum=1100,
     
     return axes
 
-def pairwise(posterior, title, pnames=None, thinning=25, fignum=1200,
-    savefile=None, bestp=None, nbins=25, nlevels=20,
+def pairwise(posterior, title, pnames=None, thinning=100, fignum=1200,
+    savefile=None, bestp=None, nbins=15, nlevels=10,
     absolute_dens=False, ranges=None, fs=11, rect=None, margin=0.01):
     
     """
@@ -813,9 +814,7 @@ def pairwise(posterior, title, pnames=None, thinning=25, fignum=1200,
             else:
                 ax.set_xticklabels([])
             # The plot:
-            cont = ax.contourf(hist[k], cmap=palette, rasterized = True, vmin=1, origin='lower',
-                levels=[0]+list(np.linspace(1,lmax[k], nlevels)),
-                extent=(xran[k][0], xran[k][-1], yran[k][0], yran[k][-1]))
+            cont = ax.contourf(hist[k], cmap=palette, rasterized = True, vmin=1, origin='lower', levels=[0]+list(np.linspace(1,lmax[k], nlevels)), extent=(xran[k][0], xran[k][-1], yran[k][0], yran[k][-1]))
             for c in cont.collections:
                 c.set_edgecolor("face")
             if bestp is not None:
@@ -852,7 +851,7 @@ def pairwise(posterior, title, pnames=None, thinning=25, fignum=1200,
     if savefile is not None:
         plt.suptitle(title)
         plt.ioff()
-        plt.savefig(savefile, dpi = 50)
+        plt.savefig(savefile)
     return axes, cb
 
 
@@ -995,7 +994,7 @@ def MCMC(data, uncert, indparams, log, savefile):
     mc3_output = mc3.sample(data=data, uncert=uncert, func=func, params=params, indparams=indparams,
                             pmin=pmin, pmax=pmax, priorlow=priorlow, priorup=priorup,
                             pnames=pnames, texnames=texnames, sampler='snooker', rms=False,
-                            nsamples=1e6, nchains=9, ncpu=3, burnin=5000, thinning=1,
+                            nsamples=1e6, nchains=9, ncpu=3, burnin=5000, thinning=5,
                             leastsq='trf', chisqscale=False, grtest=True, grbreak=1.01, grnmin=0.5,
                             hsize=10, kickoff='normal', wlike=False, plots=False, log=log, savefile=savefile)
 
