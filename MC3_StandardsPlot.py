@@ -159,8 +159,8 @@ ax[0].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 
 ftir_sym = ax[0].scatter(np.nan, np.nan, s = sz, ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = 'FTIR')
 sims_sym = ax[0].scatter(np.nan, np.nan, s = sz, marker = 's', ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = 'SIMS')
-ftirs_sym = ax[0].scatter(np.nan, np.nan, s = sz_sm, marker = '>', ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = '$\mathregular{H_2O_{t, 3550}}$ Saturated')
-ax[0].legend([ftir_sym, sims_sym, ftirs_sym], ['FTIR', 'SIMS', '$\mathregular{H_2O_{t, 3550}}$ Saturated'], loc = 'lower right', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 12}, frameon=False)
+sat_symb = ax[0].scatter(np.nan, np.nan, s = sz_sm, marker = '>', ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = '$\mathregular{H_2O_{t, 3550}}$ Saturated')
+ax[0].legend([ftir_sym, sims_sym, sat_symb], ['FTIR', 'SIMS', '$\mathregular{H_2O_{t, 3550}}$ Saturated'], loc = 'lower right', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 12}, frameon=False)
 ax[0].add_artist(l1)
 
 
@@ -214,11 +214,9 @@ ax[1].set_ylabel('$\mathregular{CO_2}$ Measured by FTIR (ppm)')
 ax[1].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[1].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 ax[1].legend(loc = 'lower right', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 12}, frameon=False)
-ax[1].tick_params(axis="x", direction='in', length=5, pad = 6.5)
-ax[1].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 
 plt.tight_layout()
-plt.savefig('FTIRSIMS_Comparison.pdf')
+# plt.savefig('FTIRSIMS_Comparison.pdf')
 plt.show()
 
 # %% no citations
@@ -282,8 +280,8 @@ ax[0].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 
 ftir_sym = ax[0].scatter(np.nan, np.nan, s = sz, ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = 'FTIR')
 sims_sym = ax[0].scatter(np.nan, np.nan, s = sz, marker = 's', ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = 'SIMS')
-ftirs_sym = ax[0].scatter(np.nan, np.nan, s = sz_sm, marker = '>', ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = '$\mathregular{H_2O_{t, 3550}}$ Saturated')
-ax[0].legend([ftir_sym, sims_sym, ftirs_sym], ['FTIR', 'SIMS', '$\mathregular{H_2O_{t, 3550}}$ Saturated'], loc = 'lower right', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 12}, frameon=False)
+sat_symb = ax[0].scatter(np.nan, np.nan, s = sz_sm, marker = '>', ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = '$\mathregular{H_2O_{t, 3550}}$ Saturated')
+ax[0].legend([ftir_sym, sims_sym, sat_symb], ['FTIR', 'SIMS', '$\mathregular{H_2O_{t, 3550}}$ Saturated'], loc = 'lower right', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 12}, frameon=False)
 ax[0].add_artist(l1)
 
 
@@ -337,8 +335,6 @@ ax[1].set_ylabel('$\mathregular{CO_2}$ Measured by FTIR (ppm)')
 ax[1].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[1].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 ax[1].legend(loc = 'lower right', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 12}, frameon=False)
-ax[1].tick_params(axis="x", direction='in', length=5, pad = 6.5)
-ax[1].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 
 plt.tight_layout()
 plt.savefig('FTIRSIMS_Comparison_nocite.pdf')
