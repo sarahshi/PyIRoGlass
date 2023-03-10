@@ -502,7 +502,7 @@ def trace(posterior, title, zchain=None, pnames=None, thinning=50,
         while ipar < npars:
             ax = plt.subplot(npanels, 1, ipar%npanels+1)
             axes.append(ax)
-            ax.plot(posterior[0::thinning,ipar], fmt, c = '#0C7BDC', ms=ms, rasterized = True)
+            ax.plot(posterior[0::thinning,ipar], fmt, c = '#171008', ms=ms, rasterized = True)
             yran = ax.get_ylim()
             if zchain is not None:
                 ax.vlines(xsep, yran[0], yran[1], "0.5")

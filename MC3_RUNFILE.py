@@ -16,8 +16,7 @@ from matplotlib import rc, cm
 
 %matplotlib inline
 %config InlineBackend.figure_format = 'retina'
-rc('font',**{'size': 12}) # 'family':'Avenir'
-plt.rcParams['pdf.fonttype'] = 42
+# rc('font',**{'size': 12}) # 'family':'Avenir'
 
 # %% 
 
@@ -86,6 +85,7 @@ MICOMP, THICKNESS = baselines.Load_ChemistryThickness(CHEMTHICK_PATH[simsno])
 
 DFS_FILES, DFS_DICT = baselines.Load_SampleCSV(FILES, wn_high = 5500, wn_low = 1000)
 DF_OUTPUT, FAILURES = baselines.Run_All_Spectra(DFS_DICT, INPUT_PATHS[simsno])
+
 
 DF_OUTPUT.to_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[simsno] + '_DF.csv')
 
