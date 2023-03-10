@@ -19,7 +19,9 @@ from matplotlib import rc, cm
 rc('font',**{'size': 12}) # 'family':'Avenir'
 plt.rcParams['pdf.fonttype'] = 42
 
-# %% Get working paths 
+# %% 
+
+# Get working paths 
 path_parent = os.path.dirname(os.getcwd())
 path_beg = os.getcwd() + '/'
 path_input = os.getcwd() + '/Inputs/'
@@ -84,7 +86,6 @@ MICOMP, THICKNESS = baselines.Load_ChemistryThickness(CHEMTHICK_PATH[simsno])
 
 DFS_FILES, DFS_DICT = baselines.Load_SampleCSV(FILES, wn_high = 5500, wn_low = 1000)
 DF_OUTPUT, FAILURES = baselines.Run_All_Spectra(DFS_DICT, INPUT_PATHS[simsno])
-
 
 DF_OUTPUT.to_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[simsno] + '_DF.csv')
 
