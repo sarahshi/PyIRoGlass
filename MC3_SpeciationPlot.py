@@ -22,13 +22,14 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 %matplotlib inline
 %config InlineBackend.figure_format = 'retina'
-rc('font',**{'family':'Avenir', 'size': 18})
+rc('font',**{'family':'Avenir', 'size': 20})
 plt.rcParams['pdf.fonttype'] = 42
 
 plt.rcParams["xtick.major.size"] = 4 # Sets length of ticks
 plt.rcParams["ytick.major.size"] = 4 # Sets length of ticks
 plt.rcParams["xtick.labelsize"] = 18 # Sets size of numbers on tick marks
 plt.rcParams["ytick.labelsize"] = 18 # Sets size of numbers on tick marks
+plt.rcParams["axes.titlesize"] = 20
 plt.rcParams["axes.labelsize"] = 20 # Axes labels
 
 # %% 
@@ -47,9 +48,7 @@ df_f18 = pd.read_csv(output_dir[-1] + '/' + 'F18_H2OCO2.csv', index_col = 0)
 df_std = pd.read_csv(output_dir[-1] + '/' + 'STD_H2OCO2.csv', index_col = 0)
 df_f74 = df_std[df_std.index.str.contains('VF74')]
 df_std = df_std[~df_std.index.str.contains('VF74')]
-df_sims1 = pd.read_csv(output_dir[-1] + '/' + 'SIMSSTD_H2OCO2.csv', index_col = 0)
-df_sims2 = pd.read_csv(output_dir[-1] + '/' + 'SIMSSTD2_H2OCO2.csv', index_col = 0)
-df_sims = pd.concat([df_sims1, df_sims2])
+df_sims = pd.read_csv(output_dir[-1] + '/' + 'SIMSSTD_H2OCO2.csv', index_col = 0)
 
 def df_filt(df): 
 
@@ -438,10 +437,10 @@ df_co2_1 = df1.loc[df1.groupby(prefix)['CO2_MEAN'].idxmax()]
 df_sat = df_co2[df_co2['H2OT_3550_SAT'] == '*']
 df_sat = df_sat[(df_sat['ERR_5200']=='-') & (df_sat['ERR_4500']=='-')]
 df_unsat = df_co2[df_co2['H2OT_3550_SAT'] == '-']
-df_unsat = df_unsat[(df_unsat['ERR_5200']=='-')]
+df_unsat = df_unsat[(df_unsat['ERR_5200']=='-') & (df_unsat['ERR_4500']=='-')]
 df_unsat = df_unsat[df_unsat['H2Om_5200_M']/df_unsat['H2Om_1635_BP'] < 1.5]
 df_unsat1 = df_co2_1[df_co2_1['H2OT_3550_SAT'] == '-']
-df_unsat1 = df_unsat1[(df_unsat1['ERR_5200']=='-')] #  & (df_unsat1['ERR_4500']=='-')
+df_unsat1 = df_unsat1[(df_unsat1['ERR_5200']=='-') & (df_unsat1['ERR_4500']=='-') ]
 df_unsat1 = df_unsat1[df_unsat1['H2Om_5200_M']/df_unsat1['H2Om_1635_BP'] < 1.5]
 
 sz_sm = 80
@@ -491,14 +490,14 @@ df_unsat = df_co2[df_co2['H2OT_3550_SAT'] == '-']
 df_unsat = df_unsat[(df_unsat['ERR_4500']=='-') & (df_unsat['ERR_4500']=='-')] # df_unsat = df_unsat[(df_unsat['ERR_5200']=='-') & (df_unsat['ERR_4500']=='-')]
 df_unsat = df_unsat[df_unsat['H2Om_5200_M']/df_unsat['H2Om_1635_BP'] < 1.5]
 df_unsat1 = df_co2_1[df_co2_1['H2OT_3550_SAT'] == '-']
-df_unsat1 = df_unsat1[(df_unsat1['ERR_4500']=='-')]
+df_unsat1 = df_unsat1[(df_unsat1['ERR_5200']=='-') & (df_unsat1['ERR_4500']=='-')]
 df_unsat1 = df_unsat1[df_unsat1['H2Om_5200_M']/df_unsat1['H2Om_1635_BP'] < 1.5]
 
 sz_sm = 80
 sz = 150
 fig, ax = plt.subplots(1, 1, figsize = (8, 8))
 ax.plot([0,7], [0,7], c = '#171008', linewidth = 1.0)
-# ax.scatter(df_sat['H2OT_3550_M']-df_sat['H2Om_1635_BP'], df_sat['OH_4500_M'], s = sz, marker = 'o', c = '#0C7BDC', edgecolors='#171008', linewidth = 0.5, zorder = 15, label = 'Fuego 2018')
+# ax.scatter(df_sat['H2OT_3550_M']-df_sat['H2Om_1635_BP'], df_sat['OH_4500_M'], s = sz, marker = 'o', c = '#0C7BDC', edgecolors='#171008', linewidth = 0.5, zorder = 15, label = 'Fuego')
 # ax.scatter(df_sat['H2OT_3550_M']-df_sat['H2Om_1635_BP']+0.005, df_sat['OH_4500_M'], s = sz_sm, marker = '>', c = '#FFFFFF', ec = '#171008', lw = 0.5, zorder = 20)
 # ax.errorbar(df_sat['H2OT_3550_M']-df_sat['H2Om_1635_BP'], df_sat['OH_4500_M'], yerr = df_sat['OH_4500_STD'], xerr = (df_sat['H2Om_1635_STD']**2 + df_sat['OH_4500_STD']**2)**(1/2), ls = 'none', elinewidth = 0.5, ecolor = 'k')
 
@@ -510,8 +509,8 @@ ax.errorbar(df_unsat1['H2OT_3550_M']-df_unsat1['H2Om_1635_BP'], df_unsat1['OH_45
 
 leg1 = ax.legend(loc = 'upper left', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 12}, frameon=False)
 
-sat_symb = ax.scatter(np.nan, np.nan, s = sz_sm, marker = '>', ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = '$\mathregular{H_2O_{t, 3550}}$ Saturated')
-ax.legend([sat_symb], ['$\mathregular{H_2O_{t, 3550}}$ Saturated'], loc = 'lower right', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 12}, frameon=False)
+# sat_symb = ax.scatter(np.nan, np.nan, s = sz_sm, marker = '>', ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = '$\mathregular{H_2O_{t, 3550}}$ Saturated')
+# ax.legend([sat_symb], ['$\mathregular{H_2O_{t, 3550}}$ Saturated'], loc = 'lower right', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 12}, frameon=False)
 ax.add_artist(leg1)
 
 ax.set_xlim([0, 4])
@@ -549,7 +548,7 @@ sz_sm = 80
 sz = 150
 fig, ax = plt.subplots(1, 1, figsize = (8, 8))
 ax.plot([0,7], [0,7], c = '#171008', linewidth = 1.0)
-# ax.scatter(df_sat['H2OT_3550_M']-df_sat['H2Om_5200_M'], df_sat['OH_4500_M'], s = sz, marker = 'o', c = '#0C7BDC', edgecolors='#171008', linewidth = 0.5, zorder = 15, label = 'Fuego 2018')
+# ax.scatter(df_sat['H2OT_3550_M']-df_sat['H2Om_5200_M'], df_sat['OH_4500_M'], s = sz, marker = 'o', c = '#0C7BDC', edgecolors='#171008', linewidth = 0.5, zorder = 15, label = 'Fuego')
 # ax.scatter(df_sat['H2OT_3550_M']-df_sat['H2Om_5200_M']+0.005, df_sat['OH_4500_M'], s = sz_sm, marker = '>', c = '#FFFFFF', ec = '#171008', lw = 0.5, zorder = 20)
 # ax.errorbar(df_sat['H2OT_3550_M']-df_sat['H2Om_5200_M'], df_sat['OH_4500_M'], yerr = df_sat['OH_4500_STD'], xerr = (df_sat['H2Om_5200_STD']**2 + df_sat['OH_4500_STD']**2)**(1/2), ls = 'none', elinewidth = 0.5, ecolor = 'k')
 
@@ -864,5 +863,220 @@ ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
 plt.tight_layout()
 plt.savefig('VOLATILESANDSPECIATION_FINAL/SpeciationRatio_1635_VF.pdf')
+
+# %%
+
+def concordance_correlation_coefficient(y_true, y_pred):
+    """Concordance correlation coefficient."""
+    # Remove NaNs
+    df = pd.DataFrame({
+        'y_true': y_true,
+        'y_pred': y_pred
+    })
+    df = df.dropna()
+    y_true = df['y_true']
+    y_pred = df['y_pred']
+    # Pearson product-moment correlation coefficients
+    cor = np.corrcoef(y_true, y_pred)[0][1]
+    # Mean
+    mean_true = np.mean(y_true)
+    mean_pred = np.mean(y_pred)
+    # Variance
+    var_true = np.var(y_true)
+    var_pred = np.var(y_pred)
+    # Standard deviation
+    sd_true = np.std(y_true)
+    sd_pred = np.std(y_pred)
+    # Calculate CCC
+    numerator = 2 * cor * sd_true * sd_pred
+    denominator = var_true + var_pred + (mean_true - mean_pred)**2
+    return numerator / denominator
+
+
+
+# %% SYNTH FUEGO FIGURE 
+
+
+df = df_f18
+prefix = df.index.str.split('_').str[:-4]
+prefix = prefix.str.join('_')
+df_co2 = df.loc[df.groupby(prefix)['CO2_MEAN'].idxmax()]
+df1 = df_f74
+df1 = df1[~df1.index.str.startswith('VF74_134D')]
+prefix = df1.index.str.split('_').str[:-4]
+prefix = prefix.str.join('_')
+df_co2_1 = df1.loc[df1.groupby(prefix)['CO2_MEAN'].idxmax()]
+
+df_sat = df_co2[df_co2['H2OT_3550_SAT'] == '*']
+df_sat = df_sat[(df_sat['ERR_5200']=='-') & (df_sat['ERR_4500']=='-')]
+df_unsat = df_co2[df_co2['H2OT_3550_SAT'] == '-']
+df_unsat = df_unsat[(df_unsat['ERR_5200']=='-') & (df_unsat['ERR_4500']=='-')]
+df_unsat = df_unsat[df_unsat['H2Om_5200_M']/df_unsat['H2Om_1635_BP'] < 1.5]
+df_unsat1 = df_co2_1[df_co2_1['H2OT_3550_SAT'] == '-']
+df_unsat1 = df_unsat1[(df_unsat1['ERR_5200']=='-') & (df_unsat1['ERR_4500']=='-') ]
+df_unsat1 = df_unsat1[df_unsat1['H2Om_5200_M']/df_unsat1['H2Om_1635_BP'] < 1.5]
+
+df_all = pd.concat([df_sat, df_unsat, df_unsat1])
+df_all = df_all[df_all.OH_4500_M<4]
+
+
+sz = 150
+
+fig, ax = plt.subplots(3, 2, figsize = (14, 19))
+ax = ax.flatten()
+
+import scipy
+slope0, intercept0, r_value0, p_value0, std_err0 = scipy.stats.linregress(df_all['H2Om_1635_BP'], df_all['H2Om_5200_M'])
+ccc0 = concordance_correlation_coefficient(df_all['H2Om_1635_BP'], df_all['H2Om_5200_M'])
+
+ax[0].plot([0,7], [0,7], c = '#171008', linewidth = 1.0)
+ax[0].scatter(df_sat['H2Om_1635_BP'], df_sat['H2Om_5200_M'], s = sz, marker = 'o', c = '#0C7BDC', edgecolors='#171008', linewidth = 0.5, zorder = 15, label = 'Fuego')
+ax[0].scatter(df_sat['H2Om_1635_BP']+0.005, df_sat['H2Om_5200_M'], s = sz_sm, marker = '>', c = '#FFFFFF', ec = '#171008', lw = 0.5, zorder = 20)
+ax[0].errorbar(df_sat['H2Om_1635_BP'], df_sat['H2Om_5200_M'], yerr = df_sat['H2Om_5200_STD'], xerr = df_sat['H2Om_1635_STD'], ls = 'none', elinewidth = 0.5, ecolor = 'k')
+ax[0].scatter(df_unsat['H2Om_1635_BP'], df_unsat['H2Om_5200_M'], s = sz, marker = 'o', c = '#0C7BDC', edgecolors='#171008', linewidth = 0.5, zorder = 15)
+ax[0].errorbar(df_unsat['H2Om_1635_BP'], df_unsat['H2Om_5200_M'], yerr = df_unsat['H2Om_5200_STD'], xerr = df_unsat['H2Om_1635_STD'], ls = 'none', elinewidth = 0.5, ecolor = 'k')
+ax[0].scatter(df_unsat1['H2Om_1635_BP'], df_unsat1['H2Om_5200_M'], s = sz, marker = 'o', c = '#0C7BDC', edgecolors='#171008', linewidth = 0.5, zorder = 15) #, label = 'Fuego 1974')
+ax[0].errorbar(df_unsat1['H2Om_1635_BP'], df_unsat1['H2Om_5200_M'], yerr = df_unsat1['H2Om_5200_STD'], xerr = df_unsat1['H2Om_1635_STD'], ls = 'none', elinewidth = 0.5, ecolor = 'k')
+leg1 = ax[0].legend(loc = 'upper left', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 12}, frameon=False)
+sat_symb = ax[0].scatter(np.nan, np.nan, s = sz_sm, marker = '>', ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = '$\mathregular{H_2O_{t, 3550}}$ Saturated')
+ax[0].legend([sat_symb], ['$\mathregular{H_2O_{t, 3550}}$ Saturated'], loc = 'lower right', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 12}, frameon=False)
+ax[0].add_artist(leg1)
+ax[0].set_xlim([0, 3])
+ax[0].set_ylim([0, 3])
+ax[0].set_xticks(np.arange(0, 4, 1))
+ax[0].set_yticks(np.arange(0, 4, 1))
+ax[0].set_title('A.')
+ax[0].set_xlabel('$\mathregular{H_2O_{m, 1635}}$ (wt.%)')
+ax[0].set_ylabel('$\mathregular{H_2O_{m, 5200}}$ (wt.%)')
+ax[0].tick_params(axis="x", direction='in', length=5, pad = 6.5)
+ax[0].tick_params(axis="y", direction='in', length=5, pad = 6.5)
+ax[0].annotate("$\mathregular{R^{2}}$="+str(np.round(r_value0, 2)), xy=(0.035, 0.85), xycoords="axes fraction", fontsize=12)
+ax[0].annotate("CCC="+str(np.round(ccc0, 2)), xy=(0.035, 0.895),
+xycoords="axes fraction", fontsize=12)
+ax[0].annotate("m="+str(np.round(slope0, 2)), xy=(0.035, 0.81),
+xycoords="axes fraction", fontsize=12)
+ax[0].annotate("b="+str(np.round(intercept0, 2)), xy=(0.035, 0.77),
+xycoords="axes fraction", fontsize=12)
+
+
+
+
+slope2, intercept2, r_value2, p_value2, std_err2 = scipy.stats.linregress(df_all['H2OT_3550_M'], df_all['H2Om_1635_BP']+df_all['OH_4500_M'])
+ccc2 = concordance_correlation_coefficient(df_all['H2OT_3550_M'], df_all['H2Om_1635_BP']+df_all['OH_4500_M'])
+ax[2].plot([0,7], [0,7], c = '#171008', linewidth = 1.0)
+ax[2].scatter(df_unsat['H2OT_3550_M'], df_unsat['H2Om_1635_BP']+df_unsat['OH_4500_M'], s = sz, marker = 'o', c = '#0C7BDC', edgecolors='#171008', linewidth = 0.5, zorder = 15, label = 'Fuego')
+ax[2].errorbar(df_unsat['H2OT_3550_M'], df_unsat['H2Om_1635_BP']+df_unsat['OH_4500_M'], yerr = (df_unsat['H2Om_1635_STD']**2 + df_unsat['OH_4500_STD']**2)**(1/2), xerr = df_unsat['H2OT_3550_STD'], ls = 'none', elinewidth = 0.5, ecolor = 'k')
+
+ax[2].scatter(df_unsat1['H2OT_3550_M'], df_unsat1['H2Om_1635_BP']+df_unsat1['OH_4500_M'], s = sz, marker = 'o', c = '#0C7BDC', edgecolors='#171008', linewidth = 0.5, zorder = 15) #, label = 'Fuego 1974')
+ax[2].errorbar(df_unsat1['H2OT_3550_M'], df_unsat1['H2Om_1635_BP']+df_unsat1['OH_4500_M'], yerr = (df_unsat1['H2Om_1635_STD']**2 + df_unsat1['OH_4500_STD']**2)**(1/2), xerr = df_unsat1['H2OT_3550_STD'], ls = 'none', elinewidth = 0.5, ecolor = 'k')
+leg1 = ax[2].legend(loc = 'upper left', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 12}, frameon=False)
+ax[2].add_artist(leg1)
+ax[2].set_xlim([0, 5])
+ax[2].set_ylim([0, 5])
+ax[2].set_title('B.')
+ax[2].set_xlabel('$\mathregular{H_2O_{t, 3550}}$ (wt.%)')
+ax[2].set_ylabel('$\mathregular{H_2O_{m, 1635} + OH^-_{4500}}$ (wt.%)')
+ax[2].tick_params(axis="x", direction='in', length=5, pad = 6.5)
+ax[2].tick_params(axis="y", direction='in', length=5, pad = 6.5)
+ax[2].annotate("$\mathregular{R^{2}}$="+str(np.round(r_value2, 2)), xy=(0.035, 0.85), xycoords="axes fraction", fontsize=12)
+ax[2].annotate("CCC="+str(np.round(ccc2, 2)), xy=(0.035, 0.895),
+xycoords="axes fraction", fontsize=12)
+ax[2].annotate("m="+str(np.round(slope2, 2)), xy=(0.035, 0.81),
+xycoords="axes fraction", fontsize=12)
+ax[2].annotate("b="+str(np.round(intercept2, 2)), xy=(0.035, 0.77),
+xycoords="axes fraction", fontsize=12)
+
+
+
+
+slope3, intercept3, r_value3, p_value3, std_err3 = scipy.stats.linregress(df_all['H2OT_3550_M'], df_all['H2Om_5200_M']+df_all['OH_4500_M'])
+ccc3 = concordance_correlation_coefficient(df_all['H2OT_3550_M'], df_all['H2Om_5200_M']+df_all['OH_4500_M'])
+ax[3].plot([0,7], [0,7], c = '#171008', linewidth = 1.0)
+ax[3].scatter(df_unsat['H2OT_3550_M'], df_unsat['H2Om_5200_M']+df_unsat['OH_4500_M'], s = sz, marker = 'o', c = '#0C7BDC', edgecolors='#171008', linewidth = 0.3, zorder = 15)
+ax[3].errorbar(df_unsat['H2OT_3550_M'], df_unsat['H2Om_5200_M']+df_unsat['OH_4500_M'], yerr = (df_unsat['H2Om_5200_STD']**2 + df_unsat['OH_4500_STD']**2)**(1/2), xerr = df_unsat['H2OT_3550_STD'], ls = 'none', elinewidth = 0.3, ecolor = 'k')
+ax[3].scatter(df_unsat1['H2OT_3550_M'], df_unsat1['H2Om_5200_M']+df_unsat1['OH_4500_M'], s = sz, marker = 'o', c = '#0C7BDC', edgecolors='#171008', linewidth = 0.3, zorder = 13, label = 'Fuego')
+ax[3].errorbar(df_unsat1['H2OT_3550_M'], df_unsat1['H2Om_5200_M']+df_unsat1['OH_4500_M'], yerr = (df_unsat1['H2Om_5200_STD']**2 + df_unsat1['OH_4500_STD']**2)**(1/2), xerr = df_unsat1['H2OT_3550_STD'], ls = 'none', elinewidth = 0.3, ecolor = 'k')
+leg1 = ax[3].legend(loc = 'upper left', labelspacing = 0.4, handletextpad = 0.3, handlelength = 1.50, prop={'size': 12}, frameon=False)
+ax[3].add_artist(leg1)
+ax[3].set_xlim([0, 5])
+ax[3].set_ylim([0, 5])
+ax[3].set_title('C.')
+ax[3].set_xlabel('$\mathregular{H_2O_{t, 3550}}$ (wt.%)')
+ax[3].set_ylabel('$\mathregular{H_2O_{m, 5200} + OH^-_{4500}}$ (wt.%)')
+ax[3].tick_params(axis="x", direction='in', length=5, pad = 6.5)
+ax[3].tick_params(axis="y", direction='in', length=5, pad = 6.5)
+ax[3].annotate("$\mathregular{R^{2}}$="+str(np.round(r_value3, 2)), xy=(0.035, 0.85), xycoords="axes fraction", fontsize=12)
+ax[3].annotate("CCC="+str(np.round(ccc3, 2)), xy=(0.035, 0.895),
+xycoords="axes fraction", fontsize=12)
+ax[3].annotate("m="+str(np.round(slope3, 2)), xy=(0.035, 0.81),
+xycoords="axes fraction", fontsize=12)
+ax[3].annotate("b="+str(np.round(intercept3, 2)), xy=(0.035, 0.77),
+xycoords="axes fraction", fontsize=12)
+
+
+
+
+slope4, intercept4, r_value4, p_value4, std_err4 = scipy.stats.linregress(df_all['H2OT_3550_M']-df_all['H2Om_1635_BP'], df_all['OH_4500_M'])
+ccc4 = concordance_correlation_coefficient(df_all['H2OT_3550_M']-df_all['H2Om_1635_BP'], df_all['OH_4500_M'])
+ax[4].plot([0,7], [0,7], c = '#171008', linewidth = 1.0)
+ax[4].scatter(df_unsat['H2OT_3550_M']-df_unsat['H2Om_1635_BP'], df_unsat['OH_4500_M'], s = sz, marker = 'o', c = '#0C7BDC', edgecolors='#171008', linewidth = 0.5, zorder = 15, label = 'Fuego')
+ax[4].errorbar(df_unsat['H2OT_3550_M']-df_unsat['H2Om_1635_BP'], df_unsat['OH_4500_M'], yerr = df_unsat['OH_4500_STD'], xerr = (df_unsat['H2Om_1635_STD']**2 + df_unsat['OH_4500_STD']**2)**(1/2), ls = 'none', elinewidth = 0.5, ecolor = 'k')
+ax[4].scatter(df_unsat1['H2OT_3550_M']-df_unsat1['H2Om_1635_BP'], df_unsat1['OH_4500_M'], s = sz, marker = 'o', c = '#0C7BDC', edgecolors='#171008', linewidth = 0.5, zorder = 15) #, label = 'Fuego 1974')
+ax[4].errorbar(df_unsat1['H2OT_3550_M']-df_unsat1['H2Om_1635_BP'], df_unsat1['OH_4500_M'], yerr = df_unsat1['OH_4500_STD'], xerr = (df_unsat1['H2Om_1635_STD']**2 + df_unsat1['OH_4500_STD']**2)**(1/2), ls = 'none', elinewidth = 0.5, ecolor = 'k')
+leg1 = ax[4].legend(loc = 'upper left', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 12}, frameon=False)
+ax[4].add_artist(leg1)
+ax[4].set_xlim([0, 4])
+ax[4].set_ylim([0, 4])
+ax[4].set_xticks(np.arange(0, 5, 1))
+ax[4].set_yticks(np.arange(0, 5, 1))
+ax[4].set_title('D.')
+ax[4].set_xlabel('$\mathregular{H_2O_{t, 3550} - H_2O_{m, 1635}}$ (wt.%)')
+ax[4].set_ylabel('$\mathregular{OH^-_{4500}}$ (wt.%)')
+ax[4].tick_params(axis="x", direction='in', length=5, pad = 6.5)
+ax[4].tick_params(axis="y", direction='in', length=5, pad = 6.5)
+ax[4].annotate("$\mathregular{R^{2}}$="+str(np.round(r_value4, 2)), xy=(0.035, 0.85), xycoords="axes fraction", fontsize=12)
+ax[4].annotate("CCC="+str(np.round(ccc4, 2)), xy=(0.035, 0.895),
+xycoords="axes fraction", fontsize=12)
+ax[4].annotate("m="+str(np.round(slope4, 2)), xy=(0.035, 0.81),
+xycoords="axes fraction", fontsize=12)
+ax[4].annotate("b="+str(np.round(intercept4, 2)), xy=(0.035, 0.77),
+xycoords="axes fraction", fontsize=12)
+
+
+
+
+
+
+slope5, intercept5, r_value5, p_value5, std_err5 = scipy.stats.linregress(df_all['H2OT_3550_M']-df_all['H2Om_5200_M'], df_all['OH_4500_M'])
+ccc5 = concordance_correlation_coefficient(df_all['H2OT_3550_M']-df_all['H2Om_5200_M'], df_all['OH_4500_M'])
+ax[5].plot([0,7], [0,7], c = '#171008', linewidth = 1.0)
+ax[5].scatter(df_unsat['H2OT_3550_M']-df_unsat['H2Om_5200_M'], df_unsat['OH_4500_M'], s = sz, marker = 'o', c = '#0C7BDC', edgecolors='#171008', linewidth = 0.5, zorder = 15, label = 'Fuego')
+ax[5].errorbar(df_unsat['H2OT_3550_M']-df_unsat['H2Om_5200_M'], df_unsat['OH_4500_M'], yerr = df_unsat['OH_4500_STD'], xerr = (df_unsat['H2Om_5200_STD']**2 + df_unsat['OH_4500_STD']**2)**(1/2), ls = 'none', elinewidth = 0.5, ecolor = 'k')
+ax[5].scatter(df_unsat1['H2OT_3550_M']-df_unsat1['H2Om_5200_M'], df_unsat1['OH_4500_M'], s = sz, marker = 'o', c = '#0C7BDC', edgecolors='#171008', linewidth = 0.5, zorder = 15) #, label = 'Fuego 1974')
+ax[5].errorbar(df_unsat1['H2OT_3550_M']-df_unsat1['H2Om_5200_M'], df_unsat1['OH_4500_M'], yerr = df_unsat1['OH_4500_STD'], xerr = (df_unsat1['H2Om_5200_STD']**2 + df_unsat1['OH_4500_STD']**2)**(1/2), ls = 'none', elinewidth = 0.5, ecolor = 'k')
+leg1 = ax[5].legend(loc = 'upper left', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 12}, frameon=False)
+ax[5].add_artist(leg1)
+ax[5].set_xlim([0, 4])
+ax[5].set_ylim([0, 4])
+ax[5].set_xticks(np.arange(0, 5, 1))
+ax[5].set_yticks(np.arange(0, 5, 1))
+ax[5].set_title('E.')
+ax[5].set_xlabel('$\mathregular{H_2O_{t, 3550} - H_2O_{m, 5200}}$ (wt.%)')
+ax[5].set_ylabel('$\mathregular{OH^-_{4500}}$ (wt.%)')
+ax[5].tick_params(axis="x", direction='in', length=5, pad = 6.5)
+ax[5].tick_params(axis="y", direction='in', length=5, pad = 6.5)
+ax[5].annotate("$\mathregular{R^{2}}$="+str(np.round(r_value5, 2)), xy=(0.035, 0.85), xycoords="axes fraction", fontsize=12)
+ax[5].annotate("CCC="+str(np.round(ccc5, 2)), xy=(0.035, 0.895),
+xycoords="axes fraction", fontsize=12)
+ax[5].annotate("m="+str(np.round(slope5, 2)), xy=(0.035, 0.81),
+xycoords="axes fraction", fontsize=12)
+ax[5].annotate("b="+str(np.round(intercept5, 2)), xy=(0.035, 0.77),
+xycoords="axes fraction", fontsize=12)
+
+fig.delaxes(ax[1])
+
+plt.tight_layout()
+plt.savefig('VOLATILESANDSPECIATION_FINAL/FuegoNetSpeciation.pdf')
+
 
 # %%

@@ -27,6 +27,7 @@ plt.rcParams["xtick.major.size"] = 4 # Sets length of ticks
 plt.rcParams["ytick.major.size"] = 4 # Sets length of ticks
 plt.rcParams["xtick.labelsize"] = 18 # Sets size of numbers on tick marks
 plt.rcParams["ytick.labelsize"] = 18 # Sets size of numbers on tick marks
+plt.rcParams["axes.titlesize"] = 20
 plt.rcParams["axes.labelsize"] = 20 # Axes labels
 
 # method treats d, z, m1 and m2 as unknowns. model f(i) = 0 = m1 + m2*z(i) - d(i);
@@ -428,6 +429,7 @@ ax[0].errorbar(tau_5200, epsilon_5200, yerr = sigma_epsilon_5200, xerr = sigma_t
 ax[0].scatter(tau_5200, epsilon_5200, s = sz, c = '#0C7BDC', edgecolors='black', linewidth = 0.5, zorder = 15)
 ax[0].set_xlim([ 0.5, 1.0])
 ax[0].set_ylim([-0.5, 3.5])
+ax[0].set_title('A.')
 xlabel_5200 = '$\\tau$='+'(Si+Al)/Total Cations'
 ax[0].set_xlabel(xlabel_5200)
 ax[0].set_ylabel('$\mathregular{ƐH_2O_{m, 5200}}$')
@@ -453,6 +455,7 @@ ax[1].errorbar(tau_4500, epsilon_4500, yerr = sigma_epsilon_4500, xerr = sigma_t
 ax[1].scatter(tau_4500, epsilon_4500, s = sz, c = '#0C7BDC', edgecolors='black', linewidth = 0.5, zorder = 15)
 ax[1].set_xlim([ 0.5, 1.0])
 ax[1].set_ylim([-0.5, 3.5])
+ax[1].set_title('B.')
 xlabel_4500 = '$\\tau$=' + '(Si+Al)/Total Cations'
 ax[1].set_xlabel(xlabel_4500) 
 ax[1].set_ylabel('$\mathregular{ƐOH^{-}_{4500}}$')
@@ -475,6 +478,7 @@ ax[2].errorbar(tau_3550, epsilon_3550, yerr = sigma_epsilon_3550, xerr = sigma_t
 ax[2].scatter(tau_3550, epsilon_3550, s = sz, c = '#0C7BDC', edgecolors='black', linewidth = 0.5, zorder = 15)
 ax[2].set_xlim([0.4, 1.0])
 ax[2].set_ylim([20, 110])
+ax[2].set_title('C.')
 xlabel_3550 = '$\\tau$=' + '(Si+Al)/Total Cations'
 ax[2].set_xlabel(xlabel_3550) 
 ax[2].set_ylabel('$\mathregular{ƐH_2O_{t, 3550}}$')
@@ -500,6 +504,7 @@ ax[3].errorbar(tau_1635, epsilon_1635, yerr = sigma_epsilon_1635, xerr = sigma_t
 ax[3].scatter(tau_1635, epsilon_1635, s = sz, c = '#0C7BDC', edgecolors='black', linewidth = 0.5, zorder = 15)
 ax[3].set_xlim([0.5, 1.0])
 ax[3].set_ylim([0, 90])
+ax[3].set_title('D.')
 xlabel_1635 = '$\\tau$=' + '(Si+Al)/Total Cations'
 ax[3].set_xlabel(xlabel_1635) 
 ax[3].set_ylabel('$\mathregular{ƐH_2O_{m, 1635}}$')
@@ -524,7 +529,7 @@ ax[4].scatter(high_df['Na/Na+Ca'], high_df['Epsilon_Carbonate'], s = sz, c = '#E
 
 dixonpan, = ax[4].plot(naca_arr, epsilon_carbonate_dixonpan, 'k-.', lw = 1.5, zorder = 0, label = 'Dixon and Pan, 1995')
 dixonpan.set_dashes([1.5, 1, 3, 1])
-legend_carbonate = '$\mathregular{ƐCO_3^{2-}}$= ' + f'{round(mest_carbonate[0],3)}(±{round(np.sqrt(np.diag(covm_est_carbonate))[0],3)})-{round(mest_carbonate[1],3)*-1}(±{round(np.sqrt(np.diag(covm_est_carbonate))[1],3)})' + '·' + f'$\\eta$'
+legend_carbonate = '$\mathregular{ƐCO_3^{2-}}$= ' + f'{round(mest_carbonate[0],3)}(±{round(np.sqrt(np.diag(covm_est_carbonate))[0],3)}) - {round(mest_carbonate[1],3)*-1}(±{round(np.sqrt(np.diag(covm_est_carbonate))[1],3)})' + '·' + f'$\\eta$'
 ax[4].plot(naca_arr, epsilon_carbonate_arr, 'k', lw = 2, zorder = 0, label = legend_carbonate)
 ax[4].fill_between(naca_arr, conf_lower_carbonate, conf_upper_carbonate, color = 'k', alpha=0.20, edgecolor = None,
     zorder = -5, label='68% Confidence Interval')
@@ -533,6 +538,7 @@ ax[4].plot(naca_arr, pred_lower_carbonate, 'k--', lw = 0.5, zorder = 0, dashes=(
 # ax[4].fill_between(naca_arr[fuego_idx], conf_lower_carbonate[fuego_idx], conf_upper_carbonate[fuego_idx], color = 'r', alpha=0.30, edgecolor = None, zorder = -5, label='Fuego Interval')
 ax[4].set_xlim([0.1, 0.9])
 ax[4].set_ylim([0, 500])
+ax[4].set_title('E.')
 ax[4].set_xlabel('$\mathregular{\\eta=Na/(Na+Ca)}$') 
 ax[4].set_ylabel('$\mathregular{ƐCO_3^{2-}}$')
 ax[4].legend(loc = 'lower left', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 12}, frameon=False)
@@ -541,6 +547,6 @@ ax[4].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 
 fig.delaxes(ax[5])
 plt.tight_layout()
-# plt.savefig('AllEpsilonRegress.pdf')
+plt.savefig('AllEpsilonRegress.pdf')
 
 # %%
