@@ -1,7 +1,7 @@
 # %% -*- coding: utf-8 -*-
 """ Created on June 12, 2021 // @author: Sarah Shi """
 
-# %% Import packages
+# Import packages
 
 import os
 import sys
@@ -22,13 +22,14 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 %matplotlib inline
 %config InlineBackend.figure_format = 'retina'
-rc('font',**{'family':'Avenir', 'size': 18})
+rc('font',**{'family':'Avenir', 'size': 20})
 plt.rcParams['pdf.fonttype'] = 42
 
 plt.rcParams["xtick.major.size"] = 4 # Sets length of ticks
 plt.rcParams["ytick.major.size"] = 4 # Sets length of ticks
 plt.rcParams["xtick.labelsize"] = 18 # Sets size of numbers on tick marks
 plt.rcParams["ytick.labelsize"] = 18 # Sets size of numbers on tick marks
+plt.rcParams["axes.titlesize"] = 20
 plt.rcParams["axes.labelsize"] = 20 # Axes labels
 
 # %% Load PC components. 
@@ -66,6 +67,7 @@ Fiege73 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('Fiege73')]
 STD_C1 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('STD_C1')]
 STD_CN92C_OL2 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('STD_CN92C_OL2')]
 STD_D1010 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('STD_D1010')]
+STD_ETF46 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('STD_ETF46')]
 VF74_127_7 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('VF74_127-7')]
 VF74_132_2 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('VF74_132-2')]
 
@@ -153,14 +155,14 @@ ax[0].set_xlim([0, 6])
 ax[0].set_ylim([0, 6])
 ax[0].set_xlabel('$\mathregular{H_2O}$ Expected (wt.%)')
 ax[0].set_ylabel('$\mathregular{H_2O_t}$ Measured by FTIR (wt.%)')
-l1 = ax[0].legend(loc = 'upper left', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 12}, frameon=False)
+l1 = ax[0].legend(loc = 'upper left', labelspacing = 0.2, handletextpad = 0.25, handlelength = 1.00, prop={'size': 13}, frameon=False)
 ax[0].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[0].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 
 ftir_sym = ax[0].scatter(np.nan, np.nan, s = sz, ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = 'FTIR')
 sims_sym = ax[0].scatter(np.nan, np.nan, s = sz, marker = 's', ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = 'SIMS')
 sat_symb = ax[0].scatter(np.nan, np.nan, s = sz_sm, marker = '>', ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = '$\mathregular{H_2O_{t, 3550}}$ Saturated')
-ax[0].legend([ftir_sym, sims_sym, sat_symb], ['FTIR', 'SIMS', '$\mathregular{H_2O_{t, 3550}}$ Saturated'], loc = 'lower right', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 12}, frameon=False)
+ax[0].legend([ftir_sym, sims_sym, sat_symb], ['FTIR', 'SIMS', '$\mathregular{H_2O_{t, 3550}}$ Saturated'], loc = 'lower right', labelspacing = 0.2, handletextpad = 0.25, handlelength = 1.00, prop={'size': 13}, frameon=False)
 ax[0].add_artist(l1)
 
 
@@ -213,7 +215,7 @@ ax[1].set_xlabel('$\mathregular{CO_2}$ Expected (ppm)')
 ax[1].set_ylabel('$\mathregular{CO_2}$ Measured by FTIR (ppm)')
 ax[1].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[1].tick_params(axis="y", direction='in', length=5, pad = 6.5)
-ax[1].legend(loc = 'lower right', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 12}, frameon=False)
+ax[1].legend(loc = 'lower right', labelspacing = 0.2, handletextpad = 0.25, handlelength = 1.00, prop={'size': 13}, frameon=False)
 
 plt.tight_layout()
 # plt.savefig('FTIRSIMS_Comparison.pdf')
@@ -274,14 +276,14 @@ ax[0].set_xlim([0, 6])
 ax[0].set_ylim([0, 6])
 ax[0].set_xlabel('$\mathregular{H_2O}$ Expected (wt.%)')
 ax[0].set_ylabel('$\mathregular{H_2O_t}$ Measured by FTIR (wt.%)')
-l1 = ax[0].legend(loc = 'upper left', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 12}, frameon=False)
+l1 = ax[0].legend(loc = 'upper left', labelspacing = 0.2, handletextpad = 0.25, handlelength = 1.00, prop={'size': 13}, frameon=False)
 ax[0].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[0].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 
 ftir_sym = ax[0].scatter(np.nan, np.nan, s = sz, ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = 'FTIR')
 sims_sym = ax[0].scatter(np.nan, np.nan, s = sz, marker = 's', ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = 'SIMS')
 sat_symb = ax[0].scatter(np.nan, np.nan, s = sz_sm, marker = '>', ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = '$\mathregular{H_2O_{t, 3550}}$ Saturated')
-ax[0].legend([ftir_sym, sims_sym, sat_symb], ['FTIR', 'SIMS', '$\mathregular{H_2O_{t, 3550}}$ Saturated'], loc = 'lower right', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 12}, frameon=False)
+ax[0].legend([ftir_sym, sims_sym, sat_symb], ['FTIR', 'SIMS', '$\mathregular{H_2O_{t, 3550}}$ Saturated'], loc = 'lower right', labelspacing = 0.2, handletextpad = 0.25, handlelength = 1.00, prop={'size': 13}, frameon=False)
 ax[0].add_artist(l1)
 
 
@@ -334,10 +336,10 @@ ax[1].set_xlabel('$\mathregular{CO_2}$ Expected (ppm)')
 ax[1].set_ylabel('$\mathregular{CO_2}$ Measured by FTIR (ppm)')
 ax[1].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[1].tick_params(axis="y", direction='in', length=5, pad = 6.5)
-ax[1].legend(loc = 'lower right', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 12}, frameon=False)
+ax[1].legend(loc = 'lower right', labelspacing = 0.2, handletextpad = 0.25, handlelength = 1.00, prop={'size': 13}, frameon=False)
 
 plt.tight_layout()
-plt.savefig('FTIRSIMS_Comparison_nocite.pdf')
+# plt.savefig('FTIRSIMS_Comparison_nocite.pdf')
 plt.show()
 
 # %% 
@@ -445,7 +447,7 @@ cbaxes.tick_params(labelsize=12)
 
 ax[1].text(0.905, 0.13, '$\mathregular{H_2O}$ (wt.%)', fontsize = 12, horizontalalignment='center', verticalalignment='center', transform=ax[1].transAxes)
 plt.tight_layout()
-plt.savefig('FTIRSIMS_Comparison_H2O.pdf')
+# plt.savefig('FTIRSIMS_Comparison_H2O.pdf')
 plt.show()
 
 # %%
@@ -458,11 +460,11 @@ h2o_line = np.array([0, 6])
 co2_line = np.array([0, 1400])
 sz_sm = 80
 sz = 150
-fig, ax = plt.subplots(2, 2, figsize = (18, 18))
+fig, ax = plt.subplots(2, 2, figsize = (14, 14))
 ax = ax.flatten()
 ax[0].plot(h2o_line, h2o_line, 'k', lw = 1, zorder = 0)
 
-ax[0].scatter(H2O_expmean(STD_D1010), H2O_mean(STD_D1010), s = sz, c = '#0C7BDC', ec = '#171008', lw = 0.5, zorder = 20, label = 'STD-GH88-1-D1010')
+ax[0].scatter(H2O_expmean(STD_D1010), H2O_mean(STD_D1010), s = sz, c = '#0C7BDC', ec = '#171008', lw = 0.5, zorder = 20, label = 'STD-D1010')
 ax[0].errorbar(H2O_expmean(STD_D1010), H2O_mean(STD_D1010), xerr = H2O_expstd(STD_D1010), yerr = H2O_mean(STD_D1010) * H2O_rsd(STD_D1010), lw = 0.5, c = 'k', zorder = 10)
 
 ax[0].scatter(H2O_expmean(STD_C1), H2O_mean(STD_C1), s = sz, marker = 's', c = '#5DB147', ec = '#171008', lw = 0.5, zorder = 20, label = "STD-CN-C-OL1'")
@@ -477,12 +479,12 @@ ax[0].errorbar(H2O_expmean(VF74_127_7), H2O_mean(VF74_127_7), xerr = H2O_expstd(
 ax[0].scatter(H2O_expmean(VF74_132_2), H2O_mean(VF74_132_2), s = sz, marker = 's', c = '#FE7D10', ec = '#171008', lw = 0.5, zorder = 20, label = 'VF74-132-2')
 ax[0].errorbar(H2O_expmean(VF74_132_2), H2O_mean(VF74_132_2), xerr = H2O_expstd(VF74_132_2), yerr = H2O_mean(VF74_132_2) * H2O_rsd(VF74_132_2), lw = 0.5, c = 'k', zorder = 10)
 
-ax[0].scatter(H2O_expmean(Fiege63), H2O_mean(Fiege63), s = sz, marker = 's', c = '#CCCCCC', ec = '#171008', lw = 0.5, zorder = 15, label = 'Fiege 63')
+ax[0].scatter(H2O_expmean(ETFSR_Ol8), H2O_mean(ETFSR_Ol8), s = sz, marker = 's', c = '#CCCCCC', ec = '#171008', lw = 0.5, zorder = 20, label = 'ETFSR-OL8')
+ax[0].errorbar(H2O_expmean(ETFSR_Ol8), H2O_mean(ETFSR_Ol8), xerr = H2O_expstd(ETFSR_Ol8), yerr = H2O_mean(ETFSR_Ol8) * H2O_rsd(ETFSR_Ol8), lw = 0.5, c = 'k', zorder = 10)
+
+ax[0].scatter(H2O_expmean(Fiege63), H2O_mean(Fiege63), s = sz, marker = 's', c = '#8A8A8A', ec = '#171008', lw = 0.5, zorder = 15, label = 'Fiege 63')
 ax[0].scatter(H2O_expmean(Fiege63), H2O_mean(Fiege63), s = sz_sm, marker = '>', c = '#FFFFFF', ec = '#171008', lw = 0.5, zorder = 20)
 ax[0].errorbar(H2O_expmean(Fiege63), H2O_mean(Fiege63), xerr = H2O_expstd(Fiege63), yerr = H2O_mean(Fiege63) * H2O_rsd(Fiege63), lw = 0.5, c = 'k', zorder = 10)
-
-ax[0].scatter(H2O_expmean(ETFSR_Ol8), H2O_mean(ETFSR_Ol8), s = sz, marker = 's', c = '#8A8A8A', ec = '#171008', lw = 0.5, zorder = 20, label = 'ETFSR-OL8')
-ax[0].errorbar(H2O_expmean(ETFSR_Ol8), H2O_mean(ETFSR_Ol8), xerr = H2O_expstd(ETFSR_Ol8), yerr = H2O_mean(ETFSR_Ol8) * H2O_rsd(ETFSR_Ol8), lw = 0.5, c = 'k', zorder = 10)
 
 ax[0].scatter(H2O_expmean(Fiege73), H2O_mean(Fiege73), s = sz, marker = 's', c = '#252525', ec = '#171008', lw = 0.5, zorder = 15, label = 'Fiege 73')
 ax[0].scatter(H2O_expmean(Fiege73), H2O_mean(Fiege73), s = sz_sm, marker = '>', c = '#FFFFFF', ec = '#171008', lw = 0.5, zorder = 20)
@@ -497,30 +499,30 @@ ax[0].errorbar(H2O_expmean(CD33_22_1_1), H2O_mean(CD33_22_1_1), xerr = H2O_expst
 ax[0].scatter(H2O_expmean(ALV1833_11), H2O_mean(ALV1833_11), s = sz, c = '#969696', ec = '#171008', lw = 0.5, zorder = 20, label = 'ALV1833-11')
 ax[0].errorbar(H2O_expmean(ALV1833_11), H2O_mean(ALV1833_11), xerr = H2O_expstd(ALV1833_11), yerr = H2O_mean(ALV1833_11) * H2O_rsd(ALV1833_11), lw = 0.5, c = 'k', zorder = 10)
 
-ax[0].scatter(H2O_expmean(WOK5_4), H2O_mean(WOK5_4), s = sz, c = '#636363', ec = '#171008', lw = 0.5, zorder = 20, label = '23WOK5-4')
+ax[0].scatter(H2O_expmean(WOK5_4), H2O_mean(WOK5_4), s = sz, c = '#636363', ec = '#171008', lw = 0.5, zorder = 20, label = 'WOK5-4')
 ax[0].errorbar(H2O_expmean(WOK5_4), H2O_mean(WOK5_4), xerr = H2O_expstd(WOK5_4), yerr = H2O_mean(WOK5_4) * H2O_rsd(WOK5_4), lw = 0.5, c = 'k', zorder = 10)
 
-ax[0].scatter(H2O_expmean(ALV1846), H2O_mean(ALV1846), s = sz, c = '#252525', ec = '#171008', lw = 0.5, zorder = 20, label = '21ALV1846-9')
+ax[0].scatter(H2O_expmean(ALV1846), H2O_mean(ALV1846), s = sz, c = '#252525', ec = '#171008', lw = 0.5, zorder = 20, label = 'ALV1846-9')
 ax[0].errorbar(H2O_expmean(ALV1846), H2O_mean(ALV1846), xerr = H2O_expstd(ALV1846), yerr = H2O_mean(ALV1846) * H2O_rsd(ALV1846), lw = 0.5, c = 'k', zorder = 10)
 ax[0].set_xlim([0, 6])
 ax[0].set_ylim([0, 6])
-ax[0].set_title('A.')
-ax[0].set_xlabel('$\mathregular{H_2O}$ Expected (wt.%)')
+ax[0].annotate("A.", xy=(0.02, 0.95), xycoords="axes fraction", fontsize=20, weight='bold')
+# ax[0].set_xlabel('$\mathregular{H_2O}$ Expected (wt.%)')
 ax[0].set_ylabel('$\mathregular{H_2O_t}$ Measured by FTIR (wt.%)')
-l1 = ax[0].legend(loc = 'upper left', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 12}, frameon=False)
+l1 = ax[0].legend(loc = (0.01, 0.445), labelspacing = 0.2, handletextpad = 0.25, handlelength = 1, prop={'size': 13}, frameon=False)
 ax[0].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[0].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 
 ftir_sym = ax[0].scatter(np.nan, np.nan, s = sz, ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = 'FTIR')
 sims_sym = ax[0].scatter(np.nan, np.nan, s = sz, marker = 's', ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = 'SIMS')
 sat_symb = ax[0].scatter(np.nan, np.nan, s = sz_sm, marker = '>', ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = '$\mathregular{H_2O_{t, 3550}}$ Saturated')
-ax[0].legend([ftir_sym, sims_sym, sat_symb], ['FTIR', 'SIMS', '$\mathregular{H_2O_{t, 3550}}$ Saturated'], loc = 'lower right', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 12}, frameon=False)
+ax[0].legend([ftir_sym, sims_sym, sat_symb], ['FTIR', 'SIMS', '$\mathregular{H_2O_{t, 3550}}$ Saturated'], loc = 'lower right', labelspacing = 0.2, handletextpad = 0.25, handlelength = 1.00, prop={'size': 13}, frameon=False)
 ax[0].add_artist(l1)
 
 
 ax[1].plot(co2_line, co2_line, 'k', lw = 1, zorder = 0)
 
-ax[1].scatter(CO2_expmean(STD_D1010), CO2_mean(STD_D1010), s = sz, c = '#0C7BDC', ec = '#171008', lw = 0.5, zorder = 20, label = 'STD-GH88-1-D1010')
+ax[1].scatter(CO2_expmean(STD_D1010), CO2_mean(STD_D1010), s = sz, c = '#0C7BDC', ec = '#171008', lw = 0.5, zorder = 20, label = 'STD-D1010')
 ax[1].errorbar(CO2_expmean(STD_D1010), CO2_mean(STD_D1010), xerr = CO2_expstd(STD_D1010), yerr = CO2_mean(STD_D1010) * CO2_rsd(STD_D1010), lw = 0.5, c = 'k', zorder = 10)
 
 ax[1].scatter(CO2_expmean(STD_C1), CO2_mean(STD_C1), s = sz, marker = 's', c = '#5DB147', ec = '#171008', lw = 0.5, zorder = 20, label = "STD-CN-C-OL1'")
@@ -544,23 +546,25 @@ ax[1].errorbar(CO2_expmean(CD33_22_1_1), CO2_mean(CD33_22_1_1), xerr = CO2_expst
 ax[1].scatter(CO2_expmean(ALV1833_11), CO2_mean(ALV1833_11), s = sz, c = '#969696', ec = '#171008', lw = 0.5, zorder = 20, label = 'ALV1833-11')
 ax[1].errorbar(CO2_expmean(ALV1833_11), CO2_mean(ALV1833_11), xerr = CO2_expstd(ALV1833_11), yerr = CO2_mean(ALV1833_11) * CO2_rsd(ALV1833_11), lw = 0.5, c = 'k', zorder = 10)
 
-ax[1].scatter(CO2_expmean(WOK5_4), CO2_mean(WOK5_4), s = sz, c = '#636363', ec = '#171008', lw = 0.5, zorder = 20, label = '23WOK5-4')
+ax[1].scatter(CO2_expmean(WOK5_4), CO2_mean(WOK5_4), s = sz, c = '#636363', ec = '#171008', lw = 0.5, zorder = 20, label = 'WOK5-4')
 ax[1].errorbar(CO2_expmean(WOK5_4), CO2_mean(WOK5_4), xerr = CO2_expstd(WOK5_4), yerr = CO2_mean(WOK5_4) * CO2_rsd(WOK5_4), lw = 0.5, c = 'k', zorder = 10)
 
 ax[1].set_xlim([0, 1400])
 ax[1].set_ylim([0, 1400])
-ax[1].set_title('B.')
-ax[1].set_xlabel('$\mathregular{CO_2}$ Expected (ppm)')
+ax[1].annotate("B.", xy=(0.02, 0.95), xycoords="axes fraction", fontsize=20, weight='bold')
+
+# ax[1].set_title('B.')
+# ax[1].set_xlabel('$\mathregular{CO_2}$ Expected (ppm)')
 ax[1].set_ylabel('$\mathregular{CO_2}$ Measured by FTIR (ppm)')
 ax[1].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[1].tick_params(axis="y", direction='in', length=5, pad = 6.5)
-ax[1].legend(loc = 'lower right', labelspacing = 0.4, handletextpad = 0.5, handlelength = 1.50, prop={'size': 12}, frameon=False)
+ax[1].legend(loc = 'lower right', labelspacing = 0.2, handletextpad = 0.25, handlelength = 1.00, prop={'size': 13}, frameon=False)
 
 
 sc1 = ax[2].plot(h2o_line, h2o_line, 'k', lw = 1, zorder = 0)
 
 for i in range(len(names)): 
-    if names[i] in ('STD_C1', 'STD_CN92C_OL2', 'VF74_127_7', 'VF74_132_2', 'Fiege63', 'ETFSR_Ol8', 'Fiege73'):
+    if names[i] in ('STD_C1', 'STD_CN92C_OL2', 'VF74_127_7', 'VF74_132_2', 'ETFSR_Ol8', 'Fiege63', 'Fiege73'):
         scatter1 = ax[2].scatter(H2O_stdexpmean[i], H2O_stdmean[i], s = sz, marker = 's', c = H2O_stdmean[i], vmin = 0, vmax = h2o_vmax, cmap = 'Blues', ec = '#171008', lw = 0.5, zorder = 20)
         ax[2].errorbar(H2O_stdexpmean[i], H2O_stdmean[i], marker = 's', xerr = H2O_stdexpstd[i], yerr = H2O_stdmean[i] * H2O_stdrsd[i], lw = 0.5, ls = 'none', c = 'k', zorder = 10)
         ax[3].scatter(CO2_stdexpmean[i], CO2_stdmean[i], s = sz, marker = 's', c = H2O_stdmean[i], vmin = 0, vmax = h2o_vmax, cmap = 'Blues', ec = '#171008', lw = 0.5, zorder = 20)
@@ -575,18 +579,16 @@ ax[2].scatter(H2O_expmean(Fiege73), H2O_mean(Fiege73), s = sz_sm, marker = '>', 
 
 ax[2].set_xlim([0, 6])
 ax[2].set_ylim([0, 6])
-ax[2].set_title('C.')
+ax[2].annotate("C.", xy=(0.02, 0.95), xycoords="axes fraction", fontsize=20, weight='bold')
 ax[2].set_xlabel('$\mathregular{H_2O}$ Expected (wt.%)')
 ax[2].set_ylabel('$\mathregular{H_2O_t}$ Measured by FTIR (wt.%)')
 ax[2].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[2].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 
-
-
 ax[3].plot(co2_line, co2_line, 'k', lw = 1, zorder = 0)
 ax[3].set_xlim([0, 1400])
 ax[3].set_ylim([0, 1400])
-ax[3].set_title('D.')
+ax[3].annotate("D.", xy=(0.02, 0.95), xycoords="axes fraction", fontsize=20, weight='bold')
 ax[3].set_xlabel('$\mathregular{CO_2}$ Expected (ppm)')
 ax[3].set_ylabel('$\mathregular{CO_2}$ Measured by FTIR (ppm)')
 ax[3].tick_params(axis="x", direction='in', length=5, pad = 6.5)
@@ -601,10 +603,11 @@ cbar = fig.colorbar(scatter1, cax=cbaxes, orientation='horizontal')
 cbaxes.xaxis.set_ticks_position("top")
 cbaxes.tick_params(labelsize=12)
 
-ax[2].text(0.905, 0.11, '$\mathregular{H_2O}$ (wt.%)', fontsize = 12, horizontalalignment='center', verticalalignment='center', transform=ax[2].transAxes)
-ax[3].text(0.905, 0.11, '$\mathregular{H_2O}$ (wt.%)', fontsize = 12, horizontalalignment='center', verticalalignment='center', transform=ax[3].transAxes)
+ax[2].text(0.895, 0.135, '$\mathregular{H_2O}$ (wt.%)', fontsize = 12, horizontalalignment='center', verticalalignment='center', transform=ax[2].transAxes)
+ax[3].text(0.895, 0.135, '$\mathregular{H_2O}$ (wt.%)', fontsize = 12, horizontalalignment='center', verticalalignment='center', transform=ax[3].transAxes)
 plt.tight_layout()
-plt.savefig('FTIRSIMS_Comparison_combined.pdf')
+plt.savefig('FTIRSIMS_Comparison_combined.pdf', bbox_inches='tight', pad_inches = 0.025)
+
 
 
 
