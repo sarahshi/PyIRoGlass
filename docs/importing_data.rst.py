@@ -2,9 +2,9 @@
 Importing Data
 ========================
 
-We walk through an implementation of PyBaselines here. We recommend following this tutorial as-is for those not familiar with navigating between directories in Python. Create this following file structure locally: 
+We walk through an implementation of PyIRoGlass here. We recommend following this tutorial as-is for those not familiar with navigating between directories in Python. Create this following file structure locally: 
 
-PyBaselines/
+PyIRoGlass/
 ├── MC3_RUNFILE.py
 └── Inputs/
     ├── ChemThick.csv
@@ -39,7 +39,7 @@ For example, here a screenshot of a CSV spreadsheet containing the glass composi
 .. image:: img/chemthick.png
 
 
-For the liquid composition, PyBaselines allows users to specify how they partition Fe between ferrous and ferric iron, because glass density changes due to the proportion of Fe$^{3+}$. To avoid ambiguity, the ChemThick file handles this by providing two columns for FeO and Fe$_{2}O_{3}$. If the speciation is unknown, input all Fe as FeO and leave the Fe$_{2}O_{3} cells empty. This will not constitute the largest uncertainty, as the molar absorptivities and thicknesses impact concentrations more significantly. 
+For the liquid composition, PyIRoGlass allows users to specify how they partition Fe between ferrous and ferric iron, because glass density changes due to the proportion of Fe$^{3+}$. To avoid ambiguity, the ChemThick file handles this by providing two columns for FeO and Fe$_{2}O_{3}$. If the speciation is unknown, input all Fe as FeO and leave the Fe$_{2}O_{3} cells empty. This will not constitute the largest uncertainty, as the molar absorptivities and thicknesses impact concentrations more significantly. 
 
 
 *******
@@ -100,4 +100,4 @@ For glass, specify the following wavenumber range based on :cite:t:`NicholsandWy
 Data Import Complete 
 ========================
 
-That is all for loading files! You are ready to get rolling with PyBaselines. See the example notebook MC3_RUNFILE.ipynb, under the big examples heading, to see how to run PyBaselines and export files. 
+That is all for loading files! You are ready to get rolling with PyIRoGlass. See the example notebook MC3_RUNFILE.ipynb, under the big examples heading, to see how to run PyIRoGlass and export files. 

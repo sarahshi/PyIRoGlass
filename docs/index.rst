@@ -55,7 +55,6 @@ Welcome to PyIRoGlass's documentation!
    references
 
 
-
 Indices and Tables
 ==================
 

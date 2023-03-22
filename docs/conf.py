@@ -79,13 +79,13 @@ nbsphinx_prolog = r"""
 
     <div class="admonition note">
       <p>This page was generated from
-        <a class="reference external" href="https://github.com/PennyWieser/PySulfSat/blob/{{ git_ref|e }}/{{ docname|e }}">{{ docname|e }}</a>.
+        <a class="reference external" href="https://github.com/sarahshi/PyIRoGlass{{ git_ref|e }}/{{ docname|e }}">{{ docname|e }}</a>.
 
             Interactive online version:
-            <a href="https://mybinder.org/v2/gh/PennyWieser/PySulfSat/{{ git_ref|e }}?filepath={{ docname|e }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a>.
+            <a href="https://github.com/sarahshi/PyIRoGlass{{ git_ref|e }}?filepath={{ docname|e }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a>.
     </p>
     <p>
-    <a class="reference download internal" download="" href="https://github.com/PennyWieser/PySulfSat/blob/{{ git_ref|e }}/{{ docname|e }}"><code class="xref download docutils literal notranslate"><span class="pre">Python</span> <span class="pre">Notebook</span> <span class="pre">Download</span></code></a>
+    <a class="reference download internal" download="" href="https://github.com/sarahshi/PyIRoGlass{{ git_ref|e }}/{{ docname|e }}"><code class="xref download docutils literal notranslate"><span class="pre">Python</span> <span class="pre">Notebook</span> <span class="pre">Download</span></code></a>
       </p>
       <script>
         if (document.location.host) {

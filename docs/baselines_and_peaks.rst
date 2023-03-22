@@ -3,10 +3,9 @@ Functions for fitting baselines and peaks
 
 .. toctree::
 
-    baselines_and_peaks/Cpx
-    baselines_and_peaks/Opx
-    baselines_and_peaks/Two_Px
-    baselines_and_peaks/Amp
-    baselines_and_peaks/Fspar
-    baselines_and_peaks/Liq
-    baselines_and_peaks/Ol
+    baselines_and_peaks/gauss
+    baselines_and_peaks/linear
+    baselines_and_peaks/carbonate
+    baselines_and_peaks/als_baselines
+    baselines_and_peaks/NIR
+    baselines_and_peaks/MIR
