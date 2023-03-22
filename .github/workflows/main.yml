@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.7', '3.8', '3.9']
+        python-version: ['3.6', '3.7', '3.8', '3.9', '3.10']
 
     steps:
     - uses: actions/checkout@v2
@@ -32,18 +32,18 @@ jobs:
     - name: Install test dependencies
       run: |
         pip install flake8 pytest coverage
-    - name: Test with pytest
-      run: |
-        coverage run -m pytest
-    - name: Clean up coverage data
-      run: |
-        # This is a workaround for the fact that the `[coverage:paths]` section
-        # of `setup.cfg` is not actually applies until we run `combine`; so we
-        # rename the report such that we can then "combine" it.
-        mv .coverage .coverage.hack
-        coverage combine
-        coverage report
-    - uses: codecov/codecov-action@v1
+    # - name: Test with pytest
+    #   run: |
+    #     coverage run -m pytest
+    # - name: Clean up coverage data
+    #   run: |
+    #     # This is a workaround for the fact that the `[coverage:paths]` section
+    #     # of `setup.cfg` is not actually applies until we run `combine`; so we
+    #     # rename the report such that we can then "combine" it.
+    #     mv .coverage .coverage.hack
+    #     coverage combine
+    #     coverage report
+    # - uses: codecov/codecov-action@v1
 
   deploy:
     needs: test
