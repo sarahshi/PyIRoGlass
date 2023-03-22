@@ -367,7 +367,6 @@ def NearIR_Process(data, wn_low, wn_high, peak):
 
     if peak == 'OH': # 4500 peak
         pr_low, pr_high = 4400, 4600
-        # STN = PH_krige / PH_std
     elif peak == 'H2O': # 5200 peak
         pr_low, pr_high = 5100, 5300
     else:
@@ -1968,3 +1967,4 @@ def ReflectanceIndex(XFo):
     n = (n_alpha+n_beta+n_gamma) / 3
 
     return n
+
