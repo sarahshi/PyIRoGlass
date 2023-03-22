@@ -1,25 +1,20 @@
-name: mc3_baselines
+name: PyIRoGlass
 channels:
     - conda-forge
     - defaults
 dependencies:
-    - python=3.6    # Python version 3.9, 3.6 original
+    - python        # Python version 3.9, 3.6 original
     - ipython       # IPython interpreter and tools
     - jupyter       # Jupyter federation architecture
     - jupyterlab    # Jupyter Lab environment
     - matplotlib    # 2D plotting library
     - numpy         # N-d array and numerics
     - pandas        # Labeled array library
-    - pyjanitor       # Cleans up Pandas dataframe column names
     - scipy         # Common math/stats/science functions
-    - seaborn       # Statistical visualizations
     - flake8
     - pep8
     - pip
     - pip:
         - mc3
         - pykrige
-        - uncertainties
         - peakdetect
-    - scikit-learn
-    - pathlib

@@ -126,12 +126,12 @@ ax[0].errorbar(H2O_expmean(VF74_127_7), H2O_mean(VF74_127_7), xerr = H2O_expstd(
 ax[0].scatter(H2O_expmean(VF74_132_2), H2O_mean(VF74_132_2), s = sz, marker = 's', c = '#FE7D10', ec = '#171008', lw = 0.5, zorder = 20, label = 'VF74-132-2 (AL et al., 2013)')
 ax[0].errorbar(H2O_expmean(VF74_132_2), H2O_mean(VF74_132_2), xerr = H2O_expstd(VF74_132_2), yerr = H2O_mean(VF74_132_2) * H2O_rsd(VF74_132_2), lw = 0.5, c = 'k', zorder = 10)
 
-ax[0].scatter(H2O_expmean(Fiege63), H2O_mean(Fiege63), s = sz, marker = 's', c = '#CCCCCC', ec = '#171008', lw = 0.5, zorder = 15, label = 'Fiege 63 (AF et al., 2015)')
+ax[0].scatter(H2O_expmean(ETFSR_Ol8), H2O_mean(ETFSR_Ol8), s = sz, marker = 's', c = '#CCCCCC', ec = '#171008', lw = 0.5, zorder = 20, label = 'ETFSR_OL8 (AB Thesis)')
+ax[0].errorbar(H2O_expmean(ETFSR_Ol8), H2O_mean(ETFSR_Ol8), xerr = H2O_expstd(ETFSR_Ol8), yerr = H2O_mean(ETFSR_Ol8) * H2O_rsd(ETFSR_Ol8), lw = 0.5, c = 'k', zorder = 10)
+
+ax[0].scatter(H2O_expmean(Fiege63), H2O_mean(Fiege63), s = sz, marker = 's', c = '#8A8A8A', ec = '#171008', lw = 0.5, zorder = 15, label = 'Fiege 63 (AF et al., 2015)')
 ax[0].scatter(H2O_expmean(Fiege63), H2O_mean(Fiege63), s = sz_sm, marker = '>', c = '#FFFFFF', ec = '#171008', lw = 0.5, zorder = 20)
 ax[0].errorbar(H2O_expmean(Fiege63), H2O_mean(Fiege63), xerr = H2O_expstd(Fiege63), yerr = H2O_mean(Fiege63) * H2O_rsd(Fiege63), lw = 0.5, c = 'k', zorder = 10)
-
-ax[0].scatter(H2O_expmean(ETFSR_Ol8), H2O_mean(ETFSR_Ol8), s = sz, marker = 's', c = '#8A8A8A', ec = '#171008', lw = 0.5, zorder = 20, label = 'ETFSR_OL8 (AB Thesis)')
-ax[0].errorbar(H2O_expmean(ETFSR_Ol8), H2O_mean(ETFSR_Ol8), xerr = H2O_expstd(ETFSR_Ol8), yerr = H2O_mean(ETFSR_Ol8) * H2O_rsd(ETFSR_Ol8), lw = 0.5, c = 'k', zorder = 10)
 
 ax[0].scatter(H2O_expmean(Fiege73), H2O_mean(Fiege73), s = sz, marker = 's', c = '#252525', ec = '#171008', lw = 0.5, zorder = 15, label = 'Fiege 73 (AF et al., 2015)')
 ax[0].scatter(H2O_expmean(Fiege73), H2O_mean(Fiege73), s = sz_sm, marker = '>', c = '#FFFFFF', ec = '#171008', lw = 0.5, zorder = 20)
@@ -146,10 +146,10 @@ ax[0].errorbar(H2O_expmean(CD33_22_1_1), H2O_mean(CD33_22_1_1), xerr = H2O_expst
 ax[0].scatter(H2O_expmean(ALV1833_11), H2O_mean(ALV1833_11), s = sz, c = '#969696', ec = '#171008', lw = 0.5, zorder = 20, label = 'ALV1833-11 (SN et al., 2000)')
 ax[0].errorbar(H2O_expmean(ALV1833_11), H2O_mean(ALV1833_11), xerr = H2O_expstd(ALV1833_11), yerr = H2O_mean(ALV1833_11) * H2O_rsd(ALV1833_11), lw = 0.5, c = 'k', zorder = 10)
 
-ax[0].scatter(H2O_expmean(WOK5_4), H2O_mean(WOK5_4), s = sz, c = '#636363', ec = '#171008', lw = 0.5, zorder = 20, label = '23WOK5-4 (SN et al., 2000)')
+ax[0].scatter(H2O_expmean(WOK5_4), H2O_mean(WOK5_4), s = sz, c = '#636363', ec = '#171008', lw = 0.5, zorder = 20, label = 'WOK5-4 (SN et al., 2000)')
 ax[0].errorbar(H2O_expmean(WOK5_4), H2O_mean(WOK5_4), xerr = H2O_expstd(WOK5_4), yerr = H2O_mean(WOK5_4) * H2O_rsd(WOK5_4), lw = 0.5, c = 'k', zorder = 10)
 
-ax[0].scatter(H2O_expmean(ALV1846), H2O_mean(ALV1846), s = sz, c = '#252525', ec = '#171008', lw = 0.5, zorder = 20, label = '21ALV1846-9 (SN et al., 2000)')
+ax[0].scatter(H2O_expmean(ALV1846), H2O_mean(ALV1846), s = sz, c = '#252525', ec = '#171008', lw = 0.5, zorder = 20, label = 'ALV1846-9 (SN et al., 2000)')
 ax[0].errorbar(H2O_expmean(ALV1846), H2O_mean(ALV1846), xerr = H2O_expstd(ALV1846), yerr = H2O_mean(ALV1846) * H2O_rsd(ALV1846), lw = 0.5, c = 'k', zorder = 10)
 ax[0].set_xlim([0, 6])
 ax[0].set_ylim([0, 6])
@@ -218,7 +218,7 @@ ax[1].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 ax[1].legend(loc = 'lower right', labelspacing = 0.2, handletextpad = 0.25, handlelength = 1.00, prop={'size': 13}, frameon=False)
 
 plt.tight_layout()
-# plt.savefig('FTIRSIMS_Comparison.pdf')
+plt.savefig('FTIRSIMS_Comparison.pdf')
 plt.show()
 
 # %% no citations
@@ -247,12 +247,12 @@ ax[0].errorbar(H2O_expmean(VF74_127_7), H2O_mean(VF74_127_7), xerr = H2O_expstd(
 ax[0].scatter(H2O_expmean(VF74_132_2), H2O_mean(VF74_132_2), s = sz, marker = 's', c = '#FE7D10', ec = '#171008', lw = 0.5, zorder = 20, label = 'VF74-132-2')
 ax[0].errorbar(H2O_expmean(VF74_132_2), H2O_mean(VF74_132_2), xerr = H2O_expstd(VF74_132_2), yerr = H2O_mean(VF74_132_2) * H2O_rsd(VF74_132_2), lw = 0.5, c = 'k', zorder = 10)
 
-ax[0].scatter(H2O_expmean(Fiege63), H2O_mean(Fiege63), s = sz, marker = 's', c = '#CCCCCC', ec = '#171008', lw = 0.5, zorder = 15, label = 'Fiege 63')
+ax[0].scatter(H2O_expmean(ETFSR_Ol8), H2O_mean(ETFSR_Ol8), s = sz, marker = 's', c = '#CCCCCC', ec = '#171008', lw = 0.5, zorder = 20, label = 'ETFSR_OL8')
+ax[0].errorbar(H2O_expmean(ETFSR_Ol8), H2O_mean(ETFSR_Ol8), xerr = H2O_expstd(ETFSR_Ol8), yerr = H2O_mean(ETFSR_Ol8) * H2O_rsd(ETFSR_Ol8), lw = 0.5, c = 'k', zorder = 10)
+
+ax[0].scatter(H2O_expmean(Fiege63), H2O_mean(Fiege63), s = sz, marker = 's', c = '#8A8A8A', ec = '#171008', lw = 0.5, zorder = 15, label = 'Fiege 63')
 ax[0].scatter(H2O_expmean(Fiege63), H2O_mean(Fiege63), s = sz_sm, marker = '>', c = '#FFFFFF', ec = '#171008', lw = 0.5, zorder = 20)
 ax[0].errorbar(H2O_expmean(Fiege63), H2O_mean(Fiege63), xerr = H2O_expstd(Fiege63), yerr = H2O_mean(Fiege63) * H2O_rsd(Fiege63), lw = 0.5, c = 'k', zorder = 10)
-
-ax[0].scatter(H2O_expmean(ETFSR_Ol8), H2O_mean(ETFSR_Ol8), s = sz, marker = 's', c = '#8A8A8A', ec = '#171008', lw = 0.5, zorder = 20, label = 'ETFSR_OL8')
-ax[0].errorbar(H2O_expmean(ETFSR_Ol8), H2O_mean(ETFSR_Ol8), xerr = H2O_expstd(ETFSR_Ol8), yerr = H2O_mean(ETFSR_Ol8) * H2O_rsd(ETFSR_Ol8), lw = 0.5, c = 'k', zorder = 10)
 
 ax[0].scatter(H2O_expmean(Fiege73), H2O_mean(Fiege73), s = sz, marker = 's', c = '#252525', ec = '#171008', lw = 0.5, zorder = 15, label = 'Fiege 73')
 ax[0].scatter(H2O_expmean(Fiege73), H2O_mean(Fiege73), s = sz_sm, marker = '>', c = '#FFFFFF', ec = '#171008', lw = 0.5, zorder = 20)
@@ -339,7 +339,7 @@ ax[1].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 ax[1].legend(loc = 'lower right', labelspacing = 0.2, handletextpad = 0.25, handlelength = 1.00, prop={'size': 13}, frameon=False)
 
 plt.tight_layout()
-# plt.savefig('FTIRSIMS_Comparison_nocite.pdf')
+plt.savefig('FTIRSIMS_Comparison_nocite.pdf')
 plt.show()
 
 # %% 
@@ -447,7 +447,7 @@ cbaxes.tick_params(labelsize=12)
 
 ax[1].text(0.905, 0.13, '$\mathregular{H_2O}$ (wt.%)', fontsize = 12, horizontalalignment='center', verticalalignment='center', transform=ax[1].transAxes)
 plt.tight_layout()
-# plt.savefig('FTIRSIMS_Comparison_H2O.pdf')
+plt.savefig('FTIRSIMS_Comparison_H2O.pdf')
 plt.show()
 
 # %%
@@ -490,10 +490,10 @@ ax[0].scatter(H2O_expmean(Fiege73), H2O_mean(Fiege73), s = sz, marker = 's', c =
 ax[0].scatter(H2O_expmean(Fiege73), H2O_mean(Fiege73), s = sz_sm, marker = '>', c = '#FFFFFF', ec = '#171008', lw = 0.5, zorder = 20)
 ax[0].errorbar(H2O_expmean(Fiege73), H2O_mean(Fiege73), xerr = H2O_expstd(Fiege73), yerr = H2O_mean(Fiege73) * H2O_rsd(Fiege73), lw = 0.5, c = 'k', zorder = 10)
 
-ax[0].scatter(H2O_expmean(CD33_12_2_2), H2O_mean(CD33_12_2_2), s = sz, c = '#F7F7F7', ec = '#171008', lw = 0.5, zorder = 20, label = 'CD33-12-2-2')
+ax[0].scatter(H2O_expmean(CD33_12_2_2), H2O_mean(CD33_12_2_2), s = sz, marker = 's', c = '#F7F7F7', ec = '#171008', lw = 0.5, zorder = 20, label = 'CD33-12-2-2')
 ax[0].errorbar(H2O_expmean(CD33_12_2_2), H2O_mean(CD33_12_2_2), xerr = H2O_expstd(CD33_12_2_2), yerr = H2O_mean(CD33_12_2_2) * H2O_rsd(CD33_12_2_2), lw = 0.5, c = 'k', zorder = 10)
 
-ax[0].scatter(H2O_expmean(CD33_22_1_1), H2O_mean(CD33_22_1_1), s = sz, c = '#CCCCCC', ec = '#171008', lw = 0.5, zorder = 20, label = 'CD33-22-1-1')
+ax[0].scatter(H2O_expmean(CD33_22_1_1), H2O_mean(CD33_22_1_1), s = sz, marker = 's', c = '#CCCCCC', ec = '#171008', lw = 0.5, zorder = 20, label = 'CD33-22-1-1')
 ax[0].errorbar(H2O_expmean(CD33_22_1_1), H2O_mean(CD33_22_1_1), xerr = H2O_expstd(CD33_22_1_1), yerr = H2O_mean(CD33_22_1_1) * H2O_rsd(CD33_22_1_1), lw = 0.5, c = 'k', zorder = 10)
 
 ax[0].scatter(H2O_expmean(ALV1833_11), H2O_mean(ALV1833_11), s = sz, c = '#969696', ec = '#171008', lw = 0.5, zorder = 20, label = 'ALV1833-11')
@@ -537,10 +537,10 @@ ax[1].errorbar(CO2_expmean(VF74_127_7), CO2_mean(VF74_127_7), xerr = CO2_expstd(
 ax[1].scatter(CO2_expmean(VF74_132_2), CO2_mean(VF74_132_2), s = sz, marker = 's', c = '#FE7D10', ec = '#171008', lw = 0.5, zorder = 20, label = 'VF74-132-2')
 ax[1].errorbar(CO2_expmean(VF74_132_2), CO2_mean(VF74_132_2), xerr = CO2_expstd(VF74_132_2), yerr = CO2_mean(VF74_132_2) * CO2_rsd(VF74_132_2), lw = 0.5, c = 'k', zorder = 10)
 
-ax[1].scatter(CO2_expmean(CD33_12_2_2), CO2_mean(CD33_12_2_2), s = sz, c = '#F7F7F7', ec = '#171008', lw = 0.5, zorder = 20, label = 'CD33-12-2-2')
+ax[1].scatter(CO2_expmean(CD33_12_2_2), CO2_mean(CD33_12_2_2), s = sz, marker = 's', c = '#F7F7F7', ec = '#171008', lw = 0.5, zorder = 20, label = 'CD33-12-2-2')
 ax[1].errorbar(CO2_expmean(CD33_12_2_2), CO2_mean(CD33_12_2_2), xerr = CO2_expstd(CD33_12_2_2), yerr = CO2_mean(CD33_12_2_2) * CO2_rsd(CD33_12_2_2), lw = 0.5, c = 'k', zorder = 10)
 
-ax[1].scatter(CO2_expmean(CD33_22_1_1), CO2_mean(CD33_22_1_1), s = sz, c = '#CCCCCC', ec = '#171008', lw = 0.5, zorder = 20, label = 'CD33-22-1-1')
+ax[1].scatter(CO2_expmean(CD33_22_1_1), CO2_mean(CD33_22_1_1), s = sz, marker = 's', c = '#CCCCCC', ec = '#171008', lw = 0.5, zorder = 20, label = 'CD33-22-1-1')
 ax[1].errorbar(CO2_expmean(CD33_22_1_1), CO2_mean(CD33_22_1_1), xerr = CO2_expstd(CD33_22_1_1), yerr = CO2_mean(CD33_22_1_1) * CO2_rsd(CD33_22_1_1), lw = 0.5, c = 'k', zorder = 10)
 
 ax[1].scatter(CO2_expmean(ALV1833_11), CO2_mean(ALV1833_11), s = sz, c = '#969696', ec = '#171008', lw = 0.5, zorder = 20, label = 'ALV1833-11')
@@ -564,7 +564,7 @@ ax[1].legend(loc = 'lower right', labelspacing = 0.2, handletextpad = 0.25, hand
 sc1 = ax[2].plot(h2o_line, h2o_line, 'k', lw = 1, zorder = 0)
 
 for i in range(len(names)): 
-    if names[i] in ('STD_C1', 'STD_CN92C_OL2', 'VF74_127_7', 'VF74_132_2', 'ETFSR_Ol8', 'Fiege63', 'Fiege73'):
+    if names[i] in ('CD33_12_2_2', 'CD33_22_1_1', 'STD_C1', 'STD_CN92C_OL2', 'VF74_127_7', 'VF74_132_2', 'ETFSR_Ol8', 'Fiege63', 'Fiege73'):
         scatter1 = ax[2].scatter(H2O_stdexpmean[i], H2O_stdmean[i], s = sz, marker = 's', c = H2O_stdmean[i], vmin = 0, vmax = h2o_vmax, cmap = 'Blues', ec = '#171008', lw = 0.5, zorder = 20)
         ax[2].errorbar(H2O_stdexpmean[i], H2O_stdmean[i], marker = 's', xerr = H2O_stdexpstd[i], yerr = H2O_stdmean[i] * H2O_stdrsd[i], lw = 0.5, ls = 'none', c = 'k', zorder = 10)
         ax[3].scatter(CO2_stdexpmean[i], CO2_stdmean[i], s = sz, marker = 's', c = H2O_stdmean[i], vmin = 0, vmax = h2o_vmax, cmap = 'Blues', ec = '#171008', lw = 0.5, zorder = 20)

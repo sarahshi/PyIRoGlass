@@ -1,62 +1,50 @@
-# %% -*- coding: utf-8 -*-
-""" Created on August 29, 2022 // @author: Sarah Shi"""
 
-# %% 
-
-from filecmp import dircmp
+#!/usr/bin/env python
 from setuptools import setup, find_packages
-import os, codecs
+from os import path
 
-# %% 
+this_directory = path.abspath(path.dirname(__file__))
 
+with open(path.join(this_directory, 'src', 'PyIRoGlass', '_version.py'), encoding='utf-8') as f:
+    exec(f.read())
 
-dir = os.path.abspath(os.path.dirname(__file__))
-
-with open(os.path.join(dir, 'README.md'), encoding='utf-8') as description:
-    ext_description = description.read()
-
-
-def read(rel_path):
-    here = os.path.abspath(os.path.dirname(__file__))
-    with codecs.open(os.path.join(here, rel_path), 'r') as fp:
-        return fp.read()
-
-def get_version(rel_path):
-    for line in read(rel_path).splitlines():
-        if line.startswith('__version__'):
-            delim = '"' if '"' in line else "'"
-            return line.split(delim)[1]
-    else:
-        raise RuntimeError("Unable to find version string.")
-
+with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
 
 setup(
-    name='MC3_BASELINES',
-    version=get_version('MC3_BASELINES/__init__.py'),
-    author='Sarah Shi and Henry Towbin',
-    author_email='sarah.c.shi@gmail.com',
-
-    description='MC3_BASELINES',
-    long_description = ext_description,
+    name="BASELINES",
+    version=__version__,
+    author="Sarah C. Shi",
+    author_email="sarah.c.shi@gmail.com",
+    description="PyIRoGlass",
+    long_description=long_description,
     long_description_content_type="text/markdown",
-    url='https://github.com/sarahshi/BASELINES',
+    url="https://github.com/sarahshi/PyIRoGlass",
+    package_dir={'': 'src'},  # Optional
+    packages=find_packages(where='src'),  # Required
 
-    packages=find_packages(where='src'),
-
+    package_data={
+        # Include all pickle files
+        "": ["*.pkl"],
+    },
     install_requires=[
-            'numpy',
             'pandas',
-            'scipy',
+            'numpy',
+            'python-ternary',
             'matplotlib',
             'scikit-learn',
-            'pykrige',
-            'mc3',
-            'peakdetect',
+            'scipy',
+            'statsmodels',
+            'openpyxl',
+            'pip', 
+            'mc3', 
+            'pykrige', 
+            'peakdetect'
+            'pathlib'
             ],
-
     classifiers=[
         "Programming Language :: Python :: 3",
+        "Operating System :: OS Independent",
     ],
-    
     python_requires='>=3.6',
 )

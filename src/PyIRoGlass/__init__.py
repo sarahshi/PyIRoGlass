@@ -84,7 +84,7 @@ def Load_PCA(PCA_Path):
     wn_high = 2200
     wn_low = 1275
 
-    PCA_DF = pd.read_csv(PCA_Path, index_col = "Wavenumber")
+    PCA_DF = pd.read_pickle(PCA_Path)
     PCA_DF = PCA_DF[wn_low:wn_high]
     PCA_matrix = np.matrix(PCA_DF.to_numpy())
 
@@ -107,7 +107,7 @@ def Load_Wavenumber(Wavenumber_Path):
     wn_high = 2200
     wn_low = 1275
 
-    Wavenumber_DF = pd.read_csv(Wavenumber_Path, index_col = "Wavenumber")
+    Wavenumber_DF = pd.read_pickle(Wavenumber_Path)
     Wavenumber_DF = Wavenumber_DF[wn_low:wn_high]
     Wavenumber = np.array(Wavenumber_DF.index)
 
@@ -998,17 +998,18 @@ def Run_All_Spectra(dfs_dict, paths):
 
     # Check current working directory 
     path_parent = os.path.dirname(os.getcwd())
+    path_beg = os.getcwd() + '/'
 
     # Load files with PCA vectors for the baseline and H2Om, 1635 peak. 
-    PCAmatrix = Load_PCA(paths[0])
-    Peak_1635_PCAmatrix = Load_PCA(paths[1])
-    Wavenumber = Load_Wavenumber(paths[0])
-    path_beg, exportpath = paths[-2], paths[-1]
+    PCAmatrix = Load_PCA(path_beg + '/src/PyIRoGlass/BaselineAvgPCA.pkl')
+    Peak_1635_PCAmatrix = Load_PCA(path_beg + '/src/PyIRoGlass/H2Om1635PCA.pkl')
+    Wavenumber = Load_Wavenumber(path_beg + '/src/PyIRoGlass/BaselineAvgPCA.pkl')
+    exportpath = paths[-1]
     Nvectors = 5
     indparams = [Wavenumber, PCAmatrix, Peak_1635_PCAmatrix, Nvectors]
 
     # Create output directories for resulting files
-    output_dir = ["FIGURES", "PLOTFILES", "NPZFILES", "LOGFILES"] 
+    output_dir = ["FIGURES", "PLOTFILES", "NPZFILES", "LOGFILES", "FINALDATA"] 
     for ii in range(len(output_dir)):
         if not os.path.exists(path_beg + output_dir[ii] + '/' + exportpath):
             os.makedirs(path_beg + output_dir[ii] + '/' + exportpath, exist_ok=True)
@@ -1038,7 +1039,7 @@ def Run_All_Spectra(dfs_dict, paths):
     error_4500 = []
     error_5200 = []
 
-    # Determine best-fit baselines for all peaks with ALS (H2Om_{5200}, OH_{4500}, H2Ot_{3550}) and PyBaselines MC3 (H2Om_{1635}, CO3^{2-})
+    # Determine best-fit baselines for all peaks with ALS (H2Om_{5200}, OH_{4500}, H2Ot_{3550}) and PyIRoGlass MC3 (H2Om_{1635}, CO3^{2-})
     try: 
         for files, data in dfs_dict.items(): 
             # Three repeat baselines for the OH_{4500}
@@ -1181,12 +1182,12 @@ def Run_All_Spectra(dfs_dict, paths):
             H2O_3550_PH.loc[files] = pd.Series({'PH_3550_M': PH_3550_M, 'PH_3550_STD': PH_3550_STD, 'H2OT_3550_MAX': MAX_3550_ABS, 
                                             'BL_H2OT_3550_MAX': BL_MAX_3550_ABS, 'H2OT_3550_SAT?': error})
 
-            # Initialize PyBaselines MC3 fit for H2Om_{1635} and CO3^{2-}
+            # Initialize PyIRoGlass MC3 fit for H2Om_{1635} and CO3^{2-}
             df_length = np.shape(Wavenumber)[0]
             CO2_wn_high, CO2_wn_low = 2200, 1275
             spec = data[CO2_wn_low:CO2_wn_high]
 
-            # Interpolate fitting data depending on wavenumber spacing, to prepare for PyBaselines MC3
+            # Interpolate fitting data depending on wavenumber spacing, to prepare for PyIRoGlass MC3
             if spec.shape[0] != df_length:              
                 interp_wn = np.linspace(spec.index[0], spec.index[-1], df_length)
                 interp_abs = interpolate.interp1d(spec.index, spec['Absorbance'])(interp_wn)
@@ -1199,7 +1200,7 @@ def Run_All_Spectra(dfs_dict, paths):
             # Set uncertainty 
             uncert = np.ones_like(spec_mc3) * 0.01
 
-            # Run PyBaselines MC3!!!
+            # Run PyIRoGlass MC3!!!
             mc3_output = MCMC(data = spec_mc3, uncert = uncert, indparams = indparams, 
                             log = path_beg+logpath+files+'.log', savefile=path_beg+savefilepath+files+'.npz')
 
