@@ -30,9 +30,11 @@ setup(
     install_requires=[
             'pandas',
             'numpy',
+            'python-ternary',
             'matplotlib',
-            'scipy',
             'scikit-learn',
+            'scipy',
+            'tqdm',
             'statsmodels',
             'openpyxl',
             'mc3', 
