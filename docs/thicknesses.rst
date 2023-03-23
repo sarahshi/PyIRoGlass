@@ -1,5 +1,5 @@
-Other Functions
-==================================
+Functions relating to determining thickness from reflectance FTIR 
+=================================================================
 
 
 .. toctree::

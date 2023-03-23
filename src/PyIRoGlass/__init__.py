@@ -1371,7 +1371,7 @@ def Beer_Lambert_Error(N, molar_mass, absorbance, sigma_absorbance, density, sig
     return concentration_std
 
 
-def Density_Calculation(MI_Composition, T_room, P_room):
+def Density_Calculation(MI_Composition, T, P):
     
     """
     The Density_Calculation function inputs the MI composition file and outputs the glass density at the temperature and pressure of analysis.
@@ -1381,8 +1381,8 @@ def Density_Calculation(MI_Composition, T_room, P_room):
     
     Args:
     - MI_Composition: dictionary containing the mole fraction of each oxide in the glass composition
-    - T_room: temperature at which the density is calculated (in Celsius)
-    - P_room: pressure at which the density is calculated (in bars)
+    - T: temperature at which the density is calculated (in Celsius)
+    - P: pressure at which the density is calculated (in bars)
     
     Returns:
     - mol: dataframe containing the mole fraction of each oxide in the glass composition
@@ -1393,14 +1393,14 @@ def Density_Calculation(MI_Composition, T_room, P_room):
     molar_mass = {'SiO2': 60.08, 'TiO2': 79.866, 'Al2O3': 101.96, 'Fe2O3': 159.69, 'FeO': 71.844, 'MnO': 70.9374, 
                 'MgO': 40.3044, 'CaO': 56.0774, 'Na2O': 61.9789, 'K2O': 94.2, 'P2O5': 141.9445, 'H2O': 18.01528, 'CO2': 44.01}
     # Convert room temperature from Celsius to Kelvin
-    T_room_K = T_room + 273.15
+    T_K = T + 273.15
 
     # Define a dictionary of partial molar volumes for each oxide, based on data from Lesher and Spera (2015)
-    par_molar_vol = {'SiO2': (26.86-1.89*P_room/1000), 'TiO2': (23.16+7.24*(T_room_K-1673)/1000-2.31*P_room/1000), 'Al2O3': (37.42-2.26*P_room/1000), 
-                     'Fe2O3': (42.13+9.09*(T_room_K-1673)/1000-2.53*P_room/1000), 'FeO': (13.65+2.92*(T_room_K-1673)/1000-0.45*P_room/1000), 
-                     'MgO': (11.69+3.27*(T_room_K-1673)/1000+0.27*P_room/1000), 'CaO': (16.53+3.74*(T_room_K-1673)/1000+0.34*P_room/1000), 
-                     'Na2O': (28.88+7.68*(T_room_K-1673)/1000-2.4*P_room/1000), 'K2O': (45.07+12.08*(T_room_K-1673)/1000-6.75*P_room/1000), 
-                     'H2O': (26.27+9.46*(T_room_K-1673)/1000-3.15*P_room/1000)}
+    par_molar_vol = {'SiO2': (26.86-1.89*P/1000), 'TiO2': (23.16+7.24*(T_K-1673)/1000-2.31*P/1000), 'Al2O3': (37.42-2.26*P/1000), 
+                     'Fe2O3': (42.13+9.09*(T_K-1673)/1000-2.53*P/1000), 'FeO': (13.65+2.92*(T_K-1673)/1000-0.45*P/1000), 
+                     'MgO': (11.69+3.27*(T_K-1673)/1000+0.27*P/1000), 'CaO': (16.53+3.74*(T_K-1673)/1000+0.34*P/1000), 
+                     'Na2O': (28.88+7.68*(T_K-1673)/1000-2.4*P/1000), 'K2O': (45.07+12.08*(T_K-1673)/1000-6.75*P/1000), 
+                     'H2O': (26.27+9.46*(T_K-1673)/1000-3.15*P/1000)}
 
     # Create an empty dataframe to store the mole fraction of each oxide in the MI composition
     mol = pd.DataFrame()
@@ -1433,9 +1433,89 @@ def Density_Calculation(MI_Composition, T_room, P_room):
 
 
 
+def Epsilon_Calc(MI_Composition):
+
+    epsilon = pd.DataFrame(columns=['Tau', 'Na/Na+Ca', 
+                                    'epsilon_H2OT_3550', 'sigma_epsilon_H2OT_3550', 
+                                    'epsilon_H2Om_1635', 'sigma_epsilon_H2Om_1635', 
+                                    'epsilon_CO2', 'sigma_epsilon_CO2', 
+                                    'epsilon_H2Om_5200', 'sigma_epsilon_H2Om_5200', 
+                                    'epsilon_OH_4500', 'sigma_epsilon_OH_4500'])
+
+    # Define a dictionary of molar masses for each oxide
+    molar_mass = {'SiO2': 60.08, 'TiO2': 79.866, 'Al2O3': 101.96, 'Fe2O3': 159.69, 'FeO': 71.844, 'MnO': 70.9374, 
+                'MgO': 40.3044, 'CaO': 56.0774, 'Na2O': 61.9789, 'K2O': 94.2, 'P2O5': 141.9445, 'H2O': 18.01528, 'CO2': 44.01}
+
+    mol, density = Density_Calculation(MI_Composition, T, P)
+
+    # Calculate extinction coefficient
+    cation_tot = mol.sum(axis = 1) + mol['Al2O3'] + mol['Na2O'] + mol['K2O'] + mol['P2O5']
+    Na_NaCa = (2*mol['Na2O']) / ((2*mol['Na2O']) + mol['CaO'])
+    SiAl_tot = (mol['SiO2'] + (2*mol['Al2O3'])) / cation_tot
+
+    # Set up extinction coefficient inversion best-fit parameters and covariance matrices 
+    mest_3550 = np.array([15.725557, 71.368691])
+    mest_1635 = np.array([-50.397564, 124.250534])
+    mest_CO2 = np.array([440.6964, -355.2053])
+    covm_est_3550 = np.diag([38.4640, 77.8597])
+    covm_est_1635 = np.diag([20.8503, 39.3875])
+    covm_est_CO2 = np.diag([103.7645, 379.9891])
+    mest_4500 = np.array([-1.632730, 3.532522])
+    mest_5200 = np.array([-2.291420, 4.675528])
+    covm_est_4500 = np.diag([0.0329, 0.0708])
+    covm_est_5200 = np.diag([0.0129, 0.0276])
+
+    # Set up matrices for calculating uncertainties on extinction coefficients
+    G_SiAl = np.ones((2, 1))
+    G_NaCa = np.ones((2, 1))
+    covz_error_SiAl = np.zeros((2, 2))
+    covz_error_NaCa = np.zeros((2, 2))
+
+    # Loop through and calculate for all MI or glass compositions. 
+    for i in MI_Composition.index:
+
+        # Calculate extinction coefficients with best-fit parameters 
+        epsilon_H2OT_3550 = mest_3550[0]+(mest_3550[1]*SiAl_tot[i])
+        epsilon_H2Om_1635 = mest_1635[0]+(mest_1635[1]*SiAl_tot[i])
+        epsilon_CO2 = mest_CO2[0]+(mest_CO2[1]*Na_NaCa[i])
+        epsilon_H2Om_5200 = mest_5200[0]+(mest_5200[1]*SiAl_tot[i])
+        epsilon_OH_4500 = mest_4500[0]+(mest_4500[1]*SiAl_tot[i])
+
+        # Calculate extinction coefficient uncertainties
+        G_SiAl[1, 0] = SiAl_tot[i]
+        G_NaCa[1, 0] = Na_NaCa[i]
+        covz_error_SiAl[1, 1] = SiAl_tot[i] * 0.01 # 1 sigma
+        covz_error_NaCa[1, 1] = Na_NaCa[i] * 0.01
+
+        CT_int_3550 = (G_SiAl*covm_est_3550*np.transpose(G_SiAl)) + (mest_3550*covz_error_SiAl*np.transpose(mest_3550))
+        CT68_3550 = (np.mean(np.diag(CT_int_3550)))**(1/2)
+
+        CT_int_1635 = (G_SiAl*covm_est_1635*np.transpose(G_SiAl)) + (mest_1635*covz_error_SiAl*np.transpose(mest_1635))
+        CT68_1635 = (np.mean(np.diag(CT_int_1635)))**(1/2)
+
+        CT_int_CO2 = (G_NaCa*covm_est_CO2*np.transpose(G_NaCa)) + (mest_CO2*covz_error_NaCa*np.transpose(mest_CO2))
+        CT68_CO2 = (np.mean(np.diag(CT_int_CO2)))**(1/2)
+
+        CT_int_5200 = (G_SiAl*covm_est_5200*np.transpose(G_SiAl)) + (mest_5200*covz_error_SiAl*np.transpose(mest_5200))
+        CT68_5200 = (np.mean(np.diag(CT_int_5200)))**(1/2)
+        CT_int_4500 = (G_SiAl*covm_est_4500*np.transpose(G_SiAl)) + (mest_4500*covz_error_SiAl*np.transpose(mest_4500))
+        CT68_4500 = (np.mean(np.diag(CT_int_4500)))**(1/2)
+
+        # Save outputs of extinction coefficients to dataframe epsilon 
+        epsilon.loc[i] = pd.Series({'Tau': SiAl_tot[i], 'Na/Na+Ca': Na_NaCa[i],
+                                    'epsilon_H2OT_3550': epsilon_H2OT_3550, 'sigma_epsilon_H2OT_3550': CT68_3550,
+                                    'epsilon_H2Om_1635': epsilon_H2Om_1635, 'sigma_epsilon_H2Om_1635': CT68_1635,
+                                    'epsilon_CO2': epsilon_CO2, 'sigma_epsilon_CO2': CT68_CO2,
+                                    'epsilon_H2Om_5200': epsilon_H2Om_5200, 'sigma_epsilon_H2Om_5200': CT68_5200,
+                                    'epsilon_OH_4500': epsilon_OH_4500,'sigma_epsilon_OH_4500': CT68_4500
+                                    })
+
+        return epsilon
+
+        
 
 
-def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, T_room, P_room):
+def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, T, P):
 
     """
     The Concentration_Output function inputs the peak heights for the total H2O peak (3550 cm^-1), molecular H2O peak (1635 cm^-1), 
@@ -1447,8 +1527,8 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, T_room, P_r
     - N: the number of Monte Carlo samples to generate
     - thickness: Wafer thickness (in µm)
     - MI_Composition: dictionary containing the mole fraction of each oxide in the glass composition
-    - T_room: temperature at which the density is calculated (in Celsius)
-    - P_room: pressure at which the density is calculated (in bars)
+    - T: temperature at which the density is calculated (in Celsius)
+    - P: pressure at which the density is calculated (in bars)
     Returns:
     - density_epsilon : dataframe containing information on glass densities and extinction coefficient
     - mega_spreadsheet_f: volatile concentrations
@@ -1474,11 +1554,11 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, T_room, P_r
                                             'OH_4500_M', 'OH_4500_STD'])
     # dataframe for storing extinction coefficient and uncertainty data
     epsilon = pd.DataFrame(columns=['Tau', 'Na/Na+Ca', 
-                                'epsilon_H2OT_3550', 'sigma_epsilon_H2OT_3550', 
-                                'epsilon_H2Om_1635', 'sigma_epsilon_H2Om_1635', 
-                                'epsilon_CO2', 'sigma_epsilon_CO2', 
-                                'epsilon_H2Om_5200', 'sigma_epsilon_H2Om_5200', 
-                                'epsilon_OH_4500', 'sigma_epsilon_OH_4500'])
+                                    'epsilon_H2OT_3550', 'sigma_epsilon_H2OT_3550', 
+                                    'epsilon_H2Om_1635', 'sigma_epsilon_H2Om_1635', 
+                                    'epsilon_CO2', 'sigma_epsilon_CO2', 
+                                    'epsilon_H2Om_5200', 'sigma_epsilon_H2Om_5200', 
+                                    'epsilon_OH_4500', 'sigma_epsilon_OH_4500'])
     # dataframe for storing glass density data
     density_df = pd.DataFrame(columns=['Density'])
     # dataframe for storing saturated glass density data
@@ -1494,7 +1574,7 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, T_room, P_r
 
     # Initialize density calculation with 0 wt.% H2O.
     MI_Composition['H2O'] = 0
-    mol, density = Density_Calculation(MI_Composition, T_room, P_room)
+    mol, density = Density_Calculation(MI_Composition, T, P)
 
     # Calculate extinction coefficient
     cation_tot = mol.sum(axis = 1) + mol['Al2O3'] + mol['Na2O'] + mol['K2O'] + mol['P2O5']
@@ -1502,14 +1582,22 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, T_room, P_r
     SiAl_tot = (mol['SiO2'] + (2*mol['Al2O3'])) / cation_tot
 
     # Set up extinction coefficient inversion best-fit parameters and covariance matrices 
-    mest_3550, mest_1635, mest_CO2 = np.array([15.725557, 71.368691]), np.array([-50.397564, 124.250534]), np.array([440.6964, -355.2053])
-    covm_est_3550, covm_est_1635, covm_est_CO2 = np.diag([38.4640, 77.8597]), np.diag([20.8503, 39.3875]), np.diag([103.7645, 379.9891])
-    mest_4500, mest_5200 = np.array([-1.632730, 3.532522]), np.array([-2.291420, 4.675528])
-    covm_est_4500, covm_est_5200 = np.diag([0.0329, 0.0708]), np.diag([0.0129, 0.0276])
+    mest_3550 = np.array([15.725557, 71.368691])
+    mest_1635 = np.array([-50.397564, 124.250534])
+    mest_CO2 = np.array([440.6964, -355.2053])
+    covm_est_3550 = np.diag([38.4640, 77.8597])
+    covm_est_1635 = np.diag([20.8503, 39.3875])
+    covm_est_CO2 = np.diag([103.7645, 379.9891])
+    mest_4500 = np.array([-1.632730, 3.532522])
+    mest_5200 = np.array([-2.291420, 4.675528])
+    covm_est_4500 = np.diag([0.0329, 0.0708])
+    covm_est_5200 = np.diag([0.0129, 0.0276])
 
     # Set up matrices for calculating uncertainties on extinction coefficients
-    G_SiAl, G_NaCa = np.ones((2, 1)),  np.ones((2, 1))
-    covz_error_SiAl, covz_error_NaCa = np.zeros((2, 2)), np.zeros((2, 2))
+    G_SiAl = np.ones((2, 1))
+    G_NaCa = np.ones((2, 1))
+    covz_error_SiAl = np.zeros((2, 2))
+    covz_error_NaCa = np.zeros((2, 2))
 
     # Loop through and calculate for all MI or glass compositions. 
     for i in MI_Composition.index:
@@ -1559,7 +1647,7 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, T_room, P_r
                                 thickness['Thickness'], thickness['Sigma_Thickness'], 
                                 epsilon['epsilon_H2OT_3550'], epsilon['sigma_epsilon_H2OT_3550'])
         MI_Composition['H2O'] = H2OT_3550_I
-        mol, density = Density_Calculation(MI_Composition, T_room, P_room)
+        mol, density = Density_Calculation(MI_Composition, T, P)
 
     # Doing density-H2O iterations:
     for k in Volatiles_DF.index: 
@@ -1676,7 +1764,7 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, T_room, P_r
                                             thickness['Thickness'][l], thickness['Sigma_Thickness'][l], 
                                             epsilon['epsilon_OH_4500'][l], epsilon['sigma_epsilon_OH_4500'][l])
                 Sat_MI_Composition.loc[l, 'H2O'] = H2Om_1635_BP + OH_4500_M
-                mol_sat, density_sat = Density_Calculation(Sat_MI_Composition, T_room, P_room)
+                mol_sat, density_sat = Density_Calculation(Sat_MI_Composition, T, P)
             density_sat = density_sat[l]
 
             H2OT_3550_M = Beer_Lambert(molar_mass['H2O'], 
@@ -1963,4 +2051,251 @@ def Reflectance_Index(XFo):
     n = (n_alpha+n_beta+n_gamma) / 3
 
     return n
+
+
+
+
+def Inversion(comp, epsilon, sigma_comp, sigma_epsilon):
+
+    """Perform a Newtonian inversion on a given set of composition and absorbance coefficient data.
+
+    Parameters:
+        comp (ndarray): A 1D array containing the composition data.
+        epsilon (ndarray): A 1D array containing the absorbance coefficient data.
+        sigma_comp (float): The standard deviation of the composition data.
+        sigma_epsilon (float): The standard deviation of the absorbance coefficient data.
+
+    Returns:
+        tuple: A tuple containing the following elements:
+            - mls (ndarray): A 1D array of the least squares estimate of the coefficients.
+            - mest_f (ndarray): A 1D array of the final estimate of the coefficients.
+            - covls (ndarray): The covariance matrix of the least squares estimate.
+            - covm_est_f (ndarray): The covariance matrix of the final estimate.
+            - covepsilon_est_f (ndarray): The covariance matrix of the final estimate of the absorbance coefficients.
+            - comp_pre (ndarray): A 1D array of the predicted composition values based on the final estimate.
+            - epsilon_pre (ndarray): A 1D array of the predicted absorbance coefficient values based on the final estimate.
+            - epsilon_linear (ndarray): A 1D array of the predicted absorbance coefficient values based on the linear regression estimate.
+
+    """
+
+    M = 2  # Number of calibration parameters
+    N = len(comp)  # Number of data points
+
+    # Create a matrix with the composition and a column of ones for intercept calculation
+    G = np.array([np.ones(N), comp]).T
+
+    # Solve for calibration parameters using regular least squares
+    mls = np.linalg.solve(np.dot(G.T, G), np.dot(G.T, epsilon))
+
+    # Compute covariance matrix for regular least squares solution
+    covls = np.linalg.inv(np.linalg.multi_dot([G.T, np.diag(sigma_epsilon**-2), G]))
+
+    # Combine all parameters into a single vector for use in optimization
+    xbar = np.concatenate([epsilon, comp, mls])
+
+    # Trial solution based on regular least squares solution
+    xg = xbar
+
+    # Initialize gradient vector
+    Fg = np.zeros([N, M*N+M])
+
+    # Initialize covariance matrix
+    covx = np.zeros([M*N+M, M*N+M])
+
+    # Set covariance matrix for measurement uncertainties
+    covx[0*N:1*N, 0*N:1*N] = np.diag(sigma_epsilon**2)
+    covx[1*N:2*N, 1*N:2*N] = np.diag(sigma_comp**2)
+
+    # Set large covariance matrix for model parameters
+    scale = 1
+    covx[M*N+0, M*N+0] = scale * covls[0, 0]
+    covx[M*N+1, M*N+1] = scale * covls[1, 1]
+
+    # Set number of iterations for optimization
+    Nit = 100
+
+    # Initialize arrays to store calculated values at each iteration
+    epsilon_pre_all = np.zeros([N, Nit])
+    epsilon_linear_all = np.zeros([N, Nit])
+    mest_all = np.zeros([2, Nit])
+
+    # Perform optimization
+    for i in range(0, Nit):
+        # Calculate residual vector and its squared norm
+        f = -xg[0:N] + (xg[M*N+1]*xg[1*N:2*N]) + (xg[M*N+0]*np.ones(N))
+        Ef = np.dot(f.T, f)
+
+        # Print error at first iteration and every 10th iteration
+        if (i == 0):
+            print('Initial error in implicit equation = ' + str(Ef))
+        elif (i%10 == 0):
+            print('Final error in implicit equation = ', Ef)
+
+        # Compute gradient vector
+        Fg[0:N, 0:N] = -np.eye(N, N)
+        Fg[0:N, N:2*N] = xg[M*N+1] * np.eye(N, N)
+        Fg[0:N, M*N+0] = np.ones([N])
+        Fg[0:N, M*N+1] = xg[1*N:2*N]
+
+        # Set regularization parameter
+        epsi = 0
+
+        # Solve linear system
+        left = Fg.T
+        right = np.linalg.multi_dot([Fg, covx, Fg.T]) + (epsi*np.eye(N, N))
+        solve = np.linalg.solve(right.conj().T, left.conj().T).conj().T
+        MO = np.dot(covx, solve)
+        xg2 = xbar + np.dot(MO, (np.dot(Fg,(xg-xbar))-f))
+        xg = xg2
+
+        # Store some variables for later use
+        mest = xg[M*N+0:M*N+M]
+        epsilon_pre = xg[0:N]
+        epsilon_linear = mest[0] + mest[1]*comp
+        epsilon_pre_all[0:N, i] = epsilon_pre[0:N]
+        mest_all[0:N, i] = mest
+        epsilon_linear_all[0:N, i] = epsilon_linear[0:N]
+
+    # Compute some additional statistics
+    MO2 = np.dot(MO, Fg)
+    covx_est = np.linalg.multi_dot([MO2, covx, MO2.T])
+    covepsilon_est_f = covx_est[0:N, 0:N]
+    covm_est_f = covx_est[-2:, -2:]
+
+    mest_f = xg[M*N:M*N+M]
+
+    # Return relevant variables
+    return mest_f, covm_est_f, covepsilon_est_f
+
+
+
+def Least_Squares(comp, epsilon, sigma_comp, sigma_epsilon):
+
+    """Perform a least squares regression on a given set of composition and absorbance coefficient data.
+
+    Parameters:
+        comp (ndarray): A 1D array containing the composition data.
+        epsilon (ndarray): A 1D array containing the absorbance coefficient data.
+        sigma_comp (float): The standard deviation of the composition data.
+        sigma_epsilon (float): The standard deviation of the absorbance coefficient data.
+
+    Returns:
+        tuple: A tuple containing the following elements:
+            - mls (ndarray): A 1D array of the least squares estimate of the coefficients.
+            - covls (ndarray): The covariance matrix of the least squares estimate.
+
+    """
+
+    M = 2  # Number of calibration parameters
+    N = len(comp)  # Number of data points
+
+    # Create a matrix with the composition and a column of ones for intercept calculation
+    G = np.array([np.ones(N), comp]).T
+
+    # Solve for calibration parameters using regular least squares
+    mls = np.linalg.solve(np.dot(G.T, G), np.dot(G.T, epsilon))
+
+    # Compute covariance matrix for regular least squares solution
+    covls = np.linalg.inv(np.linalg.multi_dot([G.T, np.diag(sigma_epsilon**-2), G]))
+
+
+    return mls, covls
+
+
+def Calculate_Calibration_Error(covariance_matrix):
+    """
+    Calculate the calibration error based on the diagonal elements of a covariance matrix.
+
+    Parameters:
+        covariance_matrix (ndarray): A covariance matrix.
+
+    Returns:
+        A float representing the calibration error.
+    """
+    diagonal = np.diag(covariance_matrix)
+    return 2 * np.sqrt(np.mean(diagonal))
+
+
+def Calculate_Epsilon(m, composition):
+    """
+    Calculate epsilon values using coefficients and composition.
+
+    Parameters:
+        m (ndarray): An array of coefficients.
+        composition (ndarray): An array of composition data.
+
+    Returns:
+        A 1D array of calculated epsilon values.
+    """
+    return m[0] + m[1] * composition
+
+def Calculate_SEE(residuals):
+    """
+    Calculate the standard error of estimate given an array of residuals.
+
+    Parameters:
+        residuals (ndarray): An array of residuals.
+
+    Returns:
+        A float representing the standard error of estimate.
+    """
+    return np.sqrt(np.sum(residuals ** 2)) / (len(residuals) - 2)
+
+
+def Calculate_R2(actual_values, predicted_values):
+    """
+    Calculate the coefficient of determination given actual and predicted values.
+
+    Parameters:
+        actual_values (ndarray): An array of actual values.
+        predicted_values (ndarray): An array of predicted values.
+
+    Returns:
+        A float representing the coefficient of determination.
+    """
+    y_bar = np.mean(actual_values)
+    total_sum_of_squares = np.sum((actual_values - y_bar) ** 2)
+    residual_sum_of_squares = np.sum((actual_values - predicted_values) ** 2)
+    return 1 - (residual_sum_of_squares / total_sum_of_squares)
+
+
+def Calculate_RMSE(residuals):
+    """
+    Calculate the root mean squared error given an array of residuals.
+
+    Parameters:
+        residuals (ndarray): An array of residuals.
+
+    Returns:
+        A float representing the root mean squared error.
+    """
+    return np.sqrt(np.mean(residuals ** 2))
+
+
+def Inversion_Fit_Errors(comp, epsilon, mest_f, covm_est_f, covepsilon_est_f):
+    """
+    Calculate error metrics for a given set of data.
+
+    Parameters:
+        comp (ndarray): A 1D array containing the composition data.
+        epsilon: A 1D array containing the absorbance coefficient data.
+        mest_f (ndarray): A 1D array of the final estimate of the coefficients.
+        covm_est_f (ndarray): The covariance matrix of the final estimate.
+        covepsilon_est_f (ndarray): The covariance matrix of the final estimate of the absorbance coefficients.
+
+    Returns:
+        A tuple containing the following elements:
+            - E_calib: A float representing the error in calibration.
+            - see_inv: A float representing the standard error of estimate.
+            - r2_inv: A float representing the coefficient of determination.
+            - rmse_inv: A float representing the root mean squared error.
+    """
+    epsilon_final_estimate = Calculate_Epsilon(mest_f, comp)
+    residuals = epsilon_final_estimate - epsilon
+    E_calib = Calculate_Calibration_Error(covepsilon_est_f)
+    SEE_inv = Calculate_SEE(residuals)
+    R2_inv = Calculate_R2(epsilon, epsilon_final_estimate)
+    RMSE_inv = Calculate_RMSE(residuals)
+
+    return E_calib, SEE_inv, R2_inv, RMSE_inv
 

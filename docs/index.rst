@@ -16,6 +16,7 @@ Welcome to PyIRoGlass's documentation!
    FAQs
    changelog
 
+
 .. toctree::
    :maxdepth: 2
    :caption: Reflectance FTIR Thickness Functions
@@ -28,7 +29,6 @@ Welcome to PyIRoGlass's documentation!
    :caption: Transmission FTIR Baseline Functions
 
    Examples/TransmissionFTIR/Workflow
-
 
 
 .. toctree::
@@ -61,5 +61,4 @@ Indices and Tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
 

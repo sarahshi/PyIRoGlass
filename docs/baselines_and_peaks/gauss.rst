@@ -1,4 +1,4 @@
-Fitting Gaussian functions to Carbonate Doublets
+Fitting Gaussian functions to :math:`CO_3^{2-}` Doublets
 ======================
 
 .. automodule:: PyIRoGlass.Gauss

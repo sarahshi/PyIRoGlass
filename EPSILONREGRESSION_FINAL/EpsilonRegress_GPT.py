@@ -269,52 +269,6 @@ def errors(comp, epsilon, mls, mest_f, covls, covm_est_f, covepsilon_est_f):
 # %% 
 
 
-
-# def errors(comp, epsilon, mls, mest_f, covls, covm_est_f, covepsilon_est_f):
-
-#     """
-#     Calculate error metrics for a given set of data.
-
-#     Parameters:
-#         comp (ndarray): A 1D array containing the composition data.
-#         epsilon: A 1D array containing the absorbance coefficient data.
-#         mls (ndarray): A 1D array of the least squares estimate of the coefficients.
-#         mest_f (ndarray): A 1D array of the final estimate of the coefficients.
-#         covls (ndarray): The covariance matrix of the least squares estimate.
-#         covm_est_f (ndarray): The covariance matrix of the final estimate.
-#         covepsilon_est_f (ndarray): The covariance matrix of the final estimate of the absorbance coefficients.
-
-#     Returns:
-#         A tuple containing the following elements:
-#             - E_calib: A float representing the error in calibration.
-#             - see_inv: A float representing the standard error of estimate.
-#             - r2_inv: A float representing the coefficient of determination.
-#             - rmse_inv: A float representing the root mean squared error.
-#     """
-
-#     vepsilon = np.diag(covepsilon_est_f)  # get diagonal elements of covariance matrix of final estimate of epsilon
-#     E_calib = 2 * np.sqrt(np.mean(vepsilon))  # calculate calibration error based on the mean of these elements
-
-#     epsilon_ls = mls[0] + mls[1] * comp  # calculate epsilon values using the least squares estimate of coefficients
-#     epsilon_linear = mest_f[0] + mest_f[1] * comp  # calculate epsilon values using the final estimate of coefficients
-
-#     res_inv = epsilon_linear - epsilon  # calculate residuals between final estimate and actual epsilon values
-#     see_inv = np.sqrt(np.sum(res_inv ** 2)) / (len(res_inv) - 1 - 1)  # calculate standard error of estimate
-
-#     yhat_inv = epsilon_linear  # predicted values of epsilon using the final estimate
-#     ybar_inv = np.mean(epsilon)  # mean of actual epsilon values
-
-#     totalsumsq_inv = np.sum((epsilon_linear - ybar_inv) ** 2)  # total sum of squares
-#     ssregress_inv = np.sum((yhat_inv - ybar_inv) ** 2)  # regression sum of squares
-#     ssresid_inv = np.sum((epsilon - yhat_inv) ** 2)  # residual sum of squares
-#     sstotal_inv = ssregress_inv + ssresid_inv  # total sum of squares
-#     r2_inv = 1 - (ssresid_inv / sstotal_inv)  # calculate coefficient of determination
-#     rmse_inv = np.sqrt(np.sum(res_inv ** 2) / len(res_inv))  # calculate root mean squared error
-
-#     return E_calib, see_inv, r2_inv, rmse_inv
-
-
-
 def errors_plotting(comp, epsilon, mest_f):
     
     """
@@ -407,23 +361,23 @@ sigma_naca = naca * 0.025
 epsilon_carbonate = df_carbonate['Epsilon_Carbonate']
 sigma_epsilon_carbonate = epsilon_carbonate * 0.10
 
-mls_5200, mest_5200, covls_5200, covm_est_5200, covepsilon_5200, comp_pre_5200, epsilon_pre_5200, epsilon_linear_5200 = inversion(tau_5200, sigma_tau_5200, epsilon_5200, sigma_epsilon_5200)
+mls_5200, mest_5200, covls_5200, covm_est_5200, covepsilon_5200, comp_pre_5200, epsilon_pre_5200, epsilon_linear_5200 = inversion(tau_5200, epsilon_5200, sigma_tau_5200, sigma_epsilon_5200)
 E_calib_5200, see_inv_5200, r2_inv_5200, rmse_inv_5200 = errors(tau_5200, epsilon_5200, mls_5200, mest_5200, covls_5200, covm_est_5200, covepsilon_5200)
 tau_arr_5200, epsilon_5200_arr, conf_lower_5200, conf_upper_5200, pred_lower_5200, pred_upper_5200 = errors_plotting(tau_5200, epsilon_5200, mest_5200)
 
-mls_4500, mest_4500, covls_4500, covm_est_4500, covepsilon_4500, comp_pre_4500, epsilon_pre_4500, epsilon_linear_4500 = inversion(tau_4500, sigma_tau_4500, epsilon_4500, sigma_epsilon_4500)
+mls_4500, mest_4500, covls_4500, covm_est_4500, covepsilon_4500, comp_pre_4500, epsilon_pre_4500, epsilon_linear_4500 = inversion(tau_4500, epsilon_4500, sigma_tau_4500, sigma_epsilon_4500)
 E_calib_4500, see_inv_4500, r2_inv_4500, rmse_inv_4500 = errors(tau_4500, epsilon_4500, mls_4500, mest_4500, covls_4500, covm_est_4500, covepsilon_4500)
 tau_arr_4500, epsilon_4500_arr, conf_lower_4500, conf_upper_4500, pred_lower_4500, pred_upper_4500 = errors_plotting(tau_4500, epsilon_4500, mest_4500)
 
-mls_3550, mest_3550, covls_3550, covm_est_3550, covepsilon_3550, comp_pre_3550, epsilon_pre_3550, epsilon_linear_3550 = inversion(tau_3550, sigma_tau_3550, epsilon_3550, sigma_epsilon_3550)
+mls_3550, mest_3550, covls_3550, covm_est_3550, covepsilon_3550, comp_pre_3550, epsilon_pre_3550, epsilon_linear_3550 = inversion(tau_3550, epsilon_3550, sigma_tau_3550, sigma_epsilon_3550)
 E_calib_3550, see_inv_3550, r2_inv_3550, rmse_inv_3550 = errors(tau_3550, epsilon_3550, mls_3550, mest_3550, covls_3550, covm_est_3550, covepsilon_3550)
 tau_arr_3550, epsilon_3550_arr, conf_lower_3550, conf_upper_3550, pred_lower_3550, pred_upper_3550 = errors_plotting(tau_3550, epsilon_3550, mest_3550)
 
-mls_1635, mest_1635, covls_1635, covm_est_1635, covepsilon_1635, comp_pre_1635, epsilon_pre_1635, epsilon_linear_1635 = inversion(tau_1635, sigma_tau_1635, epsilon_1635, sigma_epsilon_1635)
+mls_1635, mest_1635, covls_1635, covm_est_1635, covepsilon_1635, comp_pre_1635, epsilon_pre_1635, epsilon_linear_1635 = inversion(tau_1635, epsilon_1635, sigma_tau_1635, sigma_epsilon_1635)
 E_calib_1635, see_inv_1635, r2_inv_1635, rmse_inv_1635 = errors(tau_1635, epsilon_1635, mls_1635, mest_1635, covls_1635, covm_est_1635, covepsilon_1635)
 tau_arr_1635, epsilon_1635_arr, conf_lower_1635, conf_upper_1635, pred_lower_1635, pred_upper_1635 = errors_plotting(tau_1635, epsilon_1635, mest_1635)
 
-mls_carbonate, mest_carbonate, covls_carbonate, covm_est_carbonate, covepsilon_carbonate, comp_pre_carbonate, epsilon_pre_carbonate, epsilon_linear_carbonate = inversion(naca, sigma_naca, epsilon_carbonate, sigma_epsilon_carbonate)
+mls_carbonate, mest_carbonate, covls_carbonate, covm_est_carbonate, covepsilon_carbonate, comp_pre_carbonate, epsilon_pre_carbonate, epsilon_linear_carbonate = inversion(naca, epsilon_carbonate, sigma_naca, sigma_epsilon_carbonate)
 E_calib_carbonate, see_inv_carbonate, r2_inv_carbonate, rmse_inv_carbonate = errors(naca, epsilon_carbonate, mls_carbonate, mest_carbonate, covls_carbonate, covm_est_carbonate, covepsilon_carbonate)
 naca_arr, epsilon_carbonate_arr, conf_lower_carbonate, conf_upper_carbonate, pred_lower_carbonate, pred_upper_carbonate = errors_plotting(naca, epsilon_carbonate, mest_carbonate)
 

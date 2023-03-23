@@ -1,5 +1,5 @@
-Functions for fitting baselines and peaks
-==================================
+Building-block functions for fitting baselines and peaks
+========================================================
 
 .. toctree::
 
@@ -9,3 +9,5 @@ Functions for fitting baselines and peaks
     baselines_and_peaks/als_baselines
     baselines_and_peaks/NIR
     baselines_and_peaks/MIR
+    baselines_and_peaks/mcmc
+    baselines_and_peaks/run_all_spectra

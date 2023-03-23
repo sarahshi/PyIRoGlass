@@ -1,6 +1,6 @@
 Calculate glass wafer thicknesses
 ======================
 
-.. automodule::  PyIRoGlass.ThicknessCalc
+.. automodule::  PyIRoGlass.Thickness_Calc
    :members:
 
