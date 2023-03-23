@@ -28,16 +28,16 @@ path_input = os.getcwd() + '/Inputs/'
 output_dir = ["FIGURES", "PLOTFILES", "NPZFILES", "LOGFILES", "FINALDATA"] 
 
 # Change paths to direct to folder with SampleSpectra -- last bit should be whatever your folder with spectra is called. 
-PATHS = [path_input + string for string in ['TransmissionSpectra/Fuego/', 'TransmissionSpectra/Standards/', 'TransmissionSpectra/Fuego1974RH/', 'TransmissionSpectra/SIMS/', 'TransmissionSpectra/Testing/']]
+PATHS = [path_input + string for string in ['TransmissionSpectra/Fuego/', 'TransmissionSpectra/Standards/', 'TransmissionSpectra/Fuego1974RH/', 'TransmissionSpectra/SIMS/', 'TransmissionSpectra/Test1/']]
 
 # Put ChemThick file in Inputs. Direct to what your ChemThick file is called. 
-CHEMTHICK_PATH = [path_input + string for string in ['FuegoChemThick.csv', 'StandardChemThick.csv', 'DanRHChemThick.csv', 'SIMSChemThick.csv']]
+CHEMTHICK_PATH = [path_input + string for string in ['FuegoChemThick.csv', 'StandardChemThick.csv', 'DanRHChemThick.csv', 'SIMSChemThick.csv', 'FuegoChemThick.csv']]
 
 # Change last value in list to be what you want your output directory to be called. 
-INPUT_PATHS = ['FUEGO_F', 'STD_F', 'FRH_F', 'SIMS_F', 'TEST']
+INPUT_PATHS = ['FUEGO_F', 'STD_F', 'FRH_F', 'SIMS_F', 'Test']
 
 # Change to be what you want the prefix of your output files to be. 
-OUTPUT_PATH = ['F18', 'STD', 'FRH', 'SIMSSTD', 'test']
+OUTPUT_PATH = ['F18', 'STD', 'FRH', 'SIMSSTD', 'Test']
 
 
 # %% 
@@ -64,7 +64,7 @@ n_gl = 1.546
 
 REF_FUEGO = pig.Thickness_Processing(REF_DFS_DICT, n = n_gl, wn_high = 2850, wn_low = 1700, remove_baseline = True, plotting = False, phaseol = False)
 
-# %% 
+
 
 # %%
 
@@ -75,7 +75,7 @@ FILES = sorted(glob.glob(PATH + "*"))
 MICOMP, THICKNESS = pig.Load_ChemistryThickness(CHEMTHICK_PATH[fuegono])
 
 DFS_FILES, DFS_DICT = pig.Load_SampleCSV(FILES, wn_high = 5500, wn_low = 1000)
-DF_OUTPUT, FAILURES = pig.Run_All_Spectra(DFS_DICT, INPUT_PATHS[fuegono])
+DF_OUTPUT, FAILURES = pig.Run_All_Spectra(DFS_DICT, None)
 # DF_OUTPUT.to_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[fuegono] + '_DF.csv')
 
 

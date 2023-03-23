@@ -1134,7 +1134,7 @@ def Run_All_Spectra(dfs_dict, exportpath):
                                 log = path_beg+logpath+files+'.log', savefile=path_beg+savefilepath+files+'.npz')
             else: 
                 mc3_output = MCMC(data = spec_mc3, uncert = uncert, indparams = indparams, 
-                                log=False, savefile=False)
+                                log=None, savefile=None)
 
 
             # Save best-fit concentration outputs and calculate best-fit baselines and peaks for plotting
