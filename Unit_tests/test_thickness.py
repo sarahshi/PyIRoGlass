@@ -2,8 +2,7 @@ import unittest
 import numpy as np
 import pandas as pd
 import PyIRoGlass as pig
-import os
-import glob
+
 
 class test_thickness(unittest.TestCase):
     def setUp(self): 
@@ -17,7 +16,6 @@ class test_thickness(unittest.TestCase):
         self.df = pd.DataFrame({'Wavenumber': self.wn, 'Absorbance': self.abs})
         self.df.set_index('Wavenumber', inplace = True)
         self.dfs_dict = {self.file: self.df}
-
 
     def test_reflectance_index(self):
         result = pig.Reflectance_Index(self.xfo)

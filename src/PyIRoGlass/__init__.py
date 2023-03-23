@@ -947,6 +947,7 @@ def MCMC(data, uncert, indparams, log, savefile):
 
     # Define initial values, limits, and step sizes for parameters
     func = Carbonate
+    
     params = np.array([1.25, 2.00, 0.25, 0.01, 0.01, 1430, 25.0, 0.0100, 1510, 25.0, 0.0100, 0.10, 0.02, 0.01, 5e-4, 0.70])
     pmin = np.array([0.00, -5.00, -1.00, -0.75, -0.75, 1415, 22.5, 0.0000, 1500, 22.5, 0.0000, 0.00, -0.50, -0.50, -5e-2, -1.00])
     pmax = np.array([5.00, 8.00, 1.00, 0.75, 0.75, 1445, 40.0, 3.0000, 1535, 40.0, 3.0000, 3.00, 0.50, 0.50, 5e-2, 3.00])
