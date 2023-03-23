@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import pandas as pd
 import PyIRoGlass as pig
-
+import os 
 
 class test_fitting_functions(unittest.TestCase):
 
