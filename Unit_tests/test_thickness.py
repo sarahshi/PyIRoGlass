@@ -23,10 +23,11 @@ class test_thickness(unittest.TestCase):
     def test_process_thickness(self): 
         result = pig.Reflectance_Index(self.xfo)
         df_files, df_dicts = pig.Load_SampleCSV(self.path, self.wn_high, self.wn_low)
+        print(df_files.index)
         thickness_results = pig.Thickness_Processing(df_dicts, result, self.wn_high, self.wn_low, remove_baseline=False, plotting=False, phaseol=True)
         result = float(thickness_results.loc['AC4_OL27_REF_a']['Thickness_M'])
         expected = 79.81
-        self.assertAlmostEqual(result, expected, self.decimalPlace-3, msg="Thickness test and expected values from the Thickness_Processing function do not agree")
+        self.assertAlmostEqual(result, expected, self.decimalPlace-2, msg="Thickness test and expected values from the Thickness_Processing function do not agree")
 
 if __name__ == '__main__':
      unittest.main()
