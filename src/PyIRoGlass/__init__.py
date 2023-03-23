@@ -80,7 +80,10 @@ def Load_PCA(PCA_Path):
     wn_high = 2200
     wn_low = 1275
 
-    PCA_DF = pd.read_pickle(PCA_Path)
+    npz = np.load(PCA_Path)
+    PCA_DF = pd.DataFrame(npz['data'], columns = npz['columns'])
+    PCA_DF = PCA_DF.set_index('Wavenumber')
+
     PCA_DF = PCA_DF[wn_low:wn_high]
     PCA_matrix = np.matrix(PCA_DF.to_numpy())
 
@@ -103,7 +106,10 @@ def Load_Wavenumber(Wavenumber_Path):
     wn_high = 2200
     wn_low = 1275
 
-    Wavenumber_DF = pd.read_pickle(Wavenumber_Path)
+    npz = np.load(Wavenumber_Path)
+    Wavenumber_DF = pd.DataFrame(npz['data'], columns = npz['columns'])
+    Wavenumber_DF = Wavenumber_DF.set_index('Wavenumber')
+
     Wavenumber_DF = Wavenumber_DF[wn_low:wn_high]
     Wavenumber = np.array(Wavenumber_DF.index)
 
@@ -996,9 +1002,9 @@ def Run_All_Spectra(dfs_dict, exportpath):
     path_beg = os.getcwd() + '/'
 
     # Load files with PCA vectors for the baseline and H2Om, 1635 peak. 
-    PCAmatrix = Load_PCA(path_beg + '/src/PyIRoGlass/BaselineAvgPCA.pkl')
-    Peak_1635_PCAmatrix = Load_PCA(path_beg + '/src/PyIRoGlass/H2Om1635PCA.pkl')
-    Wavenumber = Load_Wavenumber(path_beg + '/src/PyIRoGlass/BaselineAvgPCA.pkl')
+    PCAmatrix = Load_PCA(path_beg + '/src/PyIRoGlass/BaselineAvgPCA.npz')
+    Peak_1635_PCAmatrix = Load_PCA(path_beg + '/src/PyIRoGlass/H2Om1635PCA.npz')
+    Wavenumber = Load_Wavenumber(path_beg + '/src/PyIRoGlass/BaselineAvgPCA.npz')
     Nvectors = 5
     indparams = [Wavenumber, PCAmatrix, Peak_1635_PCAmatrix, Nvectors]
 
