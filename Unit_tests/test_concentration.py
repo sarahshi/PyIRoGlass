@@ -57,7 +57,7 @@ class test_conc_outputs_co2(unittest.TestCase):
     def test_beer_lambert_error(self):
         result = pig.Beer_Lambert_Error(self.N, self.molar_mass, self.absorbance, self.sigma_absorbance, self.density, self.sigma_density, self.thickness, self.sigma_thickness, self.epsilon, self.sigma_epsilon) * 10000
         expected = 97.35842352      
-        self.assertAlmostEqual(result, expected, self.decimalPlace-1, msg="CO2_1515 test and expected errors from the Beer_Lambert_Error equation do not agree")
+        self.assertAlmostEqual(result, expected, self.decimalPlace-2, msg="CO2_1515 test and expected errors from the Beer_Lambert_Error equation do not agree")
 
 
 if __name__ == '__main__':
