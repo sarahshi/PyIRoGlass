@@ -26,7 +26,7 @@ class test_fitting_functions(unittest.TestCase):
             PH_5200_krige = np.array([PH_5200_krige_1, PH_5200_krige_2, PH_5200_krige_3])
             PH_5200_krige_M, PH_5200_krige_STD = np.mean(PH_5200_krige), np.std(PH_5200_krige)
 
-        result = float(PH_5200_krige)
+        result = PH_5200_krige
         expected = 0.008959072
         self.assertAlmostEqual(result, expected, self.decimalPlace, msg="H2Om5200 peak height test and expected values from the NearIR_Process function do not agree")
 
@@ -37,29 +37,28 @@ class test_fitting_functions(unittest.TestCase):
             data_H2O3550_3, plot_output_3550_3, PH_3550_3, plotindex3 = pig.MidIR_Process(data, 2300, 4000)
             PH_3550_M = np.mean([PH_3550_1, PH_3550_2, PH_3550_3])
 
-        result = float(PH_3550_M)
+        result = PH_3550_M
         expected = 1.523342931
         self.assertAlmostEqual(result, expected, self.decimalPlace, msg="H2Ot3550 peak height test and expected values from the NearIR_Process function do not agree")
 
-    # def test_MCMC(self):
+    def test_MCMC(self):
 
-    #     Volatiles_DF, failures = pig.Run_All_Spectra(self.dfs_dict, os.getcwd())
+        Volatiles_DF, failures = pig.Run_All_Spectra(self.dfs_dict, None)
 
-    #     result_H2Om_5200 = float(Volatiles_DF['PH_5200_M'])
-    #     expected_H2Om_5200 = 0.00895907201720743
+        result_H2Om_5200 = float(Volatiles_DF['PH_5200_M'])
+        expected_H2Om_5200 = 0.00895907201720743
 
-    #     result_H2Ot_3550 = float(Volatiles_DF['PH_3550_M'])
-    #     expected_H2Ot_3550 = 1.52334293070956
+        result_H2Ot_3550 = float(Volatiles_DF['PH_3550_M'])
+        expected_H2Ot_3550 = 1.52334293070956
 
-    #     result_CO2_1515 = float(Volatiles_DF['PH_1515_BP'])
-    #     expected_CO2_1515 = 0.05288739655686
+        result_CO2_1515 = float(Volatiles_DF['PH_1515_BP'])
+        expected_CO2_1515 = 0.05288739655686
 
+        self.assertAlmostEqual(result_H2Om_5200, expected_H2Om_5200, self.decimalPlace, msg="H2Om_5200 peak height test and expected values from the Run_All_Spectra function do not agree")
 
-    #     self.assertAlmostEqual(result_H2Om_5200, expected_H2Om_5200, self.decimalPlace, msg="H2Om_5200 peak height test and expected values from the Run_All_Spectra function do not agree")
+        self.assertAlmostEqual(result_H2Ot_3550, expected_H2Ot_3550, self.decimalPlace, msg="H2Ot_3550 peak height test and expected values from the Run_All_Spectra function do not agree")
 
-    #     self.assertAlmostEqual(result_H2Ot_3550, expected_H2Ot_3550, self.decimalPlace, msg="H2Ot_3550 peak height test and expected values from the Run_All_Spectra function do not agree")
-
-    #     self.assertAlmostEqual(result_CO2_1515, expected_CO2_1515, self.decimalPlace-2, msg="CO2_1515 peak height test and expected values from the Run_All_Spectra function do not agree")
+        self.assertAlmostEqual(result_CO2_1515, expected_CO2_1515, self.decimalPlace-2, msg="CO2_1515 peak height test and expected values from the Run_All_Spectra function do not agree")
 
 
 
