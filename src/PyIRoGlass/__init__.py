@@ -1,3 +1,4 @@
+# %% 
 __author__ = 'Sarah Shi, Henry Towbin'
 
 import os
@@ -28,22 +29,25 @@ themes = {'blue':{'edgecolor':'navy','facecolor':'royalblue','color':'navy'},
     'orange':{'edgecolor':'darkorange','facecolor':'gold','color':'darkgoldenrod'},}
 from ._version import __version__
 
-
+# %%
 
 def Load_SampleCSV(paths, wn_high, wn_low): 
 
     """
     The Load_SampleCSV function takes the inputs of the path to a directory with all sample CSVs, 
     wavenumber high, and wavenumber low values. 
+
     Parameters:
         paths (list): A list of file paths to CSV files containing spectral data.
         wn_high (float): The highest wavenumber to include in the output dictionary.
         wn_low (float): The lowest wavenumber to include in the output dictionary.
+
     Returns:
-        A tuple of two items:
-        - A list of file names for each sample in the directory.
-        - A dictionary where each key is a file name, and the corresponding value is a pandas dataframe containing
-        wavenumbers and absorbances for the given sample.
+        Tuple containing the following elements:
+            files (list): List of names for each sample in the directory.
+            dfs_dict (dictionary): Dictionary where each key is a file name, and the 
+                corresponding value is a pandas dataframe containing
+                wavenumbers and absorbances for the given sample.
     """
 
     dfs = []
@@ -64,17 +68,16 @@ def Load_SampleCSV(paths, wn_high, wn_low):
 
     return files, dfs_dict
 
-
-
-
-
 def Load_PCA(PCA_Path):
 
-    """The Load_PCA function takes the input of a path to a CSV of predetermined PCA components. 
+    """
+    Loads predetermined PCA components from an NPZ file.
+
     Parameters:
         PCA_Path (str): The path to a CSV file containing PCA components.
+    
     Returns:
-        A numpy matrix containing the PCA components.
+        PCA_matrix (matrix): Matrix containing the PCA components.
     """
 
     wn_high = 2200
@@ -89,18 +92,16 @@ def Load_PCA(PCA_Path):
 
     return PCA_matrix
 
-
-
-
-
 def Load_Wavenumber(Wavenumber_Path):
 
     """
-    Loads the wavenumbers associated with PCA components from a CSV file.
+    Loads the wavenumbers associated with PCA components from an NPZ file.
+
     Parameters:
         Wavenumber_Path (str): Path to a CSV file containing wavenumbers.
+
     Returns:
-        numpy.ndarray: An array of wavenumbers.
+        Wavenumber (np.ndarray): An array of wavenumbers.
     """
 
     wn_high = 2200
@@ -115,22 +116,18 @@ def Load_Wavenumber(Wavenumber_Path):
 
     return Wavenumber
 
-
-
-
-
 def Load_ChemistryThickness(ChemistryThickness_Path):
 
     """
-    The Load_ChemistryThickness function takes the input of a path to a CSV with MI chemistry or thickness. 
-    The function returns dataframes with these data.
+    Loads dataframes with glass chemistry and thickness data.
+
     Parameters:
         ChemistryThickness_Path (str): The path to a CSV file containing the chemistry and thickness data.
     
     Returns:
-        A tuple of two pandas dataframes:
-        - The first dataframe contains the MI chemistry data for each sample.
-        - The second dataframe contains the thickness and standard deviation data for each sample.
+        Tuple containing the following elements:
+            Chemistry (pd.DataFrame): The dataframe containing the glass chemistry data. 
+            Thickness (pd.DataFrame): The dataframe containing the thickness and standard deviation data. 
     """
 
     ChemistryThickness = pd.read_csv(ChemistryThickness_Path)
@@ -142,50 +139,42 @@ def Load_ChemistryThickness(ChemistryThickness_Path):
 
     return Chemistry, Thickness
 
-
-
-
-
 def Gauss(x, mu, sd, A=1):
 
-    """Return a Gaussian fit for the CO3^{2-} doublet peaks at 1515 and 1430 cm^-1 peaks.
+    """
+    Return a Gaussian fit for the CO3^{2-} doublet peaks at 1515 and 1430 cm^-1 peaks.
+    
     Parameters:
         x (numeric): The wavenumbers of interest.
         mu (numeric): The center of the peak.
         sd (numeric): The standard deviation (or width of peak).
         A (numeric, optional): The amplitude. Defaults to 1.
+    
     Returns:
-        numpy.ndarray: The Gaussian fit.
+        G (np.ndarray): The Gaussian fit.
     """
 
     G = A * np.exp(-(x - mu) ** 2 / (2 * sd ** 2))
 
     return G
 
-
-
-
-
 def Linear(x, m, b):
 
     """
-    
     Calculate a linear offset for adjusting model data. 
     
     Parameters:
-    x (numpy.ndarray): Input values.
-    m (float): Tilt of the linear offset.
-    b (float): Offset of the linear offset.
+        x (np.ndarray): Input values.
+        m (float): Tilt of the linear offset.
+        b (float): Offset of the linear offset.
+
     Returns:
-    numpy.ndarray: Linear offset.
-    
+        tilt_offset (np.ndarray): Linear offset.
     """
 
     tilt_offset = m * np.arange(0, x.size) + b
 
     return tilt_offset
-
-
 
 def Carbonate(P, x, PCAmatrix, Peak_1635_PCAmatrix, Nvectors = 5): 
 
@@ -194,23 +183,17 @@ def Carbonate(P, x, PCAmatrix, Peak_1635_PCAmatrix, Nvectors = 5):
     The Carbonate function takes in the inputs of fitting parameters P, wavenumbers x, PCA matrix, 
     number of PCA vectors of interest. The function calculates the molecular H2O_{1635} peak, 
     CO3^{2-} Gaussian peaks, linear offset, and baseline. The function then returns the model data.
+    
     Parameters:
-    ----
-    P : array_like
-        Fitting parameters including PCA and peak weights, Gaussian parameters, 
-        linear offset slope and intercept.
-    x : array_like
-        Wavenumbers of interest.
-    PCAmatrix : array_like
-        PCA matrix.
-    Peak_1635_PCAmatrix : array_like
-        PCA matrix for the 1635 peak.
-    Nvectors : int, optional
-        Number of PCA vectors of interest. Default is 5.
+        P (np.ndarray): Fitting parameters including PCA and peak weights, Gaussian parameters, 
+            linear offset slope and intercept.
+        x (np.ndarray): Wavenumbers of interest.
+        PCAmatrix (matrix): PCA matrix.
+        Peak_1635_PCAmatrix (matrix): PCA matrix for the 1635 peak.
+        Nvectors (int, optional): Number of PCA vectors of interest. Default is 5.
+
     Returns:
-    -------
-    model_data : ndarray
-        Model data for the carbonate spectra.
+        model_data (np.ndarray): Model data for the carbonate spectra.
     """
 
     PCA_Weights = np.array([P[0:Nvectors]])
@@ -232,23 +215,22 @@ def Carbonate(P, x, PCAmatrix, Peak_1635_PCAmatrix, Nvectors = 5):
     return model_data
 
 
+def als_baseline(intensities, asymmetry_param=0.05, smoothness_param=5e5, max_iters=15, conv_thresh=1e-5, verbose=False):
 
-
-
-def als_baseline(intensities, asymmetry_param=0.05, smoothness_param=5e5, max_iters=10, conv_thresh=1e-5, verbose=False):
-
-    """ Computes the asymmetric least squares baseline.
+    """ 
+    Computes the asymmetric least squares baseline.
     http://www.science.uva.nl/~hboelens/publications/draftpub/Eilers_2005.pdf
     
     Parameters:
-        intensities (array-like): The input signal to baseline.
-        asymmetry_param (float): The asymmetry parameter (p) that controls the weights. Defaults to 0.05.
-        smoothness_param (float): The smoothness parameter (s) that controls the smoothness of the baseline. Defaults to 5e5.
-        max_iters (int): The maximum number of iterations to run. Defaults to 10.
-        conv_thresh (float): The convergence threshold. The iteration stops when the change in the weights is less than this value. Defaults to 1e-5.
-        verbose (bool): If True, prints the iteration number and convergence at each iteration. Defaults to False.
+        intensities (array-like): Input signal to baseline.
+        asymmetry_param (float, optional): Asymmetry parameter (p) that controls the weights. Defaults to 0.05.
+        smoothness_param (float, optional): Smoothness parameter (s) that controls the smoothness of the baseline.
+        max_iters (int, optional): Maximum number of iterations. 
+        conv_thresh (float, optional): Convergence threshold. Iteration stops when the change in the weights < threshold.
+        verbose (bool, optional): If True, prints the iteration number and convergence at each iteration.
+
     Returns:
-        array-like: The baseline of the input signal.
+        z (np.ndarray): Baseline of the input signal.
     """
 
     smoother = WhittakerSmoother(intensities, smoothness_param, deriv_order=2)
@@ -278,20 +260,15 @@ class WhittakerSmoother(object):
 
     """
     Implements the Whittaker smoother for smoothing a signal.
-    Parameters
-    ----------
-    signal : array-like of shape (n_samples,)
-        The input signal to be smoothed.
-    smoothness_param : float
-        Relative importance of smoothness of the predicted response.
-    deriv_order : int, default=1
-        The order of the derivative of the identity matrix used in the smoothing.
-    Attributes
-    ----------
-    y : array-like of shape (n_samples,)
-        The input signal to be smoothed.
-    upper_bands : array-like of shape (2 * deriv_order + 1, n_samples)
-        The upper triangular bands of the matrix used for smoothing.
+
+    Parameters: 
+        signal (array-like): Input signal to be smoothed.
+        smoothness_param (float): Relative importance of smoothness of the predicted response.
+        deriv_order (int, optional): Order of the derivative of the identity matrix.
+    
+    Attributes: 
+        y (array-like): Input signal to be smoothed.
+        upper_bands (array-like): Upper triangular bands of the matrix used for smoothing.
     """
 
     def __init__(self, signal, smoothness_param, deriv_order=1):
@@ -323,35 +300,30 @@ class WhittakerSmoother(object):
         foo[-1] += w  # last row is the diagonal
         return solveh_banded(foo, w * self.y, overwrite_ab=True, overwrite_b=True)
 
-
-
-
-
+# %% 
 
 def NearIR_Process(data, wn_low, wn_high, peak): 
 
-    """The NearIR_Process function inputs the dictionary data, the Near-IR H2O (5200 peak) or OH (4500 peak) wavenumbers of interest, 
-    and the H2O or OH peak of interest and returns a dataframe of the absorbance data in the region of interest, median filtered data, 
-    baseline subtracted absorbance, the kriged data output, the peak height, and the signal to noise ratio. 
-    The function median filters the peak absorbance (given the noise inherent to these Near-IR peaks for MI), 
-    fits an asymmetric least squares determined baseline to the peak, and subtracts the baseline to determine the 
-    peak absorbance. The baseline-subtracted peak is then kriged, to further reduce noise and to obtain peak height. 
-    The signal to noise ratio is then determined and if the ratio is high, a warning is outputted and the 
-    user can consider the usefulness of these peaks. This function is used three times with slightly different 
-    H2O wavenumber ranges, so that uncertainty can be assessed.
-    
+    """
+    The NearIR_Process function processes Near-IR absorbance data and returns relevant information, such as the fit absorbance data, 
+    kriged data, peak height, and signal to noise ratio. The function first filters the data, then fits a baseline and subtracts 
+    it to determine the peak absorbance. Next, the data are kriged to further reduce noise and obtain peak height. Finally, the 
+    signal to noise ratio is calculated, and a warning is issued if the ratio is high.  The function is used three times with 
+    different H2Om wavenumber ranges for uncertainty assessment. 
+
     Parameters:
         data (pd.DataFrame): A dataframe of absorbance data.
-        wn_low (int): The Near-IR H2O or OH wavenumber of interest lower bound.
-        wn_high (int): The Near-IR H2O or OH wavenumber of interest upper bound.
-        peak (str): The H2O or OH peak of interest.
+        wn_low (int): The Near-IR H2Om or OH wavenumber of interest lower bound.
+        wn_high (int): The Near-IR H2Om or OH wavenumber of interest upper bound.
+        peak (str): The H2Om or OH peak of interest.
+
     Returns:
-        A tuple containing:
-        - data_output (pd.DataFrame): A dataframe of the absorbance data in the region of interest, median filtered data, 
-          baseline subtracted absorbance, and the subtracted peak.
-        - krige_output (pd.DataFrame): A dataframe of the kriged data output, including the absorbance and standard deviation.
-        - PH_krige (float): The peak height obtained after kriging.
-        - STN (float): The signal to noise ratio.
+        Tuple containing the following elements:
+            data_output (pd.DataFrame): A dataframe of the absorbance data in the region of interest, median filtered data, 
+            baseline subtracted absorbance, and the subtracted peak.
+            krige_output (pd.DataFrame): A dataframe of the kriged data output, including the absorbance and standard deviation.
+            PH_krige (float): The peak height obtained after kriging.
+            STN (float): The signal to noise ratio.
     """
 
     data_H2O = data[wn_low:wn_high]
@@ -360,7 +332,6 @@ def NearIR_Process(data, wn_low, wn_high, peak):
     data_output['Absorbance_Hat'] = signal.medfilt(data_H2O['Absorbance'], 5)
     data_output['BL_NIR_H2O'] = als_baseline(data_output['Absorbance_Hat'], asymmetry_param=0.001, smoothness_param=1e9, max_iters=10, conv_thresh=1e-5)
     data_output['Subtracted_Peak'] = data_output['Absorbance_Hat'] - data_output['BL_NIR_H2O']
-
 
     krige_wn_range = np.linspace(wn_low-5, wn_high+5, wn_high-wn_low+11)
     krige_peak = OrdinaryKriging(data_H2O.index, np.zeros(data_output['Subtracted_Peak'].shape), data_output['Subtracted_Peak'], variogram_model = 'gaussian')
@@ -382,28 +353,26 @@ def NearIR_Process(data, wn_low, wn_high, peak):
 
     return data_output, krige_output, PH_krige, STN
 
-
-
-
-
 def MidIR_Process(data, wn_low, wn_high):
 
     """
-    
-    The MidIR_Process function with the inputs of dictionary data and the Mid-IR total H2O wavenumbers of interest and returns 
-    a dataframe of the absorbance data in the region of interest, the kriged data output, and the peak height. 
-    This function is used three times with slightly different H2O wavenumber ranges, so that uncertainty in peak height can be assessed.
+    The MidIR_Process function processes the Mid-IR H2Ot, 3550 peak and returns the fit absorbance data, kriged data, peak height. 
+    The function first filters the data, then fits a baseline and subtracts it to determine the peak absorbance. Next, the data 
+    are kriged to further reduce noise and obtain peak height. The function is used three times with different H2Ot wavenumber 
+    ranges for uncertainty assessment. 
+
     Parameters:
         data (pd.DataFrame): A dataframe of absorbance data.
         wn_low (int): The Near-IR H2O or OH wavenumber of interest lower bound.
         wn_high (int): The Near-IR H2O or OH wavenumber of interest upper bound.
         peak (str): The H2O or OH peak of interest.
+    
     Returns:
-        A tuple containing:
-        - data_output (pd.DataFrame): A dataframe of the absorbance data in the region of interest, median filtered data,
-          baseline subtracted absorbance, and the subtracted peak.
-        - krige_output (pd.DataFrame): A dataframe of the kriged data output, including the absorbance and standard deviation.
-        - PH_krige (float): The peak height obtained after kriging.
+        Tuple containing the following elements:
+            data_output (pd.DataFrame): A dataframe of the absorbance data in the region of interest, median filtered data,
+            baseline subtracted absorbance, and the subtracted peak.
+            krige_output (pd.DataFrame): A dataframe of the kriged data output, including the absorbance and standard deviation.
+            PH_krige (float): The peak height obtained after kriging.
     
     """
 
@@ -421,29 +390,28 @@ def MidIR_Process(data, wn_low, wn_high):
 
     return data_output, plot_output, PH_3550, plotindex
 
-# Plotting functions 
-
+# %% Plotting functions 
 
 def trace(posterior, title, zchain=None, pnames=None, thinning=50,
     burnin=0, fignum=1000, savefile=None, fmt=".", ms=2.5, fs=11):
     
     """
     Plot parameter trace MCMC sampling.
+
     Parameters: 
-    posterior (2D ndarray): MCMC posterior sampling with dimension: [nsamples, npars].
-    zchain (1D ndarray): Chain index for each posterior sample.
-    pnames (strings): Label names for parameters.
-    thinning (int): Thinning factor for plotting (plot every thinning-th value).
-    burnin (int): Thinned burn-in number of iteration (only used when zchain is not None).
-    fignum (int): The figure number.
-    savefile (boolean): Name of file to save the plot if not none
-    fmt (string): The format string for the line and marker.
-    ms (float): Marker size.
-    fs (float): Fontsize of texts.
+        posterior (2D np.ndarray): MCMC posterior sampling with dimension: [nsamples, npars].
+        zchain (1D np.ndarray): Chain index for each posterior sample.
+        pnames (str): Label names for parameters.
+        thinning (int): Thinning factor for plotting (plot every thinning-th value).
+        burnin (int): Thinned burn-in number of iteration (only used when zchain is not None).
+        fignum (int): The figure number.
+        savefile (bool): Name of file to save the plot if not none
+        fmt (string): The format string for the line and marker.
+        ms (float): Marker size.
+        fs (float): Fontsize of texts.
     
     Returns: 
-    axes (1D list of matplotlib.axes.Axes): List of axes containing the marginal posterior distributions.
-    
+        axes (1D list of matplotlib.axes.Axes): List of axes containing the marginal posterior distributions.
     """
     
     # Get indices for samples considered in final analysis:
@@ -528,51 +496,31 @@ def histogram(posterior, title, pnames=None, thinning=1, fignum=1100,
     theme='blue', yscale=False, orientation='vertical'):
     
     """
-    Plot parameter marginal posterior distributions
-    Parameters
-    ----------
-    posterior: 1D or 2D float ndarray
-        An MCMC posterior sampling with dimension [nsamples] or [nsamples, nparameters].
-    pnames: Iterable (strings)
-        Label names for parameters.
-    thinning: Integer
-        Thinning factor for plotting (plot every thinning-th value).
-    fignum: Integer
-        The figure number.
-    savefile: Boolean
-        If not None, name of file to save the plot.
-    bestp: 1D float ndarray
-        If not None, plot the best-fitting values for each parameter given by bestp.
-    quantile: Float
-        If not None, plot the quantile- highest posterior density region of the distribution. 
-        For example, set quantile=0.68 for a 68% HPD.
-    pdf: 1D float ndarray or list of ndarrays
-        A smoothed PDF of the distribution for each parameter.
-    xpdf: 1D float ndarray or list of ndarrays
-        The X coordinates of the PDFs.
-    ranges: List of 2-element arrays
-        List with custom (lower,upper) x-ranges for each parameter.
-        Leave None for default, e.g., ranges=[(1.0,2.0), None, (0, 1000)].
-    axes: List of matplotlib.axes
-        If not None, plot histograms in the currently existing axes.
-    lw: Float
-        Linewidth of the histogram contour.
-    fs: Float
-        Font size for texts.
-    theme: String or dict
-        The histograms' color theme.  If string must be one of mc3.plots.themes.
-        If dict, must define edgecolor, facecolor, color (with valid matplotlib
-        colors) for the histogram edge and face colors, and the best-fit color, respectively.
-    yscale: Bool
-        If True, set an absolute Y-axis scaling among all posteriors. False is default.
-    orientation: String
-        Orientation of the histograms.  If 'horizontal', the bottom of the
-        histogram will be at the left (might require some adjusting of the
-        axes location, e.g., a plt.tight_layout() call).
-    Returns
-    -------
-    axes: 1D list of matplotlib.axes.Axes
-        List of axes containing the marginal posterior distributions.
+    Plot parameter marginal posterior distributions in histograms. 
+
+    Parameters: 
+        posterior (1D/2D np.ndarray): MCMC posterior sampling with dimension [nsamples] or [nsamples, nparameters]
+        pnames (str): Label names for parameters
+        thinning (int): Thinning factor for plotting (plot every thinning-th value)
+        fignum (int): Figure number
+        savefile (bool): If not None, name of file to save the plot.
+        bestp (np.ndarray): If not None, plot the best-fitting values for each parameter.
+        quantile (float): If not None, plot the quantile, highest posterior density region of the distribution. 
+            For example, set quantile=0.68 for a 68% HPD.
+        pdf (np.ndarray): A smoothed PDF of the distribution for each parameter.
+        xpdf (np.ndarray): The X coordinates of the PDFs.
+        ranges (ndarrays): List with custom (lower,upper) x-ranges for each parameter.
+            Leave None for default, e.g., ranges=[(1.0,2.0), None, (0, 1000)].
+        axes (list of matplotlib.axes): If not None, plot histograms in the currently existing axes.
+        lw (float): Linewidth of the histogram contour.
+        fs (float): Font size for texts.
+        theme (str or dict): Histograms' color theme. If dict, must define edgecolor, facecolor,
+            color for the histogram edge and face colors, and the best-fit color.
+        yscale (bool): If True, set an absolute Y-axis scaling among all posteriors. 
+        orientation (str): Histogram orientation. 
+    
+    Returns:
+        axes (list of matplotlib.axes.Axes): list of axes containing marginal posteriors 
     """
 
     if isinstance(theme, str):
@@ -701,29 +649,29 @@ def pairwise(posterior, title, pnames=None, thinning=100, fignum=1200,
     
     """
     Plot parameter pairwise posterior distributions.
-    
     Parameters: 
-    posterior (2D ndarray): An MCMC posterior sampling with dimension: [nsamples, nparameters].
-    pnames (strings): Label names for parameters.
-    thinning (int): Thinning factor for plotting (plot every thinning-th value).
-    fignum (int): The figure number.
-    savefile (boolean): Name of file to save the plot, if not none
-    bestp (1D ndarray): Plot the best-fitting values for each parameter given by bestp, if not none
-    nbins (int): Number of grid bins for the 2D histograms.
-    nlevels (int): Number of contour color levels.
-    ranges (2D ndarray): List with custom (lower,upper) x-ranges for each parameter.
-        Leave None for default, e.g., ranges=[(1.0,2.0), None, (0, 1000)].
-    fs (float): Fontsize of texts.
-    rect (1D ndarray): Plot pairwise plots in current figure, if not None
-    margin (float):  Margins between panels (when rect is not None).
+        posterior (2D np.ndarray): An MCMC posterior sampling with dimension: [nsamples, nparameters].
+        pnames (str): Label names for parameters.
+        thinning (int): Thinning factor for plotting (plot every thinning-th value).
+        fignum (int): The figure number.
+        savefile (bool): Name of file to save the plot, if not none
+        bestp (1D np.ndarray): Plot the best-fitting values for each parameter given by bestp, if not none
+        nbins (int): Number of grid bins for the 2D histograms.
+        nlevels (int): Number of contour color levels.
+        ranges (2D np.ndarray): List with custom (lower,upper) x-ranges for each parameter.
+            Leave None for default, e.g., ranges=[(1.0,2.0), None, (0, 1000)].
+        fs (float): Fontsize of texts.
+        rect (1D np.ndarray): Plot pairwise plots in current figure, if not None
+        margin (float):  Margins between panels (when rect is not None).
+
     Returns:
-    axes (2D ndarray): Array of axes containing the marginal posterior distributions.
-    cb (matplotlib.axes.Axes): The colorbar axes.
+        axes (2D np.ndarray): Array of axes containing the marginal posterior distributions.
+        cb (matplotlib.axes.Axes): The colorbar axes.
     
     Notes:
-    rect delimits the boundaries of the panels. The labels and
-    ticklabels will appear outside rect, so the user needs to leave
-    some wiggle room for them.
+        rect delimits the boundaries of the panels. The labels and
+        ticklabels will appear outside rect, so the user needs to leave
+        some wiggle room for them.
     
     """
 
@@ -833,27 +781,25 @@ def pairwise(posterior, title, pnames=None, thinning=100, fignum=1200,
         plt.savefig(savefile)
     return axes, cb
 
-
 def modelfit(data, uncert, indparams, model, title, nbins=75,
     fignum=1400, savefile=None, fmt="."):
     
     """
-    
-    Plot the binned dataset with given uncertainties and model curves
-    as a function of indparams.
+    Plot the binned dataset with given uncertainties and model curves as a function of indparams.
     In a lower panel, plot the residuals bewteen the data and model.
     
     Parameters: 
-    data (1D ndarray): Input data set.
-    uncert (1D ndarray): One-sigma uncertainties of the data points.
-    indparams (1D ndarray): Independent variable (X axis) of the data points.
-    model (1D ndarray): Model of data.
-    nbins (int): Number of bins in the output plot.
-    fignum (int): Figure number.
-    savefile (boolean): Name of file to save the plot, if not none. 
-    fmt (string): Format of the plotted markers.
+        data (1D np.ndarray): Input data set.
+        uncert (1D np.ndarray): One-sigma uncertainties of the data points.
+        indparams (1D np.ndarray): Independent variable (X axis) of the data points.
+        model (1D np.ndarray): Model of data.
+        nbins (int): Number of bins in the output plot.
+        fignum (int): Figure number.
+        savefile (bool): Name of file to save the plot, if not none. 
+        fmt (string): Format of the plotted markers.
+        
     Returns: 
-    ax (matplotlib.axes.Axes): Axes instance containing the marginal posterior distributions.
+        ax (matplotlib.axes.Axes): Axes instance containing the marginal posterior distributions.
     """
 
     # Bin down array:
@@ -892,7 +838,6 @@ def modelfit(data, uncert, indparams, model, title, nbins=75,
         plt.savefig(savefile)
     return ax, rax
 
-
 def subplotter(rect, margin, ipan, nx, ny=None, ymargin=None):
     
     """
@@ -901,16 +846,15 @@ def subplotter(rect, margin, ipan, nx, ny=None, ymargin=None):
     xright, ytop).
     
     Parameters: 
-    rect (1D ndarray): Rectangle with xlo, ylo, xhi, yhi positions of the grid boundaries.
-    margin (float): Width of margin between panels.
-    ipan (int): Index of panel to create (as in plt.subplots).
-    nx (int): Number of panels along the x axis.
-    ny (int): Number of panels along the y axis. If None, assume ny=nx.
-    ymargin (float): Width of margin between panels along y axes (if None, adopt margin).
-    
+        rect (1D np.ndarray): Rectangle with xlo, ylo, xhi, yhi positions of the grid boundaries.
+        margin (float): Width of margin between panels.
+        ipan (int): Index of panel to create (as in plt.subplots).
+        nx (int): Number of panels along the x axis.
+        ny (int): Number of panels along the y axis. If None, assume ny=nx.
+        ymargin (float): Width of margin between panels along y axes (if None, adopt margin).
+
     Returns: 
-    ax (matplotlib.axes.Axes): Axes instance at the specified position.
-    
+        ax (matplotlib.axes.Axes): Axes instance at the specified position.
     """
     if ny is None:
         ny = nx
@@ -933,22 +877,24 @@ def subplotter(rect, margin, ipan, nx, ny=None, ymargin=None):
 
     return plt.axes([xpanel, ypanel, dx, dy])
 
-
-
+# %%
 
 def MCMC(data, uncert, indparams, log, savefile):
     
     """
     Runs Monte Carlo-Markov Chain and outputs the best fit parameters and standard deviations.
+
     Parameters:
-        data (ndarray): 1D array of data points.
-        uncert (ndarray): 1D array of uncertainties on the data.
-        indparams (ndarray): 2D array of independent parameters. Each row corresponds to one data point and each column
+        data (np.ndarray): 1D array of data points.
+        uncert (np.ndarray): 1D array of uncertainties on the data.
+        indparams (np.ndarray): 2D array of independent parameters. Each row corresponds to one data point and each column
                              corresponds to a different independent parameter.
         log (bool, optional): Flag indicating whether to log the output or not. Defaults to False.
         savefile (str, optional): File name to save output to. If None, output is not saved. Defaults to None.
+        
     Returns:
         mc3_output (mc3.output): The output of the Monte Carlo-Markov Chain.
+    
     """
 
     # Define initial values, limits, and step sizes for parameters
@@ -977,15 +923,22 @@ def MCMC(data, uncert, indparams, log, savefile):
 
     return mc3_output
 
-
-
-
 def Run_All_Spectra(dfs_dict, exportpath):
 
-    """The Run_All_Spectra function inputs the dictionary of dataframes that were created by the Load_SampleCSV function and allows 
+    """
+    The Run_All_Spectra function inputs the dictionary of dataframes that were created by the Load_SampleCSV function and allows 
     for all of the samples to be batched and run through the function. The function exports the best fit and standard deviations 
     of peak locations, peak widths, and peak heights, as well as the PCA vectors used to fit the spectra. These values are 
-    exported in a csv file and figures are created for each individual sample."""
+    exported in a csv file and figures are created for each individual sample.
+    
+    Parameters:
+        dfs_dict (dictionary): dictionary containing FTIR data for each file
+        exportpath (string or None): string of desired output directory name, None if no outputs are desired 
+
+    Returns:
+        Volatiles_DF (pd.DataFrame): dataframe containing all volatile peak heights
+        failures (list): potential failures 
+    """
 
     import numpy as np
     import pandas as pd 
@@ -1142,7 +1095,6 @@ def Run_All_Spectra(dfs_dict, exportpath):
                 mc3_output = MCMC(data = spec_mc3, uncert = uncert, indparams = indparams, 
                                 log=None, savefile=None)
 
-
             # Save best-fit concentration outputs and calculate best-fit baselines and peaks for plotting
             CO2P_BP = mc3_output['bestp'][-11:-5]
             H2OmP1635_BP = mc3_output['bestp'][-5:-2]
@@ -1174,8 +1126,6 @@ def Run_All_Spectra(dfs_dict, exportpath):
             BL_MAX_1515_ABS = Baseline_Solve_BP[np.argmax((spec.index.to_numpy() > 1510) & (spec.index.to_numpy() < 1530))]
             BL_MAX_1430_ABS = Baseline_Solve_BP[np.argmax((spec.index.to_numpy() > 1410) & (spec.index.to_numpy() < 1450))]
             BL_MAX_1635_ABS = Baseline_Solve_BP[np.argmax(H1635_BP)]
-
-            # Load posterior errors and sampling errors to plot the range in iterated baselines. 
 
             # Initialize plotting, create subplots of H2Om_{5200} and OH_{4500} baselines and peak fits
             if exportpath is not None: 
@@ -1248,6 +1198,7 @@ def Run_All_Spectra(dfs_dict, exportpath):
                 ax3.legend(loc = 'upper right', prop={'size': 10})
                 ax3.invert_xaxis()
 
+                # Load posterior errors and sampling errors to plot the range in iterated baselines. 
                 posteriorerror = np.load(path_beg+savefilepath+files+'.npz')
                 samplingerror = posteriorerror['posterior'][:, 0:5]
                 samplingerror = samplingerror[0: np.shape(posteriorerror['posterior'][:, :])[0] :int(np.shape(posteriorerror['posterior'][:, :])[0] / 200), :]
@@ -1297,7 +1248,6 @@ def Run_All_Spectra(dfs_dict, exportpath):
             else: 
                 pass 
 
-
             # Create dataframe of best fit parameters and their standard deviations
             DF_Output.loc[files] = pd.Series({'PH_1635_BP':H2OmP1635_BP[0],'PH_1635_STD':H2OmP1635_STD[0],'H2Om_1635_MAX': MAX_1635_ABS, 'BL_H2Om_1635_MAX': BL_MAX_1635_ABS,
             'PH_1515_BP':CO2P_BP[5],'PH_1515_STD':CO2P_STD[5],'P_1515_BP':CO2P_BP[3],'P_1515_STD':CO2P_STD[3],'STD_1515_BP':CO2P_BP[4],'STD_1515_STD':CO2P_STD[4], 
@@ -1317,16 +1267,14 @@ def Run_All_Spectra(dfs_dict, exportpath):
 
     return Volatiles_DF, failures
 
-
-
-
+# %% 
 
 def Beer_Lambert(molar_mass, absorbance, sigma_absorbance, density, sigma_density, thickness, sigma_thickness, epsilon,
                 sigma_epsilon):
 
     """
-    
     Applies the Beer-Lambert Law to calculate concentration from the given inputs.
+
     Parameters:
         molar_mass (float): The molar mass of the substance in grams per mole.
         absorbance (float): The absorbance of the substance, measured in optical density units.
@@ -1337,8 +1285,10 @@ def Beer_Lambert(molar_mass, absorbance, sigma_absorbance, density, sigma_densit
         sigma_thickness (float): The uncertainty associated with the sample thickness measurement.
         epsilon (float): The molar extinction coefficient, measured in liters per mole per centimeter.
         sigma_epsilon (float): The uncertainty associated with the molar extinction coefficient measurement.
+
     Returns:
         pd.Series: A pandas series object containing the concentration in wt.% or ppm.
+
     Notes:
         The Beer-Lambert Law states that the absorbance of a substance is proportional to its concentration. The formula for calculating concentration from absorbance is:
         concentration = (1e6 * molar_mass * absorbance) / (density * thickness * epsilon)
@@ -1355,8 +1305,8 @@ def Beer_Lambert_Error(N, molar_mass, absorbance, sigma_absorbance, density, sig
                         sigma_epsilon): 
 
     """
-    
     Applies a Monte Carlo simulation to estimate the uncertainty in concentration calculated using the Beer-Lambert Law.
+    
     Parameters:
         N (int): The number of Monte Carlo samples to generate.
         molar_mass (float): The molar mass of the substance in grams per mole.
@@ -1368,8 +1318,10 @@ def Beer_Lambert_Error(N, molar_mass, absorbance, sigma_absorbance, density, sig
         sigma_thickness (float): The uncertainty associated with the sample thickness measurement.
         epsilon (float): The molar extinction coefficient, measured in liters per mole per centimeter.
         sigma_epsilon (float): The uncertainty associated with the molar extinction coefficient measurement.
+    
     Returns:
         float: The estimated uncertainty in concentration in wt.% or ppm. 
+    
     Notes:
         The Beer-Lambert Law states that the absorbance of a substance is proportional to its concentration. The formula for calculating concentration from absorbance is:
         concentration = (1e6 * molar_mass * absorbance) / (density * thickness * epsilon)
@@ -1390,7 +1342,6 @@ def Beer_Lambert_Error(N, molar_mass, absorbance, sigma_absorbance, density, sig
 
     return concentration_std
 
-
 def Density_Calculation(MI_Composition, T, P):
     
     """
@@ -1399,14 +1350,14 @@ def Density_Calculation(MI_Composition, T, P):
     at room temperature and pressure of analysis. The gram formula weight gfw is then determined by summing the mole fractions*molar masses. 
     The density is finally determined by dividing gram formula weight by total molar volume. 
     
-    Args:
-    - MI_Composition: dictionary containing the mole fraction of each oxide in the glass composition
-    - T: temperature at which the density is calculated (in Celsius)
-    - P: pressure at which the density is calculated (in bars)
+    Parameters:
+        MI_Composition: dictionary containing the weight percentages of each oxide in the glass composition
+        T: temperature at which the density is calculated (in Celsius)
+        P: pressure at which the density is calculated (in bars)
     
     Returns:
-    - mol: dataframe containing the mole fraction of each oxide in the glass composition
-    - density: glass density at room temperature and pressure (in kg/m^3)
+        mol: dataframe containing the mole fraction of each oxide in the glass composition
+        density: glass density at room temperature and pressure (in kg/m^3)
     """
 
     # Define a dictionary of molar masses for each oxide
@@ -1450,9 +1401,21 @@ def Density_Calculation(MI_Composition, T, P):
 
     return mol, density
 
-
-
 def Epsilon_Calc(MI_Composition, T, P):
+
+    """
+    The Epsilon_Calc function computes the extinction coefficients and their uncertainties for various molecular 
+    species in a given MI or glass composition dataset. 
+
+    Parameters:
+        MI_Composition (dictionary): Dictionary containing the weight percentages of each oxide in the glass composition
+        T (int): temperature at which the density is calculated (in Celsius)
+        P (int): pressure at which the density is calculated (in bars)
+    
+    Returns:
+        mol (pd.DataFrame): Dataframe of the mole fraction of each oxide in the glass composition
+        density (pd.DataFrame): Dataframe of glass density at room temperature and pressure (in kg/m^3)
+    """
 
     epsilon = pd.DataFrame(columns=['Tau', 'Na/Na+Ca', 
                                     'epsilon_H2OT_3550', 'sigma_epsilon_H2OT_3550', 
@@ -1531,9 +1494,6 @@ def Epsilon_Calc(MI_Composition, T, P):
 
         return epsilon
 
-        
-
-
 def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, T, P):
 
     """
@@ -1541,16 +1501,17 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, T, P):
     and carbonate peaks (1515 and 1430 cm^-1), number of samples for the Monte Carlo, thickness information, and MI composition, and 
     outputs the concentrations and uncertainties for each peak. 
     
-    Args:
-    - Volatiles_DF: dataframe containing all volatile peak heights
-    - N: the number of Monte Carlo samples to generate
-    - thickness: Wafer thickness (in µm)
-    - MI_Composition: dictionary containing the mole fraction of each oxide in the glass composition
-    - T: temperature at which the density is calculated (in Celsius)
-    - P: pressure at which the density is calculated (in bars)
+    Parameters:
+        Volatiles_DF: dataframe containing all volatile peak heights
+        N: the number of Monte Carlo samples to generate
+        thickness: Wafer thickness (in µm)
+        MI_Composition: dictionary containing the weight percentages of each oxide in the glass composition
+        T: temperature at which the density is calculated (in Celsius)
+        P: pressure at which the density is calculated (in bars)
+
     Returns:
-    - density_epsilon : dataframe containing information on glass densities and extinction coefficient
-    - mega_spreadsheet_f: volatile concentrations
+        density_epsilon : dataframe containing information on glass densities and extinction coefficient
+        mega_spreadsheet_f: volatile concentrations
     """
 
     # Create dataframes to store volatile data: 
@@ -1888,14 +1849,14 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, T, P):
     return density_epsilon, mega_spreadsheet_f
 
 
-
-# Reflectance FTIR - Interference Fringe Processing for Thicknesses
-
+# %% Reflectance FTIR - Interference Fringe Processing for Thicknesses
 
 def PeakID(ref_spec, wn_high, wn_low, peak_heigh_min_delta, peak_search_width, savgol_filter_width, smoothing_wn_width = None, remove_baseline = False, plotting = False, filename = None):
     
-    """Identifies peaks based on the peakdetect package which identifies local 
+    """
+    Identifies peaks based on the peakdetect package which identifies local 
     maxima and minima in noisy signals. Based on: https://github.com/avhn/peakdetect
+    
     Parameters:
         ref_spec (pd.DataFrame): A Pandas DataFrame indexed by wavenumber and containing absorbance values.
         wn_high (int): The upper wavenumber limit for the analysis.
@@ -1907,8 +1868,10 @@ def PeakID(ref_spec, wn_high, wn_low, peak_heigh_min_delta, peak_search_width, s
         peak_search_width (int): The size of the region around each point to search for a peak. Default is 50.
         plotting (bool): Whether to create a plot of the spectrum with identified peaks and troughs. Default is False.
         filename (str): The name of the plot file. If None, the plot is not saved. Default is None.
+    
     Returns:
-        tuple: A tuple containing the peaks and troughs identified as local maxima and minima, respectively.
+        Tuple containing the following elements:
+            Peaks and troughs identified as local maxima and minima, respectively.
     """
 
     from peakdetect import peakdetect
@@ -1950,23 +1913,21 @@ def PeakID(ref_spec, wn_high, wn_low, peak_heigh_min_delta, peak_search_width, s
 
     return peaks, troughs
 
-
-
 def Thickness_Calc(n, positions):
 
-    """Calculates thicknesses of glass wafers based on the refractive index of the 
+    """
+    Calculates thicknesses of glass wafers based on the refractive index of the 
     glass and the positions of the peaks or troughs in the FTIR spectrum.
     
     Parameters:
-    n (float): Refractive index of the glass.
-    positions (np.ndarray): Array of positions of the peaks or troughs in the FTIR spectrum.
+        n (float): Refractive index of the glass.
+        positions (np.ndarray): Array of positions of the peaks or troughs in the FTIR spectrum.
+    
     Returns:
-    np.ndarray: Array of thicknesses of glass wafers.
+        np.ndarray: Array of thicknesses of glass wafers.
     """
 
     return 1/(2 * n * np.abs(np.diff(positions)))
-
-
 
 def Thickness_Processing(dfs_dict, n, wn_high, wn_low, remove_baseline=False, plotting=False, phaseol=True):
 
@@ -1975,20 +1936,21 @@ def Thickness_Processing(dfs_dict, n, wn_high, wn_low, remove_baseline=False, pl
     peaks or troughs in the FTIR spectrum. Thicknesses for each interference fringe, starting at both the peaks
     and troughs of the fringes are determined. These thicknesses are then averaged over the interval of interest.
     Parameters: 
-    dfs_dict (dictionary): dictionary containing FTIR data for each file
-    n (float): refractive index of the glass
-    wn_high (float): the high wavenumber cutoff for the analysis
-    wn_low (float): the low wavenumber cutoff for the analysis
-    remove_baseline (boolean): whether or not to remove the baseline from the data
-    plotting (boolean): whether or not to plot the data and detected peaks and troughs
+        dfs_dict (dictionary): dictionary containing FTIR data for each file
+        n (float): refractive index of the glass
+        wn_high (float): the high wavenumber cutoff for the analysis
+        wn_low (float): the low wavenumber cutoff for the analysis
+        remove_baseline (bool): whether or not to remove the baseline from the data
+        plotting (bool): whether or not to plot the data and detected peaks and troughs
     
     Returns:
-    ThickDF (dataframe): a dataframe containing the thickness calculations for each file
+        ThickDF (pd.DataFrame): a dataframe containing the thickness calculations for each file
+
     Notes: 
-    smoothing_wn_width (float): width of the Savitzky-Golay smoothing window, if not used, set to None
-    peak_heigh_min_delta (float): minimum height difference between a peak and its surrounding points
-    peak_search_width (float): the distance (in wavenumbers) to look on either side of a peak to find the
-                              corresponding trough
+        smoothing_wn_width (float): width of the Savitzky-Golay smoothing window, if not used, set to None
+        peak_heigh_min_delta (float): minimum height difference between a peak and its surrounding points
+        peak_search_width (float): the distance (in wavenumbers) to look on either side of a peak to find the
+        corresponding trough
     """
 
     ThickDF = pd.DataFrame(columns=['Peak_Thicknesses', 'Peak_Thickness_M', 'Peak_Thickness_STD',
@@ -2051,17 +2013,17 @@ def Thickness_Processing(dfs_dict, n, wn_high, wn_low, remove_baseline=False, pl
 
     return ThickDF
 
-
 def Reflectance_Index(XFo):
 
     """
     Calculates the reflectance index for a given forsterite composition.
     The reflectance index is calculated based on values from Deer, Howie, and Zussman, 3rd Edition.
-    Input: forsterite composition in mole fraction.
+
     Parameters:
         XFo (float): The mole fraction of forsterite in the sample.
+
     Returns:
-        float: The calculated reflectance index.
+        n (float): The calculated reflectance index.
     """
 
     n_alpha = 1.827 - 0.192*XFo
@@ -2071,30 +2033,29 @@ def Reflectance_Index(XFo):
 
     return n
 
-
-
+# %% 
 
 def Inversion(comp, epsilon, sigma_comp, sigma_epsilon):
 
-    """Perform a Newtonian inversion on a given set of composition and absorbance coefficient data.
+    """
+    Perform a Newtonian inversion on a given set of composition and absorbance coefficient data.
 
     Parameters:
-        comp (ndarray): A 1D array containing the composition data.
-        epsilon (ndarray): A 1D array containing the absorbance coefficient data.
+        comp (np.ndarray): A 1D array containing the composition data.
+        epsilon (np.ndarray): A 1D array containing the absorbance coefficient data.
         sigma_comp (float): The standard deviation of the composition data.
         sigma_epsilon (float): The standard deviation of the absorbance coefficient data.
 
     Returns:
-        tuple: A tuple containing the following elements:
-            - mls (ndarray): A 1D array of the least squares estimate of the coefficients.
-            - mest_f (ndarray): A 1D array of the final estimate of the coefficients.
-            - covls (ndarray): The covariance matrix of the least squares estimate.
-            - covm_est_f (ndarray): The covariance matrix of the final estimate.
-            - covepsilon_est_f (ndarray): The covariance matrix of the final estimate of the absorbance coefficients.
-            - comp_pre (ndarray): A 1D array of the predicted composition values based on the final estimate.
-            - epsilon_pre (ndarray): A 1D array of the predicted absorbance coefficient values based on the final estimate.
-            - epsilon_linear (ndarray): A 1D array of the predicted absorbance coefficient values based on the linear regression estimate.
-
+        Tuple containing the following elements:
+            mls (np.ndarray): A 1D array of the least squares estimate of the coefficients.
+            mest_f (np.ndarray): A 1D array of the final estimate of the coefficients.
+            covls (np.ndarray): The covariance matrix of the least squares estimate.
+            covm_est_f (np.ndarray): The covariance matrix of the final estimate.
+            covepsilon_est_f (np.ndarray): The covariance matrix of the final estimate of the absorbance coefficients.
+            comp_pre (np.ndarray): A 1D array of the predicted composition values based on the final estimate.
+            epsilon_pre (np.ndarray): A 1D array of the predicted absorbance coefficient values based on the final estimate.
+            epsilon_linear (np.ndarray): A 1D array of the predicted absorbance coefficient values based on the linear regression estimate.
     """
 
     M = 2  # Number of calibration parameters
@@ -2186,23 +2147,21 @@ def Inversion(comp, epsilon, sigma_comp, sigma_epsilon):
     # Return relevant variables
     return mest_f, covm_est_f, covepsilon_est_f
 
-
-
 def Least_Squares(comp, epsilon, sigma_comp, sigma_epsilon):
 
-    """Perform a least squares regression on a given set of composition and absorbance coefficient data.
+    """
+    Perform a least squares regression on a given set of composition and absorbance coefficient data.
 
     Parameters:
-        comp (ndarray): A 1D array containing the composition data.
-        epsilon (ndarray): A 1D array containing the absorbance coefficient data.
+        comp (np.ndarray): A 1D array containing the composition data.
+        epsilon (np.ndarray): A 1D array containing the absorbance coefficient data.
         sigma_comp (float): The standard deviation of the composition data.
         sigma_epsilon (float): The standard deviation of the absorbance coefficient data.
 
     Returns:
-        tuple: A tuple containing the following elements:
-            - mls (ndarray): A 1D array of the least squares estimate of the coefficients.
-            - covls (ndarray): The covariance matrix of the least squares estimate.
-
+        Tuple containing the following elements:
+            mls (np.ndarray): A 1D array of the least squares estimate of the coefficients.
+            covls (np.ndarray): The covariance matrix of the least squares estimate.
     """
 
     M = 2  # Number of calibration parameters
@@ -2220,95 +2179,102 @@ def Least_Squares(comp, epsilon, sigma_comp, sigma_epsilon):
 
     return mls, covls
 
-
 def Calculate_Calibration_Error(covariance_matrix):
+
     """
     Calculate the calibration error based on the diagonal elements of a covariance matrix.
 
     Parameters:
-        covariance_matrix (ndarray): A covariance matrix.
+        covariance_matrix (np.ndarray): A covariance matrix.
 
     Returns:
         A float representing the calibration error.
     """
+
     diagonal = np.diag(covariance_matrix)
     return 2 * np.sqrt(np.mean(diagonal))
 
-
 def Calculate_Epsilon(m, composition):
+
     """
     Calculate epsilon values using coefficients and composition.
 
     Parameters:
-        m (ndarray): An array of coefficients.
-        composition (ndarray): An array of composition data.
+        m (np.ndarray): An array of coefficients.
+        composition (np.ndarray): An array of composition data.
 
     Returns:
         A 1D array of calculated epsilon values.
     """
+
     return m[0] + m[1] * composition
 
 def Calculate_SEE(residuals):
+
     """
     Calculate the standard error of estimate given an array of residuals.
 
     Parameters:
-        residuals (ndarray): An array of residuals.
+        residuals (np.ndarray): An array of residuals.
 
     Returns:
         A float representing the standard error of estimate.
     """
+
     return np.sqrt(np.sum(residuals ** 2)) / (len(residuals) - 2)
 
-
 def Calculate_R2(actual_values, predicted_values):
+
     """
     Calculate the coefficient of determination given actual and predicted values.
 
     Parameters:
-        actual_values (ndarray): An array of actual values.
-        predicted_values (ndarray): An array of predicted values.
+        actual_values (np.ndarray): An array of actual values.
+        predicted_values (np.ndarray): An array of predicted values.
 
     Returns:
         A float representing the coefficient of determination.
     """
+
     y_bar = np.mean(actual_values)
     total_sum_of_squares = np.sum((actual_values - y_bar) ** 2)
     residual_sum_of_squares = np.sum((actual_values - predicted_values) ** 2)
     return 1 - (residual_sum_of_squares / total_sum_of_squares)
 
-
 def Calculate_RMSE(residuals):
+
     """
     Calculate the root mean squared error given an array of residuals.
 
     Parameters:
-        residuals (ndarray): An array of residuals.
+        residuals (np.ndarray): An array of residuals.
 
     Returns:
         A float representing the root mean squared error.
     """
+
     return np.sqrt(np.mean(residuals ** 2))
 
-
 def Inversion_Fit_Errors(comp, epsilon, mest_f, covm_est_f, covepsilon_est_f):
+
     """
     Calculate error metrics for a given set of data.
 
     Parameters:
-        comp (ndarray): A 1D array containing the composition data.
+        comp (np.ndarray): A 1D array containing the composition data.
         epsilon: A 1D array containing the absorbance coefficient data.
-        mest_f (ndarray): A 1D array of the final estimate of the coefficients.
-        covm_est_f (ndarray): The covariance matrix of the final estimate.
-        covepsilon_est_f (ndarray): The covariance matrix of the final estimate of the absorbance coefficients.
+        mest_f (np.ndarray): A 1D array of the final estimate of the coefficients.
+        covm_est_f (np.ndarray): The covariance matrix of the final estimate.
+        covepsilon_est_f (np.ndarray): The covariance matrix of the final estimate of the absorbance coefficients.
 
     Returns:
-        A tuple containing the following elements:
-            - E_calib: A float representing the error in calibration.
-            - see_inv: A float representing the standard error of estimate.
-            - r2_inv: A float representing the coefficient of determination.
-            - rmse_inv: A float representing the root mean squared error.
+        Tuple containing the following elements:
+            E_calib: A float representing the error in calibration.
+            see_inv: A float representing the standard error of estimate.
+            r2_inv: A float representing the coefficient of determination.
+            rmse_inv: A float representing the root mean squared error.
     """
+
     epsilon_final_estimate = Calculate_Epsilon(mest_f, comp)
     residuals = epsilon_final_estimate - epsilon
     E_calib = Calculate_Calibration_Error(covepsilon_est_f)
@@ -2317,4 +2283,3 @@ def Inversion_Fit_Errors(comp, epsilon, mest_f, covm_est_f, covepsilon_est_f):
     RMSE_inv = Calculate_RMSE(residuals)
 
     return E_calib, SEE_inv, R2_inv, RMSE_inv
-
