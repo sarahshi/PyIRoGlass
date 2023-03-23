@@ -7,9 +7,9 @@ import glob
 
 class test_thickness(unittest.TestCase):
     def setUp(self): 
-        dir_path = os.path.dirname(os.path.realpath(__file__))
-        self.ref_path = os.path.join(dir_path, '/Inputs/ReflectanceSpectra/FuegoOl/')
-        self.path = sorted(glob.glob(ref_path + "*"))
+        self.dir_path = os.path.dirname(os.path.realpath(__file__))
+        self.ref_path = os.path.join(self.dir_path, '/Inputs/ReflectanceSpectra/FuegoOl/')
+        self.path = sorted(glob.glob(self.ref_path + "*"))
         self.xfo = 0.72
         self.decimalPlace = 4
         self.wn_high = 2700
