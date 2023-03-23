@@ -42,7 +42,7 @@ OUTPUT_PATH = ['F18', 'STD', 'FRH', 'SIMSSTD']
 
 # %% 
 
-REF_PATH = path_input + '/ReflectanceSpectra/FuegoOl/'
+REF_PATH = path_input + 'ReflectanceSpectra/FuegoOl/'
 REF_FILES = sorted(glob.glob(REF_PATH + "*"))
 
 REF_DFS_FILES, REF_DFS_DICT = pig.Load_SampleCSV(REF_FILES, wn_high = 2700, wn_low = 2100)

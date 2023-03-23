@@ -1916,14 +1916,14 @@ def Thickness_Processing(dfs_dict, n, wn_high, wn_low, remove_baseline=False, pl
             peaks_diff_filt = np.array([x for x in peaks_diff if abs(x - np.mean(peaks_diff)) < 2 * np.std(peaks_diff)])
             troughs_diff_filt = np.array([x for x in troughs_diff if abs(x - np.mean(troughs_diff)) < 2 * np.std(troughs_diff)])
 
-            t_peaks = (ThicknessCalc(n, peaks[:,0]) * 1e4).round(2)
+            t_peaks = (Thickness_Calc(n, peaks[:,0]) * 1e4).round(2)
             mean_t_peaks = np.mean(t_peaks)
             std_t_peaks = np.std(t_peaks)
             t_peaks_filt = np.array([x for x in t_peaks if abs(x - np.mean(t_peaks)) < np.std(t_peaks)])
             mean_t_peaks_filt = np.mean(t_peaks_filt).round(2)
             std_t_peaks_filt = np.std(t_peaks_filt).round(2)
 
-            t_troughs = (ThicknessCalc(n, troughs[:,0]) * 1e4).round(2)
+            t_troughs = (Thickness_Calc(n, troughs[:,0]) * 1e4).round(2)
             mean_t_troughs = np.mean(t_troughs)
             std_t_troughs = np.std(t_troughs)
             t_troughs_filt = [x for x in t_troughs if abs(x - np.mean(t_troughs)) < np.std(t_troughs)]
