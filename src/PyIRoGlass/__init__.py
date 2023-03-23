@@ -999,25 +999,26 @@ def Run_All_Spectra(dfs_dict, paths):
     PCAmatrix = Load_PCA(path_beg + '/src/PyIRoGlass/BaselineAvgPCA.pkl')
     Peak_1635_PCAmatrix = Load_PCA(path_beg + '/src/PyIRoGlass/H2Om1635PCA.pkl')
     Wavenumber = Load_Wavenumber(path_beg + '/src/PyIRoGlass/BaselineAvgPCA.pkl')
-    exportpath = paths[-1]
     Nvectors = 5
     indparams = [Wavenumber, PCAmatrix, Peak_1635_PCAmatrix, Nvectors]
 
     # Create output directories for resulting files
-    output_dir = ["FIGURES", "PLOTFILES", "NPZFILES", "LOGFILES", "FINALDATA"] 
-    for ii in range(len(output_dir)):
-        if not os.path.exists(path_beg + output_dir[ii] + '/' + exportpath):
-            os.makedirs(path_beg + output_dir[ii] + '/' + exportpath, exist_ok=True)
+    if paths is not None: 
+        exportpath = paths[-1]
+        output_dir = ["FIGURES", "PLOTFILES", "NPZFILES", "LOGFILES", "FINALDATA"] 
+        for ii in range(len(output_dir)):
+            if not os.path.exists(path_beg + output_dir[ii] + '/' + exportpath):
+                os.makedirs(path_beg + output_dir[ii] + '/' + exportpath, exist_ok=True)
 
-    plotpath = 'PLOTFILES/' + exportpath + '/'
-    logpath = 'LOGFILES/' + exportpath + '/'
-    savefilepath = 'NPZFILES/' + exportpath + '/'
-    figurepath = 'FIGURES/' + exportpath + '/'
+        plotpath = 'PLOTFILES/' + exportpath + '/'
+        logpath = 'LOGFILES/' + exportpath + '/'
+        savefilepath = 'NPZFILES/' + exportpath + '/'
+        figurepath = 'FIGURES/' + exportpath + '/'
 
-    additional_dir = ["TRACE", "HISTOGRAM", "PAIRWISE", "MODELFIT"]
-    for ii in range(len(additional_dir)): 
-        if not os.path.exists(path_beg+plotpath+additional_dir[ii]): 
-            os.makedirs(path_beg+plotpath+additional_dir[ii], exist_ok=True)
+        additional_dir = ["TRACE", "HISTOGRAM", "PAIRWISE", "MODELFIT"]
+        for ii in range(len(additional_dir)): 
+            if not os.path.exists(path_beg+plotpath+additional_dir[ii]): 
+                os.makedirs(path_beg+plotpath+additional_dir[ii], exist_ok=True)
 
     # Create dataframes to store peak height data: 
     # P_ = peak_, _BP = best parameter, #_STD = _stdev
@@ -1076,55 +1077,6 @@ def Run_All_Spectra(dfs_dict, paths):
             elif STN_5200_M < 4.0: 
                 error_5200 = '*'
 
-            # Initialize plotting, create subplots of H2Om_{5200} and OH_{4500} baselines and peak fits
-            plotmin = np.round(np.min(data[H2O4500_wn_low_1:H2O5200_wn_high_1]['Absorbance']), decimals = 1)
-            plotmax = np.round(np.max(data[H2O4500_wn_low_1:H2O5200_wn_high_1]['Absorbance']), decimals = 1)
-            fig, ax = plt.subplots(figsize = (26, 8))
-            ax1 = plt.subplot2grid((2, 3), (0, 0))
-            ax1.plot(data.index, data['Absorbance'], 'k', linewidth = 1.5)
-            ax1.plot(data_H2O5200_1.index, data_H2O5200_1['Absorbance_Hat'], 
-                    data_H2O5200_2.index, data_H2O5200_2['Absorbance_Hat'], 
-                    data_H2O5200_3.index, data_H2O5200_3['Absorbance_Hat'])
-            ax1.plot(data_H2O4500_1.index, data_H2O4500_1['Absorbance_Hat'], 
-                    data_H2O4500_2.index, data_H2O4500_2['Absorbance_Hat'], 
-                    data_H2O4500_3.index, data_H2O4500_3['Absorbance_Hat'])
-            ax1.plot(data_H2O5200_1.index, data_H2O5200_1['BL_NIR_H2O'], 'lightsteelblue',
-                    data_H2O5200_2.index, data_H2O5200_2['BL_NIR_H2O'], 'lightsteelblue',
-                    data_H2O5200_3.index, data_H2O5200_3['BL_NIR_H2O'], 'lightsteelblue')
-            ax1.plot(data_H2O4500_1.index, data_H2O4500_1['BL_NIR_H2O'], 'silver',
-                    data_H2O4500_2.index, data_H2O4500_2['BL_NIR_H2O'], 'silver',
-                    data_H2O4500_3.index, data_H2O4500_3['BL_NIR_H2O'], 'silver')
-            ax1.annotate("$\mathregular{H_2O_{m, 5200}}$  Peak Height: " + f"{PH_5200_krige_M:.4f} ± {PH_5200_krige_STD:.4f}, S2N={STN_5200_M:.2f}", (0.025, 0.90), xycoords = 'axes fraction')
-            ax1.annotate("$\mathregular{OH^{-}_{4500}}$  Peak Height: " + f"{PH_4500_krige_M:.4f} ± {PH_4500_krige_STD:.4f}, S2N={STN_4500_M:.2f}", (0.025, 0.80), xycoords = 'axes fraction')
-            ax1.set_ylabel('Absorbance')
-            warnings.filterwarnings("ignore", category = UserWarning)
-            ax1.legend(['NIR Spectrum','_','_','$\mathregular{H_2O_{m, 5200}}$ Median Filtered','_','_','$\mathregular{OH^{-}_{4500}}$ Median Filtered','_','_','$\mathregular{H_2O_{m, 5200}}$ Baseline','_','_','$\mathregular{OH^{-}_{4500}}$ Baseline'], prop={'size': 10})
-            ax1.set_xlim([4200, 5400])
-            ax1.set_ylim([plotmin-0.075, plotmax+0.075])
-            ax1.invert_xaxis()
-
-            plotmax = np.round(np.max(data_H2O4500_1['Subtracted_Peak']), decimals = 1)
-            ax2 = plt.subplot2grid((2, 3), (1, 0))
-            ax2.plot(data_H2O5200_1.index, data_H2O5200_1['Subtracted_Peak'] - np.min(krige_output_5200_1['Absorbance']), 'k',
-                    data_H2O5200_2.index, data_H2O5200_2['Subtracted_Peak'] - np.min(krige_output_5200_2['Absorbance']), 'k', 
-                    data_H2O5200_3.index, data_H2O5200_3['Subtracted_Peak'] - np.min(krige_output_5200_3['Absorbance']), 'k', label = '$\mathregular{H_2O_{m, 5200}}$ Baseline Subtracted')
-            ax2.plot(data_H2O4500_1.index, data_H2O4500_1['Subtracted_Peak'] - np.min(krige_output_4500_1['Absorbance']), 'k', 
-                    data_H2O4500_2.index, data_H2O4500_2['Subtracted_Peak'] - np.min(krige_output_4500_2['Absorbance']), 'k', 
-                    data_H2O4500_3.index, data_H2O4500_3['Subtracted_Peak'] - np.min(krige_output_4500_3['Absorbance']), 'k', label = '$\mathregular{OH^{-}_{4500}}$ Baseline Subtracted')
-            ax2.plot(krige_output_5200_1.index, krige_output_5200_1['Absorbance'] - np.min(krige_output_5200_1['Absorbance']), 
-                    krige_output_5200_2.index, krige_output_5200_2['Absorbance'] - np.min(krige_output_5200_2['Absorbance']),
-                    krige_output_5200_3.index, krige_output_5200_3['Absorbance'] - np.min(krige_output_5200_3['Absorbance']), label = '$\mathregular{H_2O_{m, 5200}}$ Kriged Peak')
-            ax2.plot(krige_output_4500_1.index, krige_output_4500_1['Absorbance'] - np.min(krige_output_4500_1['Absorbance']), 
-                    krige_output_4500_2.index, krige_output_4500_2['Absorbance'] - np.min(krige_output_4500_2['Absorbance']), 
-                    krige_output_4500_3.index, krige_output_4500_3['Absorbance'] - np.min(krige_output_4500_3['Absorbance']), label = '$\mathregular{OH^{-}_{4500}}$ Kriged Peak')
-            ax2.set_xlabel('Wavenumber $(\mathregular{cm^{-1}})$')    
-            ax2.set_ylabel('Absorbance')
-            warnings.filterwarnings("ignore", category = UserWarning)
-            ax2.legend(['$\mathregular{H_2O_{m, 5200}}$ Baseline Subtracted','_','_','$\mathregular{OH^{-}_{4500}}$ Baseline Subtracted','_','_','_','_','$\mathregular{H_2O_{m, 5200}}$ Kriged','_','_','$\mathregular{OH^{-}_{4500}}$ Kriged'], prop={'size': 10})
-            ax2.set_xlim([4200, 5400])
-            ax2.set_ylim([0, plotmax+0.05])
-            ax2.invert_xaxis()
-
             # Save NIR peak heights
             NEAR_IR_PH.loc[files] = pd.Series({'PH_5200_M': PH_5200_krige_M, 'PH_4500_M': PH_4500_krige_M, 
                                             'PH_5200_STD': PH_5200_krige_STD, 'PH_4500_STD': PH_4500_krige_STD, 
@@ -1153,26 +1105,6 @@ def Run_All_Spectra(dfs_dict, paths):
             elif MAX_3550_ABS >= 2: 
                 error = '*'
 
-            # Create subplot of H2Om_{3550} baselines and peak fits
-            plotmax = np.round(np.max(data_H2O3550_1['Absorbance'].to_numpy()), decimals = 0)
-            plotmin = np.round(np.min(data_H2O3550_1['Absorbance'].to_numpy()), decimals = 0)
-            ax3 = plt.subplot2grid((2, 3), (0, 1), rowspan = 2)
-            ax3.plot(data.index, data['Absorbance'], 'k')
-            ax3.plot(data_H2O3550_1['Absorbance'].index, data_H2O3550_1['BL_MIR_3550'], 'silver', label = '$\mathregular{H_2O_{t, 3550}}$ Baseline')
-            ax3.plot(data_H2O3550_2['Absorbance'].index, data_H2O3550_2['BL_MIR_3550'], 'silver') 
-            ax3.plot(data_H2O3550_3['Absorbance'].index, data_H2O3550_3['BL_MIR_3550'], 'silver')
-            ax3.plot(plot_output_3550_1.index, (plot_output_3550_1['Subtracted_Peak_Hat']+plot_output_3550_1['BL_MIR_3550']), 'r', linewidth = 2)
-            ax3.plot(plot_output_3550_2.index, (plot_output_3550_2['Subtracted_Peak_Hat']+plot_output_3550_2['BL_MIR_3550']), 'r', linewidth = 2)
-            ax3.plot(plot_output_3550_3.index, (plot_output_3550_3['Subtracted_Peak_Hat']+plot_output_3550_3['BL_MIR_3550']), 'r', linewidth = 2)
-            ax3.set_title(files)
-            ax3.annotate("$\mathregular{H_2O_{t, 3550}}$  Peak Height: " + f"{PH_3550_M:.4f} ± {PH_3550_STD:.4f}", (0.025, 0.95), xycoords = 'axes fraction')
-            ax3.set_xlabel('Wavenumber $(\mathregular{cm^{-1}})$')
-            ax3.set_xlim([1275, 4000])
-            ax3.set_ylabel('Absorbance')
-            ax3.set_ylim([plotmin-0.25, plotmax+0.5])
-            ax3.legend(loc = 'upper right', prop={'size': 10})
-            ax3.invert_xaxis()
-
             # Save H2Om_{3550} peak heights and saturation information
             H2O_3550_PH.loc[files] = pd.Series({'PH_3550_M': PH_3550_M, 'PH_3550_STD': PH_3550_STD, 'H2OT_3550_MAX': MAX_3550_ABS, 
                                             'BL_H2OT_3550_MAX': BL_MAX_3550_ABS, 'H2OT_3550_SAT?': error})
@@ -1196,8 +1128,14 @@ def Run_All_Spectra(dfs_dict, paths):
             uncert = np.ones_like(spec_mc3) * 0.01
 
             # Run PyIRoGlass MC3!!!
-            mc3_output = MCMC(data = spec_mc3, uncert = uncert, indparams = indparams, 
-                            log = path_beg+logpath+files+'.log', savefile=path_beg+savefilepath+files+'.npz')
+
+            if paths is not None: 
+                mc3_output = MCMC(data = spec_mc3, uncert = uncert, indparams = indparams, 
+                                log = path_beg+logpath+files+'.log', savefile=path_beg+savefilepath+files+'.npz')
+            else: 
+                mc3_output = MCMC(data = spec_mc3, uncert = uncert, indparams = indparams, 
+                                log =None, savefile=None)
+
 
             # Save best-fit concentration outputs and calculate best-fit baselines and peaks for plotting
             CO2P_BP = mc3_output['bestp'][-11:-5]
@@ -1231,36 +1169,107 @@ def Run_All_Spectra(dfs_dict, paths):
             BL_MAX_1430_ABS = Baseline_Solve_BP[np.argmax((spec.index.to_numpy() > 1410) & (spec.index.to_numpy() < 1450))]
 
             # Load posterior errors and sampling errors to plot the range in iterated baselines. 
-            posteriorerror = np.load(path_beg+savefilepath+files+'.npz')
-            samplingerror = posteriorerror['posterior'][:, 0:5]
-            samplingerror = samplingerror[0: np.shape(posteriorerror['posterior'][:, :])[0] :int(np.shape(posteriorerror['posterior'][:, :])[0] / 200), :]
-            lineerror = posteriorerror['posterior'][:, -2:None]
-            lineerror = lineerror[0:np.shape(posteriorerror['posterior'][:, :])[0]:int(np.shape(posteriorerror['posterior'][:, :])[0] / 200), :]
-            Baseline_Array = np.array(samplingerror * PCAmatrix[:, :].T)
-            Baseline_Array_Plot = Baseline_Array
 
-            ax4 = plt.subplot2grid((2, 3), (0, 2), rowspan = 2)
-            for i in range(np.shape(Baseline_Array)[0]):
-                Linearray = Linear(Wavenumber, lineerror[i, 0], lineerror[i, 1])
-                Baseline_Array_Plot[i, :] = Baseline_Array[i, :] + Linearray
-                plt.plot(Wavenumber, Baseline_Array_Plot[i, :], 'dimgray', linewidth = 0.25)
-            ax4.plot(Wavenumber, spec_mc3, 'tab:blue', linewidth = 2.5, label = 'FTIR Spectrum')
-            ax4.plot(Wavenumber, H1635_SOLVE, 'tab:orange', linewidth = 1.5, label = '$\mathregular{H_2O_{m, 1635}}$')
-            ax4.plot(Wavenumber, CO2P1515_SOLVE, 'tab:green', linewidth = 2.5, label = '$\mathregular{CO_{3, 1515}^{2-}}$')
-            ax4.plot(Wavenumber, CO2P1430_SOLVE, 'tab:red', linewidth = 2.5, label = '$\mathregular{CO_{3, 1430}^{2-}}$')
-            ax4.plot(Wavenumber, Carbonate(mc3_output['meanp'], Wavenumber, PCAmatrix, Peak_1635_PCAmatrix, Nvectors), 'tab:purple', linewidth = 1.5, label = 'MC$^\mathregular{3}$ Fit')
-            ax4.plot(Wavenumber, Baseline_Solve_BP, 'k', linewidth = 1.5, label = 'Baseline')
-            ax4.annotate("$\mathregular{H_2O_{m, 1635}}$ Peak Height: " + f"{H2OmP1635_BP[0]:.3f} ± {H2OmP1635_STD[0]:.3f}", (0.025, 0.95), xycoords = 'axes fraction')
-            ax4.annotate("$\mathregular{CO_{3, 1515}^{2-}}$ Peak Height: " + f"{CO2P_BP[5]:.3f} ± {CO2P_STD[5]:.3f}", (0.025, 0.90), xycoords = 'axes fraction')
-            ax4.annotate("$\mathregular{CO_{3, 1430}^{2-}}$ Peak Height: " + f"{CO2P_BP[2]:.3f} ± {CO2P_STD[2]:.3f}", (0.025, 0.85), xycoords = 'axes fraction')
-            ax4.set_xlim([1275, 2000])
-            ax4.set_xlabel('Wavenumber $(\mathregular{cm^{-1}})$')
-            ax4.set_ylabel('Absorbance')
-            ax4.legend(loc = 'upper right', prop={'size': 10})
-            ax4.invert_xaxis()
-            plt.tight_layout()
-            plt.savefig(path_beg + figurepath + files + '.pdf')
-            plt.close('all')
+            # Initialize plotting, create subplots of H2Om_{5200} and OH_{4500} baselines and peak fits
+            if paths is not None: 
+                plotmin = np.round(np.min(data[H2O4500_wn_low_1:H2O5200_wn_high_1]['Absorbance']), decimals = 1)
+                plotmax = np.round(np.max(data[H2O4500_wn_low_1:H2O5200_wn_high_1]['Absorbance']), decimals = 1)
+                fig, ax = plt.subplots(figsize = (26, 8))
+                ax1 = plt.subplot2grid((2, 3), (0, 0))
+                ax1.plot(data.index, data['Absorbance'], 'k', linewidth = 1.5)
+                ax1.plot(data_H2O5200_1.index, data_H2O5200_1['Absorbance_Hat'], 
+                        data_H2O5200_2.index, data_H2O5200_2['Absorbance_Hat'], 
+                        data_H2O5200_3.index, data_H2O5200_3['Absorbance_Hat'])
+                ax1.plot(data_H2O4500_1.index, data_H2O4500_1['Absorbance_Hat'], 
+                        data_H2O4500_2.index, data_H2O4500_2['Absorbance_Hat'], 
+                        data_H2O4500_3.index, data_H2O4500_3['Absorbance_Hat'])
+                ax1.plot(data_H2O5200_1.index, data_H2O5200_1['BL_NIR_H2O'], 'lightsteelblue',
+                        data_H2O5200_2.index, data_H2O5200_2['BL_NIR_H2O'], 'lightsteelblue',
+                        data_H2O5200_3.index, data_H2O5200_3['BL_NIR_H2O'], 'lightsteelblue')
+                ax1.plot(data_H2O4500_1.index, data_H2O4500_1['BL_NIR_H2O'], 'silver',
+                        data_H2O4500_2.index, data_H2O4500_2['BL_NIR_H2O'], 'silver',
+                        data_H2O4500_3.index, data_H2O4500_3['BL_NIR_H2O'], 'silver')
+                ax1.annotate("$\mathregular{H_2O_{m, 5200}}$  Peak Height: " + f"{PH_5200_krige_M:.4f} ± {PH_5200_krige_STD:.4f}, S2N={STN_5200_M:.2f}", (0.025, 0.90), xycoords = 'axes fraction')
+                ax1.annotate("$\mathregular{OH^{-}_{4500}}$  Peak Height: " + f"{PH_4500_krige_M:.4f} ± {PH_4500_krige_STD:.4f}, S2N={STN_4500_M:.2f}", (0.025, 0.80), xycoords = 'axes fraction')
+                ax1.set_ylabel('Absorbance')
+                warnings.filterwarnings("ignore", category = UserWarning)
+                ax1.legend(['NIR Spectrum','_','_','$\mathregular{H_2O_{m, 5200}}$ Median Filtered','_','_','$\mathregular{OH^{-}_{4500}}$ Median Filtered','_','_','$\mathregular{H_2O_{m, 5200}}$ Baseline','_','_','$\mathregular{OH^{-}_{4500}}$ Baseline'], prop={'size': 10})
+                ax1.set_xlim([4200, 5400])
+                ax1.set_ylim([plotmin-0.075, plotmax+0.075])
+                ax1.invert_xaxis()
+
+                plotmax = np.round(np.max(data_H2O4500_1['Subtracted_Peak']), decimals = 1)
+                ax2 = plt.subplot2grid((2, 3), (1, 0))
+                ax2.plot(data_H2O5200_1.index, data_H2O5200_1['Subtracted_Peak'] - np.min(krige_output_5200_1['Absorbance']), 'k',
+                        data_H2O5200_2.index, data_H2O5200_2['Subtracted_Peak'] - np.min(krige_output_5200_2['Absorbance']), 'k', 
+                        data_H2O5200_3.index, data_H2O5200_3['Subtracted_Peak'] - np.min(krige_output_5200_3['Absorbance']), 'k', label = '$\mathregular{H_2O_{m, 5200}}$ Baseline Subtracted')
+                ax2.plot(data_H2O4500_1.index, data_H2O4500_1['Subtracted_Peak'] - np.min(krige_output_4500_1['Absorbance']), 'k', 
+                        data_H2O4500_2.index, data_H2O4500_2['Subtracted_Peak'] - np.min(krige_output_4500_2['Absorbance']), 'k', 
+                        data_H2O4500_3.index, data_H2O4500_3['Subtracted_Peak'] - np.min(krige_output_4500_3['Absorbance']), 'k', label = '$\mathregular{OH^{-}_{4500}}$ Baseline Subtracted')
+                ax2.plot(krige_output_5200_1.index, krige_output_5200_1['Absorbance'] - np.min(krige_output_5200_1['Absorbance']), 
+                        krige_output_5200_2.index, krige_output_5200_2['Absorbance'] - np.min(krige_output_5200_2['Absorbance']),
+                        krige_output_5200_3.index, krige_output_5200_3['Absorbance'] - np.min(krige_output_5200_3['Absorbance']), label = '$\mathregular{H_2O_{m, 5200}}$ Kriged Peak')
+                ax2.plot(krige_output_4500_1.index, krige_output_4500_1['Absorbance'] - np.min(krige_output_4500_1['Absorbance']), 
+                        krige_output_4500_2.index, krige_output_4500_2['Absorbance'] - np.min(krige_output_4500_2['Absorbance']), 
+                        krige_output_4500_3.index, krige_output_4500_3['Absorbance'] - np.min(krige_output_4500_3['Absorbance']), label = '$\mathregular{OH^{-}_{4500}}$ Kriged Peak')
+                ax2.set_xlabel('Wavenumber $(\mathregular{cm^{-1}})$')    
+                ax2.set_ylabel('Absorbance')
+                warnings.filterwarnings("ignore", category = UserWarning)
+                ax2.legend(['$\mathregular{H_2O_{m, 5200}}$ Baseline Subtracted','_','_','$\mathregular{OH^{-}_{4500}}$ Baseline Subtracted','_','_','_','_','$\mathregular{H_2O_{m, 5200}}$ Kriged','_','_','$\mathregular{OH^{-}_{4500}}$ Kriged'], prop={'size': 10})
+                ax2.set_xlim([4200, 5400])
+                ax2.set_ylim([0, plotmax+0.05])
+                ax2.invert_xaxis()
+
+                # Create subplot of H2Om_{3550} baselines and peak fits
+                plotmax = np.round(np.max(data_H2O3550_1['Absorbance'].to_numpy()), decimals = 0)
+                plotmin = np.round(np.min(data_H2O3550_1['Absorbance'].to_numpy()), decimals = 0)
+                ax3 = plt.subplot2grid((2, 3), (0, 1), rowspan = 2)
+                ax3.plot(data.index, data['Absorbance'], 'k')
+                ax3.plot(data_H2O3550_1['Absorbance'].index, data_H2O3550_1['BL_MIR_3550'], 'silver', label = '$\mathregular{H_2O_{t, 3550}}$ Baseline')
+                ax3.plot(data_H2O3550_2['Absorbance'].index, data_H2O3550_2['BL_MIR_3550'], 'silver') 
+                ax3.plot(data_H2O3550_3['Absorbance'].index, data_H2O3550_3['BL_MIR_3550'], 'silver')
+                ax3.plot(plot_output_3550_1.index, (plot_output_3550_1['Subtracted_Peak_Hat']+plot_output_3550_1['BL_MIR_3550']), 'r', linewidth = 2)
+                ax3.plot(plot_output_3550_2.index, (plot_output_3550_2['Subtracted_Peak_Hat']+plot_output_3550_2['BL_MIR_3550']), 'r', linewidth = 2)
+                ax3.plot(plot_output_3550_3.index, (plot_output_3550_3['Subtracted_Peak_Hat']+plot_output_3550_3['BL_MIR_3550']), 'r', linewidth = 2)
+                ax3.set_title(files)
+                ax3.annotate("$\mathregular{H_2O_{t, 3550}}$  Peak Height: " + f"{PH_3550_M:.4f} ± {PH_3550_STD:.4f}", (0.025, 0.95), xycoords = 'axes fraction')
+                ax3.set_xlabel('Wavenumber $(\mathregular{cm^{-1}})$')
+                ax3.set_xlim([1275, 4000])
+                ax3.set_ylabel('Absorbance')
+                ax3.set_ylim([plotmin-0.25, plotmax+0.5])
+                ax3.legend(loc = 'upper right', prop={'size': 10})
+                ax3.invert_xaxis()
+
+                posteriorerror = np.load(path_beg+savefilepath+files+'.npz')
+                samplingerror = posteriorerror['posterior'][:, 0:5]
+                samplingerror = samplingerror[0: np.shape(posteriorerror['posterior'][:, :])[0] :int(np.shape(posteriorerror['posterior'][:, :])[0] / 200), :]
+                lineerror = posteriorerror['posterior'][:, -2:None]
+                lineerror = lineerror[0:np.shape(posteriorerror['posterior'][:, :])[0]:int(np.shape(posteriorerror['posterior'][:, :])[0] / 200), :]
+                Baseline_Array = np.array(samplingerror * PCAmatrix[:, :].T)
+                Baseline_Array_Plot = Baseline_Array
+
+                ax4 = plt.subplot2grid((2, 3), (0, 2), rowspan = 2)
+                for i in range(np.shape(Baseline_Array)[0]):
+                    Linearray = Linear(Wavenumber, lineerror[i, 0], lineerror[i, 1])
+                    Baseline_Array_Plot[i, :] = Baseline_Array[i, :] + Linearray
+                    plt.plot(Wavenumber, Baseline_Array_Plot[i, :], 'dimgray', linewidth = 0.25)
+                ax4.plot(Wavenumber, spec_mc3, 'tab:blue', linewidth = 2.5, label = 'FTIR Spectrum')
+                ax4.plot(Wavenumber, H1635_SOLVE, 'tab:orange', linewidth = 1.5, label = '$\mathregular{H_2O_{m, 1635}}$')
+                ax4.plot(Wavenumber, CO2P1515_SOLVE, 'tab:green', linewidth = 2.5, label = '$\mathregular{CO_{3, 1515}^{2-}}$')
+                ax4.plot(Wavenumber, CO2P1430_SOLVE, 'tab:red', linewidth = 2.5, label = '$\mathregular{CO_{3, 1430}^{2-}}$')
+                ax4.plot(Wavenumber, Carbonate(mc3_output['meanp'], Wavenumber, PCAmatrix, Peak_1635_PCAmatrix, Nvectors), 'tab:purple', linewidth = 1.5, label = 'MC$^\mathregular{3}$ Fit')
+                ax4.plot(Wavenumber, Baseline_Solve_BP, 'k', linewidth = 1.5, label = 'Baseline')
+                ax4.annotate("$\mathregular{H_2O_{m, 1635}}$ Peak Height: " + f"{H2OmP1635_BP[0]:.3f} ± {H2OmP1635_STD[0]:.3f}", (0.025, 0.95), xycoords = 'axes fraction')
+                ax4.annotate("$\mathregular{CO_{3, 1515}^{2-}}$ Peak Height: " + f"{CO2P_BP[5]:.3f} ± {CO2P_STD[5]:.3f}", (0.025, 0.90), xycoords = 'axes fraction')
+                ax4.annotate("$\mathregular{CO_{3, 1430}^{2-}}$ Peak Height: " + f"{CO2P_BP[2]:.3f} ± {CO2P_STD[2]:.3f}", (0.025, 0.85), xycoords = 'axes fraction')
+                ax4.set_xlim([1275, 2000])
+                ax4.set_xlabel('Wavenumber $(\mathregular{cm^{-1}})$')
+                ax4.set_ylabel('Absorbance')
+                ax4.legend(loc = 'upper right', prop={'size': 10})
+                ax4.invert_xaxis()
+                plt.tight_layout()
+                plt.savefig(path_beg + figurepath + files + '.pdf')
+                plt.close('all')
 
             BL_MAX_1635_ABS = Baseline_Solve_BP[np.argmax(H1635_BP)]
 
