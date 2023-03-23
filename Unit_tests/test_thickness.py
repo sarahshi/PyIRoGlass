@@ -7,8 +7,8 @@ import os
 class test_thickness(unittest.TestCase):
     def setUp(self): 
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        self.csv_path = os.path.join(dir_path, '../Inputs/ReflectanceSpectra/FuegoOl/AC4_OL21_REF_a.csv')
-
+        self.csv_path = os.path.join(dir_path, '/Inputs/ReflectanceSpectra/FuegoOl/AC4_OL21_REF_a.csv')
+        print(self.csv_path)
         self.xfo = 0.72
         self.decimalPlace = 4
         self.wn_high = 2700
