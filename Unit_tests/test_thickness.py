@@ -7,9 +7,9 @@ import glob
 
 class test_thickness(unittest.TestCase):
     def setUp(self): 
-        self.dir_path = os.path.dirname(os.path.realpath(__file__))
-        self.ref_path = os.path.join(self.dir_path, '/Inputs/ReflectanceSpectra/FuegoOl/')
+        self.ref_path = os.path.join(os.path.dirname(os.getcwd()), '/Inputs/ReflectanceSpectra/FuegoOl/')
         self.path = sorted(glob.glob(self.ref_path + "*"))
+
         self.xfo = 0.72
         self.decimalPlace = 4
         self.wn_high = 2700
@@ -23,8 +23,8 @@ class test_thickness(unittest.TestCase):
     def test_process_thickness(self): 
         result = pig.Reflectance_Index(self.xfo)
         df_files, df_dicts = pig.Load_SampleCSV(self.path, self.wn_high, self.wn_low)
-        print(df_files.index)
         thickness_results = pig.Thickness_Processing(df_dicts, result, self.wn_high, self.wn_low, remove_baseline=False, plotting=False, phaseol=True)
+        ol = thickness_results['Thickness_M'].loc['AC4_OL27_REF_a']
         result = float(thickness_results.loc['AC4_OL27_REF_a']['Thickness_M'])
         expected = 79.81
         self.assertAlmostEqual(result, expected, self.decimalPlace-2, msg="Thickness test and expected values from the Thickness_Processing function do not agree")
