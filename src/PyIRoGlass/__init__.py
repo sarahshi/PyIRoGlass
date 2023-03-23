@@ -1845,7 +1845,7 @@ def PeakID(ref_spec, wn_high, wn_low, peak_heigh_min_delta, peak_search_width, s
 
 
 
-def ThicknessCalc(n, positions):
+def Thickness_Calc(n, positions):
 
     """Calculates thicknesses of glass wafers based on the refractive index of the 
     glass and the positions of the peaks or troughs in the FTIR spectrum.
@@ -1861,7 +1861,7 @@ def ThicknessCalc(n, positions):
 
 
 
-def ThicknessProcessing(dfs_dict, n, wn_high, wn_low, remove_baseline=False, plotting=False, phaseol=True):
+def Thickness_Processing(dfs_dict, n, wn_high, wn_low, remove_baseline=False, plotting=False, phaseol=True):
 
     """
     Calculates thickness of glass wafers based on the refractive index of the glass and the positions of the
@@ -1945,7 +1945,7 @@ def ThicknessProcessing(dfs_dict, n, wn_high, wn_low, remove_baseline=False, plo
     return ThickDF
 
 
-def ReflectanceIndex(XFo):
+def Reflectance_Index(XFo):
 
     """
     Calculates the reflectance index for a given forsterite composition.

@@ -48,9 +48,9 @@ REF_FILES = sorted(glob.glob(REF_PATH + "*"))
 REF_DFS_FILES, REF_DFS_DICT = pig.Load_SampleCSV(REF_FILES, wn_high = 2700, wn_low = 2100)
 
 # Use DHZ parameterization of olivine reflectance index. 
-n_ol = pig.ReflectanceIndex(0.72)
+n_ol = pig.Reflectance_Index(0.72)
 
-REF_FUEGO = pig.ThicknessProcessing(REF_DFS_DICT, n = n_ol, wn_high = 2700, wn_low = 2100, remove_baseline = True, plotting = False, phaseol = True)
+REF_FUEGO = pig.Thickness_Processing(REF_DFS_DICT, n = n_ol, wn_high = 2700, wn_low = 2100, remove_baseline = True, plotting = False, phaseol = True)
 
 
 REF_PATH = path_input + '/ReflectanceSpectra/rf_ND70/'
@@ -62,7 +62,7 @@ REF_DFS_FILES, REF_DFS_DICT = pig.Load_SampleCSV(REF_FILES, wn_high = 2850, wn_l
 # n=1.546 in the range of 2000-2700 cm^-1 following Nichols and Wysoczanski, 2007 for basaltic glass
 n_gl = 1.546
 
-REF_FUEGO = pig.ThicknessProcessing(REF_DFS_DICT, n = n_gl, wn_high = 2850, wn_low = 1700, remove_baseline = True, plotting = False, phaseol = False)
+REF_FUEGO = pig.Thickness_Processing(REF_DFS_DICT, n = n_gl, wn_high = 2850, wn_low = 1700, remove_baseline = True, plotting = False, phaseol = False)
 
 # %%
 

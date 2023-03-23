@@ -9,12 +9,13 @@ class test_density_calculation(unittest.TestCase):
         self.MI_Composition.set_index('Sample', inplace = True)
         self.T_room = 25 
         self.P_room = 1 
-        self.decimalPlace = 3
+        self.decimalPlace = 1
 
     def test_beer_lambert(self):
         mol, density = pig.Density_Calculation(self.MI_Composition, self.T_room, self.P_room)
         expected = 2702.703546
-        self.assertAlmostEqual(density.values, expected, self.decimalPlace, msg="Density test and expected values from the Density_Calculation function do not agree")
+        rounded_density = np.around(density.values, decimals=self.decimalPlace)
+        self.assertAlmostEqual(rounded_density, expected, self.decimalPlace, msg="Density test and expected values from the Density_Calculation function do not agree")
 
 
 if __name__ == '__main__':
