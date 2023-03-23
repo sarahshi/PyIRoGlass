@@ -12,9 +12,9 @@ class test_density_calculation(unittest.TestCase):
         self.decimalPlace = 4
 
     def test_beer_lambert(self):
-        result = pig.Density_Calculation(self.MI_Composition, self.T_room, self.P_room)
+        mol, density = pig.Density_Calculation(self.MI_Composition, self.T_room, self.P_room)
         expected = 2702.703546
-        self.assertAlmostEqual(result, expected, self.decimalPlace, msg="Density test and expected values from the Density_Calculation function do not agree")
+        self.assertAlmostEqual(density, expected, self.decimalPlace, msg="Density test and expected values from the Density_Calculation function do not agree")
 
 
 if __name__ == '__main__':

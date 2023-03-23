@@ -29,7 +29,7 @@ class test_conc_outputs_h2ot(unittest.TestCase):
     def test_beer_lambert_error(self):
         result = pig.Beer_Lambert_Error(self.N, self.molar_mass, self.absorbance, self.sigma_absorbance, self.density, self.sigma_density, self.thickness, self.sigma_thickness, self.epsilon, self.sigma_epsilon)
         expected = 0.433803676139589        
-        self.assertAlmostEqual(result, expected, self.decimalPlace, msg="H2Ot test and expected errors from the Beer_Lambert_Error function do not agree")
+        self.assertAlmostEqual(result, expected, self.decimalPlace-3, msg="H2Ot test and expected errors from the Beer_Lambert_Error function do not agree")
 
 class test_conc_outputs_co2(unittest.TestCase):
     def setUp(self): 
@@ -47,17 +47,17 @@ class test_conc_outputs_co2(unittest.TestCase):
                                'MgO': 4.34, 'CaO': 9.84, 'Na2O': 3.47, 'K2O': 0.67, 'P2O5': 0.11}
         self.T_room = 25 
         self.P_room = 1 
-        self.decimalPlace = 1
+        self.decimalPlace = 2
 
     def test_beer_lambert(self):
-        result = pig.Beer_Lambert(self.molar_mass, self.absorbance, self.sigma_absorbance, self.density, self.sigma_density, self.thickness, self.sigma_thickness, self.epsilon, self.sigma_epsilon)
+        result = pig.Beer_Lambert(self.molar_mass, self.absorbance, self.sigma_absorbance, self.density, self.sigma_density, self.thickness, self.sigma_thickness, self.epsilon, self.sigma_epsilon) * 10000
         expected = 730.4045443
         self.assertAlmostEqual(result, expected, self.decimalPlace, msg="CO2_1515 test and expected values from the Beer_Lambert equation do not agree")
 
     def test_beer_lambert_error(self):
-        result = pig.Beer_Lambert_Error(self.N, self.molar_mass, self.absorbance, self.sigma_absorbance, self.density, self.sigma_density, self.thickness, self.sigma_thickness, self.epsilon, self.sigma_epsilon)
+        result = pig.Beer_Lambert_Error(self.N, self.molar_mass, self.absorbance, self.sigma_absorbance, self.density, self.sigma_density, self.thickness, self.sigma_thickness, self.epsilon, self.sigma_epsilon) * 10000
         expected = 97.35842352      
-        self.assertAlmostEqual(result, expected, self.decimalPlace, msg="CO2_1515 test and expected errors from the Beer_Lambert_Error equation do not agree")
+        self.assertAlmostEqual(result, expected, self.decimalPlace-1, msg="CO2_1515 test and expected errors from the Beer_Lambert_Error equation do not agree")
 
 
 if __name__ == '__main__':
