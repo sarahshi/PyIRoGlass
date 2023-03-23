@@ -1432,8 +1432,7 @@ def Density_Calculation(MI_Composition, T, P):
 
 
 
-
-def Epsilon_Calc(MI_Composition):
+def Epsilon_Calc(MI_Composition, T, P):
 
     epsilon = pd.DataFrame(columns=['Tau', 'Na/Na+Ca', 
                                     'epsilon_H2OT_3550', 'sigma_epsilon_H2OT_3550', 
