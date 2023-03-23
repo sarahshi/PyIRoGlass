@@ -18,8 +18,8 @@ class test_inversion(unittest.TestCase):
         m1 = float(mest_f[1])
         expected_m0 = -50.3975642
         expected_m1 = 124.2505339
-        m0_ls = float(mest_f[0])
-        m1_ls = float(mest_f[1])
+        m0_ls = float(mls[0])
+        m1_ls = float(mls[1])
         expected_m0_ls = -49.05342621
         expected_m1_ls = 122.71710923
         self.assertAlmostEqual(m0, expected_m0, self.decimalPlace, msg="m0 test and expected values from the Inversion function do not agree")
