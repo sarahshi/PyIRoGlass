@@ -996,29 +996,12 @@ def Run_All_Spectra(dfs_dict, exportpath):
     path_beg = os.getcwd() + '/'
 
     # Load files with PCA vectors for the baseline and H2Om, 1635 peak. 
-    PCAmatrix = Load_PCA(path_beg + 'src/PyIRoGlass/BaselineAvgPCA.pkl')
-    Peak_1635_PCAmatrix = Load_PCA(path_beg + 'src/PyIRoGlass/H2Om1635PCA.pkl')
-    Wavenumber = Load_Wavenumber(path_beg + 'src/PyIRoGlass/BaselineAvgPCA.pkl')
+    PCAmatrix = Load_PCA(path_beg + '/src/PyIRoGlass/BaselineAvgPCA.pkl')
+    Peak_1635_PCAmatrix = Load_PCA(path_beg + '/src/PyIRoGlass/H2Om1635PCA.pkl')
+    Wavenumber = Load_Wavenumber(path_beg + '/src/PyIRoGlass/BaselineAvgPCA.pkl')
     Nvectors = 5
     indparams = [Wavenumber, PCAmatrix, Peak_1635_PCAmatrix, Nvectors]
 
-    # Create output directories for resulting files
-    if exportpath is not None: 
-        # exportpath = paths[-1]
-        output_dir = ["FIGURES", "PLOTFILES", "NPZFILES", "LOGFILES", "FINALDATA"] 
-        for ii in range(len(output_dir)):
-            if not os.path.exists(path_beg + output_dir[ii] + '/' + exportpath):
-                os.makedirs(path_beg + output_dir[ii] + '/' + exportpath, exist_ok=True)
-
-        plotpath = 'PLOTFILES/' + exportpath + '/'
-        logpath = 'LOGFILES/' + exportpath + '/'
-        savefilepath = 'NPZFILES/' + exportpath + '/'
-        figurepath = 'FIGURES/' + exportpath + '/'
-
-        additional_dir = ["TRACE", "HISTOGRAM", "PAIRWISE", "MODELFIT"]
-        for ii in range(len(additional_dir)): 
-            if not os.path.exists(path_beg+plotpath+additional_dir[ii]): 
-                os.makedirs(path_beg+plotpath+additional_dir[ii], exist_ok=True)
 
     # Create dataframes to store peak height data: 
     # P_ = peak_, _BP = best parameter, #_STD = _stdev
@@ -1134,7 +1117,7 @@ def Run_All_Spectra(dfs_dict, exportpath):
                                 log = path_beg+logpath+files+'.log', savefile=path_beg+savefilepath+files+'.npz')
             else: 
                 mc3_output = MCMC(data = spec_mc3, uncert = uncert, indparams = indparams, 
-                                log =None, savefile=None)
+                                log=False, savefile=False)
 
 
             # Save best-fit concentration outputs and calculate best-fit baselines and peaks for plotting
@@ -1173,6 +1156,23 @@ def Run_All_Spectra(dfs_dict, exportpath):
 
             # Initialize plotting, create subplots of H2Om_{5200} and OH_{4500} baselines and peak fits
             if exportpath is not None: 
+
+                # Create output directories for resulting files
+                output_dir = ["FIGURES", "PLOTFILES", "NPZFILES", "LOGFILES", "FINALDATA"] 
+                for ii in range(len(output_dir)):
+                    if not os.path.exists(path_beg + output_dir[ii] + '/' + exportpath):
+                        os.makedirs(path_beg + output_dir[ii] + '/' + exportpath, exist_ok=True)
+
+                plotpath = 'PLOTFILES/' + exportpath + '/'
+                logpath = 'LOGFILES/' + exportpath + '/'
+                savefilepath = 'NPZFILES/' + exportpath + '/'
+                figurepath = 'FIGURES/' + exportpath + '/'
+
+                additional_dir = ["TRACE", "HISTOGRAM", "PAIRWISE", "MODELFIT"]
+                for ii in range(len(additional_dir)): 
+                    if not os.path.exists(path_beg+plotpath+additional_dir[ii]): 
+                        os.makedirs(path_beg+plotpath+additional_dir[ii], exist_ok=True)
+
                 plotmin = np.round(np.min(data[H2O4500_wn_low_1:H2O5200_wn_high_1]['Absorbance']), decimals = 1)
                 plotmax = np.round(np.max(data[H2O4500_wn_low_1:H2O5200_wn_high_1]['Absorbance']), decimals = 1)
                 fig, ax = plt.subplots(figsize = (26, 8))
@@ -1286,6 +1286,10 @@ def Run_All_Spectra(dfs_dict, exportpath):
                 fig4 = modelfit(spec_mc3, uncert, indparams[0], mc3_output['best_model'], title = files, 
                                 savefile=path_beg+plotpath+'MODELFIT/'+files+'_modelfit.pdf')
                 plt.close('all')
+
+            else: 
+                pass 
+
 
             # Create dataframe of best fit parameters and their standard deviations
             DF_Output.loc[files] = pd.Series({'PH_1635_BP':H2OmP1635_BP[0],'PH_1635_STD':H2OmP1635_STD[0],'H2Om_1635_MAX': MAX_1635_ABS, 'BL_H2Om_1635_MAX': BL_MAX_1635_ABS,
