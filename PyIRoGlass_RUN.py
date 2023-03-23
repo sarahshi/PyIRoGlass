@@ -28,7 +28,7 @@ path_input = os.getcwd() + '/Inputs/'
 output_dir = ["FIGURES", "PLOTFILES", "NPZFILES", "LOGFILES", "FINALDATA"] 
 
 # Change paths to direct to folder with SampleSpectra -- last bit should be whatever your folder with spectra is called. 
-PATHS = [path_input + string for string in ['SampleSpectra/Fuego/', 'SampleSpectra/Standards/', 'SampleSpectra/Fuego1974RH/', 'SampleSpectra/SIMS/', 'SampleSpectra/Testing']]
+PATHS = [path_input + string for string in ['TransmissionSpectra/Fuego/', 'TransmissionSpectra/Standards/', 'TransmissionSpectra/Fuego1974RH/', 'TransmissionSpectra/SIMS/', 'TransmissionSpectra/Testing/']]
 
 # Put ChemThick file in Inputs. Direct to what your ChemThick file is called. 
 CHEMTHICK_PATH = [path_input + string for string in ['FuegoChemThick.csv', 'StandardChemThick.csv', 'DanRHChemThick.csv', 'SIMSChemThick.csv']]

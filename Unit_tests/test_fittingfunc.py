@@ -26,7 +26,7 @@ class test_fitting_functions(unittest.TestCase):
             PH_5200_krige = np.array([PH_5200_krige_1, PH_5200_krige_2, PH_5200_krige_3])
             PH_5200_krige_M, PH_5200_krige_STD = np.mean(PH_5200_krige), np.std(PH_5200_krige)
 
-        result = PH_5200_krige
+        result = PH_5200_krige_M
         expected = 0.008959072
         self.assertAlmostEqual(result, expected, self.decimalPlace, msg="H2Om5200 peak height test and expected values from the NearIR_Process function do not agree")
 

@@ -1113,6 +1113,23 @@ def Run_All_Spectra(dfs_dict, exportpath):
             # Run PyIRoGlass MC3!!!
 
             if exportpath is not None: 
+                # Create output directories for resulting files
+                output_dir = ["FIGURES", "PLOTFILES", "NPZFILES", "LOGFILES", "FINALDATA"] 
+                for ii in range(len(output_dir)):
+                    if not os.path.exists(path_beg + output_dir[ii] + '/' + exportpath):
+                        os.makedirs(path_beg + output_dir[ii] + '/' + exportpath, exist_ok=True)
+
+                plotpath = 'PLOTFILES/' + exportpath + '/'
+                logpath = 'LOGFILES/' + exportpath + '/'
+                savefilepath = 'NPZFILES/' + exportpath + '/'
+                figurepath = 'FIGURES/' + exportpath + '/'
+
+                additional_dir = ["TRACE", "HISTOGRAM", "PAIRWISE", "MODELFIT"]
+                for ii in range(len(additional_dir)): 
+                    if not os.path.exists(path_beg+plotpath+additional_dir[ii]): 
+                        os.makedirs(path_beg+plotpath+additional_dir[ii], exist_ok=True)
+
+
                 mc3_output = MCMC(data = spec_mc3, uncert = uncert, indparams = indparams, 
                                 log = path_beg+logpath+files+'.log', savefile=path_beg+savefilepath+files+'.npz')
             else: 
@@ -1156,22 +1173,6 @@ def Run_All_Spectra(dfs_dict, exportpath):
 
             # Initialize plotting, create subplots of H2Om_{5200} and OH_{4500} baselines and peak fits
             if exportpath is not None: 
-
-                # Create output directories for resulting files
-                output_dir = ["FIGURES", "PLOTFILES", "NPZFILES", "LOGFILES", "FINALDATA"] 
-                for ii in range(len(output_dir)):
-                    if not os.path.exists(path_beg + output_dir[ii] + '/' + exportpath):
-                        os.makedirs(path_beg + output_dir[ii] + '/' + exportpath, exist_ok=True)
-
-                plotpath = 'PLOTFILES/' + exportpath + '/'
-                logpath = 'LOGFILES/' + exportpath + '/'
-                savefilepath = 'NPZFILES/' + exportpath + '/'
-                figurepath = 'FIGURES/' + exportpath + '/'
-
-                additional_dir = ["TRACE", "HISTOGRAM", "PAIRWISE", "MODELFIT"]
-                for ii in range(len(additional_dir)): 
-                    if not os.path.exists(path_beg+plotpath+additional_dir[ii]): 
-                        os.makedirs(path_beg+plotpath+additional_dir[ii], exist_ok=True)
 
                 plotmin = np.round(np.min(data[H2O4500_wn_low_1:H2O5200_wn_high_1]['Absorbance']), decimals = 1)
                 plotmax = np.round(np.max(data[H2O4500_wn_low_1:H2O5200_wn_high_1]['Absorbance']), decimals = 1)
