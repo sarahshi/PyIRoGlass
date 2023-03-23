@@ -4,7 +4,7 @@ import pandas as pd
 import PyIRoGlass as pig
 
 class test_density_calculation(unittest.TestCase):
-    def setup(self): 
+    def setUp(self): 
         self.MI_Composition = {'SiO2': 47.95, 'TiO2': 1.00, 'Al2O3': 18.88, 'Fe2O3': 2.04, 'FeO': 7.45, 'MnO': 0.19,
                                'MgO': 4.34, 'CaO': 9.84, 'Na2O': 3.47, 'K2O': 0.67, 'P2O5': 0.11}
         self.T_room = 25 
@@ -19,6 +19,3 @@ class test_density_calculation(unittest.TestCase):
 
 if __name__ == '__main__':
      unittest.main()
-
-
-

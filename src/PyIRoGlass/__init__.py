@@ -1,7 +1,4 @@
-# %% -*- coding: utf-8 -*-
-""" Created on June 12, 2021 // @author: Sarah Shi and Henry Towbin """
-
-# %% Import packages
+__author__ = 'Sarah Shi, Henry Towbin'
 
 import os
 import copy
@@ -29,9 +26,8 @@ themes = {'blue':{'edgecolor':'navy','facecolor':'royalblue','color':'navy'},
     'black':{'edgecolor':'0.3','facecolor':'0.3','color':'black'},
     'green':{'edgecolor':'forestgreen','facecolor':'limegreen','color':'darkgreen'},
     'orange':{'edgecolor':'darkorange','facecolor':'gold','color':'darkgoldenrod'},}
-__version__ = "0.1.1"
+from ._version import __version__
 
-# %%
 
 
 def Load_SampleCSV(paths, wn_high, wn_low): 
@@ -381,6 +377,9 @@ def NearIR_Process(data, wn_low, wn_high, peak):
     return data_output, krige_output, PH_krige, STN
 
 
+
+
+
 def MidIR_Process(data, wn_low, wn_high):
 
     """
@@ -416,11 +415,7 @@ def MidIR_Process(data, wn_low, wn_high):
 
     return data_output, plot_output, PH_3550, plotindex
 
-
-# %% 
-
-
-# %% Plotting functions 
+# Plotting functions 
 
 
 def trace(posterior, title, zchain=None, pnames=None, thinning=50,
@@ -933,7 +928,7 @@ def subplotter(rect, margin, ipan, nx, ny=None, ymargin=None):
     return plt.axes([xpanel, ypanel, dx, dy])
 
 
-# %% 
+
 
 def MCMC(data, uncert, indparams, log, savefile):
     
@@ -975,7 +970,7 @@ def MCMC(data, uncert, indparams, log, savefile):
 
     return mc3_output
 
-# %% 
+
 
 
 def Run_All_Spectra(dfs_dict, paths):
@@ -1303,7 +1298,8 @@ def Run_All_Spectra(dfs_dict, paths):
     return Volatiles_DF, failures
 
 
-# %% 
+
+
 
 def Beer_Lambert(molar_mass, absorbance, sigma_absorbance, density, sigma_density, thickness, sigma_thickness, epsilon,
                 sigma_epsilon):
@@ -1435,7 +1431,8 @@ def Density_Calculation(MI_Composition, T_room, P_room):
     return mol, density
 
 
-# %% 
+
+
 
 
 def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, T_room, P_room):
@@ -1784,9 +1781,8 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, T_room, P_r
     return density_epsilon, mega_spreadsheet_f
 
 
-# %% 
 
-# %% Reflectance FTIR - Interference Fringe Processing for Thicknesses
+# Reflectance FTIR - Interference Fringe Processing for Thicknesses
 
 
 def PeakID(ref_spec, wn_high, wn_low, peak_heigh_min_delta, peak_search_width, savgol_filter_width, smoothing_wn_width = None, remove_baseline = False, plotting = False, filename = None):

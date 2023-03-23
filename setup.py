@@ -30,17 +30,14 @@ setup(
     install_requires=[
             'pandas',
             'numpy',
-            'python-ternary',
             'matplotlib',
             'scikit-learn',
             'scipy',
-            'tqdm',
-            'statsmodels',
-            'openpyxl',
             'mc3', 
             'pykrige', 
             'peakdetect',
             ],
+
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",

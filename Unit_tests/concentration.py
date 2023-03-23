@@ -4,7 +4,7 @@ import pandas as pd
 import PyIRoGlass as pig
 
 class test_conc_outputs_h2ot(unittest.TestCase):
-    def setup(self): 
+    def setUp(self): 
         self.molar_mass = 18.01528
         self.absorbance = 1.523342931
         self.sigma_absorbance = 0.003308868
@@ -32,7 +32,7 @@ class test_conc_outputs_h2ot(unittest.TestCase):
         self.assertAlmostEqual(result, expected, self.decimalPlace, msg="H2Ot test and expected errors from the Beer_Lambert_Error function do not agree")
 
 class test_conc_outputs_co2(unittest.TestCase):
-    def setup(self): 
+    def setUp(self): 
         self.molar_mass = 44.01
         self.absorbance = 0.052887397
         self.sigma_absorbance = 0.005128284
