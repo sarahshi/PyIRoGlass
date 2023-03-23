@@ -974,7 +974,7 @@ def MCMC(data, uncert, indparams, log, savefile):
 
 
 
-def Run_All_Spectra(dfs_dict, paths):
+def Run_All_Spectra(dfs_dict, exportpath):
 
     """The Run_All_Spectra function inputs the dictionary of dataframes that were created by the Load_SampleCSV function and allows 
     for all of the samples to be batched and run through the function. The function exports the best fit and standard deviations 
@@ -996,15 +996,15 @@ def Run_All_Spectra(dfs_dict, paths):
     path_beg = os.getcwd() + '/'
 
     # Load files with PCA vectors for the baseline and H2Om, 1635 peak. 
-    PCAmatrix = Load_PCA(path_beg + '/src/PyIRoGlass/BaselineAvgPCA.pkl')
-    Peak_1635_PCAmatrix = Load_PCA(path_beg + '/src/PyIRoGlass/H2Om1635PCA.pkl')
-    Wavenumber = Load_Wavenumber(path_beg + '/src/PyIRoGlass/BaselineAvgPCA.pkl')
+    PCAmatrix = Load_PCA(path_beg + 'src/PyIRoGlass/BaselineAvgPCA.pkl')
+    Peak_1635_PCAmatrix = Load_PCA(path_beg + 'src/PyIRoGlass/H2Om1635PCA.pkl')
+    Wavenumber = Load_Wavenumber(path_beg + 'src/PyIRoGlass/BaselineAvgPCA.pkl')
     Nvectors = 5
     indparams = [Wavenumber, PCAmatrix, Peak_1635_PCAmatrix, Nvectors]
 
     # Create output directories for resulting files
-    if paths is not None: 
-        exportpath = paths[-1]
+    if exportpath is not None: 
+        # exportpath = paths[-1]
         output_dir = ["FIGURES", "PLOTFILES", "NPZFILES", "LOGFILES", "FINALDATA"] 
         for ii in range(len(output_dir)):
             if not os.path.exists(path_beg + output_dir[ii] + '/' + exportpath):
@@ -1129,7 +1129,7 @@ def Run_All_Spectra(dfs_dict, paths):
 
             # Run PyIRoGlass MC3!!!
 
-            if paths is not None: 
+            if exportpath is not None: 
                 mc3_output = MCMC(data = spec_mc3, uncert = uncert, indparams = indparams, 
                                 log = path_beg+logpath+files+'.log', savefile=path_beg+savefilepath+files+'.npz')
             else: 
@@ -1167,11 +1167,12 @@ def Run_All_Spectra(dfs_dict, paths):
 
             BL_MAX_1515_ABS = Baseline_Solve_BP[np.argmax((spec.index.to_numpy() > 1510) & (spec.index.to_numpy() < 1530))]
             BL_MAX_1430_ABS = Baseline_Solve_BP[np.argmax((spec.index.to_numpy() > 1410) & (spec.index.to_numpy() < 1450))]
+            BL_MAX_1635_ABS = Baseline_Solve_BP[np.argmax(H1635_BP)]
 
             # Load posterior errors and sampling errors to plot the range in iterated baselines. 
 
             # Initialize plotting, create subplots of H2Om_{5200} and OH_{4500} baselines and peak fits
-            if paths is not None: 
+            if exportpath is not None: 
                 plotmin = np.round(np.min(data[H2O4500_wn_low_1:H2O5200_wn_high_1]['Absorbance']), decimals = 1)
                 plotmax = np.round(np.max(data[H2O4500_wn_low_1:H2O5200_wn_high_1]['Absorbance']), decimals = 1)
                 fig, ax = plt.subplots(figsize = (26, 8))
@@ -1271,22 +1272,20 @@ def Run_All_Spectra(dfs_dict, paths):
                 plt.savefig(path_beg + figurepath + files + '.pdf')
                 plt.close('all')
 
-            BL_MAX_1635_ABS = Baseline_Solve_BP[np.argmax(H1635_BP)]
+                texnames = ['$\overline{B}$',"$\overline{B}_{PC1}$","$\overline{B}_{PC2}$","$\overline{B}_{PC3}$",'$\overline{B}_{PC4}$','$\mu_{1430}$','$\sigma_{1430}$','$a_{1430}$','$\mu_{1515}$','$\sigma_{1515}$','$a_{1515}$','$\overline{H_{1635}}$','$\overline{H_{1635}}_{PC1}$','$\overline{H_{1635}}_{PC2}$','$m$','$b$']
 
-            texnames = ['$\overline{B}$',"$\overline{B}_{PC1}$","$\overline{B}_{PC2}$","$\overline{B}_{PC3}$",'$\overline{B}_{PC4}$','$\mu_{1430}$','$\sigma_{1430}$','$a_{1430}$','$\mu_{1515}$','$\sigma_{1515}$','$a_{1515}$','$\overline{H_{1635}}$','$\overline{H_{1635}}_{PC1}$','$\overline{H_{1635}}_{PC2}$','$m$','$b$']
-
-            fig1 = trace(mc3_output['posterior'], title = files, zchain=mc3_output['zchain'], burnin=mc3_output['burnin'], 
-                        pnames=texnames, savefile=path_beg+plotpath+'TRACE/'+files+'_trace.pdf')
-            plt.close('all')
-            fig2 = histogram(mc3_output['posterior'], title = files, pnames=texnames, bestp=mc3_output['bestp'], 
-                            savefile=path_beg+plotpath+'HISTOGRAM/'+files+'_histogram.pdf', quantile=0.683)
-            plt.close('all')
-            fig3 = pairwise(mc3_output['posterior'], title = files, pnames=texnames, bestp=mc3_output['bestp'], 
-                            savefile=path_beg+plotpath+'PAIRWISE/'+files+'_pairwise.pdf')
-            plt.close('all')
-            fig4 = modelfit(spec_mc3, uncert, indparams[0], mc3_output['best_model'], title = files, 
-                            savefile=path_beg+plotpath+'MODELFIT/'+files+'_modelfit.pdf')
-            plt.close('all')
+                fig1 = trace(mc3_output['posterior'], title = files, zchain=mc3_output['zchain'], burnin=mc3_output['burnin'], 
+                            pnames=texnames, savefile=path_beg+plotpath+'TRACE/'+files+'_trace.pdf')
+                plt.close('all')
+                fig2 = histogram(mc3_output['posterior'], title = files, pnames=texnames, bestp=mc3_output['bestp'], 
+                                savefile=path_beg+plotpath+'HISTOGRAM/'+files+'_histogram.pdf', quantile=0.683)
+                plt.close('all')
+                fig3 = pairwise(mc3_output['posterior'], title = files, pnames=texnames, bestp=mc3_output['bestp'], 
+                                savefile=path_beg+plotpath+'PAIRWISE/'+files+'_pairwise.pdf')
+                plt.close('all')
+                fig4 = modelfit(spec_mc3, uncert, indparams[0], mc3_output['best_model'], title = files, 
+                                savefile=path_beg+plotpath+'MODELFIT/'+files+'_modelfit.pdf')
+                plt.close('all')
 
             # Create dataframe of best fit parameters and their standard deviations
             DF_Output.loc[files] = pd.Series({'PH_1635_BP':H2OmP1635_BP[0],'PH_1635_STD':H2OmP1635_STD[0],'H2Om_1635_MAX': MAX_1635_ABS, 'BL_H2Om_1635_MAX': BL_MAX_1635_ABS,
