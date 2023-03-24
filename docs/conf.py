@@ -125,7 +125,7 @@ master_doc = 'index'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language =  'en' # None
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -224,6 +224,6 @@ texinfo_documents = [
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
-    'pandas': ('https://pandas.pydata.org/en/latest', None),
-    'numpy': ('https://docs.scipy.org/doc/numpy', None),
+    'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
+    'numpy': ('https://numpy.org/doc/stable/', None),
 }

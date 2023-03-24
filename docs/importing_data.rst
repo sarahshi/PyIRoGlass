@@ -1,6 +1,6 @@
-========================
+==============
 Importing Data
-========================
+==============
 
 We walk through an implementation of PyIRoGlass here. We recommend following this tutorial as-is for those not familiar with navigating between directories in Python. Create this following file structure locally: 
 
@@ -42,10 +42,10 @@ For example, here a screenshot of a CSV spreadsheet containing the glass composi
 For the liquid composition, PyIRoGlass allows users to specify how they partition Fe between ferrous and ferric iron, because glass density changes due to the proportion of Fe$^{3+}$. To avoid ambiguity, the ChemThick file handles this by providing two columns for FeO and Fe$_{2}O_{3}$. If the speciation is unknown, input all Fe as FeO and leave the Fe$_{2}O_{3} cells empty. This will not constitute the largest uncertainty, as the molar absorptivities and thicknesses impact concentrations more significantly. 
 
 
-*******
-========================
+
+========================================
 PyIRoGlass for Transmission FTIR Spectra
-========================
+========================================
 
 We use the os package in Python to facilitate navigation to various directories and files. To load the transmission FTIR spectra, you must provide the path to the directory. Specify the wavenumbers of interest to fit all species peaks between 5500 and 1000 cm$^{-1}$. 
 
@@ -67,9 +67,9 @@ To load the CSV containing glass chemistry and thickness information, provide th
 Inspect each returned data type to ensure that the data imports are successful. 
 
 
-========================
+=========================================
 Thicknesses from Reflectance FTIR Spectra 
-========================
+=========================================
 
 Loading reflectance FTIR spectra occurs through a near-identical process. Define your path to the file, but modify the wavenumbers of interest for either glass or olivine. 
 
@@ -82,22 +82,20 @@ Loading reflectance FTIR spectra occurs through a near-identical process. Define
 For olivine, specify the following wavenumber range based on :cite:t:`NicholsandWysoczanski2007` and calculate the relevant reflectance index $n$ from :cite:t:`DHZ1992`. 
 
 .. code-block:: python
-    wn_high = 2700 
-    wn_low = 2100
-    REF_FILES, REF_DICT = pig.Load_SampleCSV(REF_FILES, wn_high = wn_high, wn_low = wn_low)
-    n_ol = pig.ReflectanceIndex(XFo) # Input your XFo between 0-1. 
+
+    REF_FILES, REF_DICT = pig.Load_SampleCSV(REF_FILES, wn_high = 2700, wn_low = 2100)
+    n_ol = pig.ReflectanceIndex(XFo) 
 
 For glass, specify the following wavenumber range based on :cite:t:`NicholsandWysoczanski2007` and enter the relevant reflectance index $n$. We use the reflectance index for basaltic glasses from :cite:t:`NicholsandWysoczanski2007` here. 
 
 .. code-block:: python
-    wn_high = 2850 
-    wn_low = 1700
-    REF_FILES, REF_DICT = pig.Load_SampleCSV(REF_FILES, wn_high = wn_high, wn_low = wn_low)
+
+    REF_FILES, REF_DICT = pig.Load_SampleCSV(REF_FILES, wn_high = 2850, wn_low = 1700)
     n_gl = 1.546 
 
 
-========================
+====================
 Data Import Complete 
-========================
+====================
 
 That is all for loading files! You are ready to get rolling with PyIRoGlass. See the example notebook PyIRoGlass_RUN.ipynb, under the big examples heading, to see how to run PyIRoGlass and export files. 

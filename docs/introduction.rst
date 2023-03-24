@@ -1,6 +1,6 @@
-==============================
+=========================
 Introduction and Citation
-==============================
+=========================
 
 Welcome to PyIRoGlass: An Open-Source, Bayesian MCMC Algorithm for Fitting Baselines to FTIR Spectra of Basaltic-Andesitic Glasses.
 
@@ -8,9 +8,9 @@ This tool is currently in progress, with planned submission to Volcanica in the 
 
 The open-source nature of the tool allows for continuous development. We welcome the submission of devolatilized FTIR spectra that can continue to shape the form of the baseline, and molar absorptivities. You can email the lead author, (sarah.shi (at) columbia.edu) or post an enhancement request or report of a bug on the issue page of the GitHub repository (https://github.com/sarahshi/PyIRoGlass)[https://github.com/sarahshi/PyIRoGlass]. 
 
-==============================
+=====
 Units
-==============================
+=====
 
 PyIRoGlass performs all calculations using melt compositions in oxide weight percentages, thicknesses in micrometers, analytical temperature in Celsius, and analytical pressure in bars. 
 
