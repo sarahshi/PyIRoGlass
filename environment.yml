@@ -18,3 +18,4 @@ dependencies:
         - mc3
         - pykrige
         - peakdetect
+        - PyIRoGlass

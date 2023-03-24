@@ -1073,7 +1073,7 @@ def Run_All_Spectra(dfs_dict, exportpath):
 
             if exportpath is not None: 
                 # Create output directories for resulting files
-                output_dir = ["FIGURES", "PLOTFILES", "NPZFILES", "LOGFILES", "FINALDATA"] 
+                output_dir = ["FIGURES", "PLOTFILES", "NPZFILES", "LOGFILES"] 
                 for ii in range(len(output_dir)):
                     if not os.path.exists(path_beg + output_dir[ii] + '/' + exportpath):
                         os.makedirs(path_beg + output_dir[ii] + '/' + exportpath, exist_ok=True)
