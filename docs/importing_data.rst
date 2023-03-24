@@ -4,16 +4,20 @@ Importing Data
 
 We walk through an implementation of PyIRoGlass here. We recommend following this tutorial as-is for those not familiar with navigating between directories in Python. Create this following file structure locally: 
 
-PyIRoGlass/
-├── PyIRoGlass_RUN.py
-└── Inputs/
-    ├── ChemThick.csv
-    ├── ReflectanceSpectra/
-    └── TransmissionSpectra/
-        └── YourDirectoryName
-            ├── a.CSV
-            ├── b.CSV
-            └── c.CSV
+::
+
+    PyIRoGlass/
+    ├── Inputs/
+    │   ├── ChemThick.csv
+    │   ├── ReflectanceSpectra/
+    │   └── TransmissionSpectra/
+    │       └── YourDirectoryName
+    │           ├── a.CSV
+    │           ├── b.CSV
+    │           └── c.CSV
+    │
+    └── PyIRoGlass_RUN.py
+
 
 Users can batch process their FTIR data by creating directories containing all spectra files, called SampleSpectra here, in comma separated values (.CSV). Users should format their glass composition and thickness data as a spreadsheet of comma separated values (.CSV) file with each analysis having its own row and columns of sample name, oxide components in weight percentages, and thicknesses and uncertainties in thickness in micrometers. The spectrum file name **must** match the sample name input in the chemistry and thickness file. The order of columns doesn’t matter, as the Python Pandas package will identify the column heading regardless of its location. 
 

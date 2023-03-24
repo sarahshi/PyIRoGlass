@@ -20,6 +20,7 @@ Welcome to PyIRoGlass's documentation!
 .. toctree::
    :maxdepth: 2
    :caption: References
+   
    references
 
 
