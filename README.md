@@ -1,6 +1,7 @@
 # PyIRoGlass
 [![PyPI](https://badgen.net/pypi/v/PyIRoGlass)](https://pypi.org/project/PyIRoGlass/)
 [![Build Status](https://github.com/SarahShi/PyIRoGlass/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/SarahShi/PyIRoGlass/actions/workflows/main.yml)
+[![Documentation Status](https://readthedocs.org/projects/pyiroglass/badge/?version=latest)](https://pyiroglass.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/SarahShi/PyIRoGlass/branch/main/graph/badge.svg)](https://codecov.io/gh/SarahShi/PyIRoGlass/branch/main)
 
 PyIRoGlass is a Bayesian MCMC-founded Python algorithm for determining volatile concentrations and speciation for $\mathrm{H_2O_{t, 3550}}$, $\mathrm{H_2O_{m, 1635}}$, $\mathrm{CO_{3, 1515}^{2-}}$, $\mathrm{CO_{3, 1430}^{2-}}$, $\mathrm{H_2O_{m, 5200}}$, and $\mathrm{OH_{4500}}$ from basaltic to andesitic transmission FTIR spectra. PyIRoGlass is written in the open-source language Python3 with the $\mathrm{MC^3}$ package, allowing for the proper sampling of parameter space and the determination of volatile concentrations with uncertainties. 
