@@ -5,7 +5,7 @@ Importing Data
 We walk through an implementation of PyIRoGlass here. We recommend following this tutorial as-is for those not familiar with navigating between directories in Python. Create this following file structure locally: 
 
 PyIRoGlass/
-├── PyIRoGlass_RUNFILE.py
+├── PyIRoGlass_RUN.py
 └── Inputs/
     ├── ChemThick.csv
     ├── ReflectanceSpectra/
@@ -100,4 +100,4 @@ For glass, specify the following wavenumber range based on :cite:t:`NicholsandWy
 Data Import Complete 
 ========================
 
-That is all for loading files! You are ready to get rolling with PyIRoGlass. See the example notebook PyIRoGlass_RUNFILE.ipynb, under the big examples heading, to see how to run PyIRoGlass and export files. 
+That is all for loading files! You are ready to get rolling with PyIRoGlass. See the example notebook PyIRoGlass_RUN.ipynb, under the big examples heading, to see how to run PyIRoGlass and export files. 

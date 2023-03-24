@@ -21,13 +21,14 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'PyIRoGlass'
-copyright = '2023, Sarah Shi'
-author = 'Sarah Shi'
+copyright = '2023, Sarah C. Shi'
+author = 'Sarah C. Shi'
 
 # The short X.Y version
 version = ''
 # The full version, including alpha/beta/rc tags
 release = 'v.0'
+
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -61,9 +62,7 @@ extensions = ["sphinx_rtd_theme",
 bibtex_bibfiles=['references.bib']
 bibtex_reference_style = 'author_year'
 
-
-
-## Erics nb sphinx
+# -- Erics nb sphinx ---------------------------------------------------
 
 # This is processed by Jinja2 and inserted before each notebook
 # Some change in dependencies made us need to replace `var` with
@@ -78,13 +77,13 @@ nbsphinx_prolog = r"""
 
     <div class="admonition note">
       <p>This page was generated from
-        <a class="reference external" href="https://github.com/sarahshi/PyIRoGlass/blob/{{ git_ref|e }}/{{ docname|e }}">{{ docname|e }}</a>.
+        <a class="reference external" href="https://github.com/SarahShi/PyIRoGlass/blob/{{ git_ref|e }}/{{ docname|e }}">{{ docname|e }}</a>.
 
             Interactive online version:
-            <a href="https://mybinder.org/v2/gh/sarahshi/PyIRoGlass/{{ git_ref|e }}?filepath={{ docname|e }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a>.
+            <a href="https://mybinder.org/v2/gh/SarahShi/PyIRoGlass/{{ git_ref|e }}?filepath={{ docname|e }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a>.
     </p>
     <p>
-    <a class="reference download internal" download="" href="https://github.com/sarahshi/PyIRoGlass/blob/{{ git_ref|e }}/{{ docname|e }}"><code class="xref download docutils literal notranslate"><span class="pre">Python</span> <span class="pre">Notebook</span> <span class="pre">Download</span></code></a>
+    <a class="reference download internal" download="" href="https://github.com/SarahShi/PyIRoGlass/blob/{{ git_ref|e }}/{{ docname|e }}"><code class="xref download docutils literal notranslate"><span class="pre">Python</span> <span class="pre">Notebook</span> <span class="pre">Download</span></code></a>
       </p>
       <script>
         if (document.location.host) {

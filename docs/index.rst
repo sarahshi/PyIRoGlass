@@ -14,11 +14,23 @@ Welcome to PyIRoGlass's documentation!
    importing_data
    submitting_data
    FAQs
-   changelog
+   Changelog
 
 
 .. toctree::
    :maxdepth: 2
    :caption: References
    references
+
+
+
+
+
+
+
+
+
+
+
+
 

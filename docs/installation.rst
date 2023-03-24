@@ -5,7 +5,7 @@ Installation & Updating
 Installation
 ============
 
-First, obtain Python3 (tested on V3.7). If you haven't used python before, we recomend installing it through anaconda.
+First, obtain Python3 (tested on versions greater than 3.7). If you haven't used python before, we recomend installing it through anaconda.
  `anaconda3 <https://www.anaconda.com/products/individual>`_.
 
 PyIRoGlass can be installed using pip in one line. If you are using a terminal, enter:
@@ -14,7 +14,7 @@ PyIRoGlass can be installed using pip in one line. If you are using a terminal, 
 
    pip install PyIRoGlass
 
-If you are using Jupyter Notebooks or Jupyter Lab, you can also install it by entering the following code into a notebook cell (note the !):
+If you are using Jupyter Notebooks (on Google Colab or Binder) or Jupyter Lab, you can also install it by entering the following code into a notebook cell (note the !):
 
 .. code-block:: python
 

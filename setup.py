@@ -25,7 +25,7 @@ setup(
 
     package_data={
         # Include all pickle files
-        "": ["*.pkl"],
+        "": ["*.pkl", "*.npz"],
     },
     install_requires=[
             'pandas',
