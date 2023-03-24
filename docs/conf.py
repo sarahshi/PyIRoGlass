@@ -21,8 +21,8 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'PyIRoGlass'
-copyright = '2023, Sarah C. Shi'
-author = 'Sarah C. Shi'
+copyright = '2023, Sarah Shi'
+author = 'Sarah Shi'
 
 # The short X.Y version
 version = ''
