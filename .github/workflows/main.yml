@@ -3,8 +3,6 @@ name: Test and publish to PyPI
 on:
   push:
     branches: [ main ]
-    tags: 
-      - 'v*.*.*'
   pull_request:
     branches: [ main ]
   release:
@@ -51,8 +49,12 @@ jobs:
         mv .coverage .coverage.hack
         coverage combine
         coverage report
-  
+
+    - name: Upload coverage reports to Codecov
+    - uses: codecov/codecov-action@v3
+
     - uses: codecov/codecov-action@v1
+
 
   deploy:
     needs: test
