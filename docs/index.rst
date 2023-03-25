@@ -16,15 +16,11 @@ Welcome to PyIRoGlass's documentation!
    FAQs
    Changelog
 
-
-
 .. toctree::
    :maxdepth: 2
    :caption: Transmission FTIR
 
    examples/transmission_ftir/PyIRoGlass_Transmission
-
-
 
 .. toctree::
    :maxdepth: 2
@@ -32,13 +28,21 @@ Welcome to PyIRoGlass's documentation!
 
    examples/reflectance_ftir/PyIRoGlass_Reflectance
 
-
-
 .. toctree::
    :maxdepth: 2
    :caption: Molar Absorptivity Inversion
 
    examples/inversion/PyIRoGlass_Inversion
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Detailed Code Documentation
+
+   baselines_and_peaks
+   density_concentration
+   thicknesses
+   plotting_functions
+   otherfuncs
 
 
 
