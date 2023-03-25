@@ -20,16 +20,16 @@ class test_density_epsilon_calculation(unittest.TestCase):
         self.assertAlmostEqual(result, expected, self.decimalPlace, msg="Density test and expected values from the Density_Calculation function do not agree")
 
     def test_epsilon_calculation(self):
-        epsilon = pig.Epsilon_Calc(self.MI_Composition_dry, self.T_room, self.P_room)
+        epsilon = pig.Epsilon_Calculation(self.MI_Composition_dry, self.T_room, self.P_room)
         tau = float(epsilon['Tau'])
         expected_tau = 0.682894853
         epsilon_h2ot = float(epsilon['epsilon_H2OT_3550'])
         expected_epsilon_h2ot = 64.4628687805379
         sigma_epsilon_h2ot = float(epsilon['sigma_epsilon_H2OT_3550'])
         expected_sigma_epsilon_h2ot = 7.40123952105104
-        self.assertAlmostEqual(tau, expected_tau, self.decimalPlace, msg="Tau test and expected values from the Epsilon_Calc function do not agree")
-        self.assertAlmostEqual(epsilon_h2ot, expected_epsilon_h2ot, self.decimalPlace, msg="epsilon_H2Ot test and expected values from the Epsilon_Calc function do not agree")
-        self.assertAlmostEqual(sigma_epsilon_h2ot, expected_sigma_epsilon_h2ot, self.decimalPlace, msg="sigma_epsilon_H2Ot test and expected values from the Epsilon_Calc function do not agree")
+        self.assertAlmostEqual(tau, expected_tau, self.decimalPlace, msg="Tau test and expected values from the Epsilon_Calculation function do not agree")
+        self.assertAlmostEqual(epsilon_h2ot, expected_epsilon_h2ot, self.decimalPlace, msg="epsilon_H2Ot test and expected values from the Epsilon_Calculation function do not agree")
+        self.assertAlmostEqual(sigma_epsilon_h2ot, expected_sigma_epsilon_h2ot, self.decimalPlace, msg="sigma_epsilon_H2Ot test and expected values from the Epsilon_Calculation function do not agree")
 
 
 if __name__ == '__main__':

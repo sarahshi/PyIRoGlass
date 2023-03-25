@@ -21,8 +21,8 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'PyIRoGlass'
-copyright = '2023, Sarah C. Shi'
-author = 'Sarah C. Shi'
+copyright = '2021, Sarah Shi'
+author = 'Sarah Shi'
 
 # The short X.Y version
 version = ''
@@ -48,11 +48,13 @@ extensions = ["sphinx_rtd_theme",
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx',
+    #'sphinx.ext.pngmath',\
     'sphinx.ext.napoleon',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
     'IPython.sphinxext.ipython_directive',
     'IPython.sphinxext.ipython_console_highlighting',
+    #'numpydoc',
     'nbsphinx',
     'sphinx.ext.viewcode',
     'sphinxcontrib.bibtex',
@@ -60,7 +62,9 @@ extensions = ["sphinx_rtd_theme",
 bibtex_bibfiles=['references.bib']
 bibtex_reference_style = 'author_year'
 
-# -- Erics nb sphinx ---------------------------------------------------
+
+
+## Erics nb sphinx
 
 # This is processed by Jinja2 and inserted before each notebook
 # Some change in dependencies made us need to replace `var` with
@@ -123,7 +127,7 @@ master_doc = 'index'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language =  'en' # None
+language = None
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -194,7 +198,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'PyIRoGlass.tex', 'PyIRoGlass Documentation',
-     'Sarah C. Shi', 'manual'),
+     'Sarah Shi', 'manual'),
 ]
 
 
@@ -218,7 +222,6 @@ texinfo_documents = [
      author, 'PyIRoGlass', 'One line description of project.',
      'Miscellaneous'),
 ]
-
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
