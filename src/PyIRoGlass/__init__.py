@@ -1403,10 +1403,10 @@ def Density_Calculation(MI_Composition, T, P):
 
     return mol, density
 
-def Epsilon_Calculation(MI_Composition, T, P):
+def Epsilon_Calc(MI_Composition, T, P):
 
     """
-    The Epsilon_Calculation function computes the extinction coefficients and their uncertainties for various molecular 
+    The Epsilon_Calc function computes the extinction coefficients and their uncertainties for various molecular 
     species in a given MI or glass composition dataset. 
 
     Parameters:

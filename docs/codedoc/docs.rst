@@ -55,7 +55,7 @@ Functions for calculating density, molar absorptivity
 
 .. autofunction:: PyIRoGlass.Density_Calculation
 
-.. autofunction:: PyIRoGlass.Epsilon_Calculation
+.. autofunction:: PyIRoGlass.Epsilon_Calc
 
 
 Functions for plotting MCMC results
