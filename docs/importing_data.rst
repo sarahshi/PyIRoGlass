@@ -26,15 +26,15 @@ The following columns are required for this ChemThick file:
 *  Sample
 *  SiO\ :sub:`2` 
 *  TiO\ :sub:`2` 
-*  Al\ :sub:`2` O\ :sub:`3` 
-*  Fe\ :sub:`2` O\ :sub:`3` 
-*  FeO:math:`_t`
+*  Al\ :sub:`2`O\ :sub:`3` 
+*  Fe\ :sub:`2`O\ :sub:`3` 
+*  FeO\ :sub:`t`
 *  MnO
 *  MgO 
 *  CaO 
-*  Na\ :sub:`2` O
-*  K\ :sub:`2` O 
-*  P\ :sub:`2` O\ :sub:`5`
+*  Na\ :sub:`2`O
+*  K\ :sub:`2`O 
+*  P\ :sub:`2`O\ :sub:`5`
 *  Thickness
 *  Sigma_Thickness
 
@@ -43,7 +43,7 @@ For example, here a screenshot of a CSV spreadsheet containing the glass composi
 .. image:: img/chemthick.png
 
 
-For the liquid composition, PyIRoGlass allows users to specify how they partition Fe between ferrous and ferric iron, because glass density changes due to the proportion of Fe\ :sup:`3+`. To avoid ambiguity, the ChemThick file handles this by providing two columns for FeO and Fe\ :sub:`2` O\ :sub:`3` . If the speciation is unknown, input all Fe as FeO and leave the Fe\ :sub:`2` O\ :sub:`3`  cells empty. This will not constitute the largest uncertainty, as the molar absorptivities and thicknesses impact concentrations more significantly. 
+For the liquid composition, PyIRoGlass allows users to specify how they partition Fe between ferrous and ferric iron, because glass density changes due to the proportion of Fe\ :sup:`3+`. To avoid ambiguity, the ChemThick file handles this by providing two columns for FeO and Fe\ :sub:`2`O\ :sub:`3` . If the speciation is unknown, input all Fe as FeO and leave the Fe\ :sub:`2`O\ :sub:`3`  cells empty. This will not constitute the largest uncertainty, as the molar absorptivities and thicknesses impact concentrations more significantly. 
 
 ========================================
 PyIRoGlass for Transmission FTIR Spectra
@@ -81,7 +81,7 @@ Loading reflectance FTIR spectra occurs through a near-identical process. Define
     REF_FILES, REF_DICT = pig.Load_SampleCSV(REF_FILES, wn_high = wn_high, wn_low = wn_low)
     REF_FILES = sorted(glob.glob(REF_PATH + "*"))
 
-For olivine, specify the following wavenumber range based on :cite:t:`NicholsandWysoczanski2007` and calculate the relevant reflectance index **n** from :cite:t:`DHZ1992`. 
+For olivine, specify the following wavenumber range based on :cite:t:`NicholsandWysoczanski2007` and calculate the relevant reflectance index :math:`n` from :cite:t:`DHZ1992`. 
 
 .. code-block:: python
 
