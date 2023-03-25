@@ -24,17 +24,17 @@ Users can batch process their FTIR data by creating directories containing all s
 The following columns are required for this ChemThick file:
 
 *  Sample
-*  SiO:math:`_2`
-*  TiO:math:`_2`
-*  Al:math:`_2`O:math:`_3`
-*  Fe:math:`_2`O:math:`_3`
+*  SiO\ :sub:`2` 
+*  TiO\ :sub:`2` 
+*  Al\ :sub:`2` O\ :sub:`3` 
+*  Fe\ :sub:`2` O\ :sub:`3` 
 *  FeO:math:`_t`
 *  MnO
 *  MgO 
 *  CaO 
-*  Na:math:`_2`O
-*  K:math:`_2`O 
-*  P:math:`_2`O__5__ 
+*  Na\ :sub:`2` O
+*  K\ :sub:`2` O 
+*  P\ :sub:`2` O\ :sub:`5`
 *  Thickness
 *  Sigma_Thickness
 
@@ -43,13 +43,13 @@ For example, here a screenshot of a CSV spreadsheet containing the glass composi
 .. image:: img/chemthick.png
 
 
-For the liquid composition, PyIRoGlass allows users to specify how they partition Fe between ferrous and ferric iron, because glass density changes due to the proportion of Fe:math:`^{3+}`. To avoid ambiguity, the ChemThick file handles this by providing two columns for FeO and Fe:math:`_2`O:math:`_3`. If the speciation is unknown, input all Fe as FeO and leave the Fe:math:`_2`O:math:`_3` cells empty. This will not constitute the largest uncertainty, as the molar absorptivities and thicknesses impact concentrations more significantly. 
+For the liquid composition, PyIRoGlass allows users to specify how they partition Fe between ferrous and ferric iron, because glass density changes due to the proportion of Fe\ :sup:`3+`. To avoid ambiguity, the ChemThick file handles this by providing two columns for FeO and Fe\ :sub:`2` O\ :sub:`3` . If the speciation is unknown, input all Fe as FeO and leave the Fe\ :sub:`2` O\ :sub:`3`  cells empty. This will not constitute the largest uncertainty, as the molar absorptivities and thicknesses impact concentrations more significantly. 
 
 ========================================
 PyIRoGlass for Transmission FTIR Spectra
 ========================================
 
-We use the os package in Python to facilitate navigation to various directories and files. To load the transmission FTIR spectra, you must provide the path to the directory. Specify the wavenumbers of interest to fit all species peaks between 5500 and 1000 cm:math:`^{-1}`. 
+We use the os package in Python to facilitate navigation to various directories and files. To load the transmission FTIR spectra, you must provide the path to the directory. Specify the wavenumbers of interest to fit all species peaks between 5500 and 1000 cm\ :sup:`-1`. 
 
 .. code-block:: python
 
