@@ -38,13 +38,7 @@ Welcome to PyIRoGlass's documentation!
    :maxdepth: 2
    :caption: Detailed Code Documentation
 
-   baselines_and_peaks
-   density_concentration
-   thicknesses
-   plotting_functions
-   otherfuncs
-
-
+   PyIRoGlass
 
 
 .. toctree::
