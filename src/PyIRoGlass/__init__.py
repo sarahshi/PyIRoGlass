@@ -1494,7 +1494,7 @@ def Epsilon_Calc(MI_Composition, T, P):
                                     'epsilon_OH_4500': epsilon_OH_4500,'sigma_epsilon_OH_4500': CT68_4500
                                     })
 
-        return epsilon
+    return epsilon
 
 def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, T, P):
 
