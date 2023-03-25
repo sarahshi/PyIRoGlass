@@ -1,5 +1,6 @@
 .DS_Store
 MC3_BASELINES.egg-info/
+build/
 dist/
 OldRegressions/
 PEAKFIT_FINAL/Old/
@@ -20,3 +21,4 @@ VOLATILESANDSPECIATION_FINAL/AC4_OL49_trace.pdf
 VOLATILESANDSPECIATION_FINAL/AC4_OL49_histogram.pdf
 EPSILONINVERSION_FINAL/OldEpsilonRegressions/
 PyIRoGlass_RUN_SCS.py
+src/PyIRoGlass.egg-info/
