@@ -5,8 +5,7 @@ Installation & Updating
 Installation
 ============
 
-First, obtain Python3 (tested on versions greater than 3.7). If you haven't used python before, we recomend installing it through anaconda.
- `anaconda3 <https://www.anaconda.com/products/individual>`_.
+First, obtain Python3 (tested on versions > 3.7). If you haven't used python before, we recomend installing it through `anaconda3 <https://www.anaconda.com/products/individual>`_.
 
 PyIRoGlass can be installed using pip in one line. If you are using a terminal, enter:
 

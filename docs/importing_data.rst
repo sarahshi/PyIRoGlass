@@ -24,17 +24,17 @@ Users can batch process their FTIR data by creating directories containing all s
 The following columns are required for this ChemThick file:
 
 *  Sample
-*  SiO2
-*  TiO2
-*  Al2O3
-*  Fe2O3
-*  FeOt
+*  SiO__2__
+*  TiO__2__
+*  Al__2__O__3__
+*  Fe__2__O__3__
+*  FeO__t__
 *  MnO
 *  MgO 
 *  CaO 
-*  Na2O
-*  K2O 
-*  P2O5 
+*  Na__2__O
+*  K__2__O 
+*  P__2__O__5__ 
 *  Thickness
 *  Sigma_Thickness
 
@@ -43,7 +43,7 @@ For example, here a screenshot of a CSV spreadsheet containing the glass composi
 .. image:: img/chemthick.png
 
 
-For the liquid composition, PyIRoGlass allows users to specify how they partition Fe between ferrous and ferric iron, because glass density changes due to the proportion of Fe$^{3+}$. To avoid ambiguity, the ChemThick file handles this by providing two columns for FeO and Fe$_{2}O_{3}$. If the speciation is unknown, input all Fe as FeO and leave the Fe$_{2}O_{3} cells empty. This will not constitute the largest uncertainty, as the molar absorptivities and thicknesses impact concentrations more significantly. 
+For the liquid composition, PyIRoGlass allows users to specify how they partition Fe between ferrous and ferric iron, because glass density changes due to the proportion of Fe:sup:`3+`. To avoid ambiguity, the ChemThick file handles this by providing two columns for FeO and Fe__2__O__3__. If the speciation is unknown, input all Fe as FeO and leave the Fe__2__O__3__ cells empty. This will not constitute the largest uncertainty, as the molar absorptivities and thicknesses impact concentrations more significantly. 
 
 
 
@@ -51,7 +51,7 @@ For the liquid composition, PyIRoGlass allows users to specify how they partitio
 PyIRoGlass for Transmission FTIR Spectra
 ========================================
 
-We use the os package in Python to facilitate navigation to various directories and files. To load the transmission FTIR spectra, you must provide the path to the directory. Specify the wavenumbers of interest to fit all species peaks between 5500 and 1000 cm$^{-1}$. 
+We use the os package in Python to facilitate navigation to various directories and files. To load the transmission FTIR spectra, you must provide the path to the directory. Specify the wavenumbers of interest to fit all species peaks between 5500 and 1000 cm:sup:`-1`. 
 
 .. code-block:: python
 
@@ -83,7 +83,7 @@ Loading reflectance FTIR spectra occurs through a near-identical process. Define
     REF_FILES, REF_DICT = pig.Load_SampleCSV(REF_FILES, wn_high = wn_high, wn_low = wn_low)
     REF_FILES = sorted(glob.glob(REF_PATH + "*"))
 
-For olivine, specify the following wavenumber range based on :cite:t:`NicholsandWysoczanski2007` and calculate the relevant reflectance index $n$ from :cite:t:`DHZ1992`. 
+For olivine, specify the following wavenumber range based on :cite:t:`NicholsandWysoczanski2007` and calculate the relevant reflectance index **n** from :cite:t:`DHZ1992`. 
 
 .. code-block:: python
 

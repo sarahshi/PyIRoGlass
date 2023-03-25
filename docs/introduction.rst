@@ -6,7 +6,7 @@ Welcome to PyIRoGlass: An Open-Source, Bayesian MCMC Algorithm for Fitting Basel
 
 This tool is currently in progress, with planned submission to Volcanica in the near future. Please make sure you cite this tool if you use it. Software development takes time and and academia does not always recognize the effort taken, but it does recognize citations. 
 
-The open-source nature of the tool allows for continuous development. We welcome the submission of devolatilized FTIR spectra that can continue to shape the form of the baseline, and molar absorptivities. You can email the lead author, (sarah.shi (at) columbia.edu) or post an enhancement request or report of a bug on the issue page of the GitHub repository (https://github.com/sarahshi/PyIRoGlass)[https://github.com/sarahshi/PyIRoGlass]. 
+The open-source nature of the tool allows for continuous development. We welcome the submission of devolatilized FTIR spectra that can continue to shape the form of the baseline, and molar absorptivities. You can email the lead author, :mailheader:`Sarah Shi <sarah.shi@columbia.edu>`, or post an enhancement request or report of a bug on the issue page of the GitHub repository (https://github.com/sarahshi/PyIRoGlass)[https://github.com/sarahshi/PyIRoGlass]. 
 
 =====
 Units
