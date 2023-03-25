@@ -38,7 +38,7 @@ Welcome to PyIRoGlass's documentation!
    :maxdepth: 2
    :caption: Detailed Code Documentation
 
-   PyIRoGlass
+   codedoc
 
 
 .. toctree::
