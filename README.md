@@ -11,6 +11,3 @@ Quantifying concentrations of volatiles in magmas is critical for estimating the
 
 
 <a href="https://colab.research.google.com/github/SarahShi/PyIRoGlass/blob/main/PyIRoGlass_RUN_colab.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
-
-
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/SarahShi/PyIRoGlass/HEAD)
