@@ -16,6 +16,4 @@ dependencies:
     - pip
     - pip:
         - mc3
-        - pykrige
-        - peakdetect
         - PyIRoGlass

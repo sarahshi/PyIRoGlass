@@ -20,7 +20,7 @@ class test_density_epsilon_calculation(unittest.TestCase):
         self.assertAlmostEqual(result, expected, self.decimalPlace, msg="Density test and expected values from the Density_Calculation function do not agree")
 
     def test_epsilon_calculation(self):
-        epsilon = pig.Epsilon_Calc(self.MI_Composition_dry, self.T_room, self.P_room)
+        epsilon = pig.Epsilon_Calculation(self.MI_Composition_dry, self.T_room, self.P_room)
         tau = float(epsilon['Tau'])
         expected_tau = 0.682894853
         epsilon_h2ot = float(epsilon['epsilon_H2OT_3550'])

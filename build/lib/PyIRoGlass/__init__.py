@@ -13,6 +13,7 @@ if os.environ.get('DISPLAY','') == '':
     mpl.use('Agg')
 from matplotlib import pyplot as plt
 mpl.use('pgf')
+import mc3.plots as mp
 import mc3.utils as mu
 import mc3.stats as ms
 
@@ -21,12 +22,12 @@ import scipy.signal as signal
 from scipy.linalg import solveh_banded
 import scipy.interpolate as interpolate
 
-__all__ = ['trace', 'histogram', 'pairwise', 'rms', 'modelfit', 'subplotter', 'themes',]
-themes = {'blue':{'edgecolor':'navy','facecolor':'royalblue','color':'navy'},
-    'red': {'edgecolor':'crimson','facecolor':'orangered','color':'darkred'},
-    'black':{'edgecolor':'0.3','facecolor':'0.3','color':'black'},
-    'green':{'edgecolor':'forestgreen','facecolor':'limegreen','color':'darkgreen'},
-    'orange':{'edgecolor':'darkorange','facecolor':'gold','color':'darkgoldenrod'},}
+# __all__ = ['trace', 'histogram', 'pairwise', 'rms', 'modelfit', 'subplotter', 'themes',]
+# themes = {'blue':{'edgecolor':'navy','facecolor':'royalblue','color':'navy'},
+#     'red': {'edgecolor':'crimson','facecolor':'orangered','color':'darkred'},
+#     'black':{'edgecolor':'0.3','facecolor':'0.3','color':'black'},
+#     'green':{'edgecolor':'forestgreen','facecolor':'limegreen','color':'darkgreen'},
+#     'orange':{'edgecolor':'darkorange','facecolor':'gold','color':'darkgoldenrod'},}
 from ._version import __version__
 
 # %%
@@ -137,6 +138,7 @@ def Load_ChemistryThickness(ChemistryThickness_Path):
     ChemistryThickness.set_index('Sample', inplace = True)
 
     Chemistry = ChemistryThickness.loc[:, ['SiO2', 'TiO2', 'Al2O3', 'Fe2O3', 'FeO', 'MnO', 'MgO', 'CaO', 'Na2O', 'K2O', 'P2O5']]
+    Chemistry = Chemistry.fillna(0)
     Thickness = ChemistryThickness.loc[:, ['Thickness', 'Sigma_Thickness']]
 
 
@@ -395,8 +397,9 @@ def MidIR_Process(data, wn_low, wn_high):
 
 # %% Plotting functions 
 
+
 def trace(posterior, title, zchain=None, pnames=None, thinning=50,
-    burnin=0, fignum=1000, savefile=None, fmt=".", ms=2.5, fs=11):
+    burnin=0, fignum=1000, savefile=None, fmt=".", ms=2.5, fs=12):
     
     """
     Plot parameter trace MCMC sampling.
@@ -455,7 +458,7 @@ def trace(posterior, title, zchain=None, pnames=None, thinning=50,
         while ipar < npars:
             ax = plt.subplot(npanels, 1, ipar%npanels+1)
             axes.append(ax)
-            ax.plot(posterior[0::thinning,ipar], fmt, ms=ms, rasterized = True)
+            ax.plot(posterior[0::thinning,ipar], fmt, ms=ms, c='#46A4F5', rasterized = True)
             yran = ax.get_ylim()
             if zchain is not None:
                 ax.vlines(xsep, yran[0], yran[1], "0.5")
@@ -487,15 +490,16 @@ def trace(posterior, title, zchain=None, pnames=None, thinning=50,
 
                 fig.savefig(f"{sf[0]}_page{page:02d}{sf[1]}", bbox_inches=bbox)
             else:
-                fig.suptitle(title)
+                fig.suptitle(title, fontsize=fs+1)
                 plt.ioff()
                 fig.savefig(savefile, bbox_inches='tight')
 
     return axes
 
+
 def histogram(posterior, title, pnames=None, thinning=1, fignum=1100,
     savefile=None, bestp=None, quantile=None, pdf=None,
-    xpdf=None, ranges=None, axes=None, lw=2.0, fs=11,
+    xpdf=None, ranges=None, axes=None, lw=2.0, fs=12,
     theme='blue', yscale=False, orientation='vertical'):
     
     """
@@ -555,7 +559,7 @@ def histogram(posterior, title, pnames=None, thinning=1, fignum=1100,
     nrows, ncolumns, npanels = 4, 4, 16
     npages = int(1 + (npars-1)/npanels)
 
-    ylabel = "$N$ samples" if yscale else "Posterior density"
+    ylabel = "$N$ samples" if yscale else "Posterior Density"
     if axes is None:
         figs, axes = [], []
         for j in range(npages):
@@ -648,7 +652,7 @@ def histogram(posterior, title, pnames=None, thinning=1, fignum=1100,
 
 def pairwise(posterior, title, pnames=None, thinning=100, fignum=1200,
     savefile=None, bestp=None, nbins=15, nlevels=10,
-    absolute_dens=False, ranges=None, fs=11, rect=None, margin=0.01):
+    absolute_dens=False, ranges=None, fs=12, rect=None, margin=0.01):
     
     """
     Plot parameter pairwise posterior distributions.
@@ -768,7 +772,7 @@ def pairwise(posterior, title, pnames=None, thinning=100, fignum=1200,
     cb = mpl.colorbar.ColorbarBase(
         ax2, cmap=palette, norm=norm,
         spacing='proportional', boundaries=bounds, format='%.1f')
-    cb.set_label("Posterior density", fontsize=fs)
+    cb.set_label("Posterior Density", fontsize=fs)
     cb.ax.yaxis.set_ticks_position('left')
     cb.ax.yaxis.set_label_position('left')
     cb.ax.tick_params(labelsize=fs-1, direction='in', top=True, right=True)
@@ -821,7 +825,7 @@ def modelfit(data, uncert, indparams, model, title, nbins=75,
     rax.plot([indparams[0], indparams[-1]], [0,0], 'k:', lw=1.5)
     rax.tick_params(labelsize=fs-1, direction='in', top=True, right=True)
     rax.set_xlabel("Wavenumber $(\mathregular{cm^{-1}})$", fontsize=fs)
-    rax.set_ylabel('Absorbance Residual', fontsize=fs)
+    rax.set_ylabel('Residual', fontsize=fs)
     rax.invert_xaxis()
 
     # Data and Model:
@@ -836,7 +840,7 @@ def modelfit(data, uncert, indparams, model, title, nbins=75,
     ax.legend(loc='best')
 
     if savefile is not None:
-        plt.suptitle(title)
+        plt.suptitle(title, fontsize=fs+1)
         plt.ioff()
         plt.savefig(savefile)
     return ax, rax
@@ -880,6 +884,7 @@ def subplotter(rect, margin, ipan, nx, ny=None, ymargin=None):
 
     return plt.axes([xpanel, ypanel, dx, dy])
 
+
 # %%
 
 def MCMC(data, uncert, indparams, log, savefile):
@@ -902,27 +907,31 @@ def MCMC(data, uncert, indparams, log, savefile):
 
     # Define initial values, limits, and step sizes for parameters
     func = Carbonate
-    
-    params = np.array([1.25, 2.00, 0.25, 0.01, 0.01, 1430, 25.0, 0.0100, 1510, 25.0, 0.0100, 0.10, 0.02, 0.01, 5e-4, 0.70])
-    pmin = np.array([0.00, -5.00, -1.00, -0.75, -0.75, 1415, 22.5, 0.0000, 1500, 22.5, 0.0000, 0.00, -0.50, -0.50, -5e-2, -1.00])
-    pmax = np.array([5.00, 8.00, 1.00, 0.75, 0.75, 1445, 40.0, 3.0000, 1535, 40.0, 3.0000, 3.00, 0.50, 0.50, 5e-2, 3.00])
-    pstep = np.array([0.30, 0.50, 0.20, 0.20, 0.20, 3.25, 2.25, 0.0005, 6.0, 2.25, 0.0005, 0.25, 0.75, 0.75, 0.002, 0.20])
+
+    params = np.array([1.25,  2.00,  0.25,  0.01,  0.01, 1430, 30.0, 0.0100, 1510, 30.0, 0.0100, 0.10,  0.02,  0.01,  5e-4,  0.70])
+    pmin   = np.array([0.00, -8.00, -2.00, -1.0, -0.75, 1415, 22.5, 0.0000, 1500, 22.5, 0.0000, 0.00, -0.50, -0.50, -5e-2, -1.00])
+    pmax   = np.array([5.00,  8.00,  2.00,  1.0,  0.75, 1445, 40.0, 3.0000, 1535, 40.0, 3.0000, 3.00,  0.50,  0.50,  5e-2,  3.00])
+    pstep  = np.abs(pmin - pmax) * 0.01
 
     # Define prior limits for parameters
-    priorlow = np.array([0.00, 0.00, 0.00, 0.00, 0.00, 0.0, 2.5, 0.0, 0.0, 2.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-    priorup = np.array([0.00, 0.00, 0.00, 0.00, 0.00, 0.0, 2.5, 0.0, 0.0, 2.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+    prior    = np.array([0.00, 0.00, 0.00, 0.00, 0.00, 0.0, 30.0, 0.0, 0.0, 30.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+    priorlow = np.array([0.00, 0.00, 0.00, 0.00, 0.00, 0.0, 5.00, 0.0, 0.0, 5.00, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+    priorup  = np.array([0.00, 0.00, 0.00, 0.00, 0.00, 0.0, 5.00, 0.0, 0.0, 5.00, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 
-    pnames   = ['Avg_BL',"PCA1","PCA2","PCA3","PCA4",'peak_G1430','std_G1430','G1430_amplitude','peak_G1515','std_G1515','G1515_amplitude','Average_1635Peak','1635PeakPCA1','1635PeakPCA2','m','b']
+    pnames   = ['B_mean',"B_PC1","B_PC2","B_PC3","B_PC4",'G1430_peak','G1430_std','G1430_amp',
+                'G1515_peak','G1515_std','G1515_amp','H1635_mean','H1635_PC1','H1635_PC2','m','b']
 
-    texnames = ['$\overline{B}$',"$\overline{B}_{PC1}$","$\overline{B}_{PC2}$","$\overline{B}_{PC3}$",'$\overline{B}_{PC4}$','$\mu_{1430}$','$\sigma_{1430}$','$a_{1430}$','$\mu_{1515}$','$\sigma_{1515}$','$a_{1515}$','$\overline{H_{1635}}$','$\overline{H_{1635}}_{PC1}$','$\overline{H_{1635}}_{PC2}$','$m$','$b$']
+    texnames = ['$\overline{B}$',"$\overline{B}_{PC1}$","$\overline{B}_{PC2}$","$\overline{B}_{PC3}$",'$\overline{B}_{PC4}$',
+                '$\mu_{1430}$','$\sigma_{1430}$','$a_{1430}$','$\mu_{1515}$','$\sigma_{1515}$','$a_{1515}$',
+                '$\overline{H_{1635}}$','$\overline{H_{1635}}_{PC1}$','$\overline{H_{1635}}_{PC2}$','$m$','$b$']
 
 
     mc3_output = mc3.sample(data=data, uncert=uncert, func=func, params=params, indparams=indparams,
-                            pmin=pmin, pmax=pmax, priorlow=priorlow, priorup=priorup,
+                            pmin=pmin, pmax=pmax, pstep=pstep, prior=prior, priorlow=priorlow, priorup=priorup, #
                             pnames=pnames, texnames=texnames, sampler='snooker', rms=False,
-                            nsamples=1e6, nchains=9, ncpu=3, burnin=5000, thinning=5,
-                            leastsq='trf', chisqscale=False, grtest=True, grbreak=1.01, grnmin=0.5,
-                            hsize=10, kickoff='normal', wlike=False, plots=False, log=log, savefile=savefile)
+                            nsamples=1e6, nchains=9, ncpu=4, burnin=1e4, thinning=5, leastsq='trf',
+                            chisqscale=False, grtest=True, grbreak=1.01, grnmin=0.5, hsize=10,
+                            kickoff='normal', wlike=False, plots=False, log=log, savefile=savefile)
 
     return mc3_output
 
@@ -952,6 +961,9 @@ def Run_All_Spectra(dfs_dict, exportpath):
     import os 
     import time
     import warnings
+    import mc3.plots as mp
+    import mc3.utils as mu
+    import mc3.stats as ms
 
     path_beg = os.getcwd() + '/'
 
@@ -1072,27 +1084,26 @@ def Run_All_Spectra(dfs_dict, exportpath):
             uncert = np.ones_like(spec_mc3) * 0.01
 
             # Run PyIRoGlass MC3!!!
-
             if exportpath is not None: 
+                warnings.filterwarnings("ignore", category = DeprecationWarning)
                 # Create output directories for resulting files
-                output_dir = ["FIGURES", "PLOTFILES", "NPZFILES", "LOGFILES"] 
+                output_dir = ["FIGURES", "PLOTFILES", "NPZTXTFILES", "LOGFILES"] 
                 for ii in range(len(output_dir)):
                     if not os.path.exists(path_beg + output_dir[ii] + '/' + exportpath):
                         os.makedirs(path_beg + output_dir[ii] + '/' + exportpath, exist_ok=True)
 
-                plotpath = 'PLOTFILES/' + exportpath + '/'
-                logpath = 'LOGFILES/' + exportpath + '/'
-                savefilepath = 'NPZFILES/' + exportpath + '/'
-                figurepath = 'FIGURES/' + exportpath + '/'
+                figurepath     = 'FIGURES/' + exportpath + '/'
+                plotpath       = 'PLOTFILES/' + exportpath + '/'
+                savefilepath   = 'NPZTXTFILES/' + exportpath + '/'
+                logpath        = 'LOGFILES/' + exportpath + '/'
 
                 additional_dir = ["TRACE", "HISTOGRAM", "PAIRWISE", "MODELFIT"]
                 for ii in range(len(additional_dir)): 
                     if not os.path.exists(path_beg+plotpath+additional_dir[ii]): 
                         os.makedirs(path_beg+plotpath+additional_dir[ii], exist_ok=True)
 
-
-                mc3_output = MCMC(data = spec_mc3, uncert = uncert, indparams = indparams, 
-                                log = path_beg+logpath+files+'.log', savefile=path_beg+savefilepath+files+'.npz')
+                mc3_output = MCMC(data=spec_mc3, uncert=uncert, indparams=indparams, 
+                                log=path_beg+logpath+files+'.log', savefile=path_beg+savefilepath+files+'.npz')
             else: 
                 mc3_output = MCMC(data = spec_mc3, uncert = uncert, indparams = indparams, 
                                 log=None, savefile=None)
@@ -1129,9 +1140,10 @@ def Run_All_Spectra(dfs_dict, exportpath):
             BL_MAX_1430_ABS = Baseline_Solve_BP[np.argmax((spec.index.to_numpy() > 1410) & (spec.index.to_numpy() < 1450))]
             BL_MAX_1635_ABS = Baseline_Solve_BP[np.argmax(H1635_BP)]
 
+            warnings.filterwarnings( "ignore", module = "matplotlib\..*" )
+
             # Initialize plotting, create subplots of H2Om_{5200} and OH_{4500} baselines and peak fits
             if exportpath is not None: 
-
                 plotmin = np.round(np.min(data[H2O4500_wn_low_1:H2O5200_wn_high_1]['Absorbance']), decimals = 1)
                 plotmax = np.round(np.max(data[H2O4500_wn_low_1:H2O5200_wn_high_1]['Absorbance']), decimals = 1)
                 fig, ax = plt.subplots(figsize = (26, 8))
@@ -1201,11 +1213,16 @@ def Run_All_Spectra(dfs_dict, exportpath):
                 ax3.invert_xaxis()
 
                 # Load posterior errors and sampling errors to plot the range in iterated baselines. 
-                posteriorerror = np.load(path_beg+savefilepath+files+'.npz')
-                samplingerror = posteriorerror['posterior'][:, 0:5]
-                samplingerror = samplingerror[0: np.shape(posteriorerror['posterior'][:, :])[0] :int(np.shape(posteriorerror['posterior'][:, :])[0] / 200), :]
-                lineerror = posteriorerror['posterior'][:, -2:None]
-                lineerror = lineerror[0:np.shape(posteriorerror['posterior'][:, :])[0]:int(np.shape(posteriorerror['posterior'][:, :])[0] / 200), :]
+                mcmc_npz = np.load(path_beg+savefilepath+files+'.npz')
+                posterior = mcmc_npz['posterior']
+                mask = mcmc_npz['zmask']
+                masked_posterior = posterior[mask]
+
+                samplingerror = masked_posterior[:, 0:5]
+                samplingerror = samplingerror[0: np.shape(masked_posterior[:, :])[0]:int(np.shape(masked_posterior[:, :])[0] / 100), :]
+                lineerror = masked_posterior[:, -2:None]
+                lineerror = lineerror[0:np.shape(masked_posterior[:, :])[0]:int(np.shape(masked_posterior[:, :])[0] / 100), :]
+
                 Baseline_Array = np.array(samplingerror * PCAmatrix[:, :].T)
                 Baseline_Array_Plot = Baseline_Array
 
@@ -1234,15 +1251,23 @@ def Run_All_Spectra(dfs_dict, exportpath):
 
                 texnames = ['$\overline{B}$',"$\overline{B}_{PC1}$","$\overline{B}_{PC2}$","$\overline{B}_{PC3}$",'$\overline{B}_{PC4}$','$\mu_{1430}$','$\sigma_{1430}$','$a_{1430}$','$\mu_{1515}$','$\sigma_{1515}$','$a_{1515}$','$\overline{H_{1635}}$','$\overline{H_{1635}}_{PC1}$','$\overline{H_{1635}}_{PC2}$','$m$','$b$']
 
-                fig1 = trace(mc3_output['posterior'], title = files, zchain=mc3_output['zchain'], burnin=mc3_output['burnin'], 
+                posterior, zchain, zmask = mu.burn(mc3_output)
+                post = mp.Posterior(posterior, texnames)
+
+                fig = post.plot()
+                plt.suptitle(files)
+                plt.savefig(path_beg+plotpath+'PAIRWISE/'+files+'_pairwise.pdf')
+                plt.close('all')
+
+                fig = post.plot_histogram(nx = 4, ny = 4)
+                plt.suptitle(files, y=1.015)
+                plt.savefig(path_beg+plotpath+'HISTOGRAM/'+files+'_histogram.pdf', bbox_inches='tight')
+                plt.close('all')
+            
+                fig3 = trace(mc3_output['posterior'], title = files, zchain=mc3_output['zchain'], burnin=mc3_output['burnin'], 
                             pnames=texnames, savefile=path_beg+plotpath+'TRACE/'+files+'_trace.pdf')
                 plt.close('all')
-                fig2 = histogram(mc3_output['posterior'], title = files, pnames=texnames, bestp=mc3_output['bestp'], 
-                                savefile=path_beg+plotpath+'HISTOGRAM/'+files+'_histogram.pdf', quantile=0.683)
-                plt.close('all')
-                fig3 = pairwise(mc3_output['posterior'], title = files, pnames=texnames, bestp=mc3_output['bestp'], 
-                                savefile=path_beg+plotpath+'PAIRWISE/'+files+'_pairwise.pdf')
-                plt.close('all')
+
                 fig4 = modelfit(spec_mc3, uncert, indparams[0], mc3_output['best_model'], title = files, 
                                 savefile=path_beg+plotpath+'MODELFIT/'+files+'_modelfit.pdf')
                 plt.close('all')
@@ -1403,10 +1428,10 @@ def Density_Calculation(MI_Composition, T, P):
 
     return mol, density
 
-def Epsilon_Calc(MI_Composition, T, P):
+def Epsilon_Calculation(MI_Composition, T, P):
 
     """
-    The Epsilon_Calc function computes the extinction coefficients and their uncertainties for various molecular 
+    The Epsilon_Calculation function computes the extinction coefficients and their uncertainties for various molecular 
     species in a given MI or glass composition dataset. 
 
     Parameters:

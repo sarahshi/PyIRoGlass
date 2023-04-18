@@ -2,7 +2,7 @@
 Importing Data
 ==============
 
-We walk through an implementation of PyIRoGlass here. We recommend following this tutorial as-is for those not familiar with navigating between directories in Python. Create this following file structure locally: 
+We walk through an implementation of ``PyIRoGlass`` here. We recommend following this tutorial as-is for those not familiar with navigating between directories in Python. Create this following file structure locally: 
 
 ::
 
@@ -38,12 +38,12 @@ The following columns are required for this ChemThick file:
 *  Thickness
 *  Sigma_Thickness
 
-For example, here a screenshot of a CSV spreadsheet containing the glass composition and thickness data. You can use the ChemThickTemplate.csv from the GitHub repository to create your own. 
+For example, here a screenshot of a CSV spreadsheet containing the glass composition and thickness data. You can use the ChemThickTemplate.csv from the GitHub repository to create your own. You **must** fill every cell. For oxides that were not analyzed or not detected, enter 0 into the cell. 
 
 .. image:: img/chemthick.png
 
 
-For the liquid composition, PyIRoGlass allows users to specify how they partition Fe between ferrous and ferric iron, because glass density changes due to the proportion of Fe\ :sup:`3+`. To avoid ambiguity, the ChemThick file handles this by providing two columns for FeO and Fe\ :sub:`2`O\ :sub:`3` . If the speciation is unknown, input all Fe as FeO and leave the Fe\ :sub:`2`O\ :sub:`3`  cells empty. This will not constitute the largest uncertainty, as the molar absorptivities and thicknesses impact concentrations more significantly. 
+For the liquid composition, ``PyIRoGlass`` allows users to specify how they partition Fe between ferrous and ferric iron, because glass density changes due to the proportion of Fe\ :sup:`3+`. To avoid ambiguity, the ChemThick file handles this by providing two columns for FeO and Fe\ :sub:`2`O\ :sub:`3` . If the speciation is unknown, input all Fe as FeO and leave the Fe\ :sub:`2`O\ :sub:`3`  cells empty. This will not constitute the largest uncertainty, as the molar absorptivities and thicknesses impact concentrations more significantly. 
 
 ========================================
 PyIRoGlass for Transmission FTIR Spectra
@@ -100,4 +100,4 @@ For glass, specify the following wavenumber range based on :cite:t:`NicholsandWy
 Data Import Complete 
 ====================
 
-That is all for loading files! You are ready to get rolling with PyIRoGlass. See the example notebook PyIRoGlass_RUN.ipynb, under the big examples heading, to see how to run PyIRoGlass and export files. 
+That is all for loading files! You are ready to get rolling with ``PyIRoGlass``. See the example notebook PyIRoGlass_RUN.ipynb, under the big examples heading, to see how to run ``PyIRoGlass`` and export files. 

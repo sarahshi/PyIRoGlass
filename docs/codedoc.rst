@@ -1,5 +1,5 @@
-Building-blocks functions for fitting baselines and peaks
-=========================================================
+Building-block functions
+========================
 
 .. toctree::
 
