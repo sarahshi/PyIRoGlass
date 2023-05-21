@@ -28,16 +28,16 @@ path_input = os.getcwd() + '/Inputs/'
 output_dir = ["FIGURES", "PLOTFILES", "NPZTXTFILES", "LOGFILES", "FINALDATA"] # NPZFILES
 
 # Change paths to direct to folder with SampleSpectra -- last bit should be whatever your folder with spectra is called. 
-PATHS = [path_input + string for string in ['TransmissionSpectra/Fuego/', 'TransmissionSpectra/Standards/', 'TransmissionSpectra/Fuego1974RH/', 'TransmissionSpectra/ND70/', 'TransmissionSpectra/HJYM/', 'TransmissionSpectra/YM/']]
+PATHS = [path_input + string for string in ['TransmissionSpectra/Fuego/', 'TransmissionSpectra/Standards/', 'TransmissionSpectra/Fuego1974RH/', 'TransmissionSpectra/ND70/', 'TransmissionSpectra/HJYM/', 'TransmissionSpectra/YM/', 'TransmissionSpectra/MoreStandards/']]
 
 # Put ChemThick file in Inputs. Direct to what your ChemThick file is called. 
-CHEMTHICK_PATH = [path_input + string for string in ['FuegoChemThick.csv', 'StandardChemThick.csv', 'DanRHChemThick.csv', 'ND70ChemThick.csv', 'HJYMChemThick.csv', 'YMChemThick.csv']]
+CHEMTHICK_PATH = [path_input + string for string in ['FuegoChemThick.csv', 'StandardChemThick.csv', 'DanRHChemThick.csv', 'ND70ChemThick.csv', 'HJYMChemThick.csv', 'YMChemThick.csv', 'MoreStandardChemThick.csv']]
 
 # Change last value in list to be what you want your output directory to be called. 
-INPUT_PATHS = ['FUEGO', 'STD', 'FRH', 'ND70', 'EXPSTD', 'YMSTD']
+INPUT_PATHS = ['FUEGO', 'STD', 'FRH', 'ND70', 'EXPSTD', 'YMSTD', 'M_STD']
 
 # Change to be what you want the prefix of your output files to be. 
-OUTPUT_PATH = ['FUEGO', 'STD', 'FRH', 'ND70', 'EXPSTD', 'YMSTD']
+OUTPUT_PATH = ['FUEGO', 'STD', 'FRH', 'ND70', 'EXPSTD', 'YMSTD', 'M_STD']
 
 
 # %% 
@@ -333,6 +333,36 @@ N = 500000
 DENSITY_EPSILON, MEGA_SPREADSHEET = pig.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP, T_ROOM, P_ROOM)
 MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[ymno] + '_H2OCO2.csv')
 DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[ymno] + '_DensityEpsilon.csv')
+MEGA_SPREADSHEET
+
+# %%
+
+
+ms = 6
+
+PATH = PATHS[ms]
+FILES = sorted(glob.glob(PATH + "*"))
+
+MICOMP, THICKNESS = pig.Load_ChemistryThickness(CHEMTHICK_PATH[ms])
+
+# %% 
+
+DFS_FILES, DFS_DICT = pig.Load_SampleCSV(FILES, wn_high = 5500, wn_low = 1000)
+DF_OUTPUT, FAILURES = pig.Run_All_Spectra(DFS_DICT, INPUT_PATHS[ms])
+
+DF_OUTPUT.to_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[ms] + '_DF.csv')
+
+# DF_OUTPUT = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATH[basaltsno] + '_DF.csv', index_col = 0)
+
+T_ROOM = 25 # C
+P_ROOM = 1 # Bar
+
+# %% 
+
+N = 500000
+DENSITY_EPSILON, MEGA_SPREADSHEET = pig.Concentration_Output(DF_OUTPUT, N, THICKNESS, MICOMP, T_ROOM, P_ROOM)
+MEGA_SPREADSHEET.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[ms] + '_H2OCO2.csv')
+DENSITY_EPSILON.to_csv(output_dir[-1] + '/' + OUTPUT_PATH[ms] + '_DensityEpsilon.csv')
 MEGA_SPREADSHEET
 
 # %%
