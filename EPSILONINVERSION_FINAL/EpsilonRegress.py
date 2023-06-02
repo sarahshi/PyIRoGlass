@@ -365,6 +365,7 @@ plt.tight_layout()
 # %% Carbonate
 
 epsilon_carbonate_dixonpan = 451-342*naca_arr
+epsilon_carbonate_old = 440.696-355.205*naca_arr
 
 fuego_idx = np.where((naca_arr > 0.389) & (naca_arr < 0.554))
 
@@ -372,12 +373,14 @@ df_carbonate = pd.read_excel('./EpsilonRegression.xlsx', sheet_name='CarbonateRe
 
 low_df = df_carbonate[df_carbonate.Epsilon_Location == 'Low']
 high_df = df_carbonate[df_carbonate.Epsilon_Location == 'High']
+brounce = low_df[low_df.Compilation == 'Brounce']
 
 sz = 150
 fig, ax = plt.subplots(1, 1, figsize = (8, 8))
 
 ax.errorbar(low_df['Na/Na+Ca'], low_df['Epsilon_Carbonate'], yerr = low_df['Epsilon_Carbonate']*0.1, xerr = low_df['Na/Na+Ca']*0.025, ls = 'none', elinewidth = 0.5, ecolor = 'k')
 ax.scatter(low_df['Na/Na+Ca'], low_df['Epsilon_Carbonate'], s = sz, c = '#0C7BDC', edgecolors='black', linewidth = 0.5, zorder = 15, label = '$\mathregular{CO_{3, 1430}^{2-}}$, N='+str(len(low_df)))
+ax.scatter(brounce['Na/Na+Ca'], brounce['Epsilon_Carbonate'], s = sz, c = '#0C7BDC', edgecolors='black', linewidth = 2, zorder = 15, label = 'Brounce et al., 2021')
 
 ax.errorbar(high_df['Na/Na+Ca'], high_df['Epsilon_Carbonate'], yerr = high_df['Epsilon_Carbonate']*0.10, xerr = high_df['Na/Na+Ca']*0.025, ls = 'none', elinewidth = 0.5, ecolor = 'k')
 ax.scatter(high_df['Na/Na+Ca'], high_df['Epsilon_Carbonate'], s = sz, c = '#E42211', marker = 's', edgecolors='black', linewidth = 0.5, zorder = 15, label = '$\mathregular{CO_{3, 1515}^{2-}}$, N='+str(len(high_df)))
@@ -386,6 +389,8 @@ dixonpan, = ax.plot(naca_arr, epsilon_carbonate_dixonpan, 'k-.', lw = 1.5, zorde
 dixonpan.set_dashes([1.5, 1, 3, 1])
 legend_carbonate = '$\mathregular{ƐCO_3^{2-}}$= ' + f'{round(mest_carbonate[0],3)}(±{round(np.sqrt(np.diag(covm_est_carbonate))[0],3)}) - {round(mest_carbonate[1],3)*-1}(±{round(np.sqrt(np.diag(covm_est_carbonate))[1],3)})' + '·' + f'$\\eta$, N={len(naca)}'
 ax.plot(naca_arr, epsilon_carbonate_arr, 'k', lw = 2, zorder = 0, label = legend_carbonate)
+ax.plot(naca_arr, epsilon_carbonate_old, 'green', lw = 2, zorder = 0)
+
 ax.fill_between(naca_arr, conf_lower_carbonate, conf_upper_carbonate, color = 'k', alpha=0.20, edgecolor = None, zorder = -5, label='68% Confidence Interval')
 ax.plot(naca_arr, pred_upper_carbonate, 'k--', lw = 0.5, zorder = 0, dashes=(16, 10))
 ax.plot(naca_arr, pred_lower_carbonate, 'k--', lw = 0.5, zorder = 0, dashes=(16, 10), label = '68% Prediction Interval')
@@ -543,6 +548,6 @@ ax[4].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 
 fig.delaxes(ax[5])
 plt.tight_layout()
-plt.savefig('AllEpsilonRegress1.pdf', bbox_inches='tight', pad_inches = 0.025)
+plt.savefig('AllEpsilonRegressbrounce.pdf', bbox_inches='tight', pad_inches = 0.025)
 
 # %%
