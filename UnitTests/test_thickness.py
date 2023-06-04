@@ -5,7 +5,9 @@ import PyIRoGlass as pig
 
 
 class test_thickness(unittest.TestCase):
+
     def setUp(self): 
+
         self.xfo = 0.72
         self.decimalPlace = 4
         self.wn_high = 2700
@@ -18,16 +20,19 @@ class test_thickness(unittest.TestCase):
         self.dfs_dict = {self.file: self.df}
 
     def test_reflectance_index(self):
+
         result = pig.Reflectance_Index(self.xfo)
         expected = 1.7097733333333334
         self.assertAlmostEqual(result, expected, self.decimalPlace, msg="Reflectance index test and expected values from the Reflectance_Index function do not agree")
 
     def test_process_thickness(self): 
+
         result = pig.Reflectance_Index(self.xfo)
         thickness_results = pig.Thickness_Processing(self.dfs_dict, result, self.wn_high, self.wn_low, remove_baseline=False, plotting=False, phaseol=True)
         result = float(thickness_results['Thickness_M'])
         expected = 79.81
         self.assertAlmostEqual(result, expected, self.decimalPlace-2, msg="Thickness test and expected values from the Thickness_Processing function do not agree")
+
 
 if __name__ == '__main__':
      unittest.main()
