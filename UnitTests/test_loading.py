@@ -35,8 +35,8 @@ class test_loading_csv(unittest.TestCase):
         Chemistry, Thickness = pig.Load_ChemistryThickness(file_path)
         
         # Assuming that the PCA matrix should not be empty after reading a valid .npz file
-        self.assertEqual(Chemistry.shape, (3, 11))  # Adjust based on your test data
-        self.assertEqual(Thickness.shape, (3, 2))   # Adjust based on your test data
+        self.assertEqual(Chemistry.shape, (9, 11))  # Adjust based on your test data
+        self.assertEqual(Thickness.shape, (9, 2))   # Adjust based on your test data
 
 
 if __name__ == '__main__':
