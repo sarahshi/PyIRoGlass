@@ -25,6 +25,12 @@ class test_thickness(unittest.TestCase):
         expected = 1.7097733333333334
         self.assertAlmostEqual(result, expected, self.decimalPlace, msg="Reflectance index test and expected values from the Reflectance_Index function do not agree")
 
+    def test_calc_thickness(self):
+
+        thickness = pig.Thickness_Calc(1.7097733333333334, np.array([0, 50]))
+        expected_thickness = 0.00584873
+        self.assertAlmostEqual(thickness, expected_thickness, self.decimalPlace, msg="Reflectance thickness test and expected values from the Thickness_Calc function do not agree")
+
     def test_process_thickness(self): 
 
         result = pig.Reflectance_Index(self.xfo)
