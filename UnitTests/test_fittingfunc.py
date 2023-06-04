@@ -37,7 +37,7 @@ class test_fitting_functions(unittest.TestCase):
         expected_output = np.array([0.27067057, 1.21306132, 2.0000000, 1.21306132, 0.27067057])
         result = pig.Gauss(x, mu, sd, A)
 
-        self.assertAlmostEqual(result, expected_output, decimal=5, msg="Output test and expected values from Gauss function do not agree")
+        self.assertAlmostEqual(result, expected_output, self.decimalPlace, msg="Output test and expected values from Gauss function do not agree")
 
     def test_Linear(self):
 
@@ -48,7 +48,7 @@ class test_fitting_functions(unittest.TestCase):
 
         result = pig.Linear(x, m, b)
 
-        self.assertAlmostEqual(result, expected_output, decimal=5, msg="Output test and expected values from Linear function do not agree")
+        self.assertAlmostEqual(result, expected_output, self.decimalPlace, msg="Output test and expected values from Linear function do not agree")
 
     def test_NIR(self):
 
