@@ -70,7 +70,7 @@ class test_conc_outputs_co2(unittest.TestCase):
         self.assertAlmostEqual(result, expected, self.decimalPlace-2, msg="CO2_1515 test and expected errors from the Beer_Lambert_Error equation do not agree")
 
 
-class test_conc_outputss(unittest.TestCase):
+class test_conc_outputs(unittest.TestCase):
 
     def setUp(self):
 
@@ -86,6 +86,8 @@ class test_conc_outputss(unittest.TestCase):
         self.N = 500000
         self.T_room = 25 
         self.P_room = 1 
+
+    def test_concentration(self):
 
         density_epsilon, mega_spreadsheet = pig.Concentration_Output(self.PH, self.N, self.thickness, self.MI_Composition, self.T_room, self.P_room)
         expected_H2O = 4.03892743514451
