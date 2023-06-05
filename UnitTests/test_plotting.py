@@ -16,7 +16,7 @@ class test_plotting_trace(unittest.TestCase):
     @patch('numpy.amax')
     @patch('matplotlib.pyplot.figure')
     @patch('matplotlib.pyplot.subplot')
-    @patch('mu.default_parnames')
+    @patch('mc3.utils.default_parnames')
 
     def test_trace(self, mock_default_parnames, mock_subplot, mock_figure, mock_amax, mock_where, mock_ediff1d, mock_lexsort):
 
@@ -47,7 +47,7 @@ class test_plotting_modelfit(unittest.TestCase):
     @patch('numpy.size')
     @patch('matplotlib.pyplot.figure')
     @patch('matplotlib.pyplot.axes')
-    @patch('ms.bin_array')  # adjust this according to where this function is defined
+    @patch('mc3.stats.bin_array')  # adjust this according to where this function is defined
 
     def test_modelfit(self, mock_bin_array, mock_axes, mock_figure, mock_size):
 
