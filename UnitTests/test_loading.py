@@ -32,7 +32,7 @@ class test_loading_csv(unittest.TestCase):
     def test_load_samplecsvs(self):
 
         file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../Inputs/TransmissionSpectra/Fuego/') 
-        files, dfs_dict = pig.Load_SampleCSV(file_path)
+        files, dfs_dict = pig.Load_SampleCSV(file_path, 5500, 1000)
         self.assertEqual(len(files), 97)  # Adjust based on your test data
 
     def test_load_chemthick(self):
