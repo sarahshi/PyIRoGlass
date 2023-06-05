@@ -86,6 +86,7 @@ class test_conc_outputs(unittest.TestCase):
         self.N = 500000
         self.T_room = 25 
         self.P_room = 1 
+        self.decimalPlace = 4
 
     def test_concentration(self):
 
