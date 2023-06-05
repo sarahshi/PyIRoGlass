@@ -1,22 +1,10 @@
 import unittest
-from unittest.mock import patch, MagicMock
-import os 
-import mc3
 import numpy as np
 import pandas as pd
 import PyIRoGlass as pig
-# import matplotlib.pyplot as plt
 
 
 class test_fitting_functions(unittest.TestCase):
-
-    @patch('matplotlib.pyplot.savefig', autospec=True)
-    @patch('matplotlib.pyplot.close', autospec=True)
-    @patch('matplotlib.pyplot.suptitle', autospec=True)
-    @patch('mc3.post.plot', autospec=True)
-    @patch('mc3.post.plot_histogram', autospec=True)
-    @patch('pig.trace', autospec=True)
-    @patch('pig.modelfit', autospec=True)
 
     def setUp(self): 
 
