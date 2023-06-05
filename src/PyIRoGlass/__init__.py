@@ -977,7 +977,7 @@ def Run_All_Spectra(dfs_dict, exportpath):
                                         'PH_1430_BP','PH_1430_STD','P_1430_BP','P_1430_STD','STD_1430_BP','STD_1430_STD','MAX_1430_ABS', 'BL_MAX_1430_ABS'])
     PCA_Output = pd.DataFrame(columns = ['AVG_BL_BP','AVG_BL_STD','PCA1_BP','PCA1_STD','PCA2_BP','PCA2_STD','PCA3_BP','PCA3_STD',
                                         'PCA4_BP','PCA4_STD','m_BP','m_STD','b_BP','b_STD', 'PH_1635_PCA1_BP','PH_1635_PCA1_STD','PH_1635_PCA2_BP','PH_1635_PCA2_STD'])
-    NEAR_IR_PH = pd.DataFrame(columns=['PH_5200_M', 'PH_4500_M', 'PH_5200_STD', 'PH_4500_STD', 'S2N_P5200', 'S2N_P4500', 'ERR_5200', 'ERR_4500'])
+    NEAR_IR_PH = pd.DataFrame(columns=['PH_5200_M', 'PH_5200_STD', 'PH_4500_M', 'PH_4500_STD', 'S2N_P5200', 'ERR_5200', 'S2N_P4500', 'ERR_4500'])
 
     # Initialize lists for failures and errors
     failures = []

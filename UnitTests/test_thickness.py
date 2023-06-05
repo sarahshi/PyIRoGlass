@@ -31,6 +31,19 @@ class test_thickness(unittest.TestCase):
         expected_thickness = 0.00584873
         self.assertAlmostEqual(thickness, expected_thickness, self.decimalPlace, msg="Reflectance thickness test and expected values from the Thickness_Calc function do not agree")
 
+    def test_peak_identification(self): 
+
+        result = pig.Reflectance_Index(self.xfo)
+        savgol_filter_width = 99
+        smoothing_wn_width = 15 
+        peak_heigh_min_delta = 0.002
+        peak_search_width = 10
+        wn_high = 2700
+        wn_low = 2100
+        peaks, troughs = pig.PeakID(self.dfs_dict, wn_high, wn_low, filename=self.file, plotting=False, savgol_filter_width=savgol_filter_width, smoothing_wn_width = smoothing_wn_width, remove_baseline = True, peak_heigh_min_delta = peak_heigh_min_delta, peak_search_width = peak_search_width)
+        expected_peak_loc = 2138.76
+        self.assertAlmostEqual(peaks[0, 0], expected_peak_loc, self.decimalPlace-2, msg="Peak location test and expected values from the Peak_ID function do not agree")
+
     def test_process_thickness(self): 
 
         result = pig.Reflectance_Index(self.xfo)
