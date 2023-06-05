@@ -42,7 +42,7 @@ class test_thickness(unittest.TestCase):
         wn_low = 2100
         peaks, troughs = pig.PeakID(self.dfs_dict, wn_high, wn_low, filename=self.file, plotting=False, savgol_filter_width=savgol_filter_width, smoothing_wn_width = smoothing_wn_width, remove_baseline = True, peak_heigh_min_delta = peak_heigh_min_delta, peak_search_width = peak_search_width)
         expected_peak_loc = 2138.76
-        self.assertAlmostEqual(peaks[0, 0], expected_peak_loc, self.decimalPlace-2, msg="Peak location test and expected values from the Peak_ID function do not agree")
+        self.assertAlmostEqual(float(peaks[0, 0]), expected_peak_loc, self.decimalPlace-2, msg="Peak location test and expected values from the Peak_ID function do not agree")
 
     def test_process_thickness(self): 
 
