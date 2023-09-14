@@ -53,7 +53,7 @@ INPUT_PATHS = ['FUEGO', 'STD', 'FRH', 'ND70', 'EXPSTD', 'YMSTD']
 OUTPUT_PATH = ['FUEGO', 'STD', 'FRH', 'ND70', 'EXPSTD', 'YMSTD']
 
 stdno = 1
-MEGA_SPREADSHEET = pd.read_csv(path_parent + '/' + output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_H2OCO2_FwSTD.csv', index_col = 0)
+MEGA_SPREADSHEET = pd.read_csv(path_parent + '/' + output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_H2OCO2_FwSTD_WHOI.csv', index_col = 0)
 
 # %% 
 
@@ -68,10 +68,19 @@ Fiege73 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('Fiege73')]
 STD_C1 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('C1')]
 STD_CN92C_OL2 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('CN92C_OL2')]
 STD_D1010 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('D1010')]
+STD_D1010 = STD_D1010.dropna()
 STD_ETF46 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('ETF46')]
 VF74_127_7 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('VF74_127-7')]
 VF74_132_2 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('VF74_132-2')]
+NS1 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('NS1')]
+M35 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('M35')]
+M43 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('M43')]
+BF73 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('BF73')]
+BF76 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('BF76')]
+BF77 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('BF77')]
 
+
+# INSOL = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('INSOL')]
 # STD_ETFS = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('ETFS')]
 # VF74_131_1 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('VF74_131-1')]
 # VF74_131_9 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('VF74_131-9')]
@@ -102,133 +111,10 @@ def H2O_rsd(DF):
 def CO2_rsd(DF): 
     return np.mean(DF['CO2_STD'] / DF['CO2_MEAN'])
 
-# %% 
-
-# h2o_line = np.array([0, 6])
-# co2_line = np.array([0, 1400])
-# sz_sm = 80
-# sz = 150
-# fig, ax = plt.subplots(1, 2, figsize = (18, 8))
-# ax = ax.flatten()
-# ax[0].plot(h2o_line, h2o_line, 'k', lw = 1, zorder = 0)
-
-# ax[0].scatter(H2O_expmean(STD_D1010), H2O_mean(STD_D1010), s = sz, c = '#0C7BDC', ec = '#171008', lw = 0.5, zorder = 20, label = 'D1010 (SN et al., 2000)')
-# ax[0].errorbar(H2O_expmean(STD_D1010), H2O_mean(STD_D1010), xerr = H2O_expstd(STD_D1010), yerr = H2O_mean(STD_D1010) * H2O_rsd(STD_D1010), lw = 0.5, c = 'k', zorder = 10)
-
-# ax[0].scatter(H2O_expmean(STD_C1), H2O_mean(STD_C1), s = sz, marker = 's', c = '#5DB147', ec = '#171008', lw = 0.5, zorder = 20, label = "CN_C_OL1' (AB et al., 2019)")
-# ax[0].errorbar(H2O_expmean(STD_C1), H2O_mean(STD_C1), xerr = H2O_expstd(STD_C1), yerr = H2O_mean(STD_C1) * H2O_rsd(STD_C1), lw = 0.5, c = 'k', zorder = 10)
-
-# ax[0].scatter(H2O_expmean(STD_CN92C_OL2), H2O_mean(STD_CN92C_OL2), s = sz, marker = 's', c = '#F9E600', ec = '#171008', lw = 0.5, zorder = 20, label = 'CN92C_OL2 (AB et al., 2019)')
-# ax[0].errorbar(H2O_expmean(STD_CN92C_OL2), H2O_mean(STD_CN92C_OL2), xerr = H2O_expstd(STD_CN92C_OL2), yerr = H2O_mean(STD_CN92C_OL2) * H2O_rsd(STD_CN92C_OL2), lw = 0.5, c = 'k', zorder = 10)
-
-# ax[0].scatter(H2O_expmean(VF74_127_7), H2O_mean(VF74_127_7), s = sz, marker = 's', c = '#E42211', ec = '#171008', lw = 0.5, zorder = 20, label = 'VF74-127-7 (AL et al., 2013)')
-# ax[0].errorbar(H2O_expmean(VF74_127_7), H2O_mean(VF74_127_7), xerr = H2O_expstd(VF74_127_7), yerr = H2O_mean(VF74_127_7) * H2O_rsd(VF74_127_7), lw = 0.5, c = 'k', zorder = 10)
-
-# ax[0].scatter(H2O_expmean(VF74_132_2), H2O_mean(VF74_132_2), s = sz, marker = 's', c = '#FE7D10', ec = '#171008', lw = 0.5, zorder = 20, label = 'VF74-132-2 (AL et al., 2013)')
-# ax[0].errorbar(H2O_expmean(VF74_132_2), H2O_mean(VF74_132_2), xerr = H2O_expstd(VF74_132_2), yerr = H2O_mean(VF74_132_2) * H2O_rsd(VF74_132_2), lw = 0.5, c = 'k', zorder = 10)
-
-# ax[0].scatter(H2O_expmean(ETFSR_Ol8), H2O_mean(ETFSR_Ol8), s = sz, marker = 's', c = '#CCCCCC', ec = '#171008', lw = 0.5, zorder = 20, label = 'ETFSR_OL8 (AB Thesis)')
-# ax[0].errorbar(H2O_expmean(ETFSR_Ol8), H2O_mean(ETFSR_Ol8), xerr = H2O_expstd(ETFSR_Ol8), yerr = H2O_mean(ETFSR_Ol8) * H2O_rsd(ETFSR_Ol8), lw = 0.5, c = 'k', zorder = 10)
-
-# ax[0].scatter(H2O_expmean(Fiege63), H2O_mean(Fiege63), s = sz, c = '#8A8A8A', ec = '#171008', lw = 0.5, zorder = 15, label = 'ABWCl-F0x (AF et al., 2015)')
-# ax[0].scatter(H2O_expmean(Fiege63)+0.01, H2O_mean(Fiege63), s = sz_sm, marker = '>', c = '#FFFFFF', ec = '#171008', lw = 0.5, zorder = 20)
-# ax[0].errorbar(H2O_expmean(Fiege63), H2O_mean(Fiege63), xerr = H2O_expstd(Fiege63), yerr = H2O_mean(Fiege63) * H2O_rsd(Fiege63), lw = 0.5, c = 'k', zorder = 10)
-
-# ax[0].scatter(H2O_expmean(Fiege73), H2O_mean(Fiege73), s = sz, marker = 'D', c = '#252525', ec = '#171008', lw = 0.5, zorder = 15, label = 'ABWB-0x (AF et al., 2015)')
-# ax[0].scatter(H2O_expmean(Fiege73)+0.01, H2O_mean(Fiege73), s = sz_sm, marker = '>', c = '#FFFFFF', ec = '#171008', lw = 0.5, zorder = 20)
-# ax[0].errorbar(H2O_expmean(Fiege73), H2O_mean(Fiege73), xerr = H2O_expstd(Fiege73), yerr = H2O_mean(Fiege73) * H2O_rsd(Fiege73), lw = 0.5, c = 'k', zorder = 10)
-
-# ax[0].scatter(H2O_expmean(CD33_12_2_2), H2O_mean(CD33_12_2_2), s = sz, c = '#F7F7F7', ec = '#171008', lw = 0.5, zorder = 20, label = 'CD33-12-2-2 (JA, pers. comm.)')
-# ax[0].errorbar(H2O_expmean(CD33_12_2_2), H2O_mean(CD33_12_2_2), xerr = H2O_expstd(CD33_12_2_2), yerr = H2O_mean(CD33_12_2_2) * H2O_rsd(CD33_12_2_2), lw = 0.5, c = 'k', zorder = 10)
-
-# ax[0].scatter(H2O_expmean(CD33_22_1_1), H2O_mean(CD33_22_1_1), s = sz, c = '#CCCCCC', ec = '#171008', lw = 0.5, zorder = 20, label = 'CD33-12-2-2 (JA, pers. comm.)')
-# ax[0].errorbar(H2O_expmean(CD33_22_1_1), H2O_mean(CD33_22_1_1), xerr = H2O_expstd(CD33_22_1_1), yerr = H2O_mean(CD33_22_1_1) * H2O_rsd(CD33_22_1_1), lw = 0.5, c = 'k', zorder = 10)
-
-# ax[0].scatter(H2O_expmean(ALV1833_11), H2O_mean(ALV1833_11), s = sz, c = '#969696', ec = '#171008', lw = 0.5, zorder = 20, label = 'ALV1833-11 (SN et al., 2000)')
-# ax[0].errorbar(H2O_expmean(ALV1833_11), H2O_mean(ALV1833_11), xerr = H2O_expstd(ALV1833_11), yerr = H2O_mean(ALV1833_11) * H2O_rsd(ALV1833_11), lw = 0.5, c = 'k', zorder = 10)
-
-# ax[0].scatter(H2O_expmean(WOK5_4), H2O_mean(WOK5_4), s = sz, c = '#636363', ec = '#171008', lw = 0.5, zorder = 20, label = 'WOK5-4 (SN et al., 2000)')
-# ax[0].errorbar(H2O_expmean(WOK5_4), H2O_mean(WOK5_4), xerr = H2O_expstd(WOK5_4), yerr = H2O_mean(WOK5_4) * H2O_rsd(WOK5_4), lw = 0.5, c = 'k', zorder = 10)
-
-# ax[0].scatter(H2O_expmean(ALV1846), H2O_mean(ALV1846), s = sz, c = '#252525', ec = '#171008', lw = 0.5, zorder = 20, label = 'ALV1846-9 (SN et al., 2000)')
-# ax[0].errorbar(H2O_expmean(ALV1846), H2O_mean(ALV1846), xerr = H2O_expstd(ALV1846), yerr = H2O_mean(ALV1846) * H2O_rsd(ALV1846), lw = 0.5, c = 'k', zorder = 10)
-# ax[0].set_xlim([0, 6])
-# ax[0].set_ylim([0, 6])
-# ax[0].set_xlabel('$\mathregular{H_2O}$ Expected (wt.%)')
-# ax[0].set_ylabel('$\mathregular{H_2O_t}$ Measured by FTIR (wt.%)')
-# l1 = ax[0].legend(loc = 'upper left', labelspacing = 0.2, handletextpad = 0.25, handlelength = 1.00, prop={'size': 13}, frameon=False)
-# ax[0].tick_params(axis="x", direction='in', length=5, pad = 6.5)
-# ax[0].tick_params(axis="y", direction='in', length=5, pad = 6.5)
-
-# ftir_sym = ax[0].scatter(np.nan, np.nan, s = sz, ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = 'FTIR')
-# sims_sym = ax[0].scatter(np.nan, np.nan, s = 100, marker = 's', ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = 'SIMS')
-# kft_sym = ax[0].scatter(np.nan, np.nan, s = 100, marker = 'D', ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = 'KFT')
-# sat_symb = ax[0].scatter(np.nan, np.nan, s = sz_sm, marker = '>', ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = '$\mathregular{H_2O_{t, 3550}}$ Saturated')
-# ax[0].legend([ftir_sym, sims_sym, kft_sym, sat_symb], ['FTIR', 'SIMS', 'KFT', '$\mathregular{H_2O_{t, 3550}}$ Saturated'], loc = 'lower right', labelspacing = 0.3, handletextpad = 0.25, handlelength = 1.00, prop={'size': 13}, frameon=False)
-# ax[0].add_artist(l1)
-
-
-# ax[1].plot(co2_line, co2_line, 'k', lw = 1, zorder = 0)
-
-# ax[1].scatter(CO2_expmean(STD_D1010), CO2_mean(STD_D1010), s = sz, c = '#0C7BDC', ec = '#171008', lw = 0.5, zorder = 20, label = 'D1010 (SN et al., 2000)')
-# ax[1].errorbar(CO2_expmean(STD_D1010), CO2_mean(STD_D1010), xerr = CO2_expstd(STD_D1010), yerr = CO2_mean(STD_D1010) * CO2_rsd(STD_D1010), lw = 0.5, c = 'k', zorder = 10)
-
-# ax[1].scatter(CO2_expmean(STD_C1), CO2_mean(STD_C1), s = sz, marker = 's', c = '#5DB147', ec = '#171008', lw = 0.5, zorder = 20, label = "CN_C_OL1' (AB et al., 2019)")
-# ax[1].errorbar(CO2_expmean(STD_C1), CO2_mean(STD_C1), xerr = CO2_expstd(STD_C1), yerr = CO2_mean(STD_C1) * CO2_rsd(STD_C1), lw = 0.5, c = 'k', zorder = 10)
-
-# ax[1].scatter(CO2_expmean(STD_CN92C_OL2), CO2_mean(STD_CN92C_OL2), s = sz, marker = 's', c = '#F9E600', ec = '#171008', lw = 0.5, zorder = 20, label = 'CN92C_OL2 (AB et al., 2019)')
-# ax[1].errorbar(CO2_expmean(STD_CN92C_OL2), CO2_mean(STD_CN92C_OL2), xerr = CO2_expstd(STD_CN92C_OL2), yerr = CO2_mean(STD_CN92C_OL2) * CO2_rsd(STD_CN92C_OL2), lw = 0.5, c = 'k', zorder = 10)
-
-# ax[1].scatter(CO2_expmean(VF74_127_7), CO2_mean(VF74_127_7), s = sz, marker = 's', c = '#E42211', ec = '#171008', lw = 0.5, zorder = 20, label = 'VF74-127-7 (AL et al., 2013)')
-# ax[1].errorbar(CO2_expmean(VF74_127_7), CO2_mean(VF74_127_7), xerr = CO2_expstd(VF74_127_7), yerr = CO2_mean(VF74_127_7) * CO2_rsd(VF74_127_7), lw = 0.5, c = 'k', zorder = 10)
-
-# ax[1].scatter(CO2_expmean(VF74_132_2), CO2_mean(VF74_132_2), s = sz, marker = 's', c = '#FE7D10', ec = '#171008', lw = 0.5, zorder = 20, label = 'VF74-132-2 (AL et al., 2013)')
-# ax[1].errorbar(CO2_expmean(VF74_132_2), CO2_mean(VF74_132_2), xerr = CO2_expstd(VF74_132_2), yerr = CO2_mean(VF74_132_2) * CO2_rsd(VF74_132_2), lw = 0.5, c = 'k', zorder = 10)
-
-# # ax[1].scatter(CO2_expmean(Fiege63), CO2_mean(Fiege63), s = sz, marker = 's', c = '#CCCCCC', ec = '#171008', lw = 0.5, zorder = 15)
-# # ax[1].scatter(CO2_expmean(Fiege63), CO2_mean(Fiege63), s = sz_sm, marker = '>', c = '#FFFFFF', ec = '#171008', lw = 0.5, zorder = 20)
-# # ax[1].errorbar(CO2_expmean(Fiege63), CO2_mean(Fiege63), xerr = CO2_expstd(Fiege63), yerr = CO2_mean(Fiege63) * CO2_rsd(Fiege63), lw = 0.5, c = 'k', zorder = 10)
-
-# # ax[1].scatter(CO2_expmean(ETFSR_Ol8), CO2_mean(ETFSR_Ol8), s = sz, marker = 's', c = '#8A8A8A', ec = '#171008', lw = 0.5, zorder = 20)
-# # ax[1].errorbar(CO2_expmean(ETFSR_Ol8), CO2_mean(ETFSR_Ol8), xerr = CO2_expstd(ETFSR_Ol8), yerr = CO2_mean(ETFSR_Ol8) * CO2_rsd(ETFSR_Ol8), lw = 0.5, c = 'k', zorder = 10)
-
-# # ax[1].scatter(CO2_expmean(Fiege73), CO2_mean(Fiege73), s = sz, marker = 's', c = '#252525', ec = '#171008', lw = 0.5, zorder = 15)
-# # ax[1].scatter(CO2_expmean(Fiege73), CO2_mean(Fiege73), s = sz_sm, marker = '>', c = '#FFFFFF', ec = '#171008', lw = 0.5, zorder = 20)
-# # ax[1].errorbar(CO2_expmean(Fiege73), CO2_mean(Fiege73), xerr = CO2_expstd(Fiege73), yerr = CO2_mean(Fiege73) * CO2_rsd(Fiege73), lw = 0.5, c = 'k', zorder = 10)
-
-# ax[1].scatter(CO2_expmean(CD33_12_2_2), CO2_mean(CD33_12_2_2), s = sz, c = '#F7F7F7', ec = '#171008', lw = 0.5, zorder = 20, label = 'CD33-12-2-2 (JA, pers. comm.)')
-# ax[1].errorbar(CO2_expmean(CD33_12_2_2), CO2_mean(CD33_12_2_2), xerr = CO2_expstd(CD33_12_2_2), yerr = CO2_mean(CD33_12_2_2) * CO2_rsd(CD33_12_2_2), lw = 0.5, c = 'k', zorder = 10)
-
-# ax[1].scatter(CO2_expmean(CD33_22_1_1), CO2_mean(CD33_22_1_1), s = sz, c = '#CCCCCC', ec = '#171008', lw = 0.5, zorder = 20, label = 'CD33-22-1-1 (JA, pers. comm.)')
-# ax[1].errorbar(CO2_expmean(CD33_22_1_1), CO2_mean(CD33_22_1_1), xerr = CO2_expstd(CD33_22_1_1), yerr = CO2_mean(CD33_22_1_1) * CO2_rsd(CD33_22_1_1), lw = 0.5, c = 'k', zorder = 10)
-
-# ax[1].scatter(CO2_expmean(ALV1833_11), CO2_mean(ALV1833_11), s = sz, c = '#969696', ec = '#171008', lw = 0.5, zorder = 20, label = 'ALV1833-11 (SN et al., 2000)')
-# ax[1].errorbar(CO2_expmean(ALV1833_11), CO2_mean(ALV1833_11), xerr = CO2_expstd(ALV1833_11), yerr = CO2_mean(ALV1833_11) * CO2_rsd(ALV1833_11), lw = 0.5, c = 'k', zorder = 10)
-
-# ax[1].scatter(CO2_expmean(WOK5_4), CO2_mean(WOK5_4), s = sz, c = '#636363', ec = '#171008', lw = 0.5, zorder = 20, label = '23WOK5-4 (SN et al., 2000)')
-# ax[1].errorbar(CO2_expmean(WOK5_4), CO2_mean(WOK5_4), xerr = CO2_expstd(WOK5_4), yerr = CO2_mean(WOK5_4) * CO2_rsd(WOK5_4), lw = 0.5, c = 'k', zorder = 10)
-
-# # ax[1].scatter(CO2_expmean(ALV1846), CO2_mean(ALV1846), s = sz, c = '#252525', ec = '#171008', lw = 0.5, zorder = 20)
-# # ax[1].errorbar(CO2_expmean(ALV1846), CO2_mean(ALV1846), xerr = CO2_expstd(ALV1846), yerr = CO2_mean(ALV1846) * CO2_rsd(ALV1846), lw = 0.5, c = 'k', zorder = 10)
-
-# ax[1].set_xlim([0, 1400])
-# ax[1].set_ylim([0, 1400])
-# ax[1].set_xlabel('$\mathregular{CO_2}$ Expected (ppm)')
-# ax[1].set_ylabel('$\mathregular{CO_2}$ Measured by FTIR (ppm)')
-# ax[1].tick_params(axis="x", direction='in', length=5, pad = 6.5)
-# ax[1].tick_params(axis="y", direction='in', length=5, pad = 6.5)
-# ax[1].legend(loc = 'lower right', labelspacing = 0.2, handletextpad = 0.25, handlelength = 1.00, prop={'size': 13}, frameon=False)
-
-# plt.tight_layout()
-# # plt.savefig('FTIRSIMS_Comparison.pdf')
-# plt.show()
-
-# %%
 # %% no citations
 
-
 h2o_line = np.array([0, 6])
-co2_line = np.array([0, 1400])
+co2_line = np.array([0, 6000])
 sz_sm = 80
 sz = 150
 
@@ -237,108 +123,132 @@ fig, ax = plt.subplots(1, 2, figsize = (14, 7))
 ax = ax.flatten()
 ax[0].plot(h2o_line, h2o_line, 'k', lw = 1, zorder = 0)
 
-ax[0].scatter(H2O_expmean(STD_D1010), H2O_mean(STD_D1010), s = sz, c = '#0C7BDC', ec = '#171008', lw = 0.5, zorder = 20, label = 'D1010')
-ax[0].errorbar(H2O_expmean(STD_D1010), H2O_mean(STD_D1010), xerr = H2O_expstd(STD_D1010), yerr = H2O_mean(STD_D1010) * H2O_rsd(STD_D1010), lw = 0.5, c = 'k', zorder = 10)
+# ax[0].scatter(H2O_expmean(INSOL), H2O_mean(INSOL), s = sz, marker = 's', c = '#2166AC', ec = '#171008', lw = 0.5, zorder = 20, label = 'INSOL')
+# ax[0].errorbar(H2O_expmean(INSOL), H2O_mean(INSOL), xerr = H2O_expstd(INSOL), yerr = H2O_mean(INSOL) * H2O_rsd(INSOL), lw = 0.5, c = 'k', zorder = 10)
 
-ax[0].scatter(H2O_expmean(STD_C1), H2O_mean(STD_C1), s = sz, marker = 's', c = '#5DB147', ec = '#171008', lw = 0.5, zorder = 20, label = "CN_C_OL1'")
-ax[0].errorbar(H2O_expmean(STD_C1), H2O_mean(STD_C1), xerr = H2O_expstd(STD_C1), yerr = H2O_mean(STD_C1) * H2O_rsd(STD_C1), lw = 0.5, c = 'k', zorder = 10)
 
-ax[0].scatter(H2O_expmean(STD_CN92C_OL2), H2O_mean(STD_CN92C_OL2), s = sz, marker = 's', c = '#F9E600', ec = '#171008', lw = 0.5, zorder = 20, label = 'CN92C_OL2')
-ax[0].errorbar(H2O_expmean(STD_CN92C_OL2), H2O_mean(STD_CN92C_OL2), xerr = H2O_expstd(STD_CN92C_OL2), yerr = H2O_mean(STD_CN92C_OL2) * H2O_rsd(STD_CN92C_OL2), lw = 0.5, c = 'k', zorder = 10)
-
-ax[0].scatter(H2O_expmean(VF74_127_7), H2O_mean(VF74_127_7), s = sz, marker = 's', c = '#E42211', ec = '#171008', lw = 0.5, zorder = 20, label = 'VF74-127-7')
-ax[0].errorbar(H2O_expmean(VF74_127_7), H2O_mean(VF74_127_7), xerr = H2O_expstd(VF74_127_7), yerr = H2O_mean(VF74_127_7) * H2O_rsd(VF74_127_7), lw = 0.5, c = 'k', zorder = 10)
-
-ax[0].scatter(H2O_expmean(VF74_132_2), H2O_mean(VF74_132_2), s = sz, marker = 's', c = '#FE7D10', ec = '#171008', lw = 0.5, zorder = 20, label = 'VF74-132-2')
-ax[0].errorbar(H2O_expmean(VF74_132_2), H2O_mean(VF74_132_2), xerr = H2O_expstd(VF74_132_2), yerr = H2O_mean(VF74_132_2) * H2O_rsd(VF74_132_2), lw = 0.5, c = 'k', zorder = 10)
-
-ax[0].scatter(H2O_expmean(ETFSR_Ol8), H2O_mean(ETFSR_Ol8), s = sz, marker = 's', c = '#CCCCCC', ec = '#171008', lw = 0.5, zorder = 20, label = 'ETFSR_OL8')
-ax[0].errorbar(H2O_expmean(ETFSR_Ol8), H2O_mean(ETFSR_Ol8), xerr = H2O_expstd(ETFSR_Ol8), yerr = H2O_mean(ETFSR_Ol8) * H2O_rsd(ETFSR_Ol8), lw = 0.5, c = 'k', zorder = 10)
-
-ax[0].scatter(H2O_expmean(Fiege63), H2O_mean(Fiege63), s = sz, c = '#8A8A8A', ec = '#171008', lw = 0.5, zorder = 15, label = 'ABWCl-F0x')
+ax[0].scatter(H2O_expmean(Fiege63), H2O_mean(Fiege63), s = sz, c = '#B2182B', ec = '#171008', lw = 0.5, zorder = 15, label = 'ABWCl-F0x')
 ax[0].scatter(H2O_expmean(Fiege63)+0.01, H2O_mean(Fiege63), s = sz_sm, marker = '>', c = '#FFFFFF', ec = '#171008', lw = 0.5, zorder = 20)
 ax[0].errorbar(H2O_expmean(Fiege63), H2O_mean(Fiege63), xerr = H2O_expstd(Fiege63), yerr = H2O_mean(Fiege63) * H2O_rsd(Fiege63), lw = 0.5, c = 'k', zorder = 10)
 
-ax[0].scatter(H2O_expmean(Fiege73), H2O_mean(Fiege73), s = sz, marker = 'D', c = '#252525', ec = '#171008', lw = 0.5, zorder = 15, label = 'ABWB-0x')
+ax[0].scatter(H2O_expmean(Fiege73), H2O_mean(Fiege73), s = 120, marker = 'D', c = '#D6604D', ec = '#171008', lw = 0.5, zorder = 15, label = 'ABWB-0x')
 ax[0].scatter(H2O_expmean(Fiege73)+0.01, H2O_mean(Fiege73), s = sz_sm, marker = '>', c = '#FFFFFF', ec = '#171008', lw = 0.5, zorder = 20)
 ax[0].errorbar(H2O_expmean(Fiege73), H2O_mean(Fiege73), xerr = H2O_expstd(Fiege73), yerr = H2O_mean(Fiege73) * H2O_rsd(Fiege73), lw = 0.5, c = 'k', zorder = 10)
 
-ax[0].scatter(H2O_expmean(CD33_12_2_2), H2O_mean(CD33_12_2_2), s = sz, c = '#F7F7F7', ec = '#171008', lw = 0.5, zorder = 20, label = 'CD33-12-2-2')
+ax[0].scatter(H2O_expmean(BF73), H2O_mean(BF73), s = 120, marker = 'D', c = '#F4A582', ec = '#171008', lw = 0.5, zorder = 20, label = 'BF73')
+ax[0].errorbar(H2O_expmean(BF73), H2O_mean(BF73), xerr = H2O_expstd(BF73), yerr = H2O_mean(BF73) * H2O_rsd(BF73), lw = 0.5, c = 'k', zorder = 10)
+
+ax[0].scatter(H2O_expmean(BF76), H2O_mean(BF76), s = 120, marker = 'D', c = '#FDDBC7', ec = '#171008', lw = 0.5, zorder = 20, label = 'BF76')
+ax[0].errorbar(H2O_expmean(BF76), H2O_mean(BF76), xerr = H2O_expstd(BF76), yerr = H2O_mean(BF76) * H2O_rsd(BF76), lw = 0.5, c = 'k', zorder = 10)
+
+ax[0].scatter(H2O_expmean(BF77), H2O_mean(BF77), s = 120, marker = 'D', c = '#F7F7F7', ec = '#171008', lw = 0.5, zorder = 20, label = 'BF77')
+ax[0].errorbar(H2O_expmean(BF77), H2O_mean(BF77), xerr = H2O_expstd(BF77), yerr = H2O_mean(BF77) * H2O_rsd(BF77), lw = 0.5, c = 'k', zorder = 10)
+
+ax[0].scatter(H2O_expmean(M35), H2O_mean(M35), s = 120, marker = 'D', c = '#D1E5F0', ec = '#171008', lw = 0.5, zorder = 20, label = 'M35')
+ax[0].errorbar(H2O_expmean(M35), H2O_mean(M35), xerr = H2O_expstd(M35), yerr = H2O_mean(M35) * H2O_rsd(M35), lw = 0.5, c = 'k', zorder = 10)
+
+ax[0].scatter(H2O_expmean(M43), H2O_mean(M43), s = 120, marker = 'D', c = '#92C5DE', ec = '#171008', lw = 0.5, zorder = 20, label = 'M43')
+ax[0].errorbar(H2O_expmean(M43), H2O_mean(M43), xerr = H2O_expstd(M43), yerr = H2O_mean(M43) * H2O_rsd(M43), lw = 0.5, c = 'k', zorder = 10)
+
+ax[0].scatter(H2O_expmean(NS1), H2O_mean(NS1), s = sz, c = '#4393C3', ec = '#171008', lw = 0.5, zorder = 20, label = 'NS-1')
+ax[0].errorbar(H2O_expmean(NS1), H2O_mean(NS1), xerr = H2O_expstd(NS1), yerr = H2O_mean(NS1) * H2O_rsd(NS1), lw = 0.5, c = 'k', zorder = 10)
+
+ax[0].scatter(H2O_expmean(ETFSR_Ol8), H2O_mean(ETFSR_Ol8), s = sz, marker = 's', c = '#FFFFFF', ec = '#171008', lw = 0.5, zorder = 20, label = 'ETFSR-OL8')
+ax[0].errorbar(H2O_expmean(ETFSR_Ol8), H2O_mean(ETFSR_Ol8), xerr = H2O_expstd(ETFSR_Ol8), yerr = H2O_mean(ETFSR_Ol8) * H2O_rsd(ETFSR_Ol8), lw = 0.5, c = 'k', zorder = 10)
+
+ax[0].scatter(H2O_expmean(CD33_12_2_2), H2O_mean(CD33_12_2_2), s = sz, c = '#E5E5E5', ec = '#171008', lw = 0.5, zorder = 20, label = 'CD33-12-2-2')
 ax[0].errorbar(H2O_expmean(CD33_12_2_2), H2O_mean(CD33_12_2_2), xerr = H2O_expstd(CD33_12_2_2), yerr = H2O_mean(CD33_12_2_2) * H2O_rsd(CD33_12_2_2), lw = 0.5, c = 'k', zorder = 10)
 
-ax[0].scatter(H2O_expmean(CD33_22_1_1), H2O_mean(CD33_22_1_1), s = sz, c = '#CCCCCC', ec = '#171008', lw = 0.5, zorder = 20, label = 'CD33-22-1-1')
+ax[0].scatter(H2O_expmean(CD33_22_1_1), H2O_mean(CD33_22_1_1), s = sz, c = '#BEBEBE', ec = '#171008', lw = 0.5, zorder = 20, label = 'CD33-22-1-1')
 ax[0].errorbar(H2O_expmean(CD33_22_1_1), H2O_mean(CD33_22_1_1), xerr = H2O_expstd(CD33_22_1_1), yerr = H2O_mean(CD33_22_1_1) * H2O_rsd(CD33_22_1_1), lw = 0.5, c = 'k', zorder = 10)
 
-ax[0].scatter(H2O_expmean(ALV1833_11), H2O_mean(ALV1833_11), s = sz, c = '#969696', ec = '#171008', lw = 0.5, zorder = 20, label = 'ALV1833-11')
+ax[0].scatter(H2O_expmean(STD_D1010), H2O_mean(STD_D1010), s = sz, c = '#9D9D9D', ec = '#171008', lw = 0.5, zorder = 20, label = 'D1010')
+ax[0].errorbar(H2O_expmean(STD_D1010), H2O_mean(STD_D1010), xerr = H2O_expstd(STD_D1010), yerr = H2O_mean(STD_D1010) * H2O_rsd(STD_D1010), lw = 0.5, c = 'k', zorder = 10)
+
+ax[0].scatter(H2O_expmean(ALV1833_11), H2O_mean(ALV1833_11), s = sz, c = '#7D7D7D', ec = '#171008', lw = 0.5, zorder = 20, label = 'ALV1833-11')
 ax[0].errorbar(H2O_expmean(ALV1833_11), H2O_mean(ALV1833_11), xerr = H2O_expstd(ALV1833_11), yerr = H2O_mean(ALV1833_11) * H2O_rsd(ALV1833_11), lw = 0.5, c = 'k', zorder = 10)
 
-ax[0].scatter(H2O_expmean(WOK5_4), H2O_mean(WOK5_4), s = sz, c = '#636363', ec = '#171008', lw = 0.5, zorder = 20, label = '23WOK5-4')
+ax[0].scatter(H2O_expmean(WOK5_4), H2O_mean(WOK5_4), s = sz, c = '#5C5C5C', ec = '#171008', lw = 0.5, zorder = 20, label = '23WOK5-4')
 ax[0].errorbar(H2O_expmean(WOK5_4), H2O_mean(WOK5_4), xerr = H2O_expstd(WOK5_4), yerr = H2O_mean(WOK5_4) * H2O_rsd(WOK5_4), lw = 0.5, c = 'k', zorder = 10)
 
-ax[0].scatter(H2O_expmean(ALV1846), H2O_mean(ALV1846), s = sz, c = '#252525', ec = '#171008', lw = 0.5, zorder = 20, label = '21ALV1846-9')
+ax[0].scatter(H2O_expmean(ALV1846), H2O_mean(ALV1846), s = sz, c = '#000000', ec = '#171008', lw = 0.5, zorder = 20, label = '21ALV1846-9')
 ax[0].errorbar(H2O_expmean(ALV1846), H2O_mean(ALV1846), xerr = H2O_expstd(ALV1846), yerr = H2O_mean(ALV1846) * H2O_rsd(ALV1846), lw = 0.5, c = 'k', zorder = 10)
-ax[0].set_xlim([0, 6])
-ax[0].set_ylim([0, 6])
+
+ax[0].set_xlim([0, 5])
+ax[0].set_ylim([0, 5])
 ax[0].set_xlabel('$\mathregular{H_2O}$ Expected (wt.%)')
 ax[0].set_ylabel('$\mathregular{H_2O_t}$ Measured by FTIR (wt.%)')
-l1 = ax[0].legend(loc = (0.01, 0.415), labelspacing = 0.2, handletextpad = 0.25, handlelength = 1.00, prop={'size': 13}, frameon=False)
+l1 = ax[0].legend(loc = (0.01, 0.33), labelspacing = 0.2, handletextpad = 0.25, handlelength = 1.00, prop={'size': 13}, frameon=False)
 ax[0].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[0].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 
 ftir_sym = ax[0].scatter(np.nan, np.nan, s = sz, ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = 'FTIR')
 sims_sym = ax[0].scatter(np.nan, np.nan, s = 100, marker = 's', ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = 'SIMS')
 kft_sym = ax[0].scatter(np.nan, np.nan, s = 100, marker = 'D', ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = 'KFT')
+ea_sym = ax[0].scatter(np.nan, np.nan, s = sz+10, marker = 'p', ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = 'KFT')
 sat_symb = ax[0].scatter(np.nan, np.nan, s = sz_sm, marker = '>', ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = '$\mathregular{H_2O_{t, 3550}}$ Saturated')
-ax[0].legend([ftir_sym, sims_sym, kft_sym, sat_symb], ['FTIR', 'SIMS', 'KFT', '$\mathregular{H_2O_{t, 3550}}$ Saturated'], loc = 'lower right', labelspacing = 0.3, handletextpad = 0.25, handlelength = 1.00, prop={'size': 13}, frameon=False)
+ax[0].legend([ftir_sym, sims_sym, kft_sym, ea_sym, sat_symb], ['FTIR', 'SIMS', 'KFT', 'EA', '$\mathregular{H_2O_{t, 3550}}$ Saturated'], loc = 'lower right', labelspacing = 0.3, handletextpad = 0.25, handlelength = 1.00, prop={'size': 13}, frameon=False)
 ax[0].add_artist(l1)
 ax[0].annotate("A.", xy=(0.02, 0.95), xycoords="axes fraction", fontsize=20, weight='bold')
 
 
 ax[1].plot(co2_line, co2_line, 'k', lw = 1, zorder = 0)
 
-ax[1].scatter(CO2_expmean(STD_D1010), CO2_mean(STD_D1010), s = sz, c = '#0C7BDC', ec = '#171008', lw = 0.5, zorder = 20, label = 'D1010')
-ax[1].errorbar(CO2_expmean(STD_D1010), CO2_mean(STD_D1010), xerr = CO2_expstd(STD_D1010), yerr = CO2_mean(STD_D1010) * CO2_rsd(STD_D1010), lw = 0.5, c = 'k', zorder = 10)
+# ax[1].scatter(CO2_expmean(INSOL), CO2_mean(INSOL), s = sz, marker = 's', c = '#2166AC', ec = '#171008', lw = 0.5, zorder = 20, label = 'INSOL')
+# ax[1].errorbar(CO2_expmean(INSOL), CO2_mean(INSOL), xerr = CO2_expstd(INSOL), yerr = CO2_mean(INSOL) * CO2_rsd(INSOL) * 2, lw = 0.5, c = 'k', zorder = 10)
 
-ax[1].scatter(CO2_expmean(STD_C1), CO2_mean(STD_C1), s = sz, marker = 's', c = '#5DB147', ec = '#171008', lw = 0.5, zorder = 20, label = "CN_C_OL1'")
-ax[1].errorbar(CO2_expmean(STD_C1), CO2_mean(STD_C1), xerr = CO2_expstd(STD_C1), yerr = CO2_mean(STD_C1) * CO2_rsd(STD_C1), lw = 0.5, c = 'k', zorder = 10)
+ax[1].scatter(CO2_expmean(BF73), CO2_mean(BF73), s = sz+10, marker = 'p', c = '#F4A582', ec = '#171008', lw = 0.5, zorder = 20, label = 'BF73')
+ax[1].errorbar(CO2_expmean(BF73), CO2_mean(BF73), xerr = CO2_expstd(BF73), yerr = CO2_mean(BF73) * CO2_rsd(BF73) * 2, lw = 0.5, c = 'k', zorder = 10)
 
-ax[1].scatter(CO2_expmean(STD_CN92C_OL2), CO2_mean(STD_CN92C_OL2), s = sz, marker = 's', c = '#F9E600', ec = '#171008', lw = 0.5, zorder = 20, label = 'CN92C_OL2')
-ax[1].errorbar(CO2_expmean(STD_CN92C_OL2), CO2_mean(STD_CN92C_OL2), xerr = CO2_expstd(STD_CN92C_OL2), yerr = CO2_mean(STD_CN92C_OL2) * CO2_rsd(STD_CN92C_OL2), lw = 0.5, c = 'k', zorder = 10)
+ax[1].scatter(CO2_expmean(BF76), CO2_mean(BF76), s = sz+10, marker = 'p', c = '#FDDBC7', ec = '#171008', lw = 0.5, zorder = 20, label = 'BF76')
+ax[1].errorbar(CO2_expmean(BF76), CO2_mean(BF76), xerr = CO2_expstd(BF76), yerr = CO2_mean(BF76) * CO2_rsd(BF76) * 2, lw = 0.5, c = 'k', zorder = 10)
 
-ax[1].scatter(CO2_expmean(VF74_127_7), CO2_mean(VF74_127_7), s = sz, marker = 's', c = '#E42211', ec = '#171008', lw = 0.5, zorder = 20, label = 'VF74-127-7')
-ax[1].errorbar(CO2_expmean(VF74_127_7), CO2_mean(VF74_127_7), xerr = CO2_expstd(VF74_127_7), yerr = CO2_mean(VF74_127_7) * CO2_rsd(VF74_127_7), lw = 0.5, c = 'k', zorder = 10)
+ax[1].scatter(CO2_expmean(BF77), CO2_mean(BF77), s = sz+10, marker = 'p', c = '#F7F7F7', ec = '#171008', lw = 0.5, zorder = 20, label = 'BF77')
+ax[1].errorbar(CO2_expmean(BF77), CO2_mean(BF77), xerr = CO2_expstd(BF77), yerr = CO2_mean(BF77) * CO2_rsd(BF77) * 2, lw = 0.5, c = 'k', zorder = 10)
 
-ax[1].scatter(CO2_expmean(VF74_132_2), CO2_mean(VF74_132_2), s = sz, marker = 's', c = '#FE7D10', ec = '#171008', lw = 0.5, zorder = 20, label = 'VF74-132-2')
-ax[1].errorbar(CO2_expmean(VF74_132_2), CO2_mean(VF74_132_2), xerr = CO2_expstd(VF74_132_2), yerr = CO2_mean(VF74_132_2) * CO2_rsd(VF74_132_2), lw = 0.5, c = 'k', zorder = 10)
+ax[1].scatter(CO2_expmean(M35), CO2_mean(M35), s = sz, c = '#D1E5F0', ec = '#171008', lw = 0.5, zorder = 20, label = 'M35')
+ax[1].errorbar(CO2_expmean(M35), CO2_mean(M35), xerr = CO2_expstd(M35), yerr = CO2_mean(M35) * CO2_rsd(M35 )* 2, lw = 0.5, c = 'k', zorder = 10)
 
-# ax[1].scatter(CO2_expmean(Fiege63), CO2_mean(Fiege63), s = sz, marker = 's', c = '#CCCCCC', ec = '#171008', lw = 0.5, zorder = 15)
-# ax[1].scatter(CO2_expmean(Fiege63), CO2_mean(Fiege63), s = sz_sm, marker = '>', c = '#FFFFFF', ec = '#171008', lw = 0.5, zorder = 20)
-# ax[1].errorbar(CO2_expmean(Fiege63), CO2_mean(Fiege63), xerr = CO2_expstd(Fiege63), yerr = CO2_mean(Fiege63) * CO2_rsd(Fiege63), lw = 0.5, c = 'k', zorder = 10)
+ax[1].scatter(CO2_expmean(M43), CO2_mean(M43), s = sz, c = '#92C5DE', ec = '#171008', lw = 0.5, zorder = 20, label = 'M43')
+ax[1].errorbar(CO2_expmean(M43), CO2_mean(M43), xerr = CO2_expstd(M43), yerr = CO2_mean(M43) * CO2_rsd(M43) * 2, lw = 0.5, c = 'k', zorder = 10)
 
-# ax[1].scatter(CO2_expmean(ETFSR_Ol8), CO2_mean(ETFSR_Ol8), s = sz, marker = 's', c = '#8A8A8A', ec = '#171008', lw = 0.5, zorder = 20)
-# ax[1].errorbar(CO2_expmean(ETFSR_Ol8), CO2_mean(ETFSR_Ol8), xerr = CO2_expstd(ETFSR_Ol8), yerr = CO2_mean(ETFSR_Ol8) * CO2_rsd(ETFSR_Ol8), lw = 0.5, c = 'k', zorder = 10)
+ax[1].scatter(CO2_expmean(NS1), CO2_mean(NS1), s = sz, c = '#4393C3', ec = '#171008', lw = 0.5, zorder = 20, label = 'NS-1')
+ax[1].errorbar(CO2_expmean(NS1), CO2_mean(NS1), xerr = CO2_expstd(NS1), yerr = CO2_mean(NS1) * CO2_rsd(NS1) * 2, lw = 0.5, c = 'k', zorder = 10)
 
-# ax[1].scatter(CO2_expmean(Fiege73), CO2_mean(Fiege73), s = sz, marker = 's', c = '#252525', ec = '#171008', lw = 0.5, zorder = 15)
-# ax[1].scatter(CO2_expmean(Fiege73), CO2_mean(Fiege73), s = sz_sm, marker = '>', c = '#FFFFFF', ec = '#171008', lw = 0.5, zorder = 20)
-# ax[1].errorbar(CO2_expmean(Fiege73), CO2_mean(Fiege73), xerr = CO2_expstd(Fiege73), yerr = CO2_mean(Fiege73) * CO2_rsd(Fiege73), lw = 0.5, c = 'k', zorder = 10)
+ax[1].scatter(CO2_expmean(CD33_12_2_2), CO2_mean(CD33_12_2_2), s = sz, c = '#E5E5E5', ec = '#171008', lw = 0.5, zorder = 20, label = 'CD33-12-2-2')
+ax[1].errorbar(CO2_expmean(CD33_12_2_2), CO2_mean(CD33_12_2_2), xerr = CO2_expstd(CD33_12_2_2), yerr = CO2_mean(CD33_12_2_2) * CO2_rsd(CD33_12_2_2) * 2, lw = 0.5, c = 'k', zorder = 10)
 
-ax[1].scatter(CO2_expmean(CD33_12_2_2), CO2_mean(CD33_12_2_2), s = sz, c = '#F7F7F7', ec = '#171008', lw = 0.5, zorder = 20, label = 'CD33-12-2-2')
-ax[1].errorbar(CO2_expmean(CD33_12_2_2), CO2_mean(CD33_12_2_2), xerr = CO2_expstd(CD33_12_2_2), yerr = CO2_mean(CD33_12_2_2) * CO2_rsd(CD33_12_2_2), lw = 0.5, c = 'k', zorder = 10)
+ax[1].scatter(CO2_expmean(CD33_22_1_1), CO2_mean(CD33_22_1_1), s = sz, c = '#BEBEBE', ec = '#171008', lw = 0.5, zorder = 20, label = 'CD33-22-1-1')
+ax[1].errorbar(CO2_expmean(CD33_22_1_1), CO2_mean(CD33_22_1_1), xerr = CO2_expstd(CD33_22_1_1), yerr = CO2_mean(CD33_22_1_1) * CO2_rsd(CD33_22_1_1) * 2, lw = 0.5, c = 'k', zorder = 10)
 
-ax[1].scatter(CO2_expmean(CD33_22_1_1), CO2_mean(CD33_22_1_1), s = sz, c = '#CCCCCC', ec = '#171008', lw = 0.5, zorder = 20, label = 'CD33-22-1-1')
-ax[1].errorbar(CO2_expmean(CD33_22_1_1), CO2_mean(CD33_22_1_1), xerr = CO2_expstd(CD33_22_1_1), yerr = CO2_mean(CD33_22_1_1) * CO2_rsd(CD33_22_1_1), lw = 0.5, c = 'k', zorder = 10)
+ax[1].scatter(CO2_expmean(STD_D1010), CO2_mean(STD_D1010), s = sz, c = '#9D9D9D', ec = '#171008', lw = 0.5, zorder = 20, label = 'D1010')
+ax[1].errorbar(CO2_expmean(STD_D1010), CO2_mean(STD_D1010), xerr = CO2_expstd(STD_D1010), yerr = CO2_mean(STD_D1010) * 0.1 * 2, lw = 0.5, c = 'k', zorder = 10)
 
-ax[1].scatter(CO2_expmean(ALV1833_11), CO2_mean(ALV1833_11), s = sz, c = '#969696', ec = '#171008', lw = 0.5, zorder = 20, label = 'ALV1833-11')
-ax[1].errorbar(CO2_expmean(ALV1833_11), CO2_mean(ALV1833_11), xerr = CO2_expstd(ALV1833_11), yerr = CO2_mean(ALV1833_11) * CO2_rsd(ALV1833_11), lw = 0.5, c = 'k', zorder = 10)
+ax[1].scatter(CO2_expmean(ALV1833_11), CO2_mean(ALV1833_11), s = sz, c = '#7D7D7D', ec = '#171008', lw = 0.5, zorder = 20, label = 'ALV1833-11')
+ax[1].errorbar(CO2_expmean(ALV1833_11), CO2_mean(ALV1833_11), xerr = CO2_expstd(ALV1833_11), yerr = CO2_mean(ALV1833_11) * CO2_rsd(ALV1833_11) * 2, lw = 0.5, c = 'k', zorder = 10)
 
-ax[1].scatter(CO2_expmean(WOK5_4), CO2_mean(WOK5_4), s = sz, c = '#636363', ec = '#171008', lw = 0.5, zorder = 20, label = '23WOK5-4')
-ax[1].errorbar(CO2_expmean(WOK5_4), CO2_mean(WOK5_4), xerr = CO2_expstd(WOK5_4), yerr = CO2_mean(WOK5_4) * CO2_rsd(WOK5_4), lw = 0.5, c = 'k', zorder = 10)
+ax[1].scatter(CO2_expmean(WOK5_4), CO2_mean(WOK5_4), s = sz, c = '#5C5C5C', ec = '#171008', lw = 0.5, zorder = 20, label = '23WOK5-4')
+ax[1].errorbar(CO2_expmean(WOK5_4), CO2_mean(WOK5_4), xerr = CO2_expstd(WOK5_4), yerr = CO2_mean(WOK5_4) * CO2_rsd(WOK5_4) * 2, lw = 0.5, c = 'k', zorder = 10)
 
-# ax[1].scatter(CO2_expmean(ALV1846), CO2_mean(ALV1846), s = sz, c = '#252525', ec = '#171008', lw = 0.5, zorder = 20)
-# ax[1].errorbar(CO2_expmean(ALV1846), CO2_mean(ALV1846), xerr = CO2_expstd(ALV1846), yerr = CO2_mean(ALV1846) * CO2_rsd(ALV1846), lw = 0.5, c = 'k', zorder = 10)
+merge = pd.read_csv('../BLComp/PHComparison.csv')
+merge = merge.set_index('Sample ID')
+badspec = np.array(['CI_IPGP_B6_2_50x50_256s_sp1', 'CI_IPGP_B6_1_50x50_256s_sp2', 'CI_IPGP_NBO_2_2_1_100x100_256s_sp1', 
+                    'CI_Ref_22_1_100x100_256s_sp1', 'CI_Ref_22_1_100x100_256s_sp2', 
+                    'CI_Ref_23_1_100x100_256s_sp5_BLcomp', 'CI_Ref_24_1_100x100_256s_sp1',
+                    'CI_Ref_bas_1_1_100x100_256s_sp1', 'CI_Ref_bas_1_1_100x100_256s_sp2', 
+                    'CI_Ref_bas_1_2_100x100_256s_sp1', 'CI_Ref_bas_1_2_100x100_256s_sp2', 
+                    'CI_Ref_bas_2_1_100x100_256s_sp1', 
+                    'CI_Ref_bas_2_2_100x100_256s_4sp1', 'CI_Ref_bas_2_2_100x100_256s_sp2', 'CI_Ref_bas_2_2_100x100_256s_sp3', 
+                    'CI_Ref_bas_2_3_100x100_256s_sp1', 
+                    'CI_Ref_bas_3_3_100x100_256s_sp1', 
+                    'CI_Ref_bas_4_2_100x100_256s_sp2',
+                    'LMT_BA3_2_50x50_256s_sp1', 'LMT_BA3_2_50x50_256s_sp2', 'CI_LMT_BA5_2_50x50x_256s_sp1'])
+merge = merge[~merge.index.isin(badspec)]
 
-ax[1].set_xlim([0, 1400])
-ax[1].set_ylim([0, 1400])
+ax[1].scatter(merge.CO2_EA, merge.CO2_MEAN, s = sz-50, c = 'k', ec = '#171008', lw = 0.5, zorder = 20, label = '23WOK5-4')
+
+ax[1].set_xlim([0, 12000]) # 4250
+ax[1].set_ylim([0, 12000])
 ax[1].set_xlabel('$\mathregular{CO_2}$ Expected (ppm)')
 ax[1].set_ylabel('$\mathregular{CO_2}$ Measured by FTIR (ppm)')
 ax[1].tick_params(axis="x", direction='in', length=5, pad = 6.5)
@@ -347,7 +257,7 @@ ax[1].legend(loc = 'lower right', labelspacing = 0.2, handletextpad = 0.25, hand
 ax[1].annotate("B.", xy=(0.02, 0.95), xycoords="axes fraction", fontsize=20, weight='bold')
 
 plt.tight_layout()
-plt.savefig('FTIRSIMS_Comparison_nocite.pdf')
+plt.savefig('FTIRSIMS_Comparison_testing.pdf')
 plt.show()
 
 # %% 

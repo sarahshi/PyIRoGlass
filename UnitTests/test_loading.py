@@ -10,8 +10,8 @@ class test_loading_npz(unittest.TestCase):
 
     def test_load_pca(self):
 
-        file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../src/PyIRoGlass/BaselineAvgPCA.npz') 
-        matrix = pig.Load_PCA(file_path)
+        file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../src/PyIRoGlass/BaselineAvgPC.npz') 
+        matrix = pig.Load_PC(file_path)
         
         # Assuming that the PCA matrix should not be empty after reading a valid .npz file
         self.assertIsNotNone(matrix, "Loading the PCA matrix failed.")
@@ -20,7 +20,7 @@ class test_loading_npz(unittest.TestCase):
 
     def test_load_wavenumber(self):
 
-        file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../src/PyIRoGlass/BaselineAvgPCA.npz') 
+        file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../src/PyIRoGlass/BaselineAvgPC.npz') 
         wavenumber = pig.Load_Wavenumber(file_path)
         
         # Assuming that the wavenumber array should not be empty after reading a valid .npz file

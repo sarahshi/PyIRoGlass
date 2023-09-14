@@ -26,7 +26,7 @@ plt.rcParams["axes.labelsize"] = 20 # Axes labels
 
 # %% 
 
-wn_low = 1275
+wn_low = 1250
 wn_high = 2400
 
 parent_dir = os.path.split(os.getcwd())[0]
@@ -130,12 +130,12 @@ ax[3].invert_xaxis()
 BaselinePCA = pd.read_csv(parent_dir + '/PEAKFIT_FINAL/InputData/Baseline_Avg+PCA.csv', index_col = 'Wavenumber')
 ax[4].plot(np.nan, np.nan, lw = 0, c = None, label = '')
 ax[4].plot(BaselinePCA.index, BaselinePCA.Average_Baseline, c = '#171008', lw = 3, label = '$\mathregular{\overline{Baseline}}$')
-ax[4].plot(BaselinePCA.index, BaselinePCA.PCA_1, c = '#0C7BDC', lw = 2, label = 'PC1')
-ax[4].plot(BaselinePCA.index, BaselinePCA.PCA_2, c = '#E42211', lw = 2, label = 'PC2')
-ax[4].plot(BaselinePCA.index, BaselinePCA.PCA_3, c = '#5DB147', lw = 2, label = 'PC3')
-ax[4].plot(BaselinePCA.index, BaselinePCA.PCA_4, c = '#F9C300', lw = 2, label = 'PC4')
+ax[4].plot(BaselinePCA.index, BaselinePCA.PCA_1, c = '#0C7BDC', lw = 2, label = '$\mathregular{\overline{Baseline}_{PC1}}$')
+ax[4].plot(BaselinePCA.index, BaselinePCA.PCA_2, c = '#E42211', lw = 2, label = '$\mathregular{\overline{Baseline}_{PC2}}$')
+ax[4].plot(BaselinePCA.index, BaselinePCA.PCA_3, c = '#5DB147', lw = 2, label = '$\mathregular{\overline{Baseline}_{PC3}}$')
+ax[4].plot(BaselinePCA.index, BaselinePCA.PCA_4, c = '#F9C300', lw = 2, label = '$\mathregular{\overline{Baseline}_{PC4}}$')
 ax[4].annotate("E.", xy=(0.0425, 0.925), xycoords="axes fraction", fontsize=20, weight='bold')
-ax[4].legend(loc = (0.025, 0.62), labelspacing = 0.2, handletextpad = 0.5, handlelength = 1.0, prop={'size': 15}, frameon=False)
+ax[4].legend(loc = (0.025, 0.58), labelspacing = 0.2, handletextpad = 0.5, handlelength = 1.0, prop={'size': 15}, frameon=False)
 ax[4].set_xlim([1200, 2450])
 ax[4].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[4].tick_params(axis="y", direction='in', length=5, pad = 6.5)
@@ -143,10 +143,10 @@ ax[4].invert_xaxis()
 
 ax[5].plot(np.nan, np.nan, lw = 0, c = None, label = '')
 ax[5].plot(H2OPCA.index, H2OPCA.Average_1630_Peak, c = '#171008', lw = 3, label = '$\mathregular{\overline{H_2O_{m, 1635}}}$')
-ax[5].plot(H2OPCA.index, H2OPCA['1630_Peak_PCA_1'], c = '#0C7BDC', lw = 2, label = 'PC1')
-ax[5].plot(H2OPCA.index, H2OPCA['1630_Peak_PCA_2'], c = '#E42211', lw = 2, label = 'PC2')
+ax[5].plot(H2OPCA.index, H2OPCA['1630_Peak_PCA_1'], c = '#0C7BDC', lw = 2, label = '$\mathregular{\overline{H_2O_{m, 1635}}_{PC1} }$')
+ax[5].plot(H2OPCA.index, H2OPCA['1630_Peak_PCA_2'], c = '#E42211', lw = 2, label = '$\mathregular{\overline{H_2O_{m, 1635}}_{PC2} }$')
 ax[5].annotate("F.", xy=(0.0425, 0.925), xycoords="axes fraction", fontsize=20, weight='bold')
-ax[5].legend(loc = (0.025, 0.725), labelspacing = 0.2, handletextpad = 0.5, handlelength = 1.0, prop={'size': 15}, frameon=False)
+ax[5].legend(loc = (0.025, 0.7), labelspacing = 0.2, handletextpad = 0.5, handlelength = 1.0, prop={'size': 15}, frameon=False)
 ax[5].set_xlim([1200, 2450])
 ax[5].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[5].tick_params(axis="y", direction='in', length=5, pad = 6.5)

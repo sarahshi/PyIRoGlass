@@ -63,30 +63,30 @@ def Load_SampleCSV(paths, wn_high, wn_low):
 
     return files, dfs_dict
 
-def Load_PCA(file_name):
+def Load_PC(file_name):
 
     """
-    Loads predetermined PCA components from an NPZ file.
+    Loads predetermined principal components from an NPZ file.
 
     Parameters:
-        file_name (str): The file name of an NPZ file containing PCA components.
+        file_name (str): The file name of an NPZ file containing principal components.
     
     Returns:
-        PCA_matrix (matrix): Matrix containing the PCA components.
+        PC_matrix (matrix): Matrix containing the principal components.
     """
 
-    wn_high = 2200
-    wn_low = 1275
+    wn_high = 2400
+    wn_low = 1250
 
     file_path = os.path.join(os.path.dirname(__file__), file_name)
     npz = np.load(file_path)
-    PCA_DF = pd.DataFrame(npz['data'], columns = npz['columns'])
-    PCA_DF = PCA_DF.set_index('Wavenumber')
+    PC_DF = pd.DataFrame(npz['data'], columns = npz['columns'])
+    PC_DF = PC_DF.set_index('Wavenumber')
 
-    PCA_DF = PCA_DF[wn_low:wn_high]
-    PCA_matrix = np.matrix(PCA_DF.to_numpy())
+    PC_DF = PC_DF[wn_low:wn_high]
+    PC_matrix = np.matrix(PC_DF.to_numpy())
 
-    return PCA_matrix
+    return PC_matrix
 
 def Load_Wavenumber(file_name):
 
@@ -100,8 +100,8 @@ def Load_Wavenumber(file_name):
         Wavenumber (np.ndarray): An array of wavenumbers.
     """
 
-    wn_high = 2200
-    wn_low = 1275
+    wn_high = 2400
+    wn_low = 1250
 
     file_path = os.path.join(os.path.dirname(__file__), file_name)
     npz = np.load(file_path)
@@ -175,39 +175,39 @@ def Linear(x, m, b):
 
     return tilt_offset
 
-def Carbonate(P, x, PCAmatrix, Peak_1635_PCAmatrix, Nvectors = 5): 
+def Carbonate(P, x, PCmatrix, Peak_1635_PCmatrix, Nvectors = 5): 
 
     """
     
-    The Carbonate function takes in the inputs of fitting parameters P, wavenumbers x, PCA matrix, 
-    number of PCA vectors of interest. The function calculates the molecular H2O_{1635} peak, 
+    The Carbonate function takes in the inputs of fitting parameters P, wavenumbers x, principal component matrix, 
+    number of principal component vectors of interest. The function calculates the molecular H2O_{1635} peak, 
     CO3^{2-} Gaussian peaks, linear offset, and baseline. The function then returns the model data.
     
     Parameters:
-        P (np.ndarray): Fitting parameters including PCA and peak weights, Gaussian parameters, 
+        P (np.ndarray): Fitting parameters including principal component and peak weights, Gaussian parameters, 
             linear offset slope and intercept.
         x (np.ndarray): Wavenumbers of interest.
-        PCAmatrix (matrix): PCA matrix.
-        Peak_1635_PCAmatrix (matrix): PCA matrix for the 1635 peak.
-        Nvectors (int, optional): Number of PCA vectors of interest. Default is 5.
+        PCmatrix (matrix): Principal components matrix.
+        Peak_1635_PCmatrix (matrix): Principal components matrix for the 1635 peak.
+        Nvectors (int, optional): Number of principal components vectors of interest. Default is 5.
 
     Returns:
         model_data (np.ndarray): Model data for the carbonate spectra.
     """
 
-    PCA_Weights = np.array([P[0:Nvectors]])
+    PC_Weights = np.array([P[0:Nvectors]])
     Peak_Weights = np.array([P[-5:-2]])
 
     peak_G1430, std_G1430, G1430_amplitude, peak_G1515, std_G1515, G1515_amplitude = P[Nvectors:-5]
     m, b = P[-2:None]
 
-    Peak_1635 = Peak_Weights * Peak_1635_PCAmatrix.T
+    Peak_1635 = Peak_Weights * Peak_1635_PCmatrix.T
     G1515 = Gauss(x, peak_G1515, std_G1515, A=G1515_amplitude)
     G1430 = Gauss(x, peak_G1430, std_G1430, A=G1430_amplitude)
 
     linear_offset = Linear(x, m, b) 
 
-    baseline = PCA_Weights * PCAmatrix.T
+    baseline = PC_Weights * PCmatrix.T
     model_data = baseline + linear_offset + Peak_1635 + G1515 + G1430
     model_data = np.array(model_data)[0,:]
 
@@ -490,298 +490,6 @@ def trace(posterior, title, zchain=None, pnames=None, thinning=50,
 
     return axes
 
-
-# def histogram(posterior, title, pnames=None, thinning=1, fignum=1100,
-#     savefile=None, bestp=None, quantile=None, pdf=None,
-#     xpdf=None, ranges=None, axes=None, lw=2.0, fs=12,
-#     theme='blue', yscale=False, orientation='vertical'):
-    
-#     """
-#     Plot parameter marginal posterior distributions in histograms. 
-
-#     Parameters: 
-#         posterior (1D/2D np.ndarray): MCMC posterior sampling with dimension [nsamples] or [nsamples, nparameters]
-#         pnames (str): Label names for parameters
-#         thinning (int): Thinning factor for plotting (plot every thinning-th value)
-#         fignum (int): Figure number
-#         savefile (bool): If not None, name of file to save the plot.
-#         bestp (np.ndarray): If not None, plot the best-fitting values for each parameter.
-#         quantile (float): If not None, plot the quantile, highest posterior density region of the distribution. 
-#             For example, set quantile=0.68 for a 68% HPD.
-#         pdf (np.ndarray): A smoothed PDF of the distribution for each parameter.
-#         xpdf (np.ndarray): The X coordinates of the PDFs.
-#         ranges (ndarrays): List with custom (lower,upper) x-ranges for each parameter.
-#             Leave None for default, e.g., ranges=[(1.0,2.0), None, (0, 1000)].
-#         axes (list of matplotlib.axes): If not None, plot histograms in the currently existing axes.
-#         lw (float): Linewidth of the histogram contour.
-#         fs (float): Font size for texts.
-#         theme (str or dict): Histograms' color theme. If dict, must define edgecolor, facecolor,
-#             color for the histogram edge and face colors, and the best-fit color.
-#         yscale (bool): If True, set an absolute Y-axis scaling among all posteriors. 
-#         orientation (str): Histogram orientation. 
-    
-#     Returns:
-#         axes (list of matplotlib.axes.Axes): list of axes containing marginal posteriors 
-#     """
-
-#     if isinstance(theme, str):
-#         theme = themes[theme]
-
-#     if np.ndim(posterior) == 1:
-#         posterior = np.expand_dims(posterior, axis=1)
-#     nsamples, npars = np.shape(posterior)
-
-#     if pdf is None:
-#         pdf, xpdf = [None]*npars, [None]*npars
-#     if not isinstance(pdf, list):  # Put single arrays into list
-#         pdf, xpdf  = [pdf], [xpdf]
-#     # Histogram keywords:
-#     if int(np.__version__.split('.')[1]) >= 15:
-#         hkw = {'density':not yscale}
-#     else:
-#         hkw = {'normed':not yscale}
-
-#     # Set default parameter names:
-#     if pnames is None:
-#         pnames = mu.default_parnames(npars)
-
-#     # Xranges:
-#     if ranges is None:
-#         ranges = np.repeat(None, npars)
-
-#     # Set number of rows:
-#     nrows, ncolumns, npanels = 4, 4, 16
-#     npages = int(1 + (npars-1)/npanels)
-
-#     ylabel = "$N$ samples" if yscale else "Posterior Density"
-#     if axes is None:
-#         figs, axes = [], []
-#         for j in range(npages):
-#             fig = plt.figure(fignum+j, figsize=(8.5, 11.0))
-#             figs.append(fig)
-#             fig.clf()
-#             fig.subplots_adjust(left=0.1, right=0.97, bottom=0.08, 
-#                 top=0.95, hspace=0.5, wspace=0.1)
-#             for ipar in range(np.amin([npanels, npars-npanels*j])):
-#                 ax = fig.add_subplot(nrows, ncolumns, ipar+1)
-#                 axes.append(ax)
-#                 yax = ax.yaxis if orientation == 'vertical' else ax.xaxis
-#                 if ipar%ncolumns == 0 or orientation == 'horizontal':
-#                     yax.set_label_text(ylabel, fontsize=fs)
-#                 if ipar%ncolumns != 0 or yscale is False:
-#                     yax.set_ticklabels([])
-#     else:
-#         npages = 1  # Assume there's only one page
-#         figs = [axes[0].get_figure()]
-#         for ax in axes:
-#             ax.set_yticklabels([])
-
-#     maxylim = 0
-#     for ipar in range(npars):
-#         ax = axes[ipar]
-#         if orientation == 'vertical':
-#             xax = ax.xaxis
-#             get_xlim, set_xlim = ax.get_xlim, ax.set_xlim
-#             get_ylim, set_ylim = ax.get_ylim, ax.set_ylim
-#             fill_between = ax.fill_between
-#             axline = ax.axvline
-#             plt.setp(ax.xaxis.get_majorticklabels(), rotation=90)
-#         else:
-#             xax = ax.yaxis
-#             get_xlim, set_xlim = ax.get_ylim, ax.set_ylim
-#             get_ylim, set_ylim = ax.get_xlim, ax.set_xlim
-#             fill_between = ax.fill_between
-#             axline = ax.axhline
-
-#         ax.tick_params(labelsize=fs-1, direction='in', top=True, right=True)
-#         xax.set_label_text(pnames[ipar], fontsize=fs)
-#         vals, bins, h = ax.hist(posterior[0::thinning,ipar],
-#             bins=25, histtype='step', lw=lw, zorder=0,
-#             range=ranges[ipar], ec=theme['edgecolor'],
-#             orientation=orientation, **hkw)
-#         # Plot HPD region if needed:
-#         if quantile is None:
-#             ax.hist(posterior[0::thinning,ipar],
-#                 bins=25, lw=lw, zorder=-2, alpha=0.4,
-#                 range=ranges[ipar], facecolor=theme['facecolor'], ec='none',
-#                 orientation=orientation, **hkw)
-#         if quantile is not None:
-#             PDF, Xpdf, HPDmin = ms.cred_region(
-#                 posterior[:,ipar], quantile, pdf[ipar], xpdf[ipar])
-#             vals = np.r_[0, vals, 0]
-#             bins = np.r_[bins[0] - (bins[1]-bins[0]), bins]
-#             # Interpolate xpdf into the histogram:
-#             f = interpolate.interp1d(bins+0.5*(bins[1]-bins[0]), vals, kind='nearest')
-#             # Plot the HPD region as shaded areas:
-#             if ranges[ipar] is not None:
-#                 xran = np.argwhere((Xpdf>ranges[ipar][0]) & (Xpdf<ranges[ipar][1]))
-#                 Xpdf = Xpdf[np.amin(xran):np.amax(xran)]
-#                 PDF  = PDF [np.amin(xran):np.amax(xran)]
-#             fill_between(
-#                 Xpdf, 0, f(Xpdf), where=PDF>=HPDmin,
-#                 facecolor=theme['facecolor'], edgecolor='none',
-#                 interpolate=True, zorder=-2, alpha=0.4)
-#         if bestp is not None:
-#             axline(bestp[ipar], dashes=(7,4), lw=1.25, color=theme['color'])
-#         maxylim = np.amax((maxylim, get_ylim()[1]))
-#         if ranges[ipar] is not None:
-#             set_xlim(np.clip(get_xlim(), ranges[ipar][0], ranges[ipar][1]))
-
-#     if yscale:
-#         for ax in axes:
-#             set_ylim = ax.get_ylim if orientation == 'vertical' else ax.set_xlim
-#             set_ylim(0, maxylim)
-    
-#     if savefile is not None:
-#         for page, fig in enumerate(figs):
-#             if npages > 1:
-#                 sf = os.path.splitext(savefile)
-#                 fig.savefig(f"{sf[0]}_page{page:02d}{sf[1]}", bbox_inches='tight')
-#             else:
-#                 fig.suptitle(title)
-#                 plt.ioff()
-#                 fig.savefig(savefile, bbox_inches='tight')
-    
-#     return axes
-
-# def pairwise(posterior, title, pnames=None, thinning=100, fignum=1200,
-#     savefile=None, bestp=None, nbins=15, nlevels=10,
-#     absolute_dens=False, ranges=None, fs=12, rect=None, margin=0.01):
-    
-#     """
-#     Plot parameter pairwise posterior distributions.
-#     Parameters: 
-#         posterior (2D np.ndarray): An MCMC posterior sampling with dimension: [nsamples, nparameters].
-#         pnames (str): Label names for parameters.
-#         thinning (int): Thinning factor for plotting (plot every thinning-th value).
-#         fignum (int): The figure number.
-#         savefile (bool): Name of file to save the plot, if not none
-#         bestp (1D np.ndarray): Plot the best-fitting values for each parameter given by bestp, if not none
-#         nbins (int): Number of grid bins for the 2D histograms.
-#         nlevels (int): Number of contour color levels.
-#         ranges (2D np.ndarray): List with custom (lower,upper) x-ranges for each parameter.
-#             Leave None for default, e.g., ranges=[(1.0,2.0), None, (0, 1000)].
-#         fs (float): Fontsize of texts.
-#         rect (1D np.ndarray): Plot pairwise plots in current figure, if not None
-#         margin (float):  Margins between panels (when rect is not None).
-
-#     Returns:
-#         axes (2D np.ndarray): Array of axes containing the marginal posterior distributions.
-#         cb (matplotlib.axes.Axes): The colorbar axes.
-    
-#     Notes:
-#         rect delimits the boundaries of the panels. The labels and
-#         ticklabels will appear outside rect, so the user needs to leave
-#         some wiggle room for them.
-    
-#     """
-
-#     # Get number of parameters and length of chain:
-#     nsamples, npars = np.shape(posterior)
-
-#     # Don't plot if there are no pairs:
-#     if npars == 1:
-#         return None, None
-
-#     if ranges is None:
-#         ranges = np.repeat(None, npars)
-#     else: # Set default ranges if necessary:
-#         for i in range(npars):
-#             if ranges[i] is None:
-#                 ranges[i] = (np.nanmin(posterior[0::thinning,i]), np.nanmax(posterior[0::thinning,i]))
-
-#     # Set default parameter names:
-#     if pnames is None:
-#         pnames = mu.default_parnames(npars)
-
-#     # Set palette color:
-#     palette = copy.copy(plt.cm.viridis_r)
-#     palette.set_under(color='w')
-#     palette.set_bad(color='w')
-
-#     # Gather 2D histograms:
-#     hist = []
-#     xran, yran, lmax = [], [], []
-#     for irow in range(1, npars):
-#         for icol in range(irow):
-#             ran = None
-#             if ranges[icol] is not None:
-#                 ran = [ranges[icol], ranges[irow]]
-#             h, x, y = np.histogram2d(
-#                 posterior[0::thinning,icol], posterior[0::thinning,irow],
-#                 bins=nbins, range=ran, density=False)
-#             hist.append(h.T)
-#             xran.append(x)
-#             yran.append(y)
-#             lmax.append(np.amax(h)+1)
-#     # Reset upper boundary to absolute maximum value if requested:
-#     if absolute_dens:
-#         lmax = npars*(npars+1)*2 * [np.amax(lmax)]
-
-#     if rect is None:
-#         rect = (0.10, 0.10, 0.95, 0.95)
-#         plt.figure(fignum, figsize=(12, 12))
-#         plt.clf()
-
-#     axes = np.tile(None, (npars-1, npars-1))
-#     # Plot:
-#     k = 0 # Histogram index
-#     for irow in range(1, npars):
-#         for icol in range(irow):
-#             h = (npars-1)*(irow-1) + icol + 1  # Subplot index
-#             ax = axes[icol,irow-1] = subplotter(rect, margin, h, npars-1)
-#             # Labels:
-#             ax.tick_params(labelsize=fs-1, direction='in')
-#             if icol == 0:
-#                 ax.set_ylabel(pnames[irow], size=fs)
-#             else:
-#                 ax.set_yticklabels([])
-#             if irow == npars-1:
-#                 ax.set_xlabel(pnames[icol], size=fs)
-#                 plt.setp(ax.xaxis.get_majorticklabels(), rotation=90)
-#             else:
-#                 ax.set_xticklabels([])
-#             # The plot:
-#             cont = ax.contourf(hist[k], cmap=palette, rasterized = True, vmin=1, origin='lower', levels=[0]+list(np.linspace(1,lmax[k], nlevels)), extent=(xran[k][0], xran[k][-1], yran[k][0], yran[k][-1]))
-#             for c in cont.collections:
-#                 c.set_edgecolor("face")
-#             if bestp is not None:
-#                 ax.axvline(bestp[icol], dashes=(6,4), color="0.5", lw=1.0)
-#                 ax.axhline(bestp[irow], dashes=(6,4), color="0.5", lw=1.0)
-#             if ranges[icol] is not None:
-#                 ax.set_xlim(ranges[icol])
-#             if ranges[icol] is not None:
-#                 ax.set_ylim(ranges[irow])
-#             k += 1
-
-#     # The colorbar:
-#     bounds = np.linspace(0, 1.0, nlevels)
-#     norm = mpl.colors.BoundaryNorm(bounds, palette.N)
-#     if rect is not None:
-#         dx = (rect[2]-rect[0])*0.05
-#         dy = (rect[3]-rect[1])*0.45
-#         ax2 = plt.axes([rect[2]-dx, rect[3]-dy, dx, dy])
-#     else:
-#         ax2 = plt.axes([0.95, 0.57, 0.025, 0.36])
-#     cb = mpl.colorbar.ColorbarBase(
-#         ax2, cmap=palette, norm=norm,
-#         spacing='proportional', boundaries=bounds, format='%.1f')
-#     cb.set_label("Posterior Density", fontsize=fs)
-#     cb.ax.yaxis.set_ticks_position('left')
-#     cb.ax.yaxis.set_label_position('left')
-#     cb.ax.tick_params(labelsize=fs-1, direction='in', top=True, right=True)
-#     cb.set_ticks(np.linspace(0, 1, 5))
-#     for c in ax2.collections:
-#         c.set_edgecolor("face")
-#     plt.draw()
-
-#     # Save file:
-#     if savefile is not None:
-#         plt.suptitle(title)
-#         plt.ioff()
-#         plt.savefig(savefile)
-#     return axes, cb
-
 def modelfit(data, uncert, indparams, model, title, nbins=75,
     fignum=1400, savefile=None, fmt="."):
     
@@ -902,9 +610,9 @@ def MCMC(data, uncert, indparams, log, savefile):
     # Define initial values, limits, and step sizes for parameters
     func = Carbonate
 
-    params = np.array([1.25,  2.00,  0.25,  0.01,  0.01, 1430, 30.0, 0.0100, 1510, 30.0, 0.0100, 0.10,  0.02,  0.01,  5e-4,  0.70])
-    pmin   = np.array([0.00, -8.00, -2.00, -1.0, -0.75, 1415, 22.5, 0.0000, 1500, 22.5, 0.0000, 0.00, -0.50, -0.50, -5e-2, -1.00])
-    pmax   = np.array([5.00,  8.00,  2.00,  1.0,  0.75, 1445, 40.0, 3.0000, 1535, 40.0, 3.0000, 3.00,  0.50,  0.50,  5e-2,  3.00])
+    params = np.array([1.25,  2.00,  0.25,  0.005,  0.001, 1430, 30.0, 0.01, 1510, 30.0, 0.01, 0.10,  0.02,  0.01,  5e-4,  0.50])
+    pmin   = np.array([0.00, -5.00, -1.00, -0.250, -0.100, 1415, 22.5, 0.00, 1500, 22.5, 0.00, 0.00, -0.50, -0.50, -5e-1, -1.00])
+    pmax   = np.array([5.00,  5.00,  1.00,  0.250,  0.100, 1445, 40.0, 3.00, 1535, 40.0, 3.00, 3.00,  0.50,  0.50,  5e-1,  3.00])
     pstep  = np.abs(pmin - pmax) * 0.01
 
     # Define prior limits for parameters
@@ -923,7 +631,7 @@ def MCMC(data, uncert, indparams, log, savefile):
     mc3_output = mc3.sample(data=data, uncert=uncert, func=func, params=params, indparams=indparams,
                             pmin=pmin, pmax=pmax, pstep=pstep, prior=prior, priorlow=priorlow, priorup=priorup, #
                             pnames=pnames, texnames=texnames, sampler='snooker', rms=False,
-                            nsamples=1e6, nchains=9, ncpu=4, burnin=1e4, thinning=5, leastsq='trf',
+                            nsamples=1e6, nchains=9, ncpu=4, burnin=2e4, thinning=5, leastsq='trf',
                             chisqscale=False, grtest=True, grbreak=1.01, grnmin=0.5, hsize=10,
                             kickoff='normal', wlike=False, plots=False, log=log, savefile=savefile)
 
@@ -934,7 +642,7 @@ def Run_All_Spectra(dfs_dict, exportpath):
     """
     The Run_All_Spectra function inputs the dictionary of dataframes that were created by the Load_SampleCSV function and allows 
     for all of the samples to be batched and run through the function. The function exports the best fit and standard deviations 
-    of peak locations, peak widths, and peak heights, as well as the PCA vectors used to fit the spectra. These values are 
+    of peak locations, peak widths, and peak heights, as well as the principal component vectors used to fit the spectra. These values are 
     exported in a csv file and figures are created for each individual sample.
     
     Parameters:
@@ -961,12 +669,12 @@ def Run_All_Spectra(dfs_dict, exportpath):
 
     path_beg = os.getcwd() + '/'
 
-    # Load files with PCA vectors for the baseline and H2Om, 1635 peak. 
-    Wavenumber = Load_Wavenumber('BaselineAvgPCA.npz')
-    PCAmatrix = Load_PCA('BaselineAvgPCA.npz')
-    Peak_1635_PCAmatrix = Load_PCA('H2Om1635PCA.npz')
+    # Load files with principal component vectors for the baseline and H2Om, 1635 peak. 
+    Wavenumber = Load_Wavenumber('BaselineAvgPC.npz')
+    PCmatrix = Load_PC('BaselineAvgPC.npz')
+    Peak_1635_PCmatrix = Load_PC('H2Om1635PC.npz')
     Nvectors = 5
-    indparams = [Wavenumber, PCAmatrix, Peak_1635_PCAmatrix, Nvectors]
+    indparams = [Wavenumber, PCmatrix, Peak_1635_PCmatrix, Nvectors]
 
 
     # Create dataframes to store peak height data: 
@@ -975,8 +683,8 @@ def Run_All_Spectra(dfs_dict, exportpath):
     DF_Output = pd.DataFrame(columns = ['PH_1635_BP','PH_1635_STD','H2Om_1635_MAX', 'BL_H2Om_1635_MAX', 
                                         'PH_1515_BP','PH_1515_STD','P_1515_BP','P_1515_STD','STD_1515_BP','STD_1515_STD','MAX_1515_ABS', 'BL_MAX_1515_ABS',
                                         'PH_1430_BP','PH_1430_STD','P_1430_BP','P_1430_STD','STD_1430_BP','STD_1430_STD','MAX_1430_ABS', 'BL_MAX_1430_ABS'])
-    PCA_Output = pd.DataFrame(columns = ['AVG_BL_BP','AVG_BL_STD','PCA1_BP','PCA1_STD','PCA2_BP','PCA2_STD','PCA3_BP','PCA3_STD',
-                                        'PCA4_BP','PCA4_STD','m_BP','m_STD','b_BP','b_STD', 'PH_1635_PCA1_BP','PH_1635_PCA1_STD','PH_1635_PCA2_BP','PH_1635_PCA2_STD'])
+    PC_Output = pd.DataFrame(columns = ['AVG_BL_BP','AVG_BL_STD','PC1_BP','PC1_STD','PC2_BP','PC2_STD','PC3_BP','PC3_STD',
+                                        'PC4_BP','PC4_STD','m_BP','m_STD','b_BP','b_STD', 'PH_1635_PC1_BP','PH_1635_PC1_STD','PH_1635_PC2_BP','PH_1635_PC2_STD'])
     NEAR_IR_PH = pd.DataFrame(columns=['PH_5200_M', 'PH_5200_STD', 'PH_4500_M', 'PH_4500_STD', 'S2N_P5200', 'ERR_5200', 'S2N_P4500', 'ERR_4500'])
 
     # Initialize lists for failures and errors
@@ -986,8 +694,8 @@ def Run_All_Spectra(dfs_dict, exportpath):
     error_5200 = []
 
     # Determine best-fit baselines for all peaks with ALS (H2Om_{5200}, OH_{4500}, H2Ot_{3550}) and PyIRoGlass MC3 (H2Om_{1635}, CO3^{2-})
-    try: 
-        for files, data in dfs_dict.items(): 
+    for files, data in dfs_dict.items(): 
+        try:
             # Three repeat baselines for the OH_{4500}
             H2O4500_wn_low_1, H2O4500_wn_high_1 = 4250, 4675
             data_H2O4500_1, krige_output_4500_1, PH_4500_krige_1, STN_4500_1 = NearIR_Process(data, H2O4500_wn_low_1, H2O4500_wn_high_1, 'OH')
@@ -1028,10 +736,10 @@ def Run_All_Spectra(dfs_dict, exportpath):
                 error_5200 = '*'
 
             # Save NIR peak heights
-            NEAR_IR_PH.loc[files] = pd.Series({'PH_5200_M': PH_5200_krige_M, 'PH_4500_M': PH_4500_krige_M, 
-                                            'PH_5200_STD': PH_5200_krige_STD, 'PH_4500_STD': PH_4500_krige_STD, 
-                                            'S2N_P5200': STN_5200_M, 'S2N_P4500': STN_4500_M, 
-                                            'ERR_5200': error_5200, 'ERR_4500': error_4500})
+            NEAR_IR_PH.loc[files] = pd.Series({'PH_5200_M': PH_5200_krige_M, 'PH_5200_STD': PH_5200_krige_STD, 
+                                               'PH_4500_M': PH_4500_krige_M, 'PH_4500_STD': PH_4500_krige_STD, 
+                                               'S2N_P5200': STN_5200_M, 'ERR_5200': error_5200, 
+                                               'S2N_P4500': STN_4500_M, 'ERR_4500': error_4500})
 
             # Three repeat baselines for the H2Ot_{3550}
             H2O3550_wn_low_1, H2O3550_wn_high_1 = 1900, 4400
@@ -1057,11 +765,11 @@ def Run_All_Spectra(dfs_dict, exportpath):
 
             # Save H2Om_{3550} peak heights and saturation information
             H2O_3550_PH.loc[files] = pd.Series({'PH_3550_M': PH_3550_M, 'PH_3550_STD': PH_3550_STD, 'H2OT_3550_MAX': MAX_3550_ABS, 
-                                            'BL_H2OT_3550_MAX': BL_MAX_3550_ABS, 'H2OT_3550_SAT?': error})
+                                                'BL_H2OT_3550_MAX': BL_MAX_3550_ABS, 'H2OT_3550_SAT?': error})
 
             # Initialize PyIRoGlass MC3 fit for H2Om_{1635} and CO3^{2-}
             df_length = np.shape(Wavenumber)[0]
-            CO2_wn_high, CO2_wn_low = 2200, 1275
+            CO2_wn_high, CO2_wn_low = 2400, 1250
             spec = data[CO2_wn_low:CO2_wn_high]
 
             # Interpolate fitting data depending on wavenumber spacing, to prepare for PyIRoGlass MC3
@@ -1109,9 +817,9 @@ def Run_All_Spectra(dfs_dict, exportpath):
             H2OmP1635_STD = mc3_output['stdp'][-5:-2]
             H2OmP1635_STD[0] = H2OmP1635_STD[0]
 
-            PCA_BP = mc3_output['bestp'][0:Nvectors]
-            PCA_STD = mc3_output['stdp'][0:Nvectors]
-            Baseline_Solve_BP = PCA_BP * PCAmatrix.T
+            PC_BP = mc3_output['bestp'][0:Nvectors]
+            PC_STD = mc3_output['stdp'][0:Nvectors]
+            Baseline_Solve_BP = PC_BP * PCmatrix.T
             Baseline_Solve_BP = np.asarray(Baseline_Solve_BP).ravel()
 
             m_BP, b_BP = mc3_output['bestp'][-2:None]
@@ -1119,7 +827,7 @@ def Run_All_Spectra(dfs_dict, exportpath):
             Line_BP = Linear(Wavenumber, m_BP, b_BP) 
             Baseline_Solve_BP = Baseline_Solve_BP + Line_BP
 
-            H1635_BP = H2OmP1635_BP * Peak_1635_PCAmatrix.T
+            H1635_BP = H2OmP1635_BP * Peak_1635_PCmatrix.T
             H1635_BP = np.asarray(H1635_BP).ravel()
             CO2P1430_BP = Gauss(Wavenumber, CO2P_BP[0], CO2P_BP[1], A=CO2P_BP[2])
             CO2P1515_BP = Gauss(Wavenumber, CO2P_BP[3], CO2P_BP[4], A=CO2P_BP[5])
@@ -1187,8 +895,8 @@ def Run_All_Spectra(dfs_dict, exportpath):
                 ax2.invert_xaxis()
 
                 # Create subplot of H2Om_{3550} baselines and peak fits
-                plotmax = np.round(np.max(data_H2O3550_1['Absorbance'].to_numpy()), decimals = 0)
-                plotmin = np.round(np.min(data_H2O3550_1['Absorbance'].to_numpy()), decimals = 0)
+                plotmax = np.round(np.max(data[CO2_wn_low:CO2_wn_low+2750]['Absorbance'].to_numpy()), decimals = 0)
+                plotmin = np.round(np.min(data[CO2_wn_low:CO2_wn_low+2750]['Absorbance'].to_numpy()), decimals = 0)
                 ax3 = plt.subplot2grid((2, 3), (0, 1), rowspan = 2)
                 ax3.plot(data.index, data['Absorbance'], 'k')
                 ax3.plot(data_H2O3550_1['Absorbance'].index, data_H2O3550_1['BL_MIR_3550'], 'silver', label = '$\mathregular{H_2O_{t, 3550}}$ Baseline')
@@ -1200,7 +908,7 @@ def Run_All_Spectra(dfs_dict, exportpath):
                 ax3.set_title(files)
                 ax3.annotate("$\mathregular{H_2O_{t, 3550}}$  Peak Height: " + f"{PH_3550_M:.4f} ± {PH_3550_STD:.4f}", (0.025, 0.95), xycoords = 'axes fraction')
                 ax3.set_xlabel('Wavenumber $(\mathregular{cm^{-1}})$')
-                ax3.set_xlim([1275, 4000])
+                ax3.set_xlim([1250, 4000])
                 ax3.set_ylabel('Absorbance')
                 ax3.set_ylim([plotmin-0.25, plotmax+0.5])
                 ax3.legend(loc = 'upper right', prop={'size': 10})
@@ -1217,7 +925,7 @@ def Run_All_Spectra(dfs_dict, exportpath):
                 lineerror = masked_posterior[:, -2:None]
                 lineerror = lineerror[0:np.shape(masked_posterior[:, :])[0]:int(np.shape(masked_posterior[:, :])[0] / 100), :]
 
-                Baseline_Array = np.array(samplingerror * PCAmatrix[:, :].T)
+                Baseline_Array = np.array(samplingerror * PCmatrix[:, :].T)
                 Baseline_Array_Plot = Baseline_Array
 
                 ax4 = plt.subplot2grid((2, 3), (0, 2), rowspan = 2)
@@ -1229,12 +937,12 @@ def Run_All_Spectra(dfs_dict, exportpath):
                 ax4.plot(Wavenumber, H1635_SOLVE, 'tab:orange', linewidth = 1.5, label = '$\mathregular{H_2O_{m, 1635}}$')
                 ax4.plot(Wavenumber, CO2P1515_SOLVE, 'tab:green', linewidth = 2.5, label = '$\mathregular{CO_{3, 1515}^{2-}}$')
                 ax4.plot(Wavenumber, CO2P1430_SOLVE, 'tab:red', linewidth = 2.5, label = '$\mathregular{CO_{3, 1430}^{2-}}$')
-                ax4.plot(Wavenumber, Carbonate(mc3_output['meanp'], Wavenumber, PCAmatrix, Peak_1635_PCAmatrix, Nvectors), 'tab:purple', linewidth = 1.5, label = 'MC$^\mathregular{3}$ Fit')
+                ax4.plot(Wavenumber, Carbonate(mc3_output['meanp'], Wavenumber, PCmatrix, Peak_1635_PCmatrix, Nvectors), 'tab:purple', linewidth = 1.5, label = 'MC$^\mathregular{3}$ Fit')
                 ax4.plot(Wavenumber, Baseline_Solve_BP, 'k', linewidth = 1.5, label = 'Baseline')
                 ax4.annotate("$\mathregular{H_2O_{m, 1635}}$ Peak Height: " + f"{H2OmP1635_BP[0]:.3f} ± {H2OmP1635_STD[0]:.3f}", (0.025, 0.95), xycoords = 'axes fraction')
                 ax4.annotate("$\mathregular{CO_{3, 1515}^{2-}}$ Peak Height: " + f"{CO2P_BP[5]:.3f} ± {CO2P_STD[5]:.3f}", (0.025, 0.90), xycoords = 'axes fraction')
                 ax4.annotate("$\mathregular{CO_{3, 1430}^{2-}}$ Peak Height: " + f"{CO2P_BP[2]:.3f} ± {CO2P_STD[2]:.3f}", (0.025, 0.85), xycoords = 'axes fraction')
-                ax4.set_xlim([1275, 2000])
+                ax4.set_xlim([1250, 2400])
                 ax4.set_xlabel('Wavenumber $(\mathregular{cm^{-1}})$')
                 ax4.set_ylabel('Absorbance')
                 ax4.legend(loc = 'upper right', prop={'size': 10})
@@ -1266,8 +974,12 @@ def Run_All_Spectra(dfs_dict, exportpath):
                                 savefile=path_beg+plotpath+'MODELFIT/'+files+'_modelfit.pdf')
                 plt.close('all')
 
-            else: 
-                pass 
+        except Exception as e: 
+            failures.append(files)
+            print(f"{files} failed. Reason: {str(e)}")
+
+        else: 
+            pass
 
             # Create dataframe of best fit parameters and their standard deviations
             DF_Output.loc[files] = pd.Series({'PH_1635_BP':H2OmP1635_BP[0],'PH_1635_STD':H2OmP1635_STD[0],'H2Om_1635_MAX': MAX_1635_ABS, 'BL_H2Om_1635_MAX': BL_MAX_1635_ABS,
@@ -1276,15 +988,12 @@ def Run_All_Spectra(dfs_dict, exportpath):
             'MAX_1515_ABS': MAX_1515_ABS, 'BL_MAX_1515_ABS': BL_MAX_1515_ABS,
             'MAX_1430_ABS': MAX_1430_ABS, 'BL_MAX_1430_ABS': BL_MAX_1430_ABS})
 
-            PCA_Output.loc[files] = pd.Series({'AVG_BL_BP':PCA_BP[0],'AVG_BL_STD':PCA_STD[0],'PCA1_BP':PCA_BP[1],'PCA1_STD':PCA_STD[1],'PCA2_BP':PCA_BP[2],'PCA2_STD':PCA_STD[2], 
-            'PCA3_BP':PCA_BP[3],'PCA3_STD':PCA_STD[3],'PCA4_BP':PCA_BP[4],'PCA4_STD':PCA_STD[4],'m_BP':m_BP,'m_STD':m_STD,'b_BP':b_BP,'b_STD':b_STD, 
-            'PH_1635_PCA1_BP':H2OmP1635_BP[1],'PH_1635_PCA1_STD':H2OmP1635_STD[1],'PH_1635_PCA2_BP':H2OmP1635_BP[2],'PH_1635_PCA2_STD':H2OmP1635_STD[2]})
+            PC_Output.loc[files] = pd.Series({'AVG_BL_BP':PC_BP[0],'AVG_BL_STD':PC_STD[0],'PC1_BP':PC_BP[1],'PC1_STD':PC_STD[1],'PC2_BP':PC_BP[2],'PC2_STD':PC_STD[2], 
+            'PC3_BP':PC_BP[3],'PC3_STD':PC_STD[3],'PC4_BP':PC_BP[4],'PC4_STD':PC_STD[4],'m_BP':m_BP,'m_STD':m_STD,'b_BP':b_BP,'b_STD':b_STD, 
+            'PH_1635_PC1_BP':H2OmP1635_BP[1],'PH_1635_PC1_STD':H2OmP1635_STD[1],'PH_1635_PC2_BP':H2OmP1635_BP[2],'PH_1635_PC2_STD':H2OmP1635_STD[2]})
 
-    except:
-        failures.append(files)
-        print(files + ' failed.')
 
-    Volatiles_DF = pd.concat([H2O_3550_PH, DF_Output, NEAR_IR_PH, PCA_Output], axis = 1)
+    Volatiles_DF = pd.concat([H2O_3550_PH, DF_Output, NEAR_IR_PH, PC_Output], axis = 1)
 
     return Volatiles_DF, failures
 
@@ -1554,7 +1263,7 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, T, P):
                                             'H2Om_5200_M', 'H2Om_5200_STD', 
                                             'OH_4500_M', 'OH_4500_STD'])
     # dataframe for storing extinction coefficient and uncertainty data
-    epsilon = pd.DataFrame(columns=['Tau', 'Na/Na+Ca', 
+    epsilon = pd.DataFrame(columns=['Tau', 'Eta', 
                                     'epsilon_H2OT_3550', 'sigma_epsilon_H2OT_3550', 
                                     'epsilon_H2Om_1635', 'sigma_epsilon_H2Om_1635', 
                                     'epsilon_CO2', 'sigma_epsilon_CO2', 
@@ -1567,7 +1276,7 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, T, P):
     # dataframe for storing mean volatile data
     mean_vol = pd.DataFrame(columns = ['H2OT_MEAN', 'H2OT_STD', 'CO2_MEAN', 'CO2_STD'])
     # dataframe for storing signal-to-noise error data
-    s2nerror = pd.DataFrame(columns = ['PH_5200_S2N', 'PH_4500_S2N', 'ERR_5200', 'ERR_4500'])
+    s2nerror = pd.DataFrame(columns = ['PH_5200_S2N', 'ERR_5200', 'PH_4500_S2N', 'ERR_4500'])
 
     # Define a dictionary of molar masses for each oxide
     molar_mass = {'SiO2': 60.08, 'TiO2': 79.866, 'Al2O3': 101.96, 'Fe2O3': 159.69, 'FeO': 71.844, 'MnO': 70.9374, 
@@ -1632,7 +1341,7 @@ def Concentration_Output(Volatiles_DF, N, thickness, MI_Composition, T, P):
 
         # Save outputs of extinction coefficients to dataframe epsilon 
         epsilon.loc[i] = pd.Series({
-            'Tau': SiAl_tot[i], 'Na/Na+Ca': Na_NaCa[i],
+            'Tau': SiAl_tot[i], 'Eta': Na_NaCa[i],
             'epsilon_H2OT_3550': epsilon_H2OT_3550, 'sigma_epsilon_H2OT_3550': CT68_3550,
             'epsilon_H2Om_1635': epsilon_H2Om_1635, 'sigma_epsilon_H2Om_1635': CT68_1635,
             'epsilon_CO2': epsilon_CO2, 'sigma_epsilon_CO2': CT68_CO2,
@@ -1950,7 +1659,7 @@ def Thickness_Calc(n, positions):
 
     return 1/(2 * n * np.abs(np.diff(positions)))
 
-def Thickness_Processing(dfs_dict, n, wn_high, wn_low, remove_baseline=False, plotting=False, phaseol=True):
+def Thickness_Process(dfs_dict, n, wn_high, wn_low, remove_baseline=False, plotting=False, phaseol=True):
 
     """
     Calculates thickness of glass wafers based on the refractive index of the glass and the positions of the

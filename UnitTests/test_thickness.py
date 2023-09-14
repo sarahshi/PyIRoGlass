@@ -47,7 +47,7 @@ class test_thickness(unittest.TestCase):
     def test_process_thickness(self): 
 
         result = pig.Reflectance_Index(self.xfo)
-        thickness_results = pig.Thickness_Processing(self.dfs_dict, result, self.wn_high, self.wn_low, remove_baseline=False, plotting=False, phaseol=True)
+        thickness_results = pig.Thickness_Process(self.dfs_dict, result, self.wn_high, self.wn_low, remove_baseline=False, plotting=False, phaseol=True)
         result = float(thickness_results['Thickness_M'])
         expected = 79.81
         self.assertAlmostEqual(result, expected, self.decimalPlace-2, msg="Thickness test and expected values from the Thickness_Processing function do not agree")

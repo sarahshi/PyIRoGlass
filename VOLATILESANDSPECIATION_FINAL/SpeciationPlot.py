@@ -1077,7 +1077,7 @@ df_unsat_std = df_unsat_std[~df_unsat_std.index.str.startswith('STD_ETF46')]
 
 
 df_net = pd.concat([df_sat, df_unsat, df_sat_std, df_unsat_std])
-
+df_net = df_net.dropna()
 
 slope1, intercept1, r_value1, p_value1, std_err1 = scipy.stats.linregress(df_net['H2Om_1635_BP'], df_net['H2Om_5200_M'])
 ccc1 = concordance_correlation_coefficient(df_net['H2Om_1635_BP'], df_net['H2Om_5200_M'])
@@ -1116,7 +1116,7 @@ ax[1].annotate("b="+str(np.round(intercept1, 2)), xy=(0.035, 0.69), xycoords="ax
 
 plt.tight_layout()
 
-plt.savefig('VOLATILESANDSPECIATION_FINAL/NetSpeciation.pdf', bbox_inches='tight', pad_inches = 0.025)
+plt.savefig('NetSpeciation.pdf', bbox_inches='tight', pad_inches = 0.025)
 
 
 # %%

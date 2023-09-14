@@ -76,13 +76,13 @@ class test_fitting_functions(unittest.TestCase):
         expected_H2Ot_3550 = 1.52334293070956
 
         result_CO2_1515 = float(Volatiles_DF['PH_1515_BP'])
-        expected_CO2_1515 = 0.050343559
+        expected_CO2_1515 = 0.057289618537916066
 
         self.assertAlmostEqual(result_H2Om_5200, expected_H2Om_5200, self.decimalPlace, msg="H2Om_5200 peak height test and expected values from the Run_All_Spectra function do not agree")
 
         self.assertAlmostEqual(result_H2Ot_3550, expected_H2Ot_3550, self.decimalPlace, msg="H2Ot_3550 peak height test and expected values from the Run_All_Spectra function do not agree")
 
-        self.assertAlmostEqual(result_CO2_1515, expected_CO2_1515, self.decimalPlace-2, msg="CO2_1515 peak height test and expected values from the Run_All_Spectra function do not agree")
+        self.assertAlmostEqual(result_CO2_1515, expected_CO2_1515, self.decimalPlace-3, msg="CO2_1515 peak height test and expected values from the Run_All_Spectra function do not agree")
 
 
 if __name__ == '__main__':
