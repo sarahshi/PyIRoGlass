@@ -35,20 +35,13 @@ plt.rcParams["axes.labelsize"] = 20 # Axes labels
 # %% 
 
 path_parent = os.path.dirname(os.getcwd())
-path_beg = path_parent + '/BASELINES/'
-path_input = path_parent + '/BASELINES/Inputs/'
-output_dir = ["FIGURES", "PLOTFILES", "NPZFILES", "LOGFILES", "FINALDATA"] 
-OUTPUT_PATH = ['F18', 'STD', 'FRH', 'SIMSSTD']
 
-for ii in range(len(output_dir)):
-    if not os.path.exists(path_beg + output_dir[ii]):
-       os.makedirs(path_beg + output_dir[ii], exist_ok=True)
 
-df_f18 = pd.read_csv(output_dir[-1] + '/' + 'F18_H2OCO2.csv', index_col = 0)
-df_std = pd.read_csv(output_dir[-1] + '/' + 'STD_H2OCO2.csv', index_col = 0)
+df_f18 = pd.read_csv(path_parent + '/FINALDATA/FUEGO_H2OCO2.csv', index_col = 0)
+df_std = pd.read_csv(path_parent + '/FINALDATA/STD_H2OCO2.csv', index_col = 0)
 df_f74 = df_std[df_std.index.str.contains('VF74')]
 df_std = df_std[~df_std.index.str.contains('VF74')]
-df_sims = pd.read_csv(output_dir[-1] + '/' + 'SIMSSTD_H2OCO2.csv', index_col = 0)
+df_sims = pd.read_csv(path_parent + '/FINALDATA/STD_H2OCO2.csv', index_col = 0)
 
 def df_filt(df): 
 
@@ -123,7 +116,7 @@ ax.set_ylabel('$\mathregular{H_2O_{m, 5200}}$ (wt.%)')
 ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
 plt.tight_layout()
-plt.savefig('VOLATILESANDSPECIATION_FINAL/5200v1635_STD.pdf')
+# plt.savefig('VOLATILESANDSPECIATION_FINAL/5200v1635_STD.pdf')
 
 # %%
 
@@ -163,7 +156,7 @@ ax.set_ylabel('$\mathregular{OH^-_{4500}}$ (wt.%)')
 ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
 plt.tight_layout()
-plt.savefig('VOLATILESANDSPECIATION_FINAL/4500v3550-1635_STD.pdf')
+# plt.savefig('VOLATILESANDSPECIATION_FINAL/4500v3550-1635_STD.pdf')
 
 # %%
 
@@ -202,7 +195,7 @@ ax.set_ylabel('$\mathregular{OH^-_{4500}}$ (wt.%)')
 ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
 plt.tight_layout()
-plt.savefig('VOLATILESANDSPECIATION_FINAL/4500v3550-5200_STD.pdf')
+# plt.savefig('VOLATILESANDSPECIATION_FINAL/4500v3550-5200_STD.pdf')
 
 
 # %%
@@ -239,7 +232,7 @@ ax.set_ylabel('$\mathregular{H_2O_{m, 1635}+OH^-_{4500}}$ (wt.%)')
 ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
 plt.tight_layout()
-plt.savefig('VOLATILESANDSPECIATION_FINAL/NIR1635vH2O3550_STD.pdf')
+# plt.savefig('VOLATILESANDSPECIATION_FINAL/NIR1635vH2O3550_STD.pdf')
 
 
 # %%
@@ -274,7 +267,7 @@ ax.set_ylabel('$\mathregular{H_2O_{m, 5200}+OH^-_{4500}}$ (wt.%)')
 ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
 plt.tight_layout()
-plt.savefig('VOLATILESANDSPECIATION_FINAL/NIRvH2O3550_STD.pdf')
+# plt.savefig('VOLATILESANDSPECIATION_FINAL/NIRvH2O3550_STD.pdf')
 
 # %%
 # %%
@@ -317,7 +310,7 @@ ax.set_ylabel('$\mathregular{H_2O_{m, 5200}}$' +' $\mathregular{or}$ '+ '$\mathr
 ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
 plt.tight_layout()
-plt.savefig('VOLATILESANDSPECIATION_FINAL/Speciation_5200_STD.pdf')
+# plt.savefig('VOLATILESANDSPECIATION_FINAL/Speciation_5200_STD.pdf')
 
 
 # %% 
@@ -357,7 +350,7 @@ ax.set_ylabel('$\mathregular{H_2O_{m, 1635}}$' +' $\mathregular{or}$ '+ '$\mathr
 ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
 plt.tight_layout()
-plt.savefig('VOLATILESANDSPECIATION_FINAL/Speciation_1635_STD.pdf')
+# plt.savefig('VOLATILESANDSPECIATION_FINAL/Speciation_1635_STD.pdf')
 
 
 # %%
@@ -386,7 +379,7 @@ ax.set_ylabel('$\mathregular{H_2O_{m, 5200}}/\mathregular{OH^-_{4500}}$')
 ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
 plt.tight_layout()
-plt.savefig('VOLATILESANDSPECIATION_FINAL/SpeciationRatio_5200_STD.pdf')
+# plt.savefig('VOLATILESANDSPECIATION_FINAL/SpeciationRatio_5200_STD.pdf')
 
 # %%
 
@@ -414,7 +407,7 @@ ax.set_ylabel('$\mathregular{H_2O_{m, 1635}}/\mathregular{OH^-_{4500}}$')
 ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
 plt.tight_layout()
-plt.savefig('VOLATILESANDSPECIATION_FINAL/SpeciationRatio_1635_STD.pdf')
+# plt.savefig('VOLATILESANDSPECIATION_FINAL/SpeciationRatio_1635_STD.pdf')
 
 # %%
 # %% 
@@ -469,7 +462,7 @@ ax.set_ylabel('$\mathregular{H_2O_{m, 5200}}$ (wt.%)')
 ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
 plt.tight_layout()
-plt.savefig('VOLATILESANDSPECIATION_FINAL/5200v1635_VF.pdf')
+# plt.savefig('VOLATILESANDSPECIATION_FINAL/5200v1635_VF.pdf')
 
 # %% 
 # %%
@@ -520,7 +513,7 @@ ax.set_ylabel('$\mathregular{OH^-_{4500}}$ (wt.%)')
 ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
 plt.tight_layout()
-plt.savefig('VOLATILESANDSPECIATION_FINAL/4500v3550-1635_VF.pdf')
+# plt.savefig('VOLATILESANDSPECIATION_FINAL/4500v3550-1635_VF.pdf')
 
 # %%
 # %%
@@ -571,7 +564,7 @@ ax.set_ylabel('$\mathregular{OH^-_{4500}}$ (wt.%)')
 ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
 plt.tight_layout()
-plt.savefig('VOLATILESANDSPECIATION_FINAL/4500v3550-5200_VF.pdf')
+# plt.savefig('VOLATILESANDSPECIATION_FINAL/4500v3550-5200_VF.pdf')
 
 # %%
 # %%
@@ -608,7 +601,7 @@ ax.set_ylabel('$\mathregular{H_2O_{m, 1635} + OH^-_{4500}}$ (wt.%)')
 ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
 plt.tight_layout()
-plt.savefig('VOLATILESANDSPECIATION_FINAL/NIR1635vH2O3550_VF.pdf')
+# plt.savefig('VOLATILESANDSPECIATION_FINAL/NIR1635vH2O3550_VF.pdf')
 
 # %%
 # %%
@@ -645,7 +638,7 @@ ax.set_ylabel('$\mathregular{H_2O_{m, 5200} + OH^-_{4500}}$ (wt.%)')
 ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
 plt.tight_layout()
-plt.savefig('VOLATILESANDSPECIATION_FINAL/NIRvH2O3550_VF.pdf')
+# plt.savefig('VOLATILESANDSPECIATION_FINAL/NIRvH2O3550_VF.pdf')
 
 # %%
 # %%
@@ -695,7 +688,7 @@ ax.set_ylabel('$\mathregular{H_2O_{m, 5200}}$' +' $\mathregular{or}$ '+ '$\mathr
 ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
 plt.tight_layout()
-plt.savefig('VOLATILESANDSPECIATION_FINAL/Speciation_5200_VF.pdf')
+# plt.savefig('VOLATILESANDSPECIATION_FINAL/Speciation_5200_VF.pdf')
 
 
 # %% 
@@ -760,7 +753,7 @@ ax.set_ylabel('$\mathregular{H_2O_{m, 1635}}$' +' $\mathregular{or}$ '+ '$\mathr
 ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
 plt.tight_layout()
-plt.savefig('VOLATILESANDSPECIATION_FINAL/Speciation_1635_VF.pdf')
+# plt.savefig('VOLATILESANDSPECIATION_FINAL/Speciation_1635_VF.pdf')
 
 
 # %% 
@@ -811,7 +804,7 @@ ax.set_ylabel('$\mathregular{H_2O_{m, 5200}}/\mathregular{OH^-_{4500}}$')
 ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
 plt.tight_layout()
-plt.savefig('VOLATILESANDSPECIATION_FINAL/SpeciationRatio_5200_VF.pdf')
+# plt.savefig('VOLATILESANDSPECIATION_FINAL/SpeciationRatio_5200_VF.pdf')
 
 # %%
 # %%
@@ -861,7 +854,7 @@ ax.set_ylabel('$\mathregular{H_2O_{m, 1635}}/\mathregular{OH^-_{4500}}$')
 ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
 plt.tight_layout()
-plt.savefig('VOLATILESANDSPECIATION_FINAL/SpeciationRatio_1635_VF.pdf')
+# plt.savefig('VOLATILESANDSPECIATION_FINAL/SpeciationRatio_1635_VF.pdf')
 
 # %%
 
@@ -1003,8 +996,8 @@ ax[3].set_ylabel('$\mathregular{H_2O_{m, 5200} + OH^-_{4500}}$ (wt.%)')
 ax[3].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[3].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 ax[3].annotate("$\mathregular{R^{2}}$="+str(np.round(r_value3**2, 2)), xy=(0.035, 0.7675), xycoords="axes fraction", fontsize=12)
-ax[3].annotate("CCC="+str(np.round(ccc3, 2)), xy=(0.035, 0.81), xycoords="axes fraction", fontsize=12)
-ax[3].annotate("RMSE="+str(np.round(rmse3, 2)), xy=(0.035, 0.85), xycoords="axes fraction", fontsize=12)
+ax[3].annotate("CCC="+str(np.round(ccc3, 2)), xy=(0.035, 0.85), xycoords="axes fraction", fontsize=12)
+ax[3].annotate("RMSE="+str(np.round(rmse3, 2)), xy=(0.035, 0.81), xycoords="axes fraction", fontsize=12)
 ax[3].annotate("m="+str(np.round(slope3, 2)), xy=(0.035, 0.73), xycoords="axes fraction", fontsize=12)
 ax[3].annotate("b="+str(np.round(intercept3, 2)), xy=(0.035, 0.69), xycoords="axes fraction", fontsize=12)
 
@@ -1031,8 +1024,8 @@ ax[4].set_xlabel('$\mathregular{OH^-_{4500}}$ (wt.%)')
 ax[4].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[4].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 ax[4].annotate("$\mathregular{R^{2}}$="+str(np.round(r_value4**2, 2)), xy=(0.035, 0.7675), xycoords="axes fraction", fontsize=12)
-ax[4].annotate("CCC="+str(np.round(ccc4, 2)), xy=(0.035, 0.81), xycoords="axes fraction", fontsize=12)
-ax[4].annotate("RMSE="+str(np.round(rmse4, 2)), xy=(0.035, 0.85), xycoords="axes fraction", fontsize=12)
+ax[4].annotate("CCC="+str(np.round(ccc4, 2)), xy=(0.035, 0.85), xycoords="axes fraction", fontsize=12)
+ax[4].annotate("RMSE="+str(np.round(rmse4, 2)), xy=(0.035, 0.81), xycoords="axes fraction", fontsize=12)
 ax[4].annotate("m="+str(np.round(slope4, 2)), xy=(0.035, 0.73), xycoords="axes fraction", fontsize=12)
 ax[4].annotate("b="+str(np.round(intercept4, 2)), xy=(0.035, 0.69), xycoords="axes fraction", fontsize=12)
 
@@ -1061,8 +1054,8 @@ ax[5].set_xlabel('$\mathregular{OH^-_{4500}}$ (wt.%)')
 ax[5].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[5].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 ax[5].annotate("$\mathregular{R^{2}}$="+str(np.round(r_value5**2, 2)), xy=(0.035, 0.7675), xycoords="axes fraction", fontsize=12)
-ax[5].annotate("CCC="+str(np.round(ccc5, 2)), xy=(0.035, 0.81), xycoords="axes fraction", fontsize=12)
-ax[5].annotate("RMSE="+str(np.round(rmse5, 2)), xy=(0.035, 0.85), xycoords="axes fraction", fontsize=12)
+ax[5].annotate("CCC="+str(np.round(ccc5, 2)), xy=(0.035, 0.85), xycoords="axes fraction", fontsize=12)
+ax[5].annotate("RMSE="+str(np.round(rmse5, 2)), xy=(0.035, 0.81), xycoords="axes fraction", fontsize=12)
 ax[5].annotate("m="+str(np.round(slope5, 2)), xy=(0.035, 0.73), xycoords="axes fraction", fontsize=12)
 ax[5].annotate("b="+str(np.round(intercept5, 2)), xy=(0.035, 0.69), xycoords="axes fraction", fontsize=12)
 
@@ -1109,8 +1102,8 @@ ax[1].set_ylabel('$\mathregular{H_2O_{m, 5200}}$ (wt.%)')
 ax[1].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[1].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 ax[1].annotate("$\mathregular{R^{2}}$="+str(np.round(r_value1**2, 2)), xy=(0.035, 0.7675), xycoords="axes fraction", fontsize=12)
-ax[1].annotate("CCC="+str(np.round(ccc1, 2)), xy=(0.035, 0.81), xycoords="axes fraction", fontsize=12)
-ax[1].annotate("RMSE="+str(np.round(rmse1, 2)), xy=(0.035, 0.85), xycoords="axes fraction", fontsize=12)
+ax[1].annotate("CCC="+str(np.round(ccc1, 2)), xy=(0.035, 0.85), xycoords="axes fraction", fontsize=12)
+ax[1].annotate("RMSE="+str(np.round(rmse1, 2)), xy=(0.035, 0.81), xycoords="axes fraction", fontsize=12)
 ax[1].annotate("m="+str(np.round(slope1, 2)), xy=(0.035, 0.73), xycoords="axes fraction", fontsize=12)
 ax[1].annotate("b="+str(np.round(intercept1, 2)), xy=(0.035, 0.69), xycoords="axes fraction", fontsize=12)
 
