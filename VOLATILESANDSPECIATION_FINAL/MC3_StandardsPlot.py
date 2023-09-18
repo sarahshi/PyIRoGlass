@@ -11,9 +11,11 @@ import warnings
 import mc3
 import numpy as np
 import pandas as pd
+import scipy 
 
 import scipy.signal as signal
 import scipy.interpolate as interpolate
+from sklearn.metrics import mean_squared_error
 
 import matplotlib
 from matplotlib import pyplot as plt
@@ -47,13 +49,13 @@ PATHS = [path_input + string for string in ['TransmissionSpectra/Fuego/', 'Trans
 CHEMTHICK_PATH = [path_input + string for string in ['FuegoChemThick.csv', 'StandardChemThick.csv', 'DanRHChemThick.csv', 'ND70ChemThick.csv', 'HJYMChemThick.csv', 'YMChemThick.csv']]
 
 # Change last value in list to be what you want your output directory to be called. 
-INPUT_PATHS = ['FUEGO', 'STD', 'FRH', 'ND70', 'EXPSTD', 'YMSTD']
+INPUT_PATHS = ['FUEGO', 'STD', 'FRH']
 
 # Change to be what you want the prefix of your output files to be. 
-OUTPUT_PATH = ['FUEGO', 'STD', 'FRH', 'ND70', 'EXPSTD', 'YMSTD']
+OUTPUT_PATH = ['FUEGO', 'STD', 'FRH']
 
 stdno = 1
-MEGA_SPREADSHEET = pd.read_csv(path_parent + '/' + output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_H2OCO2_FwSTD_WHOI.csv', index_col = 0)
+MEGA_SPREADSHEET = pd.read_csv(path_parent + '/' + output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_H2OCO2_FwSTD_ONorm.csv', index_col = 0)
 
 # %% 
 
@@ -75,18 +77,36 @@ VF74_132_2 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('VF74_132-2')]
 NS1 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('NS1')]
 M35 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('M35')]
 M43 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('M43')]
-BF73 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('BF73')]
-BF76 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('BF76')]
-BF77 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('BF77')]
+BF73 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('BF73_100x100')]
+BF76 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('BF76_100x')]
+BF77 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('BF77_50x50')]
 
 
-# INSOL = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('INSOL')]
-# STD_ETFS = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('ETFS')]
-# VF74_131_1 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('VF74_131-1')]
-# VF74_131_9 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('VF74_131-9')]
-# VF74_132_1 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('VF74_132-1')]
-# VF74_134D_15 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('VF74_134D-15')]
-# VF74_136_3 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('VF74_136-3')]
+def concordance_correlation_coefficient(y_true, y_pred):
+    """Concordance correlation coefficient."""
+    # Remove NaNs
+    df = pd.DataFrame({
+        'y_true': y_true,
+        'y_pred': y_pred
+    })
+    df = df.dropna()
+    y_true = df['y_true']
+    y_pred = df['y_pred']
+    # Pearson product-moment correlation coefficients
+    cor = np.corrcoef(y_true, y_pred)[0][1]
+    # Mean
+    mean_true = np.mean(y_true)
+    mean_pred = np.mean(y_pred)
+    # Variance
+    var_true = np.var(y_true)
+    var_pred = np.var(y_pred)
+    # Standard deviation
+    sd_true = np.std(y_true)
+    sd_pred = np.std(y_pred)
+    # Calculate CCC
+    numerator = 2 * cor * sd_true * sd_pred
+    denominator = var_true + var_pred + (mean_true - mean_pred)**2
+    return numerator / denominator
 
 # %% 
 
@@ -122,11 +142,6 @@ fig, ax = plt.subplots(1, 2, figsize = (14, 7))
 
 ax = ax.flatten()
 ax[0].plot(h2o_line, h2o_line, 'k', lw = 1, zorder = 0)
-
-# ax[0].scatter(H2O_expmean(INSOL), H2O_mean(INSOL), s = sz, marker = 's', c = '#2166AC', ec = '#171008', lw = 0.5, zorder = 20, label = 'INSOL')
-# ax[0].errorbar(H2O_expmean(INSOL), H2O_mean(INSOL), xerr = H2O_expstd(INSOL), yerr = H2O_mean(INSOL) * H2O_rsd(INSOL), lw = 0.5, c = 'k', zorder = 10)
-
-
 ax[0].scatter(H2O_expmean(Fiege63), H2O_mean(Fiege63), s = sz, c = '#B2182B', ec = '#171008', lw = 0.5, zorder = 15, label = 'ABWCl-F0x')
 ax[0].scatter(H2O_expmean(Fiege63)+0.01, H2O_mean(Fiege63), s = sz_sm, marker = '>', c = '#FFFFFF', ec = '#171008', lw = 0.5, zorder = 20)
 ax[0].errorbar(H2O_expmean(Fiege63), H2O_mean(Fiege63), xerr = H2O_expstd(Fiege63), yerr = H2O_mean(Fiege63) * H2O_rsd(Fiege63), lw = 0.5, c = 'k', zorder = 10)
@@ -178,7 +193,7 @@ ax[0].set_xlim([0, 5])
 ax[0].set_ylim([0, 5])
 ax[0].set_xlabel('$\mathregular{H_2O}$ Expected (wt.%)')
 ax[0].set_ylabel('$\mathregular{H_2O_t}$ Measured by FTIR (wt.%)')
-l1 = ax[0].legend(loc = (0.01, 0.33), labelspacing = 0.2, handletextpad = 0.25, handlelength = 1.00, prop={'size': 13}, frameon=False)
+l1 = ax[0].legend(loc = 'lower right', labelspacing = 0.2, handletextpad = 0.25, handlelength = 1.00, prop={'size': 13}, frameon=False)
 ax[0].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[0].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 
@@ -187,23 +202,34 @@ sims_sym = ax[0].scatter(np.nan, np.nan, s = 100, marker = 's', ec = '#171008', 
 kft_sym = ax[0].scatter(np.nan, np.nan, s = 100, marker = 'D', ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = 'KFT')
 ea_sym = ax[0].scatter(np.nan, np.nan, s = sz+10, marker = 'p', ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = 'KFT')
 sat_symb = ax[0].scatter(np.nan, np.nan, s = sz_sm, marker = '>', ec = '#171008', facecolors='none', lw = 0.5, zorder = 20, label = '$\mathregular{H_2O_{t, 3550}}$ Saturated')
-ax[0].legend([ftir_sym, sims_sym, kft_sym, ea_sym, sat_symb], ['FTIR', 'SIMS', 'KFT', 'EA', '$\mathregular{H_2O_{t, 3550}}$ Saturated'], loc = 'lower right', labelspacing = 0.3, handletextpad = 0.25, handlelength = 1.00, prop={'size': 13}, frameon=False)
+ax[0].legend([ftir_sym, sims_sym, kft_sym, sat_symb], ['FTIR', 'SIMS', 'KFT', '$\mathregular{H_2O_{t, 3550}}$ Saturated'], loc = (0.0025, 0.55), labelspacing = 0.3, handletextpad = 0.25, handlelength = 1.00, prop={'size': 13}, frameon=False)
 ax[0].add_artist(l1)
-ax[0].annotate("A.", xy=(0.02, 0.95), xycoords="axes fraction", fontsize=20, weight='bold')
+ax[0].annotate("A.", xy=(0.025, 0.95), xycoords="axes fraction", fontsize=20, weight='bold')
+
+h2o_exp = np.array([H2O_expmean(Fiege63), H2O_expmean(Fiege73), H2O_expmean(BF73), H2O_expmean(BF76), H2O_expmean(BF77), H2O_expmean(M35), H2O_expmean(M43), H2O_expmean(NS1), H2O_expmean(ETFSR_Ol8), 
+                    H2O_expmean(CD33_12_2_2), H2O_expmean(CD33_22_1_1), H2O_expmean(STD_D1010), H2O_expmean(ALV1833_11), H2O_expmean(WOK5_4), H2O_expmean(ALV1846)])
+h2o_py = np.array([H2O_mean(Fiege63), H2O_mean(Fiege73), H2O_mean(BF73), H2O_mean(BF76), H2O_mean(BF77), H2O_mean(M35), H2O_mean(M43), H2O_mean(NS1), H2O_mean(ETFSR_Ol8), 
+                    H2O_mean(CD33_12_2_2), H2O_mean(CD33_22_1_1), H2O_mean(STD_D1010), H2O_mean(ALV1833_11), H2O_mean(WOK5_4), H2O_mean(ALV1846)])
+slope0, intercept0, r_value0, p_value0, std_err0 = scipy.stats.linregress(h2o_exp, h2o_py)
+ccc0 = concordance_correlation_coefficient(h2o_exp, h2o_py)
+rmse0 = mean_squared_error(h2o_exp, h2o_py, squared=False)
+
+ax[0].annotate("$\mathregular{R^{2}}$="+str(np.round(r_value0**2, 2)), xy=(0.02, 0.8275), xycoords="axes fraction", fontsize=12)
+ax[0].annotate("CCC="+str(np.round(ccc0, 2)), xy=(0.02, 0.91), xycoords="axes fraction", fontsize=12)
+ax[0].annotate("RMSE="+str(np.round(rmse0, 2)), xy=(0.02, 0.87), xycoords="axes fraction", fontsize=12)
+ax[0].annotate("m="+str(np.round(slope0, 2)), xy=(0.02, 0.79), xycoords="axes fraction", fontsize=12)
+ax[0].annotate("b="+str(np.round(intercept0, 2)), xy=(0.02, 0.75), xycoords="axes fraction", fontsize=12)
+
 
 
 ax[1].plot(co2_line, co2_line, 'k', lw = 1, zorder = 0)
-
-# ax[1].scatter(CO2_expmean(INSOL), CO2_mean(INSOL), s = sz, marker = 's', c = '#2166AC', ec = '#171008', lw = 0.5, zorder = 20, label = 'INSOL')
-# ax[1].errorbar(CO2_expmean(INSOL), CO2_mean(INSOL), xerr = CO2_expstd(INSOL), yerr = CO2_mean(INSOL) * CO2_rsd(INSOL) * 2, lw = 0.5, c = 'k', zorder = 10)
-
-ax[1].scatter(CO2_expmean(BF73), CO2_mean(BF73), s = sz+10, marker = 'p', c = '#F4A582', ec = '#171008', lw = 0.5, zorder = 20, label = 'BF73')
+ax[1].scatter(CO2_expmean(BF73), CO2_mean(BF73), s = sz+10, marker = 's', c = '#F4A582', ec = '#171008', lw = 0.5, zorder = 20, label = 'BF73')
 ax[1].errorbar(CO2_expmean(BF73), CO2_mean(BF73), xerr = CO2_expstd(BF73), yerr = CO2_mean(BF73) * CO2_rsd(BF73) * 2, lw = 0.5, c = 'k', zorder = 10)
 
-ax[1].scatter(CO2_expmean(BF76), CO2_mean(BF76), s = sz+10, marker = 'p', c = '#FDDBC7', ec = '#171008', lw = 0.5, zorder = 20, label = 'BF76')
+ax[1].scatter(CO2_expmean(BF76), CO2_mean(BF76), s = sz+10, marker = 's', c = '#FDDBC7', ec = '#171008', lw = 0.5, zorder = 20, label = 'BF76')
 ax[1].errorbar(CO2_expmean(BF76), CO2_mean(BF76), xerr = CO2_expstd(BF76), yerr = CO2_mean(BF76) * CO2_rsd(BF76) * 2, lw = 0.5, c = 'k', zorder = 10)
 
-ax[1].scatter(CO2_expmean(BF77), CO2_mean(BF77), s = sz+10, marker = 'p', c = '#F7F7F7', ec = '#171008', lw = 0.5, zorder = 20, label = 'BF77')
+ax[1].scatter(CO2_expmean(BF77), CO2_mean(BF77), s = sz+10, marker = 's', c = '#F7F7F7', ec = '#171008', lw = 0.5, zorder = 20, label = 'BF77')
 ax[1].errorbar(CO2_expmean(BF77), CO2_mean(BF77), xerr = CO2_expstd(BF77), yerr = CO2_mean(BF77) * CO2_rsd(BF77) * 2, lw = 0.5, c = 'k', zorder = 10)
 
 ax[1].scatter(CO2_expmean(M35), CO2_mean(M35), s = sz, c = '#D1E5F0', ec = '#171008', lw = 0.5, zorder = 20, label = 'M35')
@@ -222,7 +248,7 @@ ax[1].scatter(CO2_expmean(CD33_22_1_1), CO2_mean(CD33_22_1_1), s = sz, c = '#BEB
 ax[1].errorbar(CO2_expmean(CD33_22_1_1), CO2_mean(CD33_22_1_1), xerr = CO2_expstd(CD33_22_1_1), yerr = CO2_mean(CD33_22_1_1) * CO2_rsd(CD33_22_1_1) * 2, lw = 0.5, c = 'k', zorder = 10)
 
 ax[1].scatter(CO2_expmean(STD_D1010), CO2_mean(STD_D1010), s = sz, c = '#9D9D9D', ec = '#171008', lw = 0.5, zorder = 20, label = 'D1010')
-ax[1].errorbar(CO2_expmean(STD_D1010), CO2_mean(STD_D1010), xerr = CO2_expstd(STD_D1010), yerr = CO2_mean(STD_D1010) * 0.1 * 2, lw = 0.5, c = 'k', zorder = 10)
+ax[1].errorbar(CO2_expmean(STD_D1010), CO2_mean(STD_D1010), xerr = CO2_expstd(STD_D1010), yerr = CO2_mean(STD_D1010) * CO2_rsd(STD_D1010) * 2, lw = 0.5, c = 'k', zorder = 10)
 
 ax[1].scatter(CO2_expmean(ALV1833_11), CO2_mean(ALV1833_11), s = sz, c = '#7D7D7D', ec = '#171008', lw = 0.5, zorder = 20, label = 'ALV1833-11')
 ax[1].errorbar(CO2_expmean(ALV1833_11), CO2_mean(ALV1833_11), xerr = CO2_expstd(ALV1833_11), yerr = CO2_mean(ALV1833_11) * CO2_rsd(ALV1833_11) * 2, lw = 0.5, c = 'k', zorder = 10)
@@ -230,34 +256,31 @@ ax[1].errorbar(CO2_expmean(ALV1833_11), CO2_mean(ALV1833_11), xerr = CO2_expstd(
 ax[1].scatter(CO2_expmean(WOK5_4), CO2_mean(WOK5_4), s = sz, c = '#5C5C5C', ec = '#171008', lw = 0.5, zorder = 20, label = '23WOK5-4')
 ax[1].errorbar(CO2_expmean(WOK5_4), CO2_mean(WOK5_4), xerr = CO2_expstd(WOK5_4), yerr = CO2_mean(WOK5_4) * CO2_rsd(WOK5_4) * 2, lw = 0.5, c = 'k', zorder = 10)
 
-merge = pd.read_csv('../BLComp/PHComparison.csv')
-merge = merge.set_index('Sample ID')
-badspec = np.array(['CI_IPGP_B6_2_50x50_256s_sp1', 'CI_IPGP_B6_1_50x50_256s_sp2', 'CI_IPGP_NBO_2_2_1_100x100_256s_sp1', 
-                    'CI_Ref_22_1_100x100_256s_sp1', 'CI_Ref_22_1_100x100_256s_sp2', 
-                    'CI_Ref_23_1_100x100_256s_sp5_BLcomp', 'CI_Ref_24_1_100x100_256s_sp1',
-                    'CI_Ref_bas_1_1_100x100_256s_sp1', 'CI_Ref_bas_1_1_100x100_256s_sp2', 
-                    'CI_Ref_bas_1_2_100x100_256s_sp1', 'CI_Ref_bas_1_2_100x100_256s_sp2', 
-                    'CI_Ref_bas_2_1_100x100_256s_sp1', 
-                    'CI_Ref_bas_2_2_100x100_256s_4sp1', 'CI_Ref_bas_2_2_100x100_256s_sp2', 'CI_Ref_bas_2_2_100x100_256s_sp3', 
-                    'CI_Ref_bas_2_3_100x100_256s_sp1', 
-                    'CI_Ref_bas_3_3_100x100_256s_sp1', 
-                    'CI_Ref_bas_4_2_100x100_256s_sp2',
-                    'LMT_BA3_2_50x50_256s_sp1', 'LMT_BA3_2_50x50_256s_sp2', 'CI_LMT_BA5_2_50x50x_256s_sp1'])
-merge = merge[~merge.index.isin(badspec)]
-
-ax[1].scatter(merge.CO2_EA, merge.CO2_MEAN, s = sz-50, c = 'k', ec = '#171008', lw = 0.5, zorder = 20, label = '23WOK5-4')
-
-ax[1].set_xlim([0, 12000]) # 4250
-ax[1].set_ylim([0, 12000])
+ax[1].set_xlim([0, 5000]) # 4250
+ax[1].set_ylim([0, 5000])
 ax[1].set_xlabel('$\mathregular{CO_2}$ Expected (ppm)')
 ax[1].set_ylabel('$\mathregular{CO_2}$ Measured by FTIR (ppm)')
 ax[1].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[1].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 ax[1].legend(loc = 'lower right', labelspacing = 0.2, handletextpad = 0.25, handlelength = 1.00, prop={'size': 13}, frameon=False)
-ax[1].annotate("B.", xy=(0.02, 0.95), xycoords="axes fraction", fontsize=20, weight='bold')
+ax[1].annotate("B.", xy=(0.025, 0.95), xycoords="axes fraction", fontsize=20, weight='bold')
+
+co2_exp = np.array([CO2_expmean(BF73), CO2_expmean(BF76), CO2_expmean(BF77), CO2_expmean(M35), CO2_expmean(M43), CO2_expmean(NS1),
+                    CO2_expmean(CD33_12_2_2), CO2_expmean(CD33_22_1_1), CO2_expmean(STD_D1010), CO2_expmean(ALV1833_11), CO2_expmean(WOK5_4)])
+co2_py = np.array([CO2_mean(BF73), CO2_mean(BF76), CO2_mean(BF77), CO2_mean(M35), CO2_mean(M43), CO2_mean(NS1),
+                    CO2_mean(CD33_12_2_2), CO2_mean(CD33_22_1_1), CO2_mean(STD_D1010), CO2_mean(ALV1833_11), CO2_mean(WOK5_4)])
+slope1, intercept1, r_value1, p_value1, std_err1 = scipy.stats.linregress(co2_exp, co2_py)
+ccc1 = concordance_correlation_coefficient(co2_exp, co2_py)
+rmse1 = mean_squared_error(co2_exp, co2_py, squared=False)
+
+ax[1].annotate("$\mathregular{R^{2}}$="+str(np.round(r_value1**2, 2)), xy=(0.02, 0.8275), xycoords="axes fraction", fontsize=12)
+ax[1].annotate("CCC="+str(np.round(ccc1, 2)), xy=(0.02, 0.91), xycoords="axes fraction", fontsize=12)
+ax[1].annotate("RMSE="+str(np.round(rmse1, 2)), xy=(0.02, 0.87), xycoords="axes fraction", fontsize=12)
+ax[1].annotate("m="+str(np.round(slope1, 2)), xy=(0.02, 0.79), xycoords="axes fraction", fontsize=12)
+ax[1].annotate("b="+str(np.round(intercept1, 2)), xy=(0.02, 0.75), xycoords="axes fraction", fontsize=12)
 
 plt.tight_layout()
-plt.savefig('FTIRSIMS_Comparison_testing.pdf')
+# plt.savefig('FTIRSIMS_Comparison_OBeam.pdf', bbox_inches='tight', pad_inches = 0.025)
 plt.show()
 
 # %% 

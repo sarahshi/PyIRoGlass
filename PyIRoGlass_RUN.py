@@ -36,7 +36,7 @@ PATHS = [path_spec_input + string for string in ['Fuego/', 'Standards/', 'Fuego1
 CHEMTHICK_PATH = [path_input + string for string in ['FuegoChemThick.csv', 'StandardChemThick.csv', 'FuegoRHChemThick.csv']]
 
 # Change last value in list to be what you want your output directory to be called. 
-OUTPUT_PATHS = ['FUEGO', 'STD', 'FRH']
+OUTPUT_PATHS = ['FUEGO_FULL', 'STD_FULL', 'FRH_FULL']
 
 
 # %% 
@@ -306,8 +306,8 @@ MEGA_SPREADSHEET['Sample ID'] = MEGA_SPREADSHEET.index
 CONC = pd.read_csv(output_dir[-1] + '/' + OUTPUT_PATHS[stdno] + '_H2OCO2.csv', index_col = 0) 
 CONC['Sample ID'] = MEGA_SPREADSHEET.index
 
-HJ = pd.read_csv('BLComp/PyIRoGlass-LHJ.csv', index_col=0)
-HJ_peaks = HJ[['Sample ID', '1430 cm-1', '1515 cm-1', '3535 cm-1', 'Background', 'Thickness', 'CO2_EA']]
+HJ = pd.read_csv('BLComp/PyIRoGlass-LHJ_0.csv', index_col=0)
+HJ_peaks = HJ[['Sample ID', 'PH_1430', 'PH_1515', 'Thickness']]
 
 CONC_conc = CONC[['CO2_MEAN', 'CO2_STD']]
 
@@ -321,21 +321,52 @@ merge
 # %%
 
 badspec = np.array(['CI_IPGP_B6_2_50x50_256s_sp1', 'CI_IPGP_B6_1_50x50_256s_sp2', 'CI_IPGP_NBO_2_2_1_100x100_256s_sp1', 
-                    'CI_Ref_22_1_100x100_256s_sp1', 'CI_Ref_22_1_100x100_256s_sp2', 
-                    'CI_Ref_23_1_100x100_256s_sp5_BLcomp', 'CI_Ref_24_1_100x100_256s_sp1',
+                    'CI_Ref_13_1_100x100_256s_sp1', 'CI_Ref_13_1_100x100_256s_sp2', 'CI_Ref_13_1_100x100_256s_sp3', 'CI_Ref_13_1_100x100_256s_sp4', 
+                    'CI_Ref_22_1_100x100_256s_sp1', 'CI_Ref_22_1_100x100_256s_sp2', 'CI_Ref_22_1_100x100_256s_sp3', 
+                    'CI_Ref_23_1_100x100_256s_040523_sp1', 'CI_Ref_23_1_100x100_256s_040523_sp3', 'CI_Ref_23_1_100x100_256s_sp4', 'CI_Ref_23_1_100x100_256s_sp5',
                     'CI_Ref_bas_1_1_100x100_256s_sp1', 'CI_Ref_bas_1_1_100x100_256s_sp2', 
                     'CI_Ref_bas_1_2_100x100_256s_sp1', 'CI_Ref_bas_1_2_100x100_256s_sp2', 
                     'CI_Ref_bas_2_1_100x100_256s_sp1', 
                     'CI_Ref_bas_2_2_100x100_256s_4sp1', 'CI_Ref_bas_2_2_100x100_256s_sp2', 'CI_Ref_bas_2_2_100x100_256s_sp3', 
                     'CI_Ref_bas_2_3_100x100_256s_sp1', 
-                    'CI_Ref_bas_3_3_100x100_256s_sp1', 
-                    'CI_Ref_bas_4_2_100x100_256s_sp2',
-                    'LMT_BA3_2_50x50_256s_sp1', 'LMT_BA3_2_50x50_256s_sp2', 'CI_LMT_BA5_2_50x50x_256s_sp1'])
+                    'CI_Ref_bas_3_2_100x100_256s_051423_sp1', 'CI_Ref_bas_3_3_100x100_256s_sp1', 
+                    'CI_Ref_bas_4_1_100x100_256s_sp1', 'CI_Ref_bas_4_1_100x100_256s_sp2',
+                    'LMT_BA3_2_50x50_256s_sp1', 'LMT_BA3_2_50x50_256s_sp2', 'CI_LMT_BA5_2_50x50x_256s_sp1'
+                    ])
 
 merge = merge[~merge.index.isin(badspec)]
 
 # %% 
 # %% 
+
+from sklearn.metrics import mean_squared_error
+import scipy
+
+def concordance_correlation_coefficient(y_true, y_pred):
+    """Concordance correlation coefficient."""
+    # Remove NaNs
+    df = pd.DataFrame({
+        'y_true': y_true,
+        'y_pred': y_pred
+    })
+    df = df.dropna()
+    y_true = df['y_true']
+    y_pred = df['y_pred']
+    # Pearson product-moment correlation coefficients
+    cor = np.corrcoef(y_true, y_pred)[0][1]
+    # Mean
+    mean_true = np.mean(y_true)
+    mean_pred = np.mean(y_pred)
+    # Variance
+    var_true = np.var(y_true)
+    var_pred = np.var(y_pred)
+    # Standard deviation
+    sd_true = np.std(y_true)
+    sd_pred = np.std(y_pred)
+    # Calculate CCC
+    numerator = 2 * cor * sd_true * sd_pred
+    denominator = var_true + var_pred + (mean_true - mean_pred)**2
+    return numerator / denominator
 
 
 %matplotlib inline
@@ -360,20 +391,22 @@ line = np.array([0, 2.25])
 sz = 80
 ticks = np.arange(0, 2.5, 0.25)
 
-tab = plt.get_cmap('tab20')
-labels_background = list(set(merge['Background']))
-cNorm  = mcolors.Normalize(vmin=0, vmax=len(labels_background))
-scalarMap = mcm.ScalarMappable(norm=cNorm, cmap=tab)
-background_to_color_idx = {background: idx for idx, background in enumerate(labels_background)}
+slope0, intercept0, r_value0, p_value0, std_err0 = scipy.stats.linregress(merge['PH_1515']/merge.Thickness*50, merge.PH_1515_BP/merge.Thickness*50)
+ccc0 = concordance_correlation_coefficient(merge['PH_1515']/merge.Thickness*50, merge.PH_1515_BP/merge.Thickness*50)
+rmse0 = mean_squared_error(merge['PH_1515']/merge.Thickness*50, merge.PH_1515_BP/merge.Thickness*50, squared=False)
+
+slope1, intercept1, r_value1, p_value1, std_err1 = scipy.stats.linregress(merge['PH_1430']/merge.Thickness*50, merge.PH_1430_BP/merge.Thickness*50)
+ccc1 = concordance_correlation_coefficient(merge['PH_1430']/merge.Thickness*50, merge.PH_1430_BP/merge.Thickness*50)
+rmse1 = mean_squared_error(merge['PH_1430']/merge.Thickness*50, merge.PH_1430_BP/merge.Thickness*50, squared=False)
 
 
 fig, ax = plt.subplots(1, 2, figsize=(14, 7))
 ax=ax.flatten()
 ax[0].plot(line, line, 'k', lw = 1, zorder = 0, label='1-1 Line')
 ax[0].fill_between(line, 0.9*line, 1.1*line, color='gray', edgecolor=None, alpha=0.25, label='10% Uncertainty')
-ax[0].scatter(merge['1515 cm-1']/merge.Thickness*50, merge.PH_1515_BP/merge.Thickness*50, s = sz, c = '#0C7BDC', ec = '#171008', lw = 0.5, zorder = 20,)
-ax[0].errorbar(merge['1515 cm-1']/merge.Thickness*50, merge.PH_1515_BP/merge.Thickness*50, yerr=merge.PH_1515_STD/merge.Thickness*200, xerr=merge['1515 cm-1']/merge.Thickness*50*0., fmt='none', lw = 0.5, c = 'k', zorder = 10)
-ax[0].text(0.035, 2.05, 'A. $\mathregular{CO_{3, 1515}^{2-}}$', ha='left', va ='bottom', size = 20)
+ax[0].scatter(merge['PH_1515']/merge.Thickness*50, merge.PH_1515_BP/merge.Thickness*50, s = sz, c = '#0C7BDC', ec = '#171008', lw = 0.5, zorder = 20,)
+ax[0].errorbar(merge['PH_1515']/merge.Thickness*50, merge.PH_1515_BP/merge.Thickness*50, yerr=merge.PH_1515_STD/merge.Thickness*150, xerr=merge['PH_1515']/merge.Thickness*50*0.05, fmt='none', lw = 0.5, c = 'k', zorder = 10)
+ax[0].text(0.06, 2.05, 'A. $\mathregular{CO_{3, 1515}^{2-}}$', ha='left', va ='bottom', size = 20)
 ax[0].set_xlim([0, 2.25])
 ax[0].set_ylim([0, 2.25])
 ax[0].set_xticks(ticks)  # Set x ticks
@@ -382,12 +415,18 @@ ax[0].set_ylabel('PyIRoGlass Peak Height')
 ax[0].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[0].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 
+ax[0].annotate("$\mathregular{R^{2}}$="+str(np.round(r_value0**2, 3)), xy=(0.03, 0.7975), xycoords="axes fraction", fontsize=14)
+ax[0].annotate("RMSE="+str(np.round(rmse0, 3)), xy=(0.03, 0.84), xycoords="axes fraction", fontsize=14)
+ax[0].annotate("CCC="+str(np.round(ccc0, 3)), xy=(0.03, 0.88), xycoords="axes fraction", fontsize=14)
+ax[0].annotate("m="+str(np.round(slope0, 3)), xy=(0.03, 0.76), xycoords="axes fraction", fontsize=14)
+ax[0].annotate("b="+str(np.round(intercept0, 3)), xy=(0.03, 0.72), xycoords="axes fraction", fontsize=14)
+
 
 ax[1].plot(line, line, 'k', lw = 1, zorder = 0, label='1-1 Line')
 ax[1].fill_between(line, 0.9*line, 1.1*line, color='gray', edgecolor=None, alpha=0.25, label='10% Uncertainty')
-ax[1].scatter(merge['1430 cm-1']/merge.Thickness*50, merge.PH_1430_BP/merge.Thickness*50, s = sz, c = '#0C7BDC', ec = '#171008', lw = 0.5, zorder = 20)
-ax[1].errorbar(merge['1430 cm-1']/merge.Thickness*50, merge.PH_1430_BP/merge.Thickness*50, yerr=merge.PH_1430_STD/merge.Thickness*200, xerr=merge['1430 cm-1']/merge.Thickness*50*0.05, fmt='none', lw = 0.5, c = 'k', zorder = 10)
-ax[1].text(0.035, 2.05, 'B. $\mathregular{CO_{3, 1430}^{2-}}$', ha='left', va ='bottom', size = 20)
+ax[1].scatter(merge['PH_1430']/merge.Thickness*50, merge.PH_1430_BP/merge.Thickness*50, s = sz, c = '#0C7BDC', ec = '#171008', lw = 0.5, zorder = 20)
+ax[1].errorbar(merge['PH_1430']/merge.Thickness*50, merge.PH_1430_BP/merge.Thickness*50, yerr=merge.PH_1430_STD/merge.Thickness*150, xerr=merge['PH_1430']/merge.Thickness*50*0.05, fmt='none', lw = 0.5, c = 'k', zorder = 10)
+ax[1].text(0.06, 2.05, 'B. $\mathregular{CO_{3, 1430}^{2-}}$', ha='left', va ='bottom', size = 20)
 ax[1].set_xlim([0, 2.25])
 ax[1].set_ylim([0, 2.25])
 ax[1].set_xticks(ticks)  # Set x ticks
@@ -397,19 +436,23 @@ ax[1].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[1].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 ax[1].legend(loc='lower right', labelspacing = 0.2, handletextpad = 0.25, handlelength = 1.00, prop={'size': 13}, frameon=False)
 
+ax[1].annotate("$\mathregular{R^{2}}$="+str(np.round(r_value1**2, 3)), xy=(0.03, 0.7975), xycoords="axes fraction", fontsize=14)
+ax[1].annotate("CCC="+str(np.round(ccc1, 3)), xy=(0.03, 0.88), xycoords="axes fraction", fontsize=14)
+ax[1].annotate("RMSE="+str(np.round(rmse1, 3)), xy=(0.03, 0.84), xycoords="axes fraction", fontsize=14)
+ax[1].annotate("m="+str(np.round(slope1, 3)), xy=(0.03, 0.76), xycoords="axes fraction", fontsize=14)
+ax[1].annotate("b="+str(np.round(intercept1, 3)), xy=(0.03, 0.72), xycoords="axes fraction", fontsize=14)
+
+
 plt.tight_layout()
 plt.savefig('BLComp/PeakHeightComp.pdf', bbox_inches='tight', pad_inches = 0.025)
+
+# %% 
 
 
 # %% 
 
-tab = plt.get_cmap('tab20')
-labels_background = list(set(merge['Background']))
-cNorm  = mcolors.Normalize(vmin=0, vmax=len(labels_background))
-scalarMap = mcm.ScalarMappable(norm=cNorm, cmap=tab)
-background_to_color_idx = {background: idx for idx, background in enumerate(labels_background)}
-merge['Py_Devol_1430'] = merge['PH_1430_BP'] / merge['1430 cm-1']
-merge['Py_Devol_1515'] = merge['PH_1515_BP'] / merge['1515 cm-1']
+merge['Py_Devol_1430'] = merge['PH_1430_BP'] / merge['PH_1430']
+merge['Py_Devol_1515'] = merge['PH_1515_BP'] / merge['PH_1515']
 line = np.array([0, 2.25])
 ticks = np.arange(0, 2.5, 0.25)
 
@@ -422,12 +465,12 @@ sc1 = ax[1].scatter(merge['PH_1430_BP']/merge.Thickness*50, (merge['Py_Devol_143
                     c = '#0C7BDC', ec = '#171008', lw = 0.5, 
                     zorder = 20)
 ax[0].axhline(np.mean(merge['Py_Devol_1515']), color='k', linestyle='--', dashes = (10, 10), linewidth=0.75,)
-ax[0].text(0.035, 1.075, 'A. $\mathregular{CO_{3, 1515}^{2-}}$', ha='left', va ='bottom', size = 20)
+ax[0].text(0.06, 1.075, 'A. $\mathregular{CO_{3, 1515}^{2-}}$', ha='left', va ='bottom', size = 20)
 ax[0].fill_between(line, np.mean(merge['Py_Devol_1515'])-np.std(merge['Py_Devol_1515']), np.mean(merge['Py_Devol_1515'])+np.std(merge['Py_Devol_1515']), color = 'k', alpha=0.10, edgecolor = None,
     zorder = -5, label='68% Confidence Interval')
 
 ax[1].axhline(np.mean(merge['Py_Devol_1430']), color='k', linestyle='--', dashes = (10, 10), linewidth=0.75, label='Mean')
-ax[1].text(0.035, 1.075, 'B. $\mathregular{CO_{3, 1430}^{2-}}$', ha='left', va ='bottom', size = 20)
+ax[1].text(0.06, 1.075, 'B. $\mathregular{CO_{3, 1430}^{2-}}$', ha='left', va ='bottom', size = 20)
 ax[1].fill_between(line, np.mean(merge['Py_Devol_1430'])-np.std(merge['Py_Devol_1430']), np.mean(merge['Py_Devol_1430'])+np.std(merge['Py_Devol_1430']), color = 'k', alpha=0.10, edgecolor = None,
     zorder = -5, label='68% Confidence Interval')
 ax[1].legend(loc='lower right', labelspacing = 0.2, handletextpad = 0.25, handlelength = 1.00, prop={'size': 13}, frameon=False)
@@ -446,8 +489,7 @@ ax[1].set_ylim([0.8, 1.1])
 ax[1].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[1].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 plt.tight_layout()
-plt.savefig('BLComp/Ratios.pdf', bbox_inches='tight', pad_inches = 0.025)
-
+plt.savefig('BLComp/PeakHeightRatios.pdf', bbox_inches='tight', pad_inches = 0.025)
 
 # %% 
 
