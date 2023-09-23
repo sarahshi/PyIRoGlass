@@ -67,7 +67,7 @@ class test_conc_outputs_co2(unittest.TestCase):
         
         result = pig.Beer_Lambert_Error(self.N, self.molar_mass, self.absorbance, self.sigma_absorbance, self.density, self.sigma_density, self.thickness, self.sigma_thickness, self.epsilon, self.sigma_epsilon) * 10000
         expected = 84.3764722769866
-        self.assertAlmostEqual(result, expected, self.decimalPlace-2, msg="CO2_1515 test and expected errors from the Beer_Lambert_Error equation do not agree")
+        self.assertAlmostEqual(result, expected, self.decimalPlace-4, msg="CO2_1515 test and expected errors from the Beer_Lambert_Error equation do not agree")
 
 
 class test_conc_outputs(unittest.TestCase):

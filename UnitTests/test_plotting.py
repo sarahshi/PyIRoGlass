@@ -25,7 +25,6 @@ class test_plotting_trace(unittest.TestCase):
 
         fig = pig.trace(mcmc_npz['posterior'], title = 'AC4_OL53_101220_256s_30x30_a', zchain=mcmc_npz['zchain'], burnin=mcmc_npz['burnin'], pnames=texnames)
 
-
 class test_plotting_modelfit(unittest.TestCase):
 
     def setUp(self): 
