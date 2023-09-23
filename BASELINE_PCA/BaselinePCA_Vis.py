@@ -62,7 +62,6 @@ def rescale_peak(abs, range):
     abs_mb = abs_m - abs_m.iloc[-1]
     return abs_mb
 
-
 # %% 
 
 BaselinePCA = pd.read_csv(parent_dir + '/PEAKFIT_FINAL/InputData/Baseline_Avg+PCA.csv', index_col = 'Wavenumber')

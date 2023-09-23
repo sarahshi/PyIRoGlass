@@ -3,7 +3,6 @@ __pycache__
 build/
 dist/
 BLComp/
-HJ_fitted_baseline/
 PEAKFIT_FINAL/Old/
 FIGURES/
 LOGFILES/

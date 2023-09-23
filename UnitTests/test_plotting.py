@@ -17,10 +17,10 @@ class test_plotting_trace(unittest.TestCase):
                     '$\mu_{1430}$','$\sigma_{1430}$','$a_{1430}$','$\mu_{1515}$','$\sigma_{1515}$','$a_{1515}$',
                     '$\overline{H_{1635}}$','$\overline{H_{1635}}_{PC1}$','$\overline{H_{1635}}_{PC2}$','$m$','$b$']
 
-        # file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../docs/examples/transmission_ftir/    NPZTXTFILES/RESULTS/AC4_OL53_101220_256s_30x30_a.npz') 
-        # mcmc_npz = np.load(file_path)
+        file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../docs/examples/transmission_ftir/NPZTXTFILES/RESULTS/AC4_OL53_101220_256s_30x30_a.npz') 
+        mcmc_npz = np.load(file_path)
 
-        # fig = pig.trace(mcmc_npz['posterior'], title = 'AC4_OL53_101220_256s_30x30_a', zchain=mcmc_npz['zchain'], burnin=mcmc_npz['burnin'], pnames=texnames)
+        fig = pig.trace(mcmc_npz['posterior'], title = 'AC4_OL53_101220_256s_30x30_a', zchain=mcmc_npz['zchain'], burnin=mcmc_npz['burnin'], pnames=texnames)
 
 
 class test_plotting_modelfit(unittest.TestCase):
@@ -48,10 +48,10 @@ class test_plotting_modelfit(unittest.TestCase):
                     '$\mu_{1430}$','$\sigma_{1430}$','$a_{1430}$','$\mu_{1515}$','$\sigma_{1515}$','$a_{1515}$',
                     '$\overline{H_{1635}}$','$\overline{H_{1635}}_{PC1}$','$\overline{H_{1635}}_{PC2}$','$m$','$b$']
 
-        # file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../docs/examples/transmission_ftir/NPZTXTFILES/RESULTS/AC4_OL49_021920_30x30_H2O_a.npz') 
-        # mcmc_npz = np.load(file_path)
+        file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../docs/examples/transmission_ftir/NPZTXTFILES/RESULTS/AC4_OL49_021920_30x30_H2O_a.npz') 
+        mcmc_npz = np.load(file_path)
 
-        # fig = pig.modelfit(self.spec_mc3, np.ones_like(self.spec_mc3) * 0.01, wavenumber, mcmc_npz['best_model'], title = 'AC4_OL53_101220_256s_30x30_a')
+        fig = pig.modelfit(self.spec_mc3, np.ones_like(self.spec_mc3) * 0.01, wavenumber, mcmc_npz['best_model'], title = 'AC4_OL49_021920_30x30_H2O_a')
 
 
 if __name__ == '__main__':

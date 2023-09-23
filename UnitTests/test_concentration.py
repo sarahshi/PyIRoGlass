@@ -22,7 +22,7 @@ class test_conc_outputs_h2ot(unittest.TestCase):
                                'MgO': 4.34, 'CaO': 9.84, 'Na2O': 3.47, 'K2O': 0.67, 'P2O5': 0.11}
         self.T_room = 25 
         self.P_room = 1 
-        self.decimalPlace = 4
+        self.decimalPlace = 5
 
     def test_beer_lambert(self):
 
@@ -34,7 +34,7 @@ class test_conc_outputs_h2ot(unittest.TestCase):
 
         result = pig.Beer_Lambert_Error(self.N, self.molar_mass, self.absorbance, self.sigma_absorbance, self.density, self.sigma_density, self.thickness, self.sigma_thickness, self.epsilon, self.sigma_epsilon)
         expected = 0.433803676139589        
-        self.assertAlmostEqual(result, expected, self.decimalPlace-3, msg="H2Ot test and expected errors from the Beer_Lambert_Error function do not agree")
+        self.assertAlmostEqual(result, expected, self.decimalPlace-2, msg="H2Ot test and expected errors from the Beer_Lambert_Error function do not agree")
 
 
 class test_conc_outputs_co2(unittest.TestCase):
@@ -55,7 +55,7 @@ class test_conc_outputs_co2(unittest.TestCase):
                                'MgO': 4.34, 'CaO': 9.84, 'Na2O': 3.47, 'K2O': 0.67, 'P2O5': 0.11}
         self.T_room = 25 
         self.P_room = 1 
-        self.decimalPlace = 2
+        self.decimalPlace = 5
 
     def test_beer_lambert(self):
 
@@ -86,15 +86,15 @@ class test_conc_outputs(unittest.TestCase):
         self.N = 500000
         self.T_room = 25 
         self.P_room = 1 
-        self.decimalPlace = 4
+        self.decimalPlace = 5
 
     def test_concentration(self):
 
         density_epsilon, mega_spreadsheet = pig.Concentration_Output(self.PH, self.N, self.thickness, self.MI_Composition, self.T_room, self.P_room)
         expected_H2O = 4.03892743514451
         expected_CO2 = 696.243084652244
-        self.assertAlmostEqual(float(mega_spreadsheet['H2OT_MEAN']), expected_H2O, self.decimalPlace-2, msg="H2Ot test values from the Concentration_Output equation do not agree")
-        self.assertAlmostEqual(float(mega_spreadsheet['CO2_MEAN']), expected_CO2, self.decimalPlace-2, msg="CO2m test values from the Concentration_Output equation do not agree")
+        self.assertAlmostEqual(float(mega_spreadsheet['H2OT_MEAN']), expected_H2O, self.decimalPlace, msg="H2Ot test values from the Concentration_Output equation do not agree")
+        self.assertAlmostEqual(float(mega_spreadsheet['CO2_MEAN']), expected_CO2, self.decimalPlace, msg="CO2m test values from the Concentration_Output equation do not agree")
 
 
 if __name__ == '__main__':

@@ -611,8 +611,8 @@ def MCMC(data, uncert, indparams, log, savefile):
     func = Carbonate
 
     params = np.array([1.25,  2.00,  0.25,  0.005,  0.001, 1430, 30.0, 0.01, 1510, 30.0, 0.01, 0.10,  0.02,  0.01,  5e-4,  0.50])
-    pmin   = np.array([0.00, -5.00, -1.00, -0.250, -0.100, 1415, 22.5, 0.00, 1500, 22.5, 0.00, 0.00, -0.50, -0.50, -5e-1, -1.00])
-    pmax   = np.array([5.00,  5.00,  1.00,  0.250,  0.100, 1445, 40.0, 3.00, 1535, 40.0, 3.00, 3.00,  0.50,  0.50,  5e-1,  3.00])
+    pmin   = np.array([0.00, -3.00, -2.00, -0.600, -0.300, 1415, 22.5, 0.00, 1500, 22.5, 0.00, 0.00, -2.00, -2.00, -5e-1, -1.00])
+    pmax   = np.array([4.00,  3.00,  2.00,  0.600,  0.300, 1445, 40.0, 3.00, 1535, 40.0, 3.00, 3.00,  2.00,  2.00,  5e-1,  3.00])
     pstep  = np.abs(pmin - pmax) * 0.01
 
     # Define prior limits for parameters
@@ -1109,7 +1109,7 @@ def Density_Calculation(MI_Composition, T, P):
     for oxide in MI_Composition:
         mol[oxide] = MI_Composition[oxide]/molar_mass[oxide]
 
-    # Calculate the total mole fraction for the MI composition
+    # Calculate the total moles for the MI composition
     mol_tot = pd.DataFrame()
     mol_tot = mol.sum(axis = 1)
 

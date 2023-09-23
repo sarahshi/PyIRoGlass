@@ -55,10 +55,11 @@ INPUT_PATHS = ['FUEGO', 'STD', 'FRH']
 OUTPUT_PATH = ['FUEGO', 'STD', 'FRH']
 
 stdno = 1
-MEGA_SPREADSHEET = pd.read_csv(path_parent + '/' + output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_H2OCO2_FwSTD_ONorm.csv', index_col = 0)
+MEGA_SPREADSHEET = pd.read_csv(path_parent + '/' + output_dir[-1] + '/' + OUTPUT_PATH[stdno] + '_H2OCO2_FwSTD.csv', index_col = 0)
 
 # %% 
 
+INSOL = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('INSOL')]
 ALV1846 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('21ALV1846')]
 WOK5_4 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('23WOK5-4')]
 ALV1833_11 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('ALV1833-11')]
@@ -82,33 +83,6 @@ BF76 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('BF76_100x')]
 BF77 = MEGA_SPREADSHEET[MEGA_SPREADSHEET.index.str.contains('BF77_50x50')]
 
 
-def concordance_correlation_coefficient(y_true, y_pred):
-    """Concordance correlation coefficient."""
-    # Remove NaNs
-    df = pd.DataFrame({
-        'y_true': y_true,
-        'y_pred': y_pred
-    })
-    df = df.dropna()
-    y_true = df['y_true']
-    y_pred = df['y_pred']
-    # Pearson product-moment correlation coefficients
-    cor = np.corrcoef(y_true, y_pred)[0][1]
-    # Mean
-    mean_true = np.mean(y_true)
-    mean_pred = np.mean(y_pred)
-    # Variance
-    var_true = np.var(y_true)
-    var_pred = np.var(y_pred)
-    # Standard deviation
-    sd_true = np.std(y_true)
-    sd_pred = np.std(y_pred)
-    # Calculate CCC
-    numerator = 2 * cor * sd_true * sd_pred
-    denominator = var_true + var_pred + (mean_true - mean_pred)**2
-    return numerator / denominator
-
-# %% 
 
 def H2O_mean(DF): 
     return DF['H2OT_MEAN'].mean()
@@ -130,6 +104,35 @@ def H2O_rsd(DF):
     return np.mean(DF['H2OT_STD'] / DF['H2OT_MEAN'])
 def CO2_rsd(DF): 
     return np.mean(DF['CO2_STD'] / DF['CO2_MEAN'])
+
+
+
+def concordance_correlation_coefficient(y_true, y_pred):
+    """Concordance correlation coefficient."""
+    # Remove NaNs
+    df = pd.DataFrame({
+        'y_true': y_true,
+        'y_pred': y_pred
+    })
+    df = df.dropna()
+    y_true = df['y_true']
+    y_pred = df['y_pred']
+    # Pearson product-moment correlation coefficients
+    cor = np.corrcoef(y_true, y_pred)[0][1] 
+    # Mean
+    mean_true = np.mean(y_true)
+    mean_pred = np.mean(y_pred)
+    # Variance
+    var_true = np.var(y_true)
+    var_pred = np.var(y_pred)
+    # Standard deviation
+    sd_true = np.std(y_true)
+    sd_pred = np.std(y_pred)
+    # Calculate CCC
+    numerator = 2 * cor * sd_true * sd_pred
+    denominator = var_true + var_pred + (mean_true - mean_pred)**2
+    return numerator / denominator
+
 
 # %% no citations
 
@@ -207,9 +210,9 @@ ax[0].add_artist(l1)
 ax[0].annotate("A.", xy=(0.025, 0.95), xycoords="axes fraction", fontsize=20, weight='bold')
 
 h2o_exp = np.array([H2O_expmean(Fiege63), H2O_expmean(Fiege73), H2O_expmean(BF73), H2O_expmean(BF76), H2O_expmean(BF77), H2O_expmean(M35), H2O_expmean(M43), H2O_expmean(NS1), H2O_expmean(ETFSR_Ol8), 
-                    H2O_expmean(CD33_12_2_2), H2O_expmean(CD33_22_1_1), H2O_expmean(STD_D1010), H2O_expmean(ALV1833_11), H2O_expmean(WOK5_4), H2O_expmean(ALV1846)])
+                    H2O_expmean(CD33_12_2_2), H2O_expmean(CD33_22_1_1), H2O_expmean(STD_D1010), H2O_expmean(ALV1833_11), H2O_expmean(WOK5_4), H2O_expmean(ALV1846)]) # 
 h2o_py = np.array([H2O_mean(Fiege63), H2O_mean(Fiege73), H2O_mean(BF73), H2O_mean(BF76), H2O_mean(BF77), H2O_mean(M35), H2O_mean(M43), H2O_mean(NS1), H2O_mean(ETFSR_Ol8), 
-                    H2O_mean(CD33_12_2_2), H2O_mean(CD33_22_1_1), H2O_mean(STD_D1010), H2O_mean(ALV1833_11), H2O_mean(WOK5_4), H2O_mean(ALV1846)])
+                    H2O_mean(CD33_12_2_2), H2O_mean(CD33_22_1_1), H2O_mean(STD_D1010), H2O_mean(ALV1833_11), H2O_mean(WOK5_4), H2O_mean(ALV1846)]) 
 slope0, intercept0, r_value0, p_value0, std_err0 = scipy.stats.linregress(h2o_exp, h2o_py)
 ccc0 = concordance_correlation_coefficient(h2o_exp, h2o_py)
 rmse0 = mean_squared_error(h2o_exp, h2o_py, squared=False)
@@ -238,7 +241,7 @@ ax[1].errorbar(CO2_expmean(M35), CO2_mean(M35), xerr = CO2_expstd(M35), yerr = C
 ax[1].scatter(CO2_expmean(M43), CO2_mean(M43), s = sz, c = '#92C5DE', ec = '#171008', lw = 0.5, zorder = 20, label = 'M43')
 ax[1].errorbar(CO2_expmean(M43), CO2_mean(M43), xerr = CO2_expstd(M43), yerr = CO2_mean(M43) * CO2_rsd(M43) * 2, lw = 0.5, c = 'k', zorder = 10)
 
-ax[1].scatter(CO2_expmean(NS1), CO2_mean(NS1), s = sz, c = '#4393C3', ec = '#171008', lw = 0.5, zorder = 20, label = 'NS-1')
+ax[1].scatter(CO2_expmean(NS1), CO2_mean(NS1), s = sz, marker='s', c = '#4393C3', ec = '#171008', lw = 0.5, zorder = 20, label = 'NS-1')
 ax[1].errorbar(CO2_expmean(NS1), CO2_mean(NS1), xerr = CO2_expstd(NS1), yerr = CO2_mean(NS1) * CO2_rsd(NS1) * 2, lw = 0.5, c = 'k', zorder = 10)
 
 ax[1].scatter(CO2_expmean(CD33_12_2_2), CO2_mean(CD33_12_2_2), s = sz, c = '#E5E5E5', ec = '#171008', lw = 0.5, zorder = 20, label = 'CD33-12-2-2')
@@ -280,7 +283,7 @@ ax[1].annotate("m="+str(np.round(slope1, 2)), xy=(0.02, 0.79), xycoords="axes fr
 ax[1].annotate("b="+str(np.round(intercept1, 2)), xy=(0.02, 0.75), xycoords="axes fraction", fontsize=12)
 
 plt.tight_layout()
-# plt.savefig('FTIRSIMS_Comparison_OBeam.pdf', bbox_inches='tight', pad_inches = 0.025)
+plt.savefig('FTIRSIMS_Comparison.pdf', bbox_inches='tight', pad_inches = 0.025)
 plt.show()
 
 # %% 
@@ -687,11 +690,3 @@ plt.show()
 # %% 
 
 df_cat_norm = dft_mol_norm.copy()
-
-
-
-# %% 
-
-
-# %% 
-# %%

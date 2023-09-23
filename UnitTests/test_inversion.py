@@ -12,7 +12,7 @@ class test_inversion(unittest.TestCase):
         self.sigma_tau = self.tau * 0.025 
         self.epsilon_1635 = np.array([25., 56., 55., 42., 40.8, 42.34, 52.05, 55., 49.])
         self.sigma_epsilon_1635 = self.epsilon_1635 * 0.05
-        self.decimalPlace = 3
+        self.decimalPlace = 5
         self.cov = np.identity(2)
 
     def test_epsilon_invert(self):

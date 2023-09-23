@@ -81,7 +81,7 @@ Functions for determining thickness from reflectance FTIR spectra
 
 .. autofunction:: PyIRoGlass.Thickness_Calc
 
-.. autofunction:: PyIRoGlass.Thickness_Processing
+.. autofunction:: PyIRoGlass.Thickness_Process
 
 .. autofunction:: PyIRoGlass.Reflectance_Index
 
