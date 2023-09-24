@@ -527,7 +527,7 @@ def modelfit(data, uncert, indparams, model, title, nbins=75,
     rax.errorbar(binindp, bindata-binmodel, binuncert, fmt='ko', ms=4)
     rax.plot([indparams[0], indparams[-1]], [0,0], 'k:', lw=1.5)
     rax.tick_params(labelsize=fs-1, direction='in', top=True, right=True)
-    rax.set_xlabel("Wavenumber $(\mathregular{cm^{-1}})$", fontsize=fs)
+    rax.set_xlabel("Wavenumber (cm^-1)", fontsize=fs) # $(\mathregular{cm^{-1}})$
     rax.set_ylabel('Residual', fontsize=fs)
     rax.invert_xaxis()
 
@@ -586,9 +586,9 @@ def MCMC(data, uncert, indparams, log, savefile):
     pnames   = ['B_mean','B_PC1','B_PC2','B_PC3','B_PC4','G1430_peak','G1430_std','G1430_amp',
                 'G1515_peak','G1515_std','G1515_amp','H1635_mean','H1635_PC1','H1635_PC2','m','b']
 
-    texnames = ['$\overline{B}$','$\overline{B}_{PC1}$','$\overline{B}_{PC2}$','$\overline{B}_{PC3}$','$\overline{B}_{PC4}$',
-                '$\mu_{1430}$','$\sigma_{1430}$','$a_{1430}$','$\mu_{1515}$','$\sigma_{1515}$','$a_{1515}$',
-                '$\overline{H_{1635}}$','$\overline{H_{1635}}_{PC1}$','$\overline{H_{1635}}_{PC2}$','$m$','$b$']
+    texnames = ['$\\overline{B}$','$\\overline{B}_{PC1}$','$\\overline{B}_{PC2}$','$\\overline{B}_{PC3}$','$\\overline{B}_{PC4}$',
+                '$\\mu_{1430}$','$\\sigma_{1430}$','$a_{1430}$','$\\mu_{1515}$','$\\sigma_{1515}$','$a_{1515}$',
+                '$\\overline{H_{1635}}$','$\\overline{H_{1635}}_{PC1}$','$\\overline{H_{1635}}_{PC2}$','$m$','$b$']
 
 
     mc3_output = mc3.sample(data=data, uncert=uncert, func=func, params=params, indparams=indparams,
@@ -914,9 +914,9 @@ def Run_All_Spectra(dfs_dict, exportpath):
                 plt.savefig(path_beg + figurepath + files + '.pdf')
                 plt.close('all')
 
-                texnames = ['$\overline{B}$','$\overline{B}_{PC1}$','$\overline{B}_{PC2}$','$\overline{B}_{PC3}$','$\overline{B}_{PC4}$',
-                            '$\mu_{1430}$','$\sigma_{1430}$','$a_{1430}$','$\mu_{1515}$','$\sigma_{1515}$','$a_{1515}$',
-                            '$\overline{H_{1635}}$','$\overline{H_{1635}}_{PC1}$','$\overline{H_{1635}}_{PC2}$','$m$','$b$']
+                texnames = ['$\\overline{B}$','$\\overline{B}_{PC1}$','$\\overline{B}_{PC2}$','$\\overline{B}_{PC3}$','$\\overline{B}_{PC4}$',
+                            '$\\mu_{1430}$','$\\sigma_{1430}$','$a_{1430}$','$\\mu_{1515}$','$\\sigma_{1515}$','$a_{1515}$',
+                            '$\\overline{H_{1635}}$','$\\overline{H_{1635}}_{PC1}$','$\\overline{H_{1635}}_{PC2}$','$m$','$b$']
 
                 posterior, zchain, zmask = mu.burn(mc3_output)
                 post = mp.Posterior(posterior, texnames)

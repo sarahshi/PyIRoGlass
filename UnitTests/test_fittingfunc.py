@@ -70,13 +70,13 @@ class test_fitting_functions(unittest.TestCase):
 
         Volatiles_DF, failures = pig.Run_All_Spectra(self.dfs_dict, None)
 
-        result_H2Om_5200 = float(Volatiles_DF['PH_5200_M'])
+        result_H2Om_5200 = float(Volatiles_DF['PH_5200_M'].iloc[0])
         expected_H2Om_5200 = 0.00895907201720743
 
-        result_H2Ot_3550 = float(Volatiles_DF['PH_3550_M'])
+        result_H2Ot_3550 = float(Volatiles_DF['PH_3550_M'].iloc[0])
         expected_H2Ot_3550 = 1.52334293070956
 
-        result_CO2_1515 = float(Volatiles_DF['PH_1515_BP'])
+        result_CO2_1515 = float(Volatiles_DF['PH_1515_BP'].iloc[0])
         expected_CO2_1515 = 0.057289618537916066
 
         self.assertAlmostEqual(result_H2Om_5200, expected_H2Om_5200, self.decimalPlace, msg="H2Om_5200 peak height test and expected values from the Run_All_Spectra function do not agree")

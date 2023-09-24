@@ -93,8 +93,8 @@ class test_conc_outputs(unittest.TestCase):
         density_epsilon, mega_spreadsheet = pig.Concentration_Output(self.PH, self.N, self.thickness, self.MI_Composition, self.T_room, self.P_room)
         expected_H2O = 4.03892743514451
         expected_CO2 = 713.3372363302
-        self.assertAlmostEqual(float(mega_spreadsheet['H2OT_MEAN']), expected_H2O, self.decimalPlace, msg="H2Ot test values from the Concentration_Output equation do not agree")
-        self.assertAlmostEqual(float(mega_spreadsheet['CO2_MEAN']), expected_CO2, self.decimalPlace, msg="CO2m test values from the Concentration_Output equation do not agree")
+        self.assertAlmostEqual(float(mega_spreadsheet['H2OT_MEAN'].iloc[0]), expected_H2O, self.decimalPlace, msg="H2Ot test values from the Concentration_Output equation do not agree")
+        self.assertAlmostEqual(float(mega_spreadsheet['CO2_MEAN'].iloc[0]), expected_CO2, self.decimalPlace, msg="CO2m test values from the Concentration_Output equation do not agree")
 
 class test_conc_outputs_saturated(unittest.TestCase): # OL49
 
