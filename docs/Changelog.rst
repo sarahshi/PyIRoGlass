@@ -2,6 +2,7 @@
 Change Log
 ==========
 
+
 Version 0.2.1
 =============
 Minimal changes to clean code, fix UnitTesting, and prepare for publication. 
