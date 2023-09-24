@@ -5,7 +5,9 @@ import numpy as np
 import pandas as pd
 import sys
 import PyIRoGlass as pig
-import matplotlib.pyplot as plt
+import matplotlib
+import matplotlib.pyplot
+from matplotlib import pyplot as plt
 
 
 class test_plotting_trace(unittest.TestCase):
@@ -66,7 +68,7 @@ class test_plotting_modelfit(unittest.TestCase):
         self.decimalPlace = 5
 
 
-    @patch.object(matplotlib.pyplot.Figure, 'savefig')
+    @patch('matplotlib.pyplot.Figure.savefig')
     def test_modelfit_savefile(self, mock_savefig):
 
         file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../src/PyIRoGlass/BaselineAvgPC.npz') 
@@ -90,7 +92,7 @@ class test_plotting_modelfit(unittest.TestCase):
         self.assertIn('dummy_filename.png', args[0])
         plt.close('all')
 
-    @patch.object(matplotlib.pyplot.Figure, 'savefig')
+    @patch('matplotlib.pyplot.Figure.savefig')
     def test_modelfit_nosavefile(self, mock_savefig):
 
         file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../src/PyIRoGlass/BaselineAvgPC.npz') 
