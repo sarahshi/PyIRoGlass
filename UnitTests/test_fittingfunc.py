@@ -1,8 +1,8 @@
+import os
 import unittest
 import numpy as np
 import pandas as pd
 import PyIRoGlass as pig
-
 
 
 class test_fitting_functions(unittest.TestCase):
@@ -84,6 +84,22 @@ class test_fitting_functions(unittest.TestCase):
         self.assertAlmostEqual(result_H2Ot_3550, expected_H2Ot_3550, self.decimalPlace, msg="H2Ot_3550 peak height test and expected values from the Run_All_Spectra function do not agree")
 
         self.assertAlmostEqual(result_CO2_1515, expected_CO2_1515, self.decimalPlace-3, msg="CO2_1515 peak height test and expected values from the Run_All_Spectra function do not agree")
+
+
+    def test_MCMC_exportpath(self):
+
+        temp_export_path = "temp_test_dir"
+        os.makedirs(temp_export_path, exist_ok=True)
+        
+        Volatiles_DF, failures = pig.Run_All_Spectra(self.sample_dfs_dict, temp_export_path)
+        Volatiles_DF.to_csv(os.path.join(temp_export_path, "output.csv"))
+
+        # Check if the result was exported correctly
+        self.assertTrue(os.path.exists(os.path.join(temp_export_path, "output.csv")))
+        
+        # Cleanup
+        os.remove(os.path.join(temp_export_path, "output.csv"))
+        os.rmdir(temp_export_path)
 
 
 if __name__ == '__main__':

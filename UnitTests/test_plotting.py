@@ -5,12 +5,35 @@ import numpy as np
 import pandas as pd
 import sys
 import PyIRoGlass as pig
-
+import matplotlib.pyplot as plt
 
 
 class test_plotting_trace(unittest.TestCase):
 
-    def test_trace(self):
+    @patch("matplotlib.pyplot.Figure.savefig")
+    def test_trace_savefile(self, mock_savefig):
+
+        pnames   = ['B_mean',"B_PC1","B_PC2","B_PC3","B_PC4",'G1430_peak','G1430_std','G1430_amp',
+                    'G1515_peak','G1515_std','G1515_amp','H1635_mean','H1635_PC1','H1635_PC2','m','b']
+
+        texnames = ['$\overline{B}$',"$\overline{B}_{PC1}$","$\overline{B}_{PC2}$","$\overline{B}_{PC3}$",'$\overline{B}_{PC4}$',
+                    '$\mu_{1430}$','$\sigma_{1430}$','$a_{1430}$','$\mu_{1515}$','$\sigma_{1515}$','$a_{1515}$',
+                    '$\overline{H_{1635}}$','$\overline{H_{1635}}_{PC1}$','$\overline{H_{1635}}_{PC2}$','$m$','$b$']
+
+        file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../docs/examples/transmission_ftir/NPZTXTFILES/RESULTS/AC4_OL53_101220_256s_30x30_a.npz') 
+        mcmc_npz = np.load(file_path)
+
+        fig = pig.trace(mcmc_npz['posterior'], title = 'AC4_OL53_101220_256s_30x30_a', zchain=mcmc_npz['zchain'], burnin=mcmc_npz['burnin'], pnames=texnames, savefile='dummy_filename.png')
+
+        # Check if savefig was called with the correct filename
+        mock_savefig.assert_called_once()
+        args, kwargs = mock_savefig.call_args
+        assert 'dummy_filename.png' in args[0]
+        plt.close('all')
+
+
+    @patch("matplotlib.pyplot.Figure.savefig")
+    def test_trace_nosavefile(self, mock_savefig):
 
         pnames   = ['B_mean',"B_PC1","B_PC2","B_PC3","B_PC4",'G1430_peak','G1430_std','G1430_amp',
                     'G1515_peak','G1515_std','G1515_amp','H1635_mean','H1635_PC1','H1635_PC2','m','b']
@@ -23,6 +46,11 @@ class test_plotting_trace(unittest.TestCase):
         mcmc_npz = np.load(file_path)
 
         fig = pig.trace(mcmc_npz['posterior'], title = 'AC4_OL53_101220_256s_30x30_a', zchain=mcmc_npz['zchain'], burnin=mcmc_npz['burnin'], pnames=texnames)
+
+        # Check if savefig was never called
+        mock_savefig.assert_not_called()
+        plt.close('all')
+
 
 class test_plotting_modelfit(unittest.TestCase):
 
@@ -37,7 +65,32 @@ class test_plotting_modelfit(unittest.TestCase):
         self.spec_mc3 = self.df_lim['Absorbance'].to_numpy()
         self.decimalPlace = 5
 
-    def test_modelfit(self):
+
+    def test_modelfit_savefile(self, mock_savefig):
+
+        file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../src/PyIRoGlass/BaselineAvgPC.npz') 
+        wavenumber = pig.Load_Wavenumber(file_path)
+        
+        pnames   = ['B_mean',"B_PC1","B_PC2","B_PC3","B_PC4",'G1430_peak','G1430_std','G1430_amp',
+                    'G1515_peak','G1515_std','G1515_amp','H1635_mean','H1635_PC1','H1635_PC2','m','b']
+
+        texnames = ['$\overline{B}$',"$\overline{B}_{PC1}$","$\overline{B}_{PC2}$","$\overline{B}_{PC3}$",'$\overline{B}_{PC4}$',
+                    '$\mu_{1430}$','$\sigma_{1430}$','$a_{1430}$','$\mu_{1515}$','$\sigma_{1515}$','$a_{1515}$',
+                    '$\overline{H_{1635}}$','$\overline{H_{1635}}_{PC1}$','$\overline{H_{1635}}_{PC2}$','$m$','$b$']
+
+        file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../docs/examples/transmission_ftir/NPZTXTFILES/RESULTS/AC4_OL49_021920_30x30_H2O_a.npz') 
+        mcmc_npz = np.load(file_path)
+
+        fig = pig.modelfit(self.spec_mc3, np.ones_like(self.spec_mc3) * 0.01, wavenumber, mcmc_npz['best_model'], title = 'AC4_OL49_021920_30x30_H2O_a', savefile='dummy_filename.png')
+        
+        # Check if savefig was called with the correct filename
+        mock_savefig.assert_called_once()
+        args, kwargs = mock_savefig.call_args
+        assert "dummy_filename.png" in args[0]
+        plt.close('all')
+
+
+    def test_modelfit_nosavefile(self, mock_savefig):
 
         file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../src/PyIRoGlass/BaselineAvgPC.npz') 
         wavenumber = pig.Load_Wavenumber(file_path)
@@ -53,6 +106,10 @@ class test_plotting_modelfit(unittest.TestCase):
         mcmc_npz = np.load(file_path)
 
         fig = pig.modelfit(self.spec_mc3, np.ones_like(self.spec_mc3) * 0.01, wavenumber, mcmc_npz['best_model'], title = 'AC4_OL49_021920_30x30_H2O_a')
+        
+        # Check if savefig was called with the correct filename
+        mock_savefig.assert_not_called()
+        plt.close('all')
 
 
 if __name__ == '__main__':

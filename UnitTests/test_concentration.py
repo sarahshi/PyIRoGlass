@@ -4,7 +4,6 @@ import pandas as pd
 import PyIRoGlass as pig
 
 
-
 class test_conc_outputs_h2ot(unittest.TestCase):
 
     def setUp(self): 
@@ -89,13 +88,40 @@ class test_conc_outputs(unittest.TestCase):
         self.P_room = 1 
         self.decimalPlace = 5
 
-    def test_concentration(self):
+    def test_concentration(self): # OL53
 
         density_epsilon, mega_spreadsheet = pig.Concentration_Output(self.PH, self.N, self.thickness, self.MI_Composition, self.T_room, self.P_room)
         expected_H2O = 4.03892743514451
         expected_CO2 = 713.3372363302
         self.assertAlmostEqual(float(mega_spreadsheet['H2OT_MEAN']), expected_H2O, self.decimalPlace, msg="H2Ot test values from the Concentration_Output equation do not agree")
         self.assertAlmostEqual(float(mega_spreadsheet['CO2_MEAN']), expected_CO2, self.decimalPlace, msg="CO2m test values from the Concentration_Output equation do not agree")
+
+class test_conc_outputs_saturated(unittest.TestCase): # OL49
+
+    def setUp(self):
+
+        self.MI_Composition = pd.DataFrame({'SiO2': [52.34], 'TiO2': [1.04], 'Al2O3': [17.92], 'Fe2O3': [1.93], 'FeO': [7.03],
+                              'MnO': [0.20], 'MgO': [3.63], 'CaO': [7.72], 'Na2O': [4.25], 'K2O': [0.78], 'P2O5': [0.14]},
+                              index=['AC4_OL49_021920_30x30_H2O_a'])
+        self.PH = pd.DataFrame({'PH_3550_M': [2.17224950314409], 'PH_3550_STD': [0.00220916618090868], 'H2OT_3550_SAT?': ['*'], 'PH_1635_BP': [0.658349188362703],
+                   'PH_1635_STD': [0.00307592496318145], 'PH_1515_BP': [0.106864326434928], 'PH_1515_STD': [0.0035555642315165],
+                   'PH_1430_BP': [0.109429135799036], 'PH_1430_STD': [0.00405404583060287], 'PH_5200_M': [0.0249095178877388], 'PH_5200_STD': [0.000801149484503151], 
+                   'PH_4500_M': [0.014569658580663], 'PH_4500_STD': [0.0000638336854435091], 'S2N_P5200': [12.1959313061391], 'S2N_P4500': [8.15732983956986],
+                   'ERR_5200': ['-'], 'ERR_4500': ['-']}, index=['AC4_OL49_021920_30x30_H2O_a'])
+        self.thickness = pd.DataFrame({'Thickness': [91.25], 'Sigma_Thickness': [3]}, index=['AC4_OL49_021920_30x30_H2O_a'])
+        self.N = 500000
+        self.T_room = 25 
+        self.P_room = 1 
+        self.decimalPlace = 5
+
+    def test_concentration(self):
+
+        density_epsilon, mega_spreadsheet = pig.Concentration_Output(self.PH, self.N, self.thickness, self.MI_Composition, self.T_room, self.P_room)
+        expected_H2O = 2.54389275724829
+        expected_CO2 = 738.262088884613
+        self.assertAlmostEqual(float(mega_spreadsheet['H2OT_MEAN']), expected_H2O, self.decimalPlace, msg="H2Ot test values from the saturated Concentration_Output equation do not agree")
+        self.assertAlmostEqual(float(mega_spreadsheet['CO2_MEAN']), expected_CO2, self.decimalPlace, msg="CO2m test values from the saturated Concentration_Output equation do not agree")
+
 
 
 if __name__ == '__main__':
