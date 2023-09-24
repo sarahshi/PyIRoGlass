@@ -85,7 +85,7 @@ def Load_PC(file_name):
     PC_DF = PC_DF.set_index('Wavenumber')
 
     PC_DF = PC_DF[wn_low:wn_high]
-    PC_matrix = np.ndarray(PC_DF.to_numpy())
+    PC_matrix = PC_DF.to_numpy()
 
     return PC_matrix
 
