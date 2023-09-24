@@ -66,6 +66,7 @@ class test_plotting_modelfit(unittest.TestCase):
         self.decimalPlace = 5
 
 
+    @patch("matplotlib.pyplot.Figure.savefig")
     def test_modelfit_savefile(self, mock_savefig):
 
         file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../src/PyIRoGlass/BaselineAvgPC.npz') 
@@ -90,6 +91,7 @@ class test_plotting_modelfit(unittest.TestCase):
         plt.close('all')
 
 
+    @patch("matplotlib.pyplot.Figure.savefig")
     def test_modelfit_nosavefile(self, mock_savefig):
 
         file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../src/PyIRoGlass/BaselineAvgPC.npz') 
