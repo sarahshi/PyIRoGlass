@@ -18,9 +18,9 @@ class test_plotting_trace(unittest.TestCase):
         pnames   = ['B_mean','B_PC1','B_PC2','B_PC3','B_PC4','G1430_peak','G1430_std','G1430_amp',
                     'G1515_peak','G1515_std','G1515_amp','H1635_mean','H1635_PC1','H1635_PC2','m','b']
 
-        texnames = [r'$\overline{B}$',r'$\overline{B}_{PC1}$',r'$\overline{B}_{PC2}$',r'$\overline{B}_{PC3}$',r'$\overline{B}_{PC4}$',
-                    r'$\mu_{1430}$',r'$\sigma_{1430}$',r'$a_{1430}$',r'$\mu_{1515}$',r'$\sigma_{1515}$',r'$a_{1515}$',
-                    r'$\overline{H_{1635}}$',r'$\overline{H_{1635}}_{PC1}$',r'$\overline{H_{1635}}_{PC2}$',r'$m$',r'$b$']
+        texnames = ['$\overline{B}$','$\overline{B}_{PC1}$','$\overline{B}_{PC2}$','$\overline{B}_{PC3}$','$\overline{B}_{PC4}$',
+                    '$\mu_{1430}$','$\sigma_{1430}$','$a_{1430}$','$\mu_{1515}$','$\sigma_{1515}$','$a_{1515}$',
+                    '$\overline{H_{1635}}$','$\overline{H_{1635}}_{PC1}$','$\overline{H_{1635}}_{PC2}$','$m$','$b$']
 
         file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../docs/examples/transmission_ftir/NPZTXTFILES/RESULTS/AC4_OL53_101220_256s_30x30_a.npz') 
         mcmc_npz = np.load(file_path)
@@ -40,9 +40,9 @@ class test_plotting_trace(unittest.TestCase):
         pnames   = ['B_mean','B_PC1','B_PC2','B_PC3','B_PC4','G1430_peak','G1430_std','G1430_amp',
                     'G1515_peak','G1515_std','G1515_amp','H1635_mean','H1635_PC1','H1635_PC2','m','b']
 
-        texnames = [r'$\overline{B}$',r'$\overline{B}_{PC1}$',r'$\overline{B}_{PC2}$',r'$\overline{B}_{PC3}$',r'$\overline{B}_{PC4}$',
-                    r'$\mu_{1430}$',r'$\sigma_{1430}$',r'$a_{1430}$',r'$\mu_{1515}$',r'$\sigma_{1515}$',r'$a_{1515}$',
-                    r'$\overline{H_{1635}}$',r'$\overline{H_{1635}}_{PC1}$',r'$\overline{H_{1635}}_{PC2}$',r'$m$',r'$b$']
+        texnames = ['$\overline{B}$','$\overline{B}_{PC1}$','$\overline{B}_{PC2}$','$\overline{B}_{PC3}$','$\overline{B}_{PC4}$',
+                    '$\mu_{1430}$','$\sigma_{1430}$','$a_{1430}$','$\mu_{1515}$','$\sigma_{1515}$','$a_{1515}$',
+                    '$\overline{H_{1635}}$','$\overline{H_{1635}}_{PC1}$','$\overline{H_{1635}}_{PC2}$','$m$','$b$']
 
         file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../docs/examples/transmission_ftir/NPZTXTFILES/RESULTS/AC4_OL53_101220_256s_30x30_a.npz') 
         mcmc_npz = np.load(file_path)
@@ -77,9 +77,9 @@ class test_plotting_modelfit(unittest.TestCase):
         pnames   = ['B_mean','B_PC1','B_PC2','B_PC3','B_PC4','G1430_peak','G1430_std','G1430_amp',
                     'G1515_peak','G1515_std','G1515_amp','H1635_mean','H1635_PC1','H1635_PC2','m','b']
 
-        texnames = [r'$\overline{B}$',r'$\overline{B}_{PC1}$',r'$\overline{B}_{PC2}$',r'$\overline{B}_{PC3}$',r'$\overline{B}_{PC4}$',
-                    r'$\mu_{1430}$',r'$\sigma_{1430}$',r'$a_{1430}$',r'$\mu_{1515}$',r'$\sigma_{1515}$',r'$a_{1515}$',
-                    r'$\overline{H_{1635}}$',r'$\overline{H_{1635}}_{PC1}$',r'$\overline{H_{1635}}_{PC2}$',r'$m$',r'$b$']
+        texnames = ['$\overline{B}$','$\overline{B}_{PC1}$','$\overline{B}_{PC2}$','$\overline{B}_{PC3}$','$\overline{B}_{PC4}$',
+                    '$\mu_{1430}$','$\sigma_{1430}$','$a_{1430}$','$\mu_{1515}$','$\sigma_{1515}$','$a_{1515}$',
+                    '$\overline{H_{1635}}$','$\overline{H_{1635}}_{PC1}$','$\overline{H_{1635}}_{PC2}$','$m$','$b$']
 
         file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../docs/examples/transmission_ftir/NPZTXTFILES/RESULTS/AC4_OL49_021920_30x30_H2O_a.npz') 
         mcmc_npz = np.load(file_path)
@@ -101,9 +101,9 @@ class test_plotting_modelfit(unittest.TestCase):
         pnames   = ['B_mean','B_PC1','B_PC2','B_PC3','B_PC4','G1430_peak','G1430_std','G1430_amp',
                     'G1515_peak','G1515_std','G1515_amp','H1635_mean','H1635_PC1','H1635_PC2','m','b']
 
-        texnames = [r'$\overline{B}$',r'$\overline{B}_{PC1}$',r'$\overline{B}_{PC2}$',r'$\overline{B}_{PC3}$',r'$\overline{B}_{PC4}$',
-                    r'$\mu_{1430}$',r'$\sigma_{1430}$',r'$a_{1430}$',r'$\mu_{1515}$',r'$\sigma_{1515}$',r'$a_{1515}$',
-                    r'$\overline{H_{1635}}$',r'$\overline{H_{1635}}_{PC1}$',r'$\overline{H_{1635}}_{PC2}$',r'$m$',r'$b$']
+        texnames = ['$\overline{B}$','$\overline{B}_{PC1}$','$\overline{B}_{PC2}$','$\overline{B}_{PC3}$','$\overline{B}_{PC4}$',
+                    '$\mu_{1430}$','$\sigma_{1430}$','$a_{1430}$','$\mu_{1515}$','$\sigma_{1515}$','$a_{1515}$',
+                    '$\overline{H_{1635}}$','$\overline{H_{1635}}_{PC1}$','$\overline{H_{1635}}_{PC2}$','$m$','$b$']
 
         file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../docs/examples/transmission_ftir/NPZTXTFILES/RESULTS/AC4_OL49_021920_30x30_H2O_a.npz') 
         mcmc_npz = np.load(file_path)
