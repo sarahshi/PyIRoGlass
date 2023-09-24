@@ -4,6 +4,7 @@ import pandas as pd
 import PyIRoGlass as pig
 
 
+
 class test_fitting_functions(unittest.TestCase):
 
     def setUp(self): 

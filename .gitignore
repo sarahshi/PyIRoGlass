@@ -21,3 +21,10 @@ VOLATILESANDSPECIATION_FINAL/AC4_OL49_trace.pdf
 VOLATILESANDSPECIATION_FINAL/AC4_OL49_histogram.pdf
 EPSILONINVERSION_FINAL/OldEpsilonRegressions/
 src/PyIRoGlass.egg-info/
+pairplot.pdf
+pairplot_molfrac.pdf
+pairplot_molfrac_kde.pdf
+pairplot_pca.pdf
+correlation.csv
+correlation_molfrac.csv
+correlation_pca.csv

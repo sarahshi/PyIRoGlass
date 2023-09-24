@@ -4,9 +4,8 @@ import os
 import numpy as np
 import pandas as pd
 import sys
-sys.path.append('../src/')
-
 import PyIRoGlass as pig
+
 
 
 class test_plotting_trace(unittest.TestCase):

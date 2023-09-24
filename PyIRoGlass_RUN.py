@@ -20,6 +20,7 @@ import seaborn as sns
 %matplotlib inline
 %config InlineBackend.figure_format = 'retina'
 
+
 # %% 
 
 # Get working paths 
@@ -29,13 +30,13 @@ path_spec_input = os.getcwd() + '/Inputs/TransmissionSpectra/'
 output_dir = ["FIGURES", "PLOTFILES", "NPZTXTFILES", "LOGFILES", "FINALDATA"] 
 
 # Change paths to direct to folder with SampleSpectra -- last bit should be whatever your folder with spectra is called. 
-PATHS = [path_spec_input + string for string in ['Fuego/', 'Standards/', 'Fuego1974RH/', 'plot/']]
+PATHS = [path_spec_input + string for string in ['Fuego/', 'Standards/', 'Fuego1974RH/']]
 
 # Put ChemThick file in Inputs. Direct to what your ChemThick file is called. 
 CHEMTHICK_PATH = [path_input + string for string in ['FuegoChemThick.csv', 'StandardChemThick.csv', 'FuegoRHChemThick.csv']]
 
 # Change last value in list to be what you want your output directory to be called. 
-OUTPUT_PATHS = ['FUEGO', 'STD', 'FRH', 'plot']
+OUTPUT_PATHS = ['FUEGO', 'STD', 'FRH']
 
 
 # %% 

@@ -7,7 +7,7 @@ Data Imports
 
 .. autofunction:: PyIRoGlass.Load_SampleCSV
 
-.. autofunction:: PyIRoGlass.Load_PCA
+.. autofunction:: PyIRoGlass.Load_PC
 
 .. autofunction:: PyIRoGlass.Load_Wavenumber
 
@@ -63,10 +63,6 @@ Functions for plotting MCMC results
 
 
 .. autofunction:: PyIRoGlass.modelfit
-
-.. autofunction:: PyIRoGlass.histogram
-
-.. autofunction:: PyIRoGlass.pairwise
 
 .. autofunction:: PyIRoGlass.trace
 

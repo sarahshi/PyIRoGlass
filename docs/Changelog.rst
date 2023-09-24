@@ -2,6 +2,10 @@
 Change Log
 ==========
 
+Version 0.2.0
+=============
+Update parameter estimation regions with the guidance of devolatilized spectra, improve functionality. 
+
 
 Version 0.1.0
 =============

@@ -6,9 +6,10 @@ import pandas as pd
 import PyIRoGlass as pig
 
 
+
 class test_loading_npz(unittest.TestCase):
 
-    def test_load_pca(self):
+    def test_load_pc(self):
 
         file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../src/PyIRoGlass/BaselineAvgPC.npz') 
         matrix = pig.Load_PC(file_path)

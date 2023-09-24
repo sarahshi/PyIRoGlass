@@ -18,6 +18,7 @@ from matplotlib import rc, cm
 rc('font',**{'family':'Avenir', 'size': 18})
 plt.rcParams['pdf.fonttype'] = 42
 
+
 # %% 
 
 

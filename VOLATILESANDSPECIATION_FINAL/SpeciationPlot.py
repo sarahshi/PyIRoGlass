@@ -32,6 +32,7 @@ plt.rcParams["ytick.labelsize"] = 18 # Sets size of numbers on tick marks
 plt.rcParams["axes.titlesize"] = 20
 plt.rcParams["axes.labelsize"] = 20 # Axes labels
 
+
 # %% 
 
 path_parent = os.path.dirname(os.getcwd())

@@ -20,6 +20,8 @@ These folks have been fundamental to the development of ``PyIRoGlass``:
 - `Terry Plank <https://github.com/terryplank>`_ (LDEO)
 - `Anna Barth <https://github.com/barthac>`_ (LDEO, Berkeley)
 - `Daniel Rasmussen <https://github.com/DJRgeoscience>`_ (LDEO)
+- `Yves Moussallam <https://eesc.columbia.edu/content/yves-moussallam>`_ (LDEO)
+- `Hyun Joo Lee <https://people.climate.columbia.edu/users/profile/hyun-joo-lee>`_ (LDEO)
 - `William Menke <https://www.ldeo.columbia.edu/users/menke/>`_ (LDEO)
 
 

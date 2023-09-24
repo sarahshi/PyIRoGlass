@@ -38,13 +38,14 @@ def Load_SampleCSV(paths, wn_high, wn_low):
         wn_low (float): The lowest wavenumber to include in the output dictionary.
 
     Returns:
-        Tuple containing the following elements:
-            files (list): List of names for each sample in the directory.
-            dfs_dict (dictionary): Dictionary where each key is a file name, and the 
-                corresponding value is a pandas dataframe containing
-                wavenumbers and absorbances for the given sample.
-    """
+        tuple: Tuple containing the following elements:
+            - files (list): List of names for each sample in the directory.
+            - dfs_dict (dict): Dictionary where each key is a file name, and the 
+              corresponding value is a pandas dataframe containing wavenumbers 
+              and absorbances for the given sample.
 
+    """
+              
     dfs = []
     files = []
 
@@ -1103,9 +1104,9 @@ def Density_Calculation(MI_Composition, T, P):
                      'Na2O': (28.88+7.68*(T_K-1673)/1000-2.4*P/1000), 'K2O': (45.07+12.08*(T_K-1673)/1000-6.75*P/1000), 
                      'H2O': (26.27+9.46*(T_K-1673)/1000-3.15*P/1000)}
 
-    # Create an empty dataframe to store the mole fraction of each oxide in the MI composition
+    # Create an empty dataframe to store the moles of each oxide in the MI composition
     mol = pd.DataFrame()
-    # Calculate the mole fraction of each oxide by dividing its mole fraction by its molar mass
+    # Calculate the moles of each oxide by dividing its weight percentage by its molar mass
     for oxide in MI_Composition:
         mol[oxide] = MI_Composition[oxide]/molar_mass[oxide]
 

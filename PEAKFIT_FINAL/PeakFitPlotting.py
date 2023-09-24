@@ -33,7 +33,6 @@ plt.rcParams["ytick.labelsize"] = 18 # Sets size of numbers on tick marks
 plt.rcParams["axes.titlesize"] = 20
 plt.rcParams["axes.labelsize"] = 20 # Axes labels
 
-
 # %% PCA Component Plotting
 
 BaselinePCA = pd.read_csv('./InputData/Baseline_Avg+PCA.csv')
