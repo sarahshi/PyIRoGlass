@@ -12,7 +12,7 @@ import matplotlib as mpl
 if os.environ.get('DISPLAY','') == '':
     mpl.use('Agg')
 from matplotlib import pyplot as plt
-mpl.use('pgf')
+# mpl.use('pgf')
 import mc3.plots as mp
 import mc3.utils as mu
 import mc3.stats as ms
