@@ -65,6 +65,7 @@ bibtex_reference_style = 'author_year'
 
 
 ## Erics nb sphinx
+nbsphinx_allow_errors = True
 
 # This is processed by Jinja2 and inserted before each notebook
 # Some change in dependencies made us need to replace `var` with
@@ -79,13 +80,13 @@ nbsphinx_prolog = r"""
 
     <div class="admonition note">
       <p>This page was generated from
-        <a class="reference external" href="https://github.com/SarahShi/PyIRoGlass/blob/{{ git_ref|e }}/{{ docname|e }}">{{ docname|e }}</a>.
+        <a class="reference external" href="https://github.com/PennyWieser/DiadFit/blob/{{ git_ref|e }}/{{ docname|e }}">{{ docname|e }}</a>.
 
             Interactive online version:
-            <a href="https://mybinder.org/v2/gh/SarahShi/PyIRoGlass/{{ git_ref|e }}?filepath={{ docname|e }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a>.
+            <a href="https://mybinder.org/v2/gh/PennyWieser/DiadFit/{{ git_ref|e }}?filepath={{ docname|e }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a>.
     </p>
     <p>
-    <a class="reference download internal" download="" href="https://github.com/SarahShi/PyIRoGlass/blob/{{ git_ref|e }}/{{ docname|e }}"><code class="xref download docutils literal notranslate"><span class="pre">Python</span> <span class="pre">Notebook</span> <span class="pre">Download</span></code></a>
+    <a class="reference download internal" download="" href="https://github.com/PennyWieser/DiadFit/blob/{{ git_ref|e }}/{{ docname|e }}"><code class="xref download docutils literal notranslate"><span class="pre">Python</span> <span class="pre">Notebook</span> <span class="pre">Download</span></code></a>
       </p>
       <script>
         if (document.location.host) {
@@ -127,7 +128,7 @@ master_doc = 'index'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = 'en'
+language = None
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -154,7 +155,7 @@ html_theme =  "sphinx_rtd_theme" #'alabaster'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-# html_static_path = ['_static']
+html_static_path = ['_static']
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
