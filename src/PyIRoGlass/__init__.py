@@ -527,7 +527,7 @@ def modelfit(data, uncert, indparams, model, title, nbins=75,
     rax.errorbar(binindp, bindata-binmodel, binuncert, fmt='ko', ms=4)
     rax.plot([indparams[0], indparams[-1]], [0,0], 'k:', lw=1.5)
     rax.tick_params(labelsize=fs-1, direction='in', top=True, right=True)
-    rax.set_xlabel("Wavenumber $(\mathregular{cm^{-1}})$", fontsize=fs) 
+    rax.set_xlabel("Wavenumber (cm^-1)", fontsize=fs) 
     rax.set_ylabel('Residual', fontsize=fs)
     rax.invert_xaxis()
 

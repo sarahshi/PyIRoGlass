@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+Version 0.2.1
+=============
+Minimal changes to clean code, fix UnitTesting, and prepare for publication. 
+
+
 Version 0.2.0
 =============
 Update parameter estimation regions with the guidance of devolatilized spectra, improve functionality. 
