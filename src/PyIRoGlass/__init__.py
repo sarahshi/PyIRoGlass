@@ -85,7 +85,7 @@ def Load_PC(file_name):
     PC_DF = PC_DF.set_index('Wavenumber')
 
     PC_DF = PC_DF[wn_low:wn_high]
-    PC_matrix = np.matrix(PC_DF.to_numpy())
+    PC_matrix = np.ndarray(PC_DF.to_numpy())
 
     return PC_matrix
 
@@ -202,13 +202,13 @@ def Carbonate(P, x, PCmatrix, Peak_1635_PCmatrix, Nvectors = 5):
     peak_G1430, std_G1430, G1430_amplitude, peak_G1515, std_G1515, G1515_amplitude = P[Nvectors:-5]
     m, b = P[-2:None]
 
-    Peak_1635 = Peak_Weights * Peak_1635_PCmatrix.T
+    Peak_1635 = Peak_Weights @ Peak_1635_PCmatrix.T
     G1515 = Gauss(x, peak_G1515, std_G1515, A=G1515_amplitude)
     G1430 = Gauss(x, peak_G1430, std_G1430, A=G1430_amplitude)
 
     linear_offset = Linear(x, m, b) 
 
-    baseline = PC_Weights * PCmatrix.T
+    baseline = PC_Weights @ PCmatrix.T
     model_data = baseline + linear_offset + Peak_1635 + G1515 + G1430
     model_data = np.array(model_data)[0,:]
 
@@ -545,7 +545,8 @@ def modelfit(data, uncert, indparams, model, title, nbins=75,
     if savefile is not None:
         plt.suptitle(title, fontsize=fs+1)
         plt.ioff()
-        plt.savefig(savefile)
+        plt.savefig(savefile, bbox_inches='tight')
+        
     return ax, rax
 
 
@@ -582,12 +583,12 @@ def MCMC(data, uncert, indparams, log, savefile):
     priorlow = np.array([0.00, 0.00, 0.00, 0.00, 0.00, 0.0, 5.00, 0.0, 0.0, 5.00, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
     priorup  = np.array([0.00, 0.00, 0.00, 0.00, 0.00, 0.0, 5.00, 0.0, 0.0, 5.00, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 
-    pnames   = ['B_mean',"B_PC1","B_PC2","B_PC3","B_PC4",'G1430_peak','G1430_std','G1430_amp',
+    pnames   = ['B_mean','B_PC1','B_PC2','B_PC3','B_PC4','G1430_peak','G1430_std','G1430_amp',
                 'G1515_peak','G1515_std','G1515_amp','H1635_mean','H1635_PC1','H1635_PC2','m','b']
 
-    texnames = ['$\overline{B}$',"$\overline{B}_{PC1}$","$\overline{B}_{PC2}$","$\overline{B}_{PC3}$",'$\overline{B}_{PC4}$',
-                '$\mu_{1430}$','$\sigma_{1430}$','$a_{1430}$','$\mu_{1515}$','$\sigma_{1515}$','$a_{1515}$',
-                '$\overline{H_{1635}}$','$\overline{H_{1635}}_{PC1}$','$\overline{H_{1635}}_{PC2}$','$m$','$b$']
+    texnames = [r'$\overline{B}$',r'$\overline{B}_{PC1}$',r'$\overline{B}_{PC2}$',r'$\overline{B}_{PC3}$',r'$\overline{B}_{PC4}$',
+                r'$\mu_{1430}$',r'$\sigma_{1430}$','$a_{1430}$',r'$\mu_{1515}$',r'$\sigma_{1515}$','$a_{1515}$',
+                r'$\overline{H_{1635}}$',r'$\overline{H_{1635}}_{PC1}$',r'$\overline{H_{1635}}_{PC2}$','$m$','$b$']
 
 
     mc3_output = mc3.sample(data=data, uncert=uncert, func=func, params=params, indparams=indparams,
@@ -781,7 +782,7 @@ def Run_All_Spectra(dfs_dict, exportpath):
 
             PC_BP = mc3_output['bestp'][0:Nvectors]
             PC_STD = mc3_output['stdp'][0:Nvectors]
-            Baseline_Solve_BP = PC_BP * PCmatrix.T
+            Baseline_Solve_BP = PC_BP @ PCmatrix.T
             Baseline_Solve_BP = np.asarray(Baseline_Solve_BP).ravel()
 
             m_BP, b_BP = mc3_output['bestp'][-2:None]
@@ -789,7 +790,7 @@ def Run_All_Spectra(dfs_dict, exportpath):
             Line_BP = Linear(Wavenumber, m_BP, b_BP) 
             Baseline_Solve_BP = Baseline_Solve_BP + Line_BP
 
-            H1635_BP = H2OmP1635_BP * Peak_1635_PCmatrix.T
+            H1635_BP = H2OmP1635_BP @ Peak_1635_PCmatrix.T
             H1635_BP = np.asarray(H1635_BP).ravel()
             CO2P1430_BP = Gauss(Wavenumber, CO2P_BP[0], CO2P_BP[1], A=CO2P_BP[2])
             CO2P1515_BP = Gauss(Wavenumber, CO2P_BP[3], CO2P_BP[4], A=CO2P_BP[5])
@@ -829,7 +830,7 @@ def Run_All_Spectra(dfs_dict, exportpath):
                 ax1.annotate("$\mathregular{OH^{-}_{4500}}$  Peak Height: " + f"{PH_4500_krige_M:.4f} ± {PH_4500_krige_STD:.4f}, S2N={STN_4500_M:.2f}", (0.025, 0.80), xycoords = 'axes fraction')
                 ax1.set_ylabel('Absorbance')
                 warnings.filterwarnings("ignore", category = UserWarning)
-                ax1.legend(['NIR Spectrum','_','_','$\mathregular{H_2O_{m, 5200}}$ Median Filtered','_','_','$\mathregular{OH^{-}_{4500}}$ Median Filtered','_','_','$\mathregular{H_2O_{m, 5200}}$ Baseline','_','_','$\mathregular{OH^{-}_{4500}}$ Baseline'], prop={'size': 10})
+                ax1.legend(['NIR Spectrum','_','_',r'$\mathregular{H_2O_{m, 5200}}$ Median Filtered','_','_',r'$\mathregular{OH^{-}_{4500}}$ Median Filtered','_','_',r'$\mathregular{H_2O_{m, 5200}}$ Baseline','_','_',r'$\mathregular{OH^{-}_{4500}}$ Baseline'], prop={'size': 10})
                 ax1.set_xlim([4200, 5400])
                 ax1.set_ylim([plotmin-0.075, plotmax+0.075])
                 ax1.invert_xaxis()
@@ -838,20 +839,20 @@ def Run_All_Spectra(dfs_dict, exportpath):
                 ax2 = plt.subplot2grid((2, 3), (1, 0))
                 ax2.plot(data_H2O5200_1.index, data_H2O5200_1['Subtracted_Peak'] - np.min(krige_output_5200_1['Absorbance']), 'k',
                         data_H2O5200_2.index, data_H2O5200_2['Subtracted_Peak'] - np.min(krige_output_5200_2['Absorbance']), 'k', 
-                        data_H2O5200_3.index, data_H2O5200_3['Subtracted_Peak'] - np.min(krige_output_5200_3['Absorbance']), 'k', label = '$\mathregular{H_2O_{m, 5200}}$ Baseline Subtracted')
+                        data_H2O5200_3.index, data_H2O5200_3['Subtracted_Peak'] - np.min(krige_output_5200_3['Absorbance']), 'k', label = r'$\mathregular{H_2O_{m, 5200}}$ Baseline Subtracted')
                 ax2.plot(data_H2O4500_1.index, data_H2O4500_1['Subtracted_Peak'] - np.min(krige_output_4500_1['Absorbance']), 'k', 
                         data_H2O4500_2.index, data_H2O4500_2['Subtracted_Peak'] - np.min(krige_output_4500_2['Absorbance']), 'k', 
-                        data_H2O4500_3.index, data_H2O4500_3['Subtracted_Peak'] - np.min(krige_output_4500_3['Absorbance']), 'k', label = '$\mathregular{OH^{-}_{4500}}$ Baseline Subtracted')
+                        data_H2O4500_3.index, data_H2O4500_3['Subtracted_Peak'] - np.min(krige_output_4500_3['Absorbance']), 'k', label = r'$\mathregular{OH^{-}_{4500}}$ Baseline Subtracted')
                 ax2.plot(krige_output_5200_1.index, krige_output_5200_1['Absorbance'] - np.min(krige_output_5200_1['Absorbance']), 
                         krige_output_5200_2.index, krige_output_5200_2['Absorbance'] - np.min(krige_output_5200_2['Absorbance']),
-                        krige_output_5200_3.index, krige_output_5200_3['Absorbance'] - np.min(krige_output_5200_3['Absorbance']), label = '$\mathregular{H_2O_{m, 5200}}$ Kriged Peak')
+                        krige_output_5200_3.index, krige_output_5200_3['Absorbance'] - np.min(krige_output_5200_3['Absorbance']), label = r'$\mathregular{H_2O_{m, 5200}}$ Kriged Peak')
                 ax2.plot(krige_output_4500_1.index, krige_output_4500_1['Absorbance'] - np.min(krige_output_4500_1['Absorbance']), 
                         krige_output_4500_2.index, krige_output_4500_2['Absorbance'] - np.min(krige_output_4500_2['Absorbance']), 
-                        krige_output_4500_3.index, krige_output_4500_3['Absorbance'] - np.min(krige_output_4500_3['Absorbance']), label = '$\mathregular{OH^{-}_{4500}}$ Kriged Peak')
+                        krige_output_4500_3.index, krige_output_4500_3['Absorbance'] - np.min(krige_output_4500_3['Absorbance']), label = r'$\mathregular{OH^{-}_{4500}}$ Kriged Peak')
                 ax2.set_xlabel('Wavenumber $(\mathregular{cm^{-1}})$')    
                 ax2.set_ylabel('Absorbance')
                 warnings.filterwarnings("ignore", category = UserWarning)
-                ax2.legend(['$\mathregular{H_2O_{m, 5200}}$ Baseline Subtracted','_','_','$\mathregular{OH^{-}_{4500}}$ Baseline Subtracted','_','_','_','_','$\mathregular{H_2O_{m, 5200}}$ Kriged','_','_','$\mathregular{OH^{-}_{4500}}$ Kriged'], prop={'size': 10})
+                ax2.legend([r'$\mathregular{H_2O_{m, 5200}}$ Baseline Subtracted','_','_',r'$\mathregular{OH^{-}_{4500}}$ Baseline Subtracted','_','_','_','_',r'$\mathregular{H_2O_{m, 5200}}$ Kriged','_','_',r'$\mathregular{OH^{-}_{4500}}$ Kriged'], prop={'size': 10})
                 ax2.set_xlim([4200, 5400])
                 ax2.set_ylim([0, plotmax+0.05])
                 ax2.invert_xaxis()
@@ -861,7 +862,7 @@ def Run_All_Spectra(dfs_dict, exportpath):
                 plotmin = np.round(np.min(data[CO2_wn_low:CO2_wn_low+2750]['Absorbance'].to_numpy()), decimals = 0)
                 ax3 = plt.subplot2grid((2, 3), (0, 1), rowspan = 2)
                 ax3.plot(data.index, data['Absorbance'], 'k')
-                ax3.plot(data_H2O3550_1['Absorbance'].index, data_H2O3550_1['BL_MIR_3550'], 'silver', label = '$\mathregular{H_2O_{t, 3550}}$ Baseline')
+                ax3.plot(data_H2O3550_1['Absorbance'].index, data_H2O3550_1['BL_MIR_3550'], 'silver', label = r'$\mathregular{H_2O_{t, 3550}}$ Baseline')
                 ax3.plot(data_H2O3550_2['Absorbance'].index, data_H2O3550_2['BL_MIR_3550'], 'silver') 
                 ax3.plot(data_H2O3550_3['Absorbance'].index, data_H2O3550_3['BL_MIR_3550'], 'silver')
                 ax3.plot(plot_output_3550_1.index, (plot_output_3550_1['Subtracted_Peak_Hat']+plot_output_3550_1['BL_MIR_3550']), 'r', linewidth = 2)
@@ -887,7 +888,7 @@ def Run_All_Spectra(dfs_dict, exportpath):
                 lineerror = masked_posterior[:, -2:None]
                 lineerror = lineerror[0:np.shape(masked_posterior[:, :])[0]:int(np.shape(masked_posterior[:, :])[0] / 100), :]
 
-                Baseline_Array = np.array(samplingerror * PCmatrix[:, :].T)
+                Baseline_Array = np.array(samplingerror @ PCmatrix[:, :].T)
                 Baseline_Array_Plot = Baseline_Array
 
                 ax4 = plt.subplot2grid((2, 3), (0, 2), rowspan = 2)
@@ -896,9 +897,9 @@ def Run_All_Spectra(dfs_dict, exportpath):
                     Baseline_Array_Plot[i, :] = Baseline_Array[i, :] + Linearray
                     plt.plot(Wavenumber, Baseline_Array_Plot[i, :], 'dimgray', linewidth = 0.25)
                 ax4.plot(Wavenumber, spec_mc3, 'tab:blue', linewidth = 2.5, label = 'FTIR Spectrum')
-                ax4.plot(Wavenumber, H1635_SOLVE, 'tab:orange', linewidth = 1.5, label = '$\mathregular{H_2O_{m, 1635}}$')
-                ax4.plot(Wavenumber, CO2P1515_SOLVE, 'tab:green', linewidth = 2.5, label = '$\mathregular{CO_{3, 1515}^{2-}}$')
-                ax4.plot(Wavenumber, CO2P1430_SOLVE, 'tab:red', linewidth = 2.5, label = '$\mathregular{CO_{3, 1430}^{2-}}$')
+                ax4.plot(Wavenumber, H1635_SOLVE, 'tab:orange', linewidth = 1.5, label = r'$\mathregular{H_2O_{m, 1635}}$')
+                ax4.plot(Wavenumber, CO2P1515_SOLVE, 'tab:green', linewidth = 2.5, label = r'$\mathregular{CO_{3, 1515}^{2-}}$')
+                ax4.plot(Wavenumber, CO2P1430_SOLVE, 'tab:red', linewidth = 2.5, label = r'$\mathregular{CO_{3, 1430}^{2-}}$')
                 ax4.plot(Wavenumber, Carbonate(mc3_output['meanp'], Wavenumber, PCmatrix, Peak_1635_PCmatrix, Nvectors), 'tab:purple', linewidth = 1.5, label = 'MC$^\mathregular{3}$ Fit')
                 ax4.plot(Wavenumber, Baseline_Solve_BP, 'k', linewidth = 1.5, label = 'Baseline')
                 ax4.annotate("$\mathregular{H_2O_{m, 1635}}$ Peak Height: " + f"{H2OmP1635_BP[0]:.3f} ± {H2OmP1635_STD[0]:.3f}", (0.025, 0.95), xycoords = 'axes fraction')
@@ -913,7 +914,9 @@ def Run_All_Spectra(dfs_dict, exportpath):
                 plt.savefig(path_beg + figurepath + files + '.pdf')
                 plt.close('all')
 
-                texnames = ['$\overline{B}$',"$\overline{B}_{PC1}$","$\overline{B}_{PC2}$","$\overline{B}_{PC3}$",'$\overline{B}_{PC4}$','$\mu_{1430}$','$\sigma_{1430}$','$a_{1430}$','$\mu_{1515}$','$\sigma_{1515}$','$a_{1515}$','$\overline{H_{1635}}$','$\overline{H_{1635}}_{PC1}$','$\overline{H_{1635}}_{PC2}$','$m$','$b$']
+                texnames = [r'$\overline{B}$',r'$\overline{B}_{PC1}$',r'$\overline{B}_{PC2}$',r'$\overline{B}_{PC3}$',r'$\overline{B}_{PC4}$',
+                            r'$\mu_{1430}$',r'$\sigma_{1430}$','$a_{1430}$',r'$\mu_{1515}$',r'$\sigma_{1515}$','$a_{1515}$',
+                            r'$\overline{H_{1635}}$',r'$\overline{H_{1635}}_{PC1}$',r'$\overline{H_{1635}}_{PC2}$','$m$','$b$']
 
                 posterior, zchain, zmask = mu.burn(mc3_output)
                 post = mp.Posterior(posterior, texnames)
