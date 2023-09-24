@@ -91,7 +91,7 @@ class test_fitting_functions(unittest.TestCase):
         temp_export_path = "temp_test_dir"
         os.makedirs(temp_export_path, exist_ok=True)
         
-        Volatiles_DF, failures = pig.Run_All_Spectra(self.sample_dfs_dict, temp_export_path)
+        Volatiles_DF, failures = pig.Run_All_Spectra(self.dfs_dict, temp_export_path)
         Volatiles_DF.to_csv(os.path.join(temp_export_path, "output.csv"))
 
         # Check if the result was exported correctly
