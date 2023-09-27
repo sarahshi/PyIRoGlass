@@ -14,7 +14,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 setup(
     name="PyIRoGlass",
     version=__version__,
-    author="Sarah C. Shi",
+    author="Sarah Shi",
     author_email="sarah.c.shi@gmail.com",
     description="PyIRoGlass",
     long_description=long_description,
