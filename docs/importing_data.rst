@@ -24,17 +24,17 @@ Users can batch process their FTIR data by creating directories containing all s
 The following columns are required for this ChemThick file:
 
 *  Sample
-*  SiO\ :sub:`2` 
-*  TiO\ :sub:`2` 
-*  Al\ :sub:`2`O\ :sub:`3` 
-*  Fe\ :sub:`2`O\ :sub:`3` 
+*  SiO\ :sub:`2`
+*  TiO\ :sub:`2`
+*  Al\ :sub:`2` O\ :sub:`3`
+*  Fe\ :sub:`2` O\ :sub:`3`
 *  FeO\ :sub:`t`
 *  MnO
 *  MgO 
 *  CaO 
-*  Na\ :sub:`2`O
-*  K\ :sub:`2`O 
-*  P\ :sub:`2`O\ :sub:`5`
+*  Na\ :sub:`2` O
+*  K\ :sub:`2` O
+*  P\ :sub:`2` O\ :sub:`5`
 *  Thickness
 *  Sigma_Thickness
 
