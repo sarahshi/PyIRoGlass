@@ -67,6 +67,7 @@ bibtex_reference_style = 'author_year'
 ## Erics nb sphinx
 nbsphinx_allow_errors = True
 
+
 # This is processed by Jinja2 and inserted before each notebook
 # Some change in dependencies made us need to replace `var` with
 # `env.config.html_context['var']`.
