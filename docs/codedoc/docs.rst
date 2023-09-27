@@ -66,8 +66,6 @@ Functions for plotting MCMC results
 
 .. autofunction:: PyIRoGlass.trace
 
-.. autofunction:: PyIRoGlass.subplotter
-
 
 Functions for determining thickness from reflectance FTIR spectra
 =================================================================

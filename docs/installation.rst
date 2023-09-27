@@ -15,7 +15,7 @@ First, obtain Python3 (tested on versions≥3.7). If you haven't used python bef
 
 If you are using Jupyter Notebooks (on Google Colab or Binder) or Jupyter Lab, you can also install it by entering the following code into a notebook cell (note the !):
 
-.. code-block:: python
+.. code-block:: bash
 
    !pip install PyIRoGlass
 
@@ -40,7 +40,7 @@ To upgrade to the most recent version of ``PyIRoGlass``, type the following into
 
 Or in your Jupyter environment:
 
-.. code-block:: python
+.. code-block:: bash
 
    !pip install PyIRoGlass --upgrade
 
