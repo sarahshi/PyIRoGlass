@@ -1,8 +1,0 @@
-name: PyIRoGlass-RTD
-channels:
-    - conda-forge
-    - defaults
-dependencies:
-    - python
-    - ipython       # IPython interpreter and tools
-    - pandoc
