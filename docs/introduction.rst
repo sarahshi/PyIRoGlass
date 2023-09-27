@@ -6,7 +6,7 @@ Welcome to ``PyIRoGlass``: An Open-Source, Bayesian MCMC Algorithm for Fitting B
 
 This tool is currently in progress, with submission to Volcanica in the near future. Please make sure you cite this tool if you use it. Software development takes time and and academia does not always recognize the effort taken, but it does recognize citations. 
 
-The open-source nature of the tool allows for continuous development. We welcome the submission of devolatilized FTIR spectra that can continue to shape the form of the baseline, and molar absorptivities. You can email `Sarah Shi <mailto:sarah.shi@columbia.edu>`_ or post an enhancement request or report of a bug on the issue page of the `PyIRoGlass GitHub repository <https://github.com/SarahShi/PyIRoGlass>`_. 
+The open-source nature of the tool allows for continuous development. We welcome the submission of devolatilized FTIR spectra that can continue to shape the form of the baseline, and molar absorptivities. You can email `sarah.shi@columbia.edu <mailto:sarah.shi@columbia.edu>`_ or post an enhancement request or report of a bug on the issue page of the `PyIRoGlass GitHub repository <https://github.com/SarahShi/PyIRoGlass>`_. 
 
 
 =============
@@ -15,7 +15,7 @@ Collaborators
 
 These folks have been fundamental to the development of ``PyIRoGlass``: 
 
-- `Sarah Shi <https://github.com/sarahshi>`_ (LDEO) `sarah.shi@columbia.edu <mailto:sarah.shi@columbia.edu>`_
+- `Sarah Shi <https://github.com/sarahshi>`_ (LDEO) 
 - `Henry Towbin <https://github.com/whtowbin>`_ (LDEO)
 - `Terry Plank <https://github.com/terryplank>`_ (LDEO)
 - `Anna Barth <https://github.com/barthac>`_ (LDEO, Berkeley)
