@@ -1,0 +1,139 @@
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+  Multi-core Markov-chain Monte Carlo (mc3).
+  Version 3.1.2.
+  Copyright (c) 2015-2023 Patricio Cubillos and collaborators.
+  mc3 is open-source software under the MIT license (see LICENSE).
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+Least-squares best-fitting parameters:
+  [ 5.11735236e-01 -2.96327877e+00  2.75707715e-01 -5.06637046e-01
+  2.26248986e-01  1.42725865e+03  3.43512091e+01  5.02432187e-02
+  1.51923346e+03  3.24143045e+01  5.30599427e-02  2.99675069e-01
+ -5.25464614e-02  4.67980624e-02 -4.44873222e-04  7.21255305e-01]
+
+Start MCMC chains  (Sat Sep 23 11:00:45 2023)
+
+[:         ]  10.0% completed  (Sat Sep 23 11:00:52 2023)
+Out-of-bound Trials:
+[    0 18551     0    26     0     2     0   352     4     0    82     1
+     0     0     0     0]
+Best Parameters: (chisq=49.7843)
+[ 5.11735236e-01 -2.96327877e+00  2.75707715e-01 -5.06637046e-01
+  2.26248986e-01  1.42725865e+03  3.43512091e+01  5.02432187e-02
+  1.51923346e+03  3.24143045e+01  5.30599427e-02  2.99675069e-01
+ -5.25464614e-02  4.67980624e-02 -4.44873222e-04  7.21255305e-01]
+
+[::        ]  20.0% completed  (Sat Sep 23 11:00:59 2023)
+Out-of-bound Trials:
+[    1 23222     0   240   150   101  1322   372    14  1027    86     1
+     0     0     0     0]
+Best Parameters: (chisq=49.7843)
+[ 5.11735236e-01 -2.96327877e+00  2.75707715e-01 -5.06637046e-01
+  2.26248986e-01  1.42725865e+03  3.43512091e+01  5.02432187e-02
+  1.51923346e+03  3.24143045e+01  5.30599427e-02  2.99675069e-01
+ -5.25464614e-02  4.67980624e-02 -4.44873222e-04  7.21255305e-01]
+
+[:::       ]  30.0% completed  (Sat Sep 23 11:01:07 2023)
+Out-of-bound Trials:
+[    3 31661     0   916   755   234  3874   383    42  2559    90     2
+     0     0     0     0]
+Best Parameters: (chisq=49.7843)
+[ 5.11735236e-01 -2.96327877e+00  2.75707715e-01 -5.06637046e-01
+  2.26248986e-01  1.42725865e+03  3.43512091e+01  5.02432187e-02
+  1.51923346e+03  3.24143045e+01  5.30599427e-02  2.99675069e-01
+ -5.25464614e-02  4.67980624e-02 -4.44873222e-04  7.21255305e-01]
+Gelman-Rubin statistics for free parameters:
+[1.0331394  1.03454814 1.00977936 1.02099123 1.02667308 1.019098
+ 1.026297   1.00112975 1.00917225 1.01897136 1.00705804 1.00581763
+ 1.00958724 1.01509338 1.03437309 1.03342544]
+
+[::::      ]  40.0% completed  (Sat Sep 23 11:01:14 2023)
+Out-of-bound Trials:
+[   10 41599     0  1677  1443   435  7029   397    80  4221    99     2
+     0     0     0     0]
+Best Parameters: (chisq=49.7843)
+[ 5.11735236e-01 -2.96327877e+00  2.75707715e-01 -5.06637046e-01
+  2.26248986e-01  1.42725865e+03  3.43512091e+01  5.02432187e-02
+  1.51923346e+03  3.24143045e+01  5.30599427e-02  2.99675069e-01
+ -5.25464614e-02  4.67980624e-02 -4.44873222e-04  7.21255305e-01]
+Gelman-Rubin statistics for free parameters:
+[1.01115427 1.01212427 1.00163074 1.01074558 1.00498583 1.0035084
+ 1.01366423 1.00096845 1.002415   1.00462555 1.00209489 1.00082206
+ 1.00078257 1.00207599 1.01186969 1.01226642]
+
+[:::::     ]  50.0% completed  (Sat Sep 23 11:01:21 2023)
+Out-of-bound Trials:
+[   11 52210     0  2587  2253   669 10543   415   114  6160   105     2
+     0     0     0     0]
+Best Parameters: (chisq=49.7843)
+[ 5.11735236e-01 -2.96327877e+00  2.75707715e-01 -5.06637046e-01
+  2.26248986e-01  1.42725865e+03  3.43512091e+01  5.02432187e-02
+  1.51923346e+03  3.24143045e+01  5.30599427e-02  2.99675069e-01
+ -5.25464614e-02  4.67980624e-02 -4.44873222e-04  7.21255305e-01]
+Gelman-Rubin statistics for free parameters:
+[1.00274988 1.00297377 1.00189966 1.00290737 1.00196551 1.0014147
+ 1.0043706  1.00178592 1.00120418 1.00275346 1.00105156 1.00155051
+ 1.00069121 1.00211739 1.00292017 1.00299406]
+All parameters converged to within 1% of unity.
+
+[::::::    ]  60.0% completed  (Sat Sep 23 11:01:28 2023)
+Out-of-bound Trials:
+[   15 63110     0  3484  3254   874 14418   431   174  8392   113     2
+     0     0     0     0]
+Best Parameters: (chisq=49.7843)
+[ 5.11735236e-01 -2.96327877e+00  2.75707715e-01 -5.06637046e-01
+  2.26248986e-01  1.42725865e+03  3.43512091e+01  5.02432187e-02
+  1.51923346e+03  3.24143045e+01  5.30599427e-02  2.99675069e-01
+ -5.25464614e-02  4.67980624e-02 -4.44873222e-04  7.21255305e-01]
+Gelman-Rubin statistics for free parameters:
+[1.00136932 1.00146962 1.00158353 1.00134223 1.00130049 1.00112265
+ 1.00297882 1.00130396 1.00030204 1.00295048 1.00121805 1.00153511
+ 1.00116868 1.00163784 1.0014347  1.00144199]
+All parameters converged to within 1% of unity.
+
+All parameters satisfy the GR convergence threshold of 1.01, stopping
+the MCMC.
+
+MCMC Summary:
+-------------
+  Number of evaluated samples:        604670
+  Number of parallel chains:               9
+  Average iterations per chain:        67185
+  Burned-in iterations per chain:      20000
+  Thinning factor:                         5
+  MCMC sample size (thinned, burned):  84934
+  Acceptance rate:   23.91%
+
+Parameter name     best fit   median      1sigma_low   1sigma_hi        S/N
+--------------- -----------  -----------------------------------  ---------
+B_mean           5.1174e-01   5.5602e-01 -3.3889e-02  5.3078e-02       11.7
+B_PC1           -2.9633e+00  -2.5085e+00 -3.4928e-01  5.5367e-01        6.6
+B_PC2            2.7571e-01   2.6984e-01 -2.1082e-02  2.0490e-02       13.4
+B_PC3           -5.0664e-01  -4.4857e-01 -4.8410e-02  7.2774e-02        8.2
+B_PC4            2.2625e-01   1.8934e-01 -4.6524e-02  3.8298e-02        5.3
+G1430_peak       1.4273e+03   1.4271e+03 -3.0366e+00  3.1965e+00      458.0
+G1430_std        3.4351e+01   3.4442e+01 -3.0058e+00  2.9100e+00       12.3
+G1430_amp        5.0243e-02   4.9892e-02 -4.3164e-03  4.5145e-03       11.5
+G1515_peak       1.5192e+03   1.5195e+03 -2.7836e+00  2.6822e+00      550.3
+G1515_std        3.2414e+01   3.3084e+01 -2.7336e+00  3.0069e+00       11.8
+G1515_amp        5.3060e-02   5.3340e-02 -3.7498e-03  3.7488e-03       14.2
+H1635_mean       2.9968e-01   3.0016e-01 -3.0700e-03  3.0477e-03       96.7
+H1635_PC1       -5.2546e-02  -5.5400e-02 -1.6189e-02  1.6408e-02        3.2
+H1635_PC2        4.6798e-02   4.6252e-02 -1.8050e-02  1.7189e-02        2.6
+m               -4.4487e-04  -3.6764e-04 -5.9283e-05  9.4660e-05        5.8
+b                7.2126e-01   6.9815e-01 -2.8336e-02  1.7699e-02       31.2
+
+  Best-parameter's chi-squared:        48.7939
+  Best-parameter's -2*log(posterior):  49.7843
+  Bayesian Information Criterion:     151.0377
+  Reduced chi-squared:                  0.0841
+  Standard deviation of residuals:  0.00286127
+
+For a detailed summary with all parameter posterior statistics see
+/Users/sarahcshi/Documents/GitHub/PyIRoGlass/docs/examples/transmission_ftir/NPZTXTFILES/RESULTS/AC4_OL53_101220_256s_30x30_a_statistics.txt
+
+Output sampler files:
+  /Users/sarahcshi/Documents/GitHub/PyIRoGlass/docs/examples/transmission_ftir/NPZTXTFILES/RESULTS/AC4_OL53_101220_256s_30x30_a_statistics.txt
+  /Users/sarahcshi/Documents/GitHub/PyIRoGlass/docs/examples/transmission_ftir/NPZTXTFILES/RESULTS/AC4_OL53_101220_256s_30x30_a.npz
+  /Users/sarahcshi/Documents/GitHub/PyIRoGlass/docs/examples/transmission_ftir/LOGFILES/RESULTS/AC4_OL53_101220_256s_30x30_a.log
