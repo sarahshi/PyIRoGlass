@@ -3,6 +3,11 @@ Change Log
 ==========
 
 
+Version 0.2.2
+=============
+Accidental deletion of GitHub commits, this restores all commits to v0.2.1. .git file size reduced. 
+
+
 Version 0.2.1
 =============
 Minimal changes to clean code, fix UnitTesting, and prepare for publication. 
