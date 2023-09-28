@@ -156,7 +156,7 @@ html_static_path = ['_static']
 html_logo = "_static/PyIRoGlass_logo.png"
 html_theme_options = {
     'logo_only': True,
-    'display_version': True,
+    'display_version': False,
 }
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
