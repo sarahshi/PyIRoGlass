@@ -87,7 +87,7 @@ for hj_file_path, data in DFS_DICT.items():
     # ax.set_ylim([-0.25, 2.5])
     ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
     ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
-    plt.savefig(common_part+'_BLcomp.png', bbox_inches='tight', pad_inches = 0.025)
+    plt.savefig('png/'+common_part+'_BLcomp.png', bbox_inches='tight', pad_inches = 0.025)
 
 
 # %%

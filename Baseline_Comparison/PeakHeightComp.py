@@ -45,6 +45,9 @@ stdno = 1
 MEGA_SPREADSHEET = pd.read_csv('../FINALDATA/' + OUTPUT_PATHS[stdno] + '_DF.csv', index_col = 0) 
 MEGA_SPREADSHEET['Sample ID'] = MEGA_SPREADSHEET.index
 
+DE = pd.read_csv('../FINALDATA/' + OUTPUT_PATHS[stdno] + '_DensityEpsilon.csv', index_col = 0) 
+DE['Sample ID'] = DE.index
+
 CONC = pd.read_csv('../FINALDATA/' + OUTPUT_PATHS[stdno] + '_H2OCO2.csv', index_col = 0) 
 CONC['Sample ID'] = MEGA_SPREADSHEET.index
 
@@ -80,7 +83,6 @@ badspec = np.array(['CI_IPGP_B6_1_50x50_256s_sp1', 'CI_IPGP_B6_2_50x50_256s_sp1'
                     ])
 
 merge = merge[~merge.index.isin(badspec)]
-
 merge = merge[~merge.index.str.contains('map_actual_focusedProperly', case=False, na=False)]
 
 merge
@@ -166,6 +168,8 @@ merge_filt = merge_int[abs(merge_int['Py_Devol_1515'] - mean_1515) < 1.5 * std_1
 merge_filt.to_csv('PHComparison_lim.csv')
 merge_filt
 
+DE_filt = DE[DE.index.isin(merge_filt.index)].drop(columns=['Sample ID', 'Density'])
+DE_filt['Repeats'] = merge_filt['Repeats']
 
 
 slope0, intercept0, r_value0, p_value0, std_err0 = scipy.stats.linregress(merge_filt.PH_1515_norm, merge_filt.PH_1515_BP_norm)
@@ -211,8 +215,6 @@ ax[1].set_ylim([0, 2.5])
 ax[1].set_xticks(ticks)  # Set x ticks
 ax[1].set_yticks(ticks)  # Set y ticks
 ax[1].set_xticklabels(tick_labels)
-
-# ax[1].set_xlabel('Devolatilized Peak Height')
 ax[1].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[1].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 ax[1].legend(loc='lower right', labelspacing = 0.2, handletextpad = 0.25, handlelength = 1.00, prop={'size': 13}, frameon=False)
@@ -223,8 +225,6 @@ ax[1].annotate("RMSE="+str(np.round(rmse1, 3)), xy=(0.03, 0.84), xycoords="axes 
 ax[1].annotate("m="+str(np.round(slope1, 3)), xy=(0.03, 0.76), xycoords="axes fraction", fontsize=14)
 ax[1].annotate("b="+str(np.round(intercept1, 3)), xy=(0.03, 0.72), xycoords="axes fraction", fontsize=14)
 
-# fig, ax = plt.subplots(1, 2, figsize=(14, 7))
-# ax.flatten()
 sc2 = ax[2].scatter(merge_filt.PH_1515_norm, (merge_filt['Py_Devol_1515']), s = sz, 
                     c = '#0C7BDC', ec = '#171008', lw = 0.5, 
                     zorder = 20)
@@ -262,21 +262,20 @@ ax[3].set_ylim([0.85, 1.05])
 ax[3].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[3].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 plt.tight_layout()
-plt.savefig('PHCombined_HJND.pdf', bbox_inches='tight', pad_inches = 0.025)
+# plt.savefig('PHCombined_HJND.pdf', bbox_inches='tight', pad_inches = 0.025)
 
 # %% 
 
 col_means = ['PH_1515_norm', 'PH_1515_BP_norm', 'PH_1515_STD_norm', 'PH_1430_norm', 'PH_1430_BP_norm', 'PH_1430_STD_norm', 
              'Py_Devol_1430', 'Py_Devol_1515', 'H2OT_MEAN', 'H2OT_STD', 'CO2_MEAN', 'CO2_STD']
 
-
-means = merge_filt.groupby('Repeats')[col_means].mean()
-display(means)
-
 std = merge_filt.groupby('Repeats')[col_means].std()
 std.to_csv('std.csv')
-display(std)
 
+counts = merge_filt.groupby('Repeats')['PH_1515_norm'].count()
+counts.to_csv('counts.csv')
+
+means = merge_filt.groupby('Repeats')[col_means].mean()
 means['per_analysis_1515'] = means['PH_1515_STD_norm'] / means['PH_1515_BP_norm']
 means['per_analysis_1430'] = means['PH_1430_STD_norm'] / means['PH_1430_BP_norm']
 means['per_repeat_1515'] = std['PH_1515_BP_norm'] / means['PH_1515_BP_norm']
@@ -301,11 +300,50 @@ means['H2OT_STD_net'] = means['error_prop_h2o'] * means['H2OT_MEAN']
 means['CO2_STD_net'] = means['error_prop_co2'] * means['CO2_MEAN']
 means.to_csv('means.csv')
 
+de_means = DE_filt.groupby('Repeats').mean()
+de_std = DE_filt.groupby('Repeats').std()
 
 
-counts = merge_filt.groupby('Repeats')['PH_1515_norm'].count()
-counts.to_csv('counts.csv')
-display(counts)
+# %% 
+
+def Error_Prop(mean_std, mean_mean, std_mean): 
+    
+    sigma_analysis = mean_std/mean_mean
+    sigma_repeat = std_mean/mean_mean
+    sigma_prop = np.where(sigma_repeat.isna(), sigma_analysis,
+        np.sqrt(sigma_analysis**2 + sigma_repeat**2))
+    uncert_prop = mean_mean * sigma_prop
+
+    return uncert_prop
+
+columns = ['Density', 'sigma_Density', 'Tau', 'sigma_Tau', 'Eta', 'sigma_Eta', 
+           'epsilon_H2OT_3550', 'sigma_epsilon_H2OT_3550', 
+           'epsilon_H2Om_1635', 'sigma_epsilon_H2Om_1635', 
+           'epsilon_CO2', 'sigma_epsilon_CO2',
+           'epsilon_H2Om_5200', 'sigma_epsilon_H2Om_5200', 
+           'epsilon_OH_4500', 'sigma_epsilon_OH_4500'
+           ]
+
+df = pd.DataFrame(columns=columns)
+df['Density'] = de_means.Density_Sat
+df['Tau'] = de_means.Tau
+df['Eta'] = de_means.Eta
+df['epsilon_H2OT_3550'] = de_means.epsilon_H2OT_3550
+df['epsilon_H2Om_1635'] = de_means.epsilon_H2Om_1635
+df['epsilon_CO2'] = de_means.epsilon_CO2
+df['epsilon_H2Om_5200'] = de_means.epsilon_H2Om_5200
+df['epsilon_OH_4500'] = de_means.epsilon_OH_4500
+
+df['sigma_Density'] = Error_Prop(0, de_means['Density_Sat'], de_std['Density_Sat'])
+df['sigma_Tau'] = Error_Prop(0, de_means['Tau'], de_std['Tau'])
+df['sigma_Eta'] = Error_Prop(0, de_means['Eta'], de_std['Eta'])
+df['sigma_epsilon_H2OT_3550'] = Error_Prop(de_means['sigma_epsilon_H2OT_3550'], de_means['epsilon_H2OT_3550'], de_std['epsilon_H2OT_3550'])
+df['sigma_epsilon_H2Om_1635'] = Error_Prop(de_means['sigma_epsilon_H2Om_1635'], de_means['epsilon_H2Om_1635'], de_std['epsilon_H2Om_1635'])
+df['sigma_epsilon_CO2'] = Error_Prop(de_means['sigma_epsilon_CO2'], de_means['epsilon_CO2'], de_std['epsilon_CO2'])
+df['sigma_epsilon_H2Om_5200'] = Error_Prop(de_means['sigma_epsilon_H2Om_5200'], de_means['epsilon_H2Om_5200'], de_std['epsilon_H2Om_5200'])
+df['sigma_epsilon_OH_4500'] = Error_Prop(de_means['sigma_epsilon_OH_4500'], de_means['epsilon_OH_4500'], de_std['epsilon_OH_4500'])
+
+df.to_csv('nd70_propagatesigma.csv')
 
 
 # %% 
