@@ -3,7 +3,7 @@ __pycache__
 /build/
 /dist/
 Peak_Fit/Old/
-/Baseline_Comparison/*.png
+/Baseline_Comparison/png/*.png
 /Baseline_Comparison/DevolatilizedBL/
 /FIGURES/
 /LOGFILES/
