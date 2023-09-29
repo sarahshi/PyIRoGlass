@@ -5,6 +5,8 @@
 Welcome to PyIRoGlass's documentation!
 ======================================
 
+.. image:: _static/PyIRoGlass_logo.png
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents
