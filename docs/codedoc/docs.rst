@@ -5,47 +5,47 @@ PyIRoGlass Documentation
 Data Imports 
 ============
 
-.. autofunction:: PyIRoGlass.Load_SampleCSV
+.. autofunction:: Load_SampleCSV
 
-.. autofunction:: PyIRoGlass.Load_PC
+.. autofunction:: Load_PC
 
-.. autofunction:: PyIRoGlass.Load_Wavenumber
+.. autofunction:: Load_Wavenumber
 
-.. autofunction:: PyIRoGlass.Load_ChemistryThickness
+.. autofunction:: Load_ChemistryThickness
 
 
 Building-blocks functions for fitting baselines and peaks
 =========================================================
 
-.. autofunction:: PyIRoGlass.Gauss
+.. autofunction:: Gauss
 
-.. autofunction:: PyIRoGlass.Linear
+.. autofunction:: Linear
 
-.. autofunction:: PyIRoGlass.Carbonate
+.. autofunction:: Carbonate
 
-.. autofunction:: PyIRoGlass.als_baseline
+.. autofunction:: als_baseline
 
-.. autoclass:: PyIRoGlass.WhittakerSmoother
+.. autoclass:: WhittakerSmoother
    :members:
 
-.. autofunction:: PyIRoGlass.NearIR_Process
+.. autofunction:: NearIR_Process
 
-.. autofunction:: PyIRoGlass.MidIR_Process
+.. autofunction:: MidIR_Process
 
-.. autofunction:: PyIRoGlass.MCMC
+.. autofunction:: MCMC
 
-.. autofunction:: PyIRoGlass.Run_All_Spectra
+.. autofunction:: Run_All_Spectra
 
 
 Functions for calculating concentrations
 ========================================
 
 
-.. autofunction:: PyIRoGlass.Beer_Lambert
+.. autofunction:: Beer_Lambert
 
-.. autofunction:: PyIRoGlass.Beer_Lambert_Error
+.. autofunction:: Beer_Lambert_Error
 
-.. autofunction:: PyIRoGlass.Concentration_Output
+.. autofunction:: Concentration_Output
 
 
 
@@ -53,49 +53,49 @@ Functions for calculating density, molar absorptivity
 =====================================================
 
 
-.. autofunction:: PyIRoGlass.Density_Calculation
+.. autofunction:: Density_Calculation
 
-.. autofunction:: PyIRoGlass.Epsilon_Calculation
+.. autofunction:: Epsilon_Calculation
 
 
 Functions for plotting MCMC results
 ===================================
 
 
-.. autofunction:: PyIRoGlass.modelfit
+.. autofunction:: modelfit
 
-.. autofunction:: PyIRoGlass.trace
+.. autofunction:: trace
 
 
 Functions for determining thickness from reflectance FTIR spectra
 =================================================================
 
 
-.. autofunction:: PyIRoGlass.PeakID
+.. autofunction:: PeakID
 
-.. autofunction:: PyIRoGlass.Thickness_Calc
+.. autofunction:: Thickness_Calc
 
-.. autofunction:: PyIRoGlass.Thickness_Process
+.. autofunction:: Thickness_Process
 
-.. autofunction:: PyIRoGlass.Reflectance_Index
+.. autofunction:: Reflectance_Index
 
 
 Functions for molar absorptivity inversions
 ===========================================
 
 
-.. autofunction:: PyIRoGlass.Inversion
+.. autofunction:: Inversion
 
-.. autofunction:: PyIRoGlass.Least_Squares
+.. autofunction:: Least_Squares
 
-.. autofunction:: PyIRoGlass.Calculate_Calibration_Error
+.. autofunction:: Calculate_Calibration_Error
 
-.. autofunction:: PyIRoGlass.Calculate_Epsilon
+.. autofunction:: Calculate_Epsilon
 
-.. autofunction:: PyIRoGlass.Calculate_SEE
+.. autofunction:: Calculate_SEE
 
-.. autofunction:: PyIRoGlass.Calculate_R2
+.. autofunction:: Calculate_R2
 
-.. autofunction:: PyIRoGlass.Calculate_RMSE
+.. autofunction:: Calculate_RMSE
 
-.. autofunction:: PyIRoGlass.Inversion_Fit_Errors
+.. autofunction:: Inversion_Fit_Errors
