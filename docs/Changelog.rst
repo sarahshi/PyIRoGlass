@@ -3,6 +3,11 @@ Change Log
 ==========
 
 
+Version 0.3.1
+=============
+Updating molar absorptivity inversion to add Brounce et al., 2021 value for carbonate. Paper submitted to Volcanica!
+
+
 Version 0.2.2
 =============
 Accidental deletion of GitHub commits, this restores all commits to v0.2.1. .git file size reduced. 
