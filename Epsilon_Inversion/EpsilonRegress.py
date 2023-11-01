@@ -25,10 +25,10 @@ plt.rcParams['pdf.fonttype'] = 42
 
 plt.rcParams["xtick.major.size"] = 4 # Sets length of ticks
 plt.rcParams["ytick.major.size"] = 4 # Sets length of ticks
-plt.rcParams["xtick.labelsize"] = 18 # Sets size of numbers on tick marks
-plt.rcParams["ytick.labelsize"] = 18 # Sets size of numbers on tick marks
-plt.rcParams["axes.titlesize"] = 20
-plt.rcParams["axes.labelsize"] = 20 # Axes labels
+plt.rcParams["xtick.labelsize"] = 20 # Sets size of numbers on tick marks
+plt.rcParams["ytick.labelsize"] = 20 # Sets size of numbers on tick marks
+plt.rcParams["axes.titlesize"] = 22
+plt.rcParams["axes.labelsize"] = 22 # Axes labels
 
 # method treats d, z, m1 and m2 as unknowns. model f(i) = 0 = m1 + m2*z(i) - d(i);
 # unknowns:  m1, m2 and the predicted (z,d)'s
@@ -212,7 +212,7 @@ epsilon_1635 = df_1635['Epsilon_1635']
 sigma_epsilon_1635 = epsilon_1635 * 0.05
 
 df_carbonate = pd.read_excel('./EpsilonRegression.xlsx', sheet_name='CarbonateRegress')
-naca = df_carbonate['Na/Na+Ca']
+naca = df_carbonate['Eta']
 sigma_naca = naca * 0.025
 epsilon_carbonate = df_carbonate['Epsilon_Carbonate']
 sigma_epsilon_carbonate = epsilon_carbonate * 0.10
@@ -245,7 +245,7 @@ epsilon_5200_mandeville = -2.463 + 4.899*tau_arr_5200
 
 fuego_idx = np.where((tau_arr_5200 > 0.653) & (tau_arr_5200 < 0.715))
 
-legend_5200 = '$\mathregular{ƐH_2O_{m, 5200}}$ = ' + f'{round(mest_5200[0],3)}(±{round(np.sqrt(np.diag(covm_est_5200))[0],3)}) + {round(mest_5200[1],3)}(±{round(np.sqrt(np.diag(covm_est_5200))[1],3)})'+ '·' + '$\\tau$'+ f', N={len(tau_5200)}'
+legend_5200 = '$\mathregular{ƐH_2O_{m, 5200}}$ = ' + f'{round(mest_5200[0],3)}(±{round(np.sqrt(np.diag(covm_est_5200))[0],3)}) + {round(mest_5200[1],3)}(±{round(np.sqrt(np.diag(covm_est_5200))[1],3)})'+ '·' + '$\\tau$'+ f', n={len(tau_5200)}'
 
 sz = 150
 fig, ax = plt.subplots(1, 1, figsize = (8, 8))
@@ -279,7 +279,7 @@ epsilon_4500_mandeville = -2.026+4.054*tau_arr_4500
 
 fuego_idx = np.where((tau_arr_4500 > 0.653) & (tau_arr_4500 < 0.715))
 
-legend_4500 = '$\mathregular{ƐOH^{-}_{4500}}$ = ' + f'{round(mest_4500[0],3)}(±{round(np.sqrt(np.diag(covm_est_4500))[0],3)}) + {round(mest_4500[1],3)}(±{round(np.sqrt(np.diag(covm_est_4500))[1],3)})'+ '·' + '$\\tau$'+ f', N={len(tau_4500)}'
+legend_4500 = '$\mathregular{ƐOH^{-}_{4500}}$ = ' + f'{round(mest_4500[0],3)}(±{round(np.sqrt(np.diag(covm_est_4500))[0],3)}) + {round(mest_4500[1],3)}(±{round(np.sqrt(np.diag(covm_est_4500))[1],3)})'+ '·' + '$\\tau$'+ f', n={len(tau_4500)}'
 
 sz = 150
 fig, ax = plt.subplots(1, 1, figsize = (8, 8))
@@ -309,7 +309,7 @@ plt.tight_layout()
 
 fuego_idx = np.where((tau_arr_3550 > 0.653) & (tau_arr_3550 < 0.715))
 
-legend_3550 = '$\mathregular{ƐH_2O_{t, 3550}}$ = ' + f'{round(mest_3550[0],3)}(±{round(np.sqrt(np.diag(covm_est_3550))[0],3)}) + {round(mest_3550[1],3)}(±{round(np.sqrt(np.diag(covm_est_3550))[1],3)})'+ '·' + '$\\tau$'+ f', N={len(tau_3550)}'
+legend_3550 = '$\mathregular{ƐH_2O_{t, 3550}}$ = ' + f'{round(mest_3550[0],3)}(±{round(np.sqrt(np.diag(covm_est_3550))[0],3)}) + {round(mest_3550[1],3)}(±{round(np.sqrt(np.diag(covm_est_3550))[1],3)})'+ '·' + '$\\tau$'+ f', n={len(tau_3550)}'
 
 sz = 150
 fig, ax = plt.subplots(1, 1, figsize = (8, 8))
@@ -338,7 +338,7 @@ epsilon_1635_mandeville = -57.813+131.94*tau_arr_1635
 
 fuego_idx = np.where((tau_arr_1635 > 0.653) & (tau_arr_1635 < 0.715))
 
-legend_1635 = '$\mathregular{ƐH_2O_{m, 1635}}$ = ' + f'{round(mest_1635[0],3)}(±{round(np.sqrt(np.diag(covm_est_1635))[0],3)}) + {round(mest_1635[1],3)}(±{round(np.sqrt(np.diag(covm_est_1635))[1],3)})'+ '·' + '$\\tau$'+ f', N={len(tau_1635)}'
+legend_1635 = '$\mathregular{ƐH_2O_{m, 1635}}$ = ' + f'{round(mest_1635[0],3)}(±{round(np.sqrt(np.diag(covm_est_1635))[0],3)}) + {round(mest_1635[1],3)}(±{round(np.sqrt(np.diag(covm_est_1635))[1],3)})'+ '·' + '$\\tau$'+ f', n={len(tau_1635)}'
 
 sz = 150
 fig, ax = plt.subplots(1, 1, figsize = (8, 8))
@@ -379,16 +379,16 @@ brounce = low_df[low_df.Compilation == 'Brounce']
 sz = 150
 fig, ax = plt.subplots(1, 1, figsize = (8, 8))
 
-ax.errorbar(low_df['Na/Na+Ca'], low_df['Epsilon_Carbonate'], yerr = low_df['Epsilon_Carbonate']*0.1, xerr = low_df['Na/Na+Ca']*0.025, ls = 'none', elinewidth = 0.5, ecolor = 'k')
-ax.scatter(low_df['Na/Na+Ca'], low_df['Epsilon_Carbonate'], s = sz, c = '#0C7BDC', edgecolors='black', linewidth = 0.5, zorder = 15, label = '$\mathregular{CO_{3, 1430}^{2-}}$, N='+str(len(low_df)))
-ax.scatter(brounce['Na/Na+Ca'], brounce['Epsilon_Carbonate'], s = sz, c = '#0C7BDC', edgecolors='black', linewidth = 2, zorder = 15, label = 'Brounce et al., 2021')
+ax.errorbar(low_df['Eta'], low_df['Epsilon_Carbonate'], yerr = low_df['Epsilon_Carbonate']*0.1, xerr = low_df['Eta']*0.025, ls = 'none', elinewidth = 0.5, ecolor = 'k')
+ax.scatter(low_df['Eta'], low_df['Epsilon_Carbonate'], s = sz, c = '#0C7BDC', edgecolors='black', linewidth = 0.5, zorder = 15, label = '$\mathregular{CO_{3, 1430}^{2-}}$, n='+str(len(low_df)))
+ax.scatter(brounce['Eta'], brounce['Epsilon_Carbonate'], s = sz, c = '#0C7BDC', edgecolors='black', linewidth = 2, zorder = 15, label = 'Brounce et al., 2021')
 
-ax.errorbar(high_df['Na/Na+Ca'], high_df['Epsilon_Carbonate'], yerr = high_df['Epsilon_Carbonate']*0.10, xerr = high_df['Na/Na+Ca']*0.025, ls = 'none', elinewidth = 0.5, ecolor = 'k')
-ax.scatter(high_df['Na/Na+Ca'], high_df['Epsilon_Carbonate'], s = sz, c = '#E42211', marker = 's', edgecolors='black', linewidth = 0.5, zorder = 15, label = '$\mathregular{CO_{3, 1515}^{2-}}$, N='+str(len(high_df)))
+ax.errorbar(high_df['Eta'], high_df['Epsilon_Carbonate'], yerr = high_df['Epsilon_Carbonate']*0.10, xerr = high_df['Eta']*0.025, ls = 'none', elinewidth = 0.5, ecolor = 'k')
+ax.scatter(high_df['Eta'], high_df['Epsilon_Carbonate'], s = sz, c = '#E42211', marker = 's', edgecolors='black', linewidth = 0.5, zorder = 15, label = '$\mathregular{CO_{3, 1515}^{2-}}$, n='+str(len(high_df)))
 
 dixonpan, = ax.plot(naca_arr, epsilon_carbonate_dixonpan, 'k-.', lw = 1.5, zorder = 0, label = 'Dixon and Pan, 1995')
 dixonpan.set_dashes([1.5, 1, 3, 1])
-legend_carbonate = '$\mathregular{ƐCO_3^{2-}}$= ' + f'{round(mest_carbonate[0],3)}(±{round(np.sqrt(np.diag(covm_est_carbonate))[0],3)}) - {round(mest_carbonate[1],3)*-1}(±{round(np.sqrt(np.diag(covm_est_carbonate))[1],3)})' + '·' + f'$\\eta$, N={len(naca)}'
+legend_carbonate = '$\mathregular{ƐCO_3^{2-}}$= ' + f'{round(mest_carbonate[0],3)}(±{round(np.sqrt(np.diag(covm_est_carbonate))[0],3)}) - {round(mest_carbonate[1],3)*-1}(±{round(np.sqrt(np.diag(covm_est_carbonate))[1],3)})' + '·' + f'$\\eta$, n={len(naca)}'
 ax.plot(naca_arr, epsilon_carbonate_arr, 'k', lw = 2, zorder = 0, label = legend_carbonate)
 ax.plot(naca_arr, epsilon_carbonate_old, 'green', lw = 2, zorder = 0)
 
@@ -419,7 +419,7 @@ epsilon_5200_mandeville = -2.463 + 4.899*tau_arr_5200
 
 fuego_idx = np.where((tau_arr_5200 > 0.653) & (tau_arr_5200 < 0.715))
 
-legend_5200 = '$\mathregular{ƐH_2O_{m, 5200}}$=' + f'{round(mest_5200[0],3)}(±{round(np.sqrt(np.diag(covm_est_5200))[0],3)})+{round(mest_5200[1],3)}(±{round(np.sqrt(np.diag(covm_est_5200))[1],3)})'+ '·' + '$\\tau$'+ f', N={len(tau_5200)}'
+legend_5200 = '$\mathregular{ƐH_2O_{m, 5200}}$=' + f'{round(mest_5200[0],3)}(±{round(np.sqrt(np.diag(covm_est_5200))[0],3)})+{round(mest_5200[1],3)}(±{round(np.sqrt(np.diag(covm_est_5200))[1],3)})'+ '·' + '$\\tau$'+ f', n={len(tau_5200)}'
 
 ax[0].plot(tau_arr_5200, epsilon_5200_arr, 'k', lw = 2, zorder = 0, label = legend_5200)
 mand, = ax[0].plot(tau_arr_5200, epsilon_5200_mandeville, 'k-.', lw = 2, zorder = 0, label = 'Mandeville et al., 2002')
@@ -443,7 +443,7 @@ ax[0].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 epsilon_4500_mandeville = -2.026+4.054*tau_arr_4500
 
 fuego_idx = np.where((tau_arr_4500 > 0.653) & (tau_arr_4500 < 0.715))
-legend_4500 = '$\mathregular{ƐOH^{-}_{4500}}$=' + f'{round(mest_4500[0],3)}(±{round(np.sqrt(np.diag(covm_est_4500))[0],3)})+{round(mest_4500[1],3)}(±{round(np.sqrt(np.diag(covm_est_4500))[1],3)})'+ '·' + '$\\tau$'+ f', N={len(tau_4500)}'
+legend_4500 = '$\mathregular{ƐOH^{-}_{4500}}$=' + f'{round(mest_4500[0],3)}(±{round(np.sqrt(np.diag(covm_est_4500))[0],3)})+{round(mest_4500[1],3)}(±{round(np.sqrt(np.diag(covm_est_4500))[1],3)})'+ '·' + '$\\tau$'+ f', n={len(tau_4500)}'
 
 ax[1].plot(tau_arr_4500, epsilon_4500_arr, 'k', lw = 2, zorder = 0, label = legend_4500)
 mand, = ax[1].plot(tau_arr_4500, epsilon_4500_mandeville, 'k-.', lw = 2, zorder = 0, label = 'Mandeville et al., 2002')
@@ -467,7 +467,7 @@ ax[1].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 
 
 fuego_idx = np.where((tau_arr_3550 > 0.653) & (tau_arr_3550 < 0.715))
-legend_3550 = '$\mathregular{ƐH_2O_{t, 3550}}$=' + f'{round(mest_3550[0],3)}(±{round(np.sqrt(np.diag(covm_est_3550))[0],3)})+{round(mest_3550[1],3)}(±{round(np.sqrt(np.diag(covm_est_3550))[1],3)})'+ '·' + '$\\tau$'+ f', N={len(tau_3550)}'
+legend_3550 = '$\mathregular{ƐH_2O_{t, 3550}}$=' + f'{round(mest_3550[0],3)}(±{round(np.sqrt(np.diag(covm_est_3550))[0],3)})+{round(mest_3550[1],3)}(±{round(np.sqrt(np.diag(covm_est_3550))[1],3)})'+ '·' + '$\\tau$'+ f', n={len(tau_3550)}'
 
 ax[2].plot(tau_arr_3550, epsilon_3550_arr, 'k', lw = 2, zorder = 0, label = legend_3550)
 mand.set_dashes([1.5, 1, 3, 1])
@@ -492,7 +492,7 @@ ax[2].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 epsilon_1635_mandeville = -57.813+131.94*tau_arr_1635
 
 fuego_idx = np.where((tau_arr_1635 > 0.653) & (tau_arr_1635 < 0.715))
-legend_1635 = '$\mathregular{ƐH_2O_{m, 1635}}$=' + f'{round(mest_1635[0],3)}(±{round(np.sqrt(np.diag(covm_est_1635))[0],3)})+{round(mest_1635[1],3)}(±{round(np.sqrt(np.diag(covm_est_1635))[1],3)})'+ '·' + '$\\tau$'+ f', N={len(tau_1635)}'
+legend_1635 = '$\mathregular{ƐH_2O_{m, 1635}}$=' + f'{round(mest_1635[0],3)}(±{round(np.sqrt(np.diag(covm_est_1635))[0],3)})+{round(mest_1635[1],3)}(±{round(np.sqrt(np.diag(covm_est_1635))[1],3)})'+ '·' + '$\\tau$'+ f', n={len(tau_1635)}'
 
 ax[3].plot(tau_arr_1635, epsilon_1635_arr, 'k', lw = 2, zorder = 0, label = legend_1635)
 mand, = ax[3].plot(tau_arr_1635, epsilon_1635_mandeville, 'k-.', lw = 2, zorder = 0, label = 'Mandeville et al., 2002')
@@ -523,11 +523,11 @@ df_carbonate = pd.read_excel('./EpsilonRegression.xlsx', sheet_name='CarbonateRe
 low_df = df_carbonate[df_carbonate.Epsilon_Location == 'Low']
 high_df = df_carbonate[df_carbonate.Epsilon_Location == 'High']
 
-ax[4].errorbar(low_df['Na/Na+Ca'], low_df['Epsilon_Carbonate'], yerr = low_df['Epsilon_Carbonate']*0.1, xerr = low_df['Na/Na+Ca']*0.025, ls = 'none', elinewidth = 0.5, ecolor = 'k')
-ax[4].scatter(low_df['Na/Na+Ca'], low_df['Epsilon_Carbonate'], s = sz, c = '#0C7BDC', edgecolors='black', linewidth = 0.5, zorder = 15, label = '$\mathregular{CO_{3, 1430}^{2-}}$, N='+str(len(low_df)))
+ax[4].errorbar(low_df['Eta'], low_df['Epsilon_Carbonate'], yerr = low_df['Epsilon_Carbonate']*0.1, xerr = low_df['Eta']*0.025, ls = 'none', elinewidth = 0.5, ecolor = 'k')
+ax[4].scatter(low_df['Eta'], low_df['Epsilon_Carbonate'], s = sz, c = '#0C7BDC', edgecolors='black', linewidth = 0.5, zorder = 15, label = '$\mathregular{CO_{3, 1430}^{2-}}$, n='+str(len(low_df)))
 
-ax[4].errorbar(high_df['Na/Na+Ca'], high_df['Epsilon_Carbonate'], yerr = high_df['Epsilon_Carbonate']*0.10, xerr = high_df['Na/Na+Ca']*0.025, ls = 'none', elinewidth = 0.5, ecolor = 'k')
-ax[4].scatter(high_df['Na/Na+Ca'], high_df['Epsilon_Carbonate'], s = sz, c = '#E42211', marker = 's', edgecolors='black', linewidth = 0.5, zorder = 15, label = '$\mathregular{CO_{3, 1515}^{2-}}$, N='+str(len(high_df)))
+ax[4].errorbar(high_df['Eta'], high_df['Epsilon_Carbonate'], yerr = high_df['Epsilon_Carbonate']*0.10, xerr = high_df['Eta']*0.025, ls = 'none', elinewidth = 0.5, ecolor = 'k')
+ax[4].scatter(high_df['Eta'], high_df['Epsilon_Carbonate'], s = sz, c = '#E42211', marker = 's', edgecolors='black', linewidth = 0.5, zorder = 15, label = '$\mathregular{CO_{3, 1515}^{2-}}$, n='+str(len(high_df)))
 
 dixonpan, = ax[4].plot(naca_arr, epsilon_carbonate_dixonpan, 'k-.', lw = 1.5, zorder = 0, label = 'Dixon and Pan, 1995')
 dixonpan.set_dashes([1.5, 1, 3, 1])
@@ -549,6 +549,6 @@ ax[4].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 
 fig.delaxes(ax[5])
 plt.tight_layout()
-plt.savefig('AllEpsilonRegressbrounce.pdf', bbox_inches='tight', pad_inches = 0.025)
+plt.savefig('AllEpsilonRegress_brounce.pdf', bbox_inches='tight', pad_inches = 0.025)
 
 # %%
