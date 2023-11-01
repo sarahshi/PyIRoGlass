@@ -84,7 +84,7 @@ def Load_PC(file_name):
     PC_DF = pd.DataFrame(npz['data'], columns = npz['columns'])
     PC_DF = PC_DF.set_index('Wavenumber')
 
-    PC_DF = PC_DF[wn_low:wn_high]
+    PC_DF = PC_DF.loc[wn_low:wn_high]
     PC_matrix = PC_DF.to_numpy()
 
     return PC_matrix
@@ -110,7 +110,7 @@ def Load_Wavenumber(file_name):
     Wavenumber_DF = pd.DataFrame(npz['data'], columns = npz['columns'])
     Wavenumber_DF = Wavenumber_DF.set_index('Wavenumber')
 
-    Wavenumber_DF = Wavenumber_DF[wn_low:wn_high]
+    Wavenumber_DF = Wavenumber_DF.loc[wn_low:wn_high]
     Wavenumber = np.array(Wavenumber_DF.index)
 
     return Wavenumber
@@ -326,7 +326,7 @@ def NearIR_Process(data, wn_low, wn_high, peak):
             STN (float): The signal to noise ratio.
     """
 
-    data_H2O = data[wn_low:wn_high]
+    data_H2O = data.loc[wn_low:wn_high]
     data_output = pd.DataFrame(columns = ['Absorbance', 'Absorbance_Hat', 'BL_NIR_H2O', 'Subtracted_Peak'], index = data_H2O.index)
     data_output['Absorbance'] = data_H2O
     data_output['Absorbance_Hat'] = signal.medfilt(data_H2O['Absorbance'], 5)
@@ -345,10 +345,10 @@ def NearIR_Process(data, wn_low, wn_high, peak):
     else:
         raise ValueError(f'Invalid peak type: {peak}')
 
-    PH_max = data_output['Subtracted_Peak'][pr_low:pr_high].max()
-    PH_krige = krige_output['Absorbance'][pr_low:pr_high].max() - krige_output['Absorbance'].min()
+    PH_max = data_output['Subtracted_Peak'].loc[pr_low:pr_high].max()
+    PH_krige = krige_output['Absorbance'].loc[pr_low:pr_high].max() - krige_output['Absorbance'].min()
     PH_krige_index = int(data_output['Subtracted_Peak'][data_output['Subtracted_Peak'] == PH_max].index.to_numpy())
-    PH_std = data_output['Subtracted_Peak'][PH_krige_index - 50:PH_krige_index + 50].std()
+    PH_std = data_output['Subtracted_Peak'].loc[PH_krige_index - 50:PH_krige_index + 50].std()
     STN = PH_krige / PH_std
 
     return data_output, krige_output, PH_krige, STN
@@ -376,7 +376,7 @@ def MidIR_Process(data, wn_low, wn_high):
     
     """
 
-    data_H2O3550 = data[wn_low:wn_high]
+    data_H2O3550 = data.loc[wn_low:wn_high]
     data_output = pd.DataFrame(columns = ['Absorbance', 'BL_MIR_3550', 'Subtracted_Peak', 'Subtracted_Peak_Hat'], index = data_H2O3550.index)
     data_output['Absorbance'] = data_H2O3550['Absorbance']
     data_output['BL_MIR_3550'] = als_baseline(data_H2O3550['Absorbance'], asymmetry_param=0.0010, smoothness_param=1e11, max_iters=20, conv_thresh=1e-7)
@@ -384,7 +384,7 @@ def MidIR_Process(data, wn_low, wn_high):
     data_output['Subtracted_Peak_Hat'] = signal.medfilt(data_output['Subtracted_Peak'], 21)
 
     peak_wn_low, peak_wn_high = 3300, 3600
-    plot_output = data_output[peak_wn_low:peak_wn_high]
+    plot_output = data_output.loc[peak_wn_low:peak_wn_high]
     plotindex = np.argmax(plot_output['Absorbance'].index.to_numpy() > 3400)
     PH_3550 = np.max(plot_output['Subtracted_Peak_Hat'])
 
@@ -733,7 +733,7 @@ def Run_All_Spectra(dfs_dict, exportpath):
             # Initialize PyIRoGlass MC3 fit for H2Om_{1635} and CO3^{2-}
             df_length = np.shape(Wavenumber)[0]
             CO2_wn_high, CO2_wn_low = 2400, 1250
-            spec = data[CO2_wn_low:CO2_wn_high]
+            spec = data.loc[CO2_wn_low:CO2_wn_high]
 
             # Interpolate fitting data depending on wavenumber spacing, to prepare for PyIRoGlass MC3
             if spec.shape[0] != df_length:              
@@ -809,8 +809,8 @@ def Run_All_Spectra(dfs_dict, exportpath):
 
             # Initialize plotting, create subplots of H2Om_{5200} and OH_{4500} baselines and peak fits
             if exportpath is not None: 
-                plotmin = np.round(np.min(data[H2O4500_wn_low_1:H2O5200_wn_high_1]['Absorbance']), decimals = 1)
-                plotmax = np.round(np.max(data[H2O4500_wn_low_1:H2O5200_wn_high_1]['Absorbance']), decimals = 1)
+                plotmin = np.round(np.min(data.loc[H2O4500_wn_low_1:H2O5200_wn_high_1]['Absorbance']), decimals = 1)
+                plotmax = np.round(np.max(data.loc[H2O4500_wn_low_1:H2O5200_wn_high_1]['Absorbance']), decimals = 1)
                 fig, ax = plt.subplots(figsize = (26, 8))
                 ax1 = plt.subplot2grid((2, 3), (0, 0))
                 ax1.plot(data.index, data['Absorbance'], 'k', linewidth = 1.5)
@@ -858,8 +858,8 @@ def Run_All_Spectra(dfs_dict, exportpath):
                 ax2.invert_xaxis()
 
                 # Create subplot of H2Om_{3550} baselines and peak fits
-                plotmax = np.round(np.max(data[CO2_wn_low:CO2_wn_low+2750]['Absorbance'].to_numpy()), decimals = 0)
-                plotmin = np.round(np.min(data[CO2_wn_low:CO2_wn_low+2750]['Absorbance'].to_numpy()), decimals = 0)
+                plotmax = np.round(np.max(data.loc[CO2_wn_low:CO2_wn_low+2750]['Absorbance'].to_numpy()), decimals = 0)
+                plotmin = np.round(np.min(data.loc[CO2_wn_low:CO2_wn_low+2750]['Absorbance'].to_numpy()), decimals = 0)
                 ax3 = plt.subplot2grid((2, 3), (0, 1), rowspan = 2)
                 ax3.plot(data.index, data['Absorbance'], 'k')
                 ax3.plot(data_H2O3550_1['Absorbance'].index, data_H2O3550_1['BL_MIR_3550'], 'silver', label = '$\mathregular{H_2O_{t, 3550}}$ Baseline')
@@ -1572,7 +1572,7 @@ def PeakID(ref_spec, wn_high, wn_low, peak_heigh_min_delta, peak_search_width, s
     from peakdetect import peakdetect
 
 
-    spec = ref_spec[wn_low:wn_high].copy() # dataframe indexed by wavenumber
+    spec = ref_spec.loc[wn_low:wn_high].copy() # dataframe indexed by wavenumber
     spec_filt = pd.DataFrame(columns = ['Wavenumber', 'Absorbance']) 
     baseline = 0
 
