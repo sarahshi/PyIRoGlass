@@ -57,16 +57,16 @@ class test_conc_outputs_co2(unittest.TestCase):
         self.P_room = 1 
         self.decimalPlace = 5
 
-    def test_beer_lambert(self):
+    def test_beer_lambert(self): # OL53, 1515 peak
 
         result = pig.Beer_Lambert(self.molar_mass, self.absorbance, self.sigma_absorbance, self.density, self.sigma_density, self.thickness, self.sigma_thickness, self.epsilon, self.sigma_epsilon) * 10000
-        expected = 727.658175499597
+        expected = 747.498925861367
         self.assertAlmostEqual(result, expected, self.decimalPlace, msg="CO2_1515 test and expected values from the Beer_Lambert equation do not agree")
 
     def test_beer_lambert_error(self):
         
         result = pig.Beer_Lambert_Error(self.N, self.molar_mass, self.absorbance, self.sigma_absorbance, self.density, self.sigma_density, self.thickness, self.sigma_thickness, self.epsilon, self.sigma_epsilon) * 10000
-        expected = 61.7178129279466
+        expected = 85.8212335730925
         self.assertAlmostEqual(result, expected, delta=1, msg="CO2_1515 test and expected errors from the Beer_Lambert_Error equation do not agree")
 
 
