@@ -15,13 +15,12 @@
 import os
 import sys
 import sphinx_rtd_theme
-sys.path.insert(0, os.path.abspath('../src'))
-
+sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
 project = 'PyIRoGlass'
-copyright = '2021, Sarah Shi'
+copyright = '2023, Sarah Shi'
 author = 'Sarah Shi'
 
 # The short X.Y version
@@ -32,8 +31,7 @@ release = 'v.0'
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-# sys.path.insert(0, os.path.abspath('..'))
-
+sys.path.insert(0, os.path.abspath('..'))
 
 # -- General configuration ---------------------------------------------------
 
