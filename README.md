@@ -9,4 +9,23 @@
 
 PyIRoGlass is a Bayesian MCMC-founded Python algorithm for determining volatile concentrations and speciation for $\mathrm{H_2O_{t, 3550}}$, $\mathrm{H_2O_{m, 1635}}$, $\mathrm{CO_{3, 1515}^{2-}}$, $\mathrm{CO_{3, 1430}^{2-}}$, $\mathrm{H_2O_{m, 5200}}$, and $\mathrm{OH_{4500}}$ from basaltic to andesitic transmission FTIR spectra. PyIRoGlass is written in the open-source language Python3 with the $\mathrm{MC^3}$ package, allowing for the proper sampling of parameter space and the determination of volatile concentrations with uncertainties. 
 
-Quantifying concentrations of volatiles in magmas is critical for estimating the conditions of magma storage, assessing phase equilibria, and understanding eruption processes. We develop and present PyIRoGlass, a new open-source Python package implementing a Bayesian method with Markov Chain Monte Carlo sampling, to process the transmission FTIR spectra of basaltic to andesitic glasses and to quantify volatile concentrations with uncertainties for all $\mathrm{H_2O}$ and $\mathrm{CO_2}$ glass species, when devolatilized baselines are not readily available. We utilize a database of naturally degassed melt inclusions from the Aleutians and back-arc basin basalts to determine the fundamental shapes and variability of the baseline in the mid-IR region, in which the $\mathrm{CO_3^{2-}}$ doublets and $\mathrm{H_2O_{m, 1635}}$ peaks are found. The baseline and peak shapes vary across samples, dependent on the chemistry of samples and concentration of volatiles. All parameters within the Beer-Lambert Law — including the baseline, molar absorptivity, thickness, and density — are closely examined to quantify the associated uncertainties. Molar absorptivity is recalibrated as a function of compositional parameters by applying a Newtonian inversion, allowing for the quantification of the uncertainty of the inversion and of the uncertainty in composition. PyIRoGlass further provides functions for processing reflectance FTIR spectra to determine sample wafer thickness. This Bayesian method allows for the simultaneous MCMC sampling of all likely baselines and peaks to iteratively solve for the best-fit parameters. We present a promising method for confidently processing transmission FTIR spectra to determine volatile concentrations with robust estimation of uncertainty and  consideration of covariance within fit parameters. The open-source nature of the Python package allows for continuous evolution as more data become available.
+## Documentation
+Check the [documentation](https://pyiroglass.readthedocs.io/en/latest/) for a run-through of the PyIRoGlass code! And be sure to read the manuscript.
+
+### Run on the Cloud 
+If you do not have Python installed locally, run PyIRoGlass on [Google Colab](https://colab.research.google.com/github/SarahShi/PyIRoGlass/blob/main/PyIRoGlass_RUN_colab.ipynb)
+
+### Run and Install Locally
+Obtain a version of Python between 3.7 and 3.11 if you do not already have it installed. PyIRoGlass can be installed with one line. Open terminal and type the following:
+
+```
+pip install PyIRoGlass
+```
+
+Make sure that you keep up with the latest version of PyIRoGlass. To upgrade to the latest version of PyIRoGlass, open terminal and type the following: 
+
+```
+pip install PyIRoGlass --upgrade
+```
+
+Quantifying volatile concentrations in magmas is critical for understanding magma storage, phase equilibria, and eruption processes. We present PyIRoGlass, an open-source Python package for quantifying H$_2$O and CO$_2$ species concentrations in the transmission FTIR spectra of basaltic to andesitic glasses. We leverage a database of naturally degassed melt inclusions and back-arc basin basalts to delineate the fundamental shape and variability of the baseline underlying the $\mathrm{CO_3^{2-}}$ and $\mathrm{H_2O_{m, 1635}}$ peaks, in the mid-infrared region. All Beer-Lambert Law parameters are examined to quantify associated uncertainties. PyIRoGlass employs Bayesian inference and Markov Chain Monte Carlo sampling to fit all probable baselines and peaks, solving for best-fit parameters and capturing covariance to offer robust uncertainty estimates. Results from PyIRoGlass agree with independent analysis of experimental devolatilized glasses (within 6\%) and interlaboratory standards (13\% for H$_2$O, 9\% for CO$_2$). The open-source nature of PyIRoGlass ensures its adaptability and evolution as more data become available.
