@@ -17,4 +17,3 @@ dependencies:
     - pip:
         - mc3
         - PyIRoGlass
-
