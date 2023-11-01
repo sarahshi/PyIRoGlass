@@ -5,6 +5,7 @@ __pycache__
 Peak_Fit/Old/
 /Baseline_Comparison/png/*.png
 /Baseline_Comparison/DevolatilizedBL/
+/Baseline_Comparison/ND70Spec/
 /FIGURES/
 /LOGFILES/
 /NPZTXTFILES/
@@ -23,10 +24,10 @@ Volatiles_Speciation/AC4_OL49_trace.pdf
 Volatiles_Speciation/AC4_OL49_histogram.pdf
 Epsilon_Inversion/OldEpsilonRegressions/
 src/PyIRoGlass.egg-info/
-pairplot.pdf
-pairplot_molfrac.pdf
-pairplot_molfrac_kde.pdf
-pairplot_pca.pdf
-correlation.csv
-correlation_molfrac.csv
-correlation_pca.csv
+/Baseline_Comparison/pairplot.pdf
+/Baseline_Comparison/pairplot_molfrac.pdf
+/Baseline_Comparison/pairplot_molfrac_kde.pdf
+/Baseline_Comparison/pairplot_pca.pdf
+/Baseline_Comparison/correlation.csv
+/Baseline_Comparison/correlation_molfrac.csv
+/Baseline_Comparison/correlation_pca.csv

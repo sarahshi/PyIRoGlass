@@ -13,11 +13,21 @@ from pathlib import Path
 
 from matplotlib import pyplot as plt
 from matplotlib import rc, cm
+
+import scipy 
+from sklearn.metrics import mean_squared_error
+
 %matplotlib inline
 %config InlineBackend.figure_format = 'retina'
-rc('font',**{'family':'Avenir', 'size': 18})
+rc('font',**{'family':'Avenir', 'size': 20})
 plt.rcParams['pdf.fonttype'] = 42
 
+plt.rcParams["xtick.major.size"] = 4 # Sets length of ticks
+plt.rcParams["ytick.major.size"] = 4 # Sets length of ticks
+plt.rcParams["xtick.labelsize"] = 20 # Sets size of numbers on tick marks
+plt.rcParams["ytick.labelsize"] = 20 # Sets size of numbers on tick marks
+plt.rcParams["axes.titlesize"] = 22
+plt.rcParams["axes.labelsize"] = 22 # Axes labels
 
 # %% 
 
@@ -190,25 +200,68 @@ Fuego1
 
 # %% 
 
+def relative_root_mean_squared_error(true, pred):
+    num = np.sum(np.square(true - pred))
+    den = np.sum(np.square(pred))
+    squared_error = num/den
+    rrmse_loss = np.sqrt(squared_error)
+    return rrmse_loss
+
+def concordance_correlation_coefficient(y_true, y_pred):
+    """Concordance correlation coefficient."""
+    # Remove NaNs
+    df = pd.DataFrame({
+        'y_true': y_true,
+        'y_pred': y_pred
+    })
+    df = df.dropna()
+    y_true = df['y_true']
+    y_pred = df['y_pred']
+    # Pearson product-moment correlation coefficients
+    cor = np.corrcoef(y_true, y_pred)[0][1] 
+    # Mean
+    mean_true = np.mean(y_true)
+    mean_pred = np.mean(y_pred)
+    # Variance
+    var_true = np.var(y_true)
+    var_pred = np.var(y_pred)
+    # Standard deviation
+    sd_true = np.std(y_true)
+    sd_pred = np.std(y_pred)
+    # Calculate CCC
+    numerator = 2 * cor * sd_true * sd_pred
+    denominator = var_true + var_pred + (mean_true - mean_pred)**2
+    return numerator / denominator
+
 micro = pd.read_csv('FuegoOlMicrometer.csv')
+
+slope1, intercept1, r_value1, p_value1, std_err1 = scipy.stats.linregress(micro.Thickness_Micrometer.values, Fuego1.Thickness_M.astype(float))
+ccc1 = concordance_correlation_coefficient(micro.Thickness_Micrometer.values, Fuego1.Thickness_M.astype(float))
+rmse1 = mean_squared_error(micro.Thickness_Micrometer.values, Fuego1.Thickness_M.astype(float), squared=False)
 
 range = [0, 90]
 
 sz = 150
-fig, ax = plt.subplots(1, 1, figsize = (8, 8))
+fig, ax = plt.subplots(1, 1, figsize = (7.5, 7.5))
 ax.plot(range, range, 'k', lw = 1, zorder = 0)
 
 ax.errorbar(micro.Thickness_Micrometer, Fuego1.Thickness_M, yerr = Fuego1.Thickness_STD, xerr = 3, ls = 'none', elinewidth = 0.5, ecolor = 'k')
 ax.scatter(micro.Thickness_Micrometer, Fuego1.Thickness_M, s = sz, c = '#0C7BDC', edgecolors='black', linewidth = 0.5, zorder = 15)
-ax.set_xlim([0, 90])
-ax.set_ylim([0, 90])
+ax.set_xlim([20, 90])
+ax.set_ylim([20, 90])
+
+ax.annotate("$\mathregular{R^{2}}$="+str(np.round(r_value1**2, 2)), xy=(0.02, 0.8775), xycoords="axes fraction", fontsize=16)
+ax.annotate("CCC="+str(np.round(ccc1, 2)), xy=(0.02, 0.96), xycoords="axes fraction", fontsize=16)
+ax.annotate("RMSE="+str(np.round(rmse1, 2))+"; RRMSE="+str(np.round(relative_root_mean_squared_error(micro.Thickness_Micrometer.values, Fuego1.Thickness_M.values)*100, 2))+'%', xy=(0.02, 0.92), xycoords="axes fraction", fontsize=16)
+ax.annotate("m="+str(np.round(slope1, 2)), xy=(0.02, 0.84), xycoords="axes fraction", fontsize=16)
+ax.annotate("b="+str(np.round(intercept1, 2)), xy=(0.02, 0.80), xycoords="axes fraction", fontsize=16)
 
 ax.set_xlabel('Micrometer Thickness (µm)')
 ax.set_ylabel('Reflectance FTIR Thickness (µm)')
 ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
 plt.tight_layout()
-plt.savefig('OlThicknessTest.pdf')
+plt.savefig('OlThicknessTest.pdf',bbox_inches='tight', pad_inches = 0.025)
 
 
 # %% 
