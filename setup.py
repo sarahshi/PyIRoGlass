@@ -35,7 +35,7 @@ setup(
             'scipy',
             'mc3', 
             'pykrige', 
-            'peakdetect',
+            # 'peakdetect',
             ],
 
     classifiers=[
