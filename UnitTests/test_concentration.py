@@ -26,7 +26,7 @@ class test_conc_outputs_h2ot(unittest.TestCase):
 
     def test_beer_lambert(self):
 
-        result = pig.Beer_Lambert(self.molar_mass, self.absorbance, self.sigma_absorbance, self.density, self.sigma_density, self.thickness, self.sigma_thickness, self.epsilon, self.sigma_epsilon)
+        result = pig.Beer_Lambert(self.molar_mass, self.absorbance, self.density, self.thickness, self.epsilon)
         expected = 4.03892743514451
         self.assertAlmostEqual(result, expected, self.decimalPlace, msg="H2Ot test and expected values from the Beer_Lambert function do not agree")
 
@@ -59,7 +59,7 @@ class test_conc_outputs_co2(unittest.TestCase):
 
     def test_beer_lambert(self): # OL53, 1515 peak
 
-        result = pig.Beer_Lambert(self.molar_mass, self.absorbance, self.sigma_absorbance, self.density, self.sigma_density, self.thickness, self.sigma_thickness, self.epsilon, self.sigma_epsilon) * 10000
+        result = pig.Beer_Lambert(self.molar_mass, self.absorbance, self.density, self.thickness, self.epsilon) * 10000
         expected = 747.498925861367
         self.assertAlmostEqual(result, expected, self.decimalPlace, msg="CO2_1515 test and expected values from the Beer_Lambert equation do not agree")
 
@@ -90,7 +90,7 @@ class test_conc_outputs(unittest.TestCase):
 
     def test_concentration(self): # OL53
 
-        density_epsilon, mega_spreadsheet = pig.Concentration_Output(self.PH, self.N, self.thickness, self.MI_Composition, self.T_room, self.P_room)
+        density_epsilon, mega_spreadsheet = pig.Concentration_Output(self.PH, self.thickness, self.MI_Composition, self.N, self.T_room, self.P_room)
         expected_H2O = 4.03892743514451
         expected_CO2 = 727.658175499597
         self.assertAlmostEqual(float(mega_spreadsheet['H2OT_MEAN'].iloc[0]), expected_H2O, self.decimalPlace, msg="H2Ot test values from the Concentration_Output equation do not agree")
@@ -116,7 +116,7 @@ class test_conc_outputs_saturated(unittest.TestCase): # OL49
 
     def test_concentration(self):
 
-        density_epsilon, mega_spreadsheet = pig.Concentration_Output(self.PH, self.N, self.thickness, self.MI_Composition, self.T_room, self.P_room)
+        density_epsilon, mega_spreadsheet = pig.Concentration_Output(self.PH, self.thickness, self.MI_Composition, self.N, self.T_room, self.P_room)
         expected_H2O = 2.54389275724829
         expected_CO2 = 748.715067109224
         self.assertAlmostEqual(float(mega_spreadsheet['H2OT_MEAN'].iloc[0]), expected_H2O, self.decimalPlace, msg="H2Ot test values from the saturated Concentration_Output equation do not agree")
