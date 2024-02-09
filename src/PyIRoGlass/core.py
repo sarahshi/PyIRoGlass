@@ -1401,16 +1401,16 @@ def Epsilon_Calculation(Composition, T, P):
         columns=[
             'Tau',
             'Eta',
-            'eps_H2OT_3550',
-            'sigma_eps_H2OT_3550',
-            'eps_H2Om_1635',
-            'sigma_eps_H2Om_1635',
-            'eps_CO2',
-            'sigma_eps_CO2',
-            'eps_H2Om_5200',
-            'sigma_eps_H2Om_5200',
-            'eps_OH_4500',
-            'sigma_eps_OH_4500'
+            'epsilon_H2OT_3550',
+            'sigma_epsilon_H2OT_3550',
+            'epsilon_H2Om_1635',
+            'sigma_epsilon_H2Om_1635',
+            'epsilon_CO2',
+            'sigma_epsilon_CO2',
+            'epsilon_H2Om_5200',
+            'sigma_epsilon_H2Om_5200',
+            'epsilon_OH_4500',
+            'sigma_epsilon_OH_4500'
             ]
             )
 
@@ -1445,11 +1445,11 @@ def Epsilon_Calculation(Composition, T, P):
     for i in Composition.index:
 
         # Calculate extinction coefficients with best-fit parameters
-        eps_H2OT_3550 = mest_3550[0]+(mest_3550[1]*SiAl_tot[i])
-        eps_H2Om_1635 = mest_1635[0]+(mest_1635[1]*SiAl_tot[i])
-        eps_CO2 = mest_CO2[0]+(mest_CO2[1]*Na_NaCa[i])
-        eps_H2Om_5200 = mest_5200[0]+(mest_5200[1]*SiAl_tot[i])
-        eps_OH_4500 = mest_4500[0]+(mest_4500[1]*SiAl_tot[i])
+        epsilon_H2OT_3550 = mest_3550[0]+(mest_3550[1]*SiAl_tot[i])
+        epsilon_H2Om_1635 = mest_1635[0]+(mest_1635[1]*SiAl_tot[i])
+        epsilon_CO2 = mest_CO2[0]+(mest_CO2[1]*Na_NaCa[i])
+        epsilon_H2Om_5200 = mest_5200[0]+(mest_5200[1]*SiAl_tot[i])
+        epsilon_OH_4500 = mest_4500[0]+(mest_4500[1]*SiAl_tot[i])
 
         # Calculate extinction coefficient uncertainties
         G_SiAl[1, 0] = SiAl_tot[i]
@@ -1480,16 +1480,16 @@ def Epsilon_Calculation(Composition, T, P):
         epsilon.loc[i] = pd.Series({
             'Tau': SiAl_tot[i],
             'Na/Na+Ca': Na_NaCa[i],
-            'eps_H2OT_3550': eps_H2OT_3550,
-            'sigma_eps_H2OT_3550': CT68_3550,
-            'eps_H2Om_1635': eps_H2Om_1635,
-            'sigma_eps_H2Om_1635': CT68_1635,
-            'eps_CO2': eps_CO2,
-            'sigma_eps_CO2': CT68_CO2,
-            'eps_H2Om_5200': eps_H2Om_5200,
-            'sigma_eps_H2Om_5200': CT68_5200,
-            'eps_OH_4500': eps_OH_4500,
-            'sigma_eps_OH_4500': CT68_4500
+            'epsilon_H2OT_3550': epsilon_H2OT_3550,
+            'sigma_epsilon_H2OT_3550': CT68_3550,
+            'epsilon_H2Om_1635': epsilon_H2Om_1635,
+            'sigma_epsilon_H2Om_1635': CT68_1635,
+            'epsilon_CO2': epsilon_CO2,
+            'sigma_epsilon_CO2': CT68_CO2,
+            'epsilon_H2Om_5200': epsilon_H2Om_5200,
+            'sigma_epsilon_H2Om_5200': CT68_5200,
+            'epsilon_OH_4500': epsilon_OH_4500,
+            'sigma_epsilon_OH_4500': CT68_4500
             })
 
     return epsilon
@@ -1585,7 +1585,7 @@ def Concentration_Output(Volatile_PH, thick, Composition, N=500000, T=25, P=1):
             Volatile_PH['PH_3550_M'],
             density,
             thick['Thickness'],
-            epsilon['eps_H2OT_3550'],
+            epsilon['epsilon_H2OT_3550'],
             )
         Composition['H2O'] = H2OT_3550_I
         mol, density = Density_Calculation(Composition, T, P)
@@ -1598,42 +1598,42 @@ def Concentration_Output(Volatile_PH, thick, Composition, N=500000, T=25, P=1):
             Volatile_PH['PH_3550_M'][kk],
             density[kk],
             thick['Thickness'][kk],
-            epsilon['eps_H2OT_3550'][kk],
+            epsilon['epsilon_H2OT_3550'][kk],
             )
         H2Om_1635_BP = Beer_Lambert(
             molar_mass['H2O'],
             Volatile_PH['PH_1635_BP'][kk],
             density[kk],
             thick['Thickness'][kk],
-            epsilon['eps_H2Om_1635'][kk],
+            epsilon['epsilon_H2Om_1635'][kk],
             )
         CO2_1515_BP = Beer_Lambert(
             molar_mass['CO2'],
             Volatile_PH['PH_1515_BP'][kk],
             density[kk],
             thick['Thickness'][kk],
-            epsilon['eps_CO2'][kk],
+            epsilon['epsilon_CO2'][kk],
             )
         CO2_1430_BP = Beer_Lambert(
             molar_mass['CO2'],
             Volatile_PH['PH_1430_BP'][kk],
             density[kk],
             thick['Thickness'][kk],
-            epsilon['eps_CO2'][kk],
+            epsilon['epsilon_CO2'][kk],
             )
         H2Om_5200_M = Beer_Lambert(
             molar_mass['H2O'],
             Volatile_PH['PH_5200_M'][kk],
             density[kk],
             thick['Thickness'][kk],
-            epsilon['eps_H2Om_5200'][kk],
+            epsilon['epsilon_H2Om_5200'][kk],
             )
         OH_4500_M = Beer_Lambert(
             molar_mass['H2O'],
             Volatile_PH['PH_4500_M'][kk],
             density[kk],
             thick['Thickness'][kk],
-            epsilon['eps_OH_4500'][kk],
+            epsilon['epsilon_OH_4500'][kk],
             )
         # Multiply by 1e4 to convert CO2 concentrations to ppm
         CO2_1515_BP *= 10000
@@ -1648,8 +1648,8 @@ def Concentration_Output(Volatile_PH, thick, Composition, N=500000, T=25, P=1):
             density[kk] * 0.025,
             thick['Thickness'][kk],
             thick['Sigma_Thickness'][kk],
-            epsilon['eps_H2OT_3550'][kk],
-            epsilon['sigma_eps_H2OT_3550'][kk]
+            epsilon['epsilon_H2OT_3550'][kk],
+            epsilon['sigma_epsilon_H2OT_3550'][kk]
             )
         H2Om_1635_BP_STD = Beer_Lambert_Error(
             N, molar_mass['H2O'],
@@ -1659,8 +1659,8 @@ def Concentration_Output(Volatile_PH, thick, Composition, N=500000, T=25, P=1):
             density[kk] * 0.025,
             thick['Thickness'][kk],
             thick['Sigma_Thickness'][kk],
-            epsilon['eps_H2Om_1635'][kk],
-            epsilon['sigma_eps_H2Om_1635'][kk]
+            epsilon['epsilon_H2Om_1635'][kk],
+            epsilon['sigma_epsilon_H2Om_1635'][kk]
             )
         CO2_1515_BP_STD = Beer_Lambert_Error(
             N, molar_mass['CO2'],
@@ -1670,8 +1670,8 @@ def Concentration_Output(Volatile_PH, thick, Composition, N=500000, T=25, P=1):
             density[kk] * 0.025,
             thick['Thickness'][kk],
             thick['Sigma_Thickness'][kk],
-            epsilon['eps_CO2'][kk],
-            epsilon['sigma_eps_CO2'][kk]
+            epsilon['epsilon_CO2'][kk],
+            epsilon['sigma_epsilon_CO2'][kk]
             )
         CO2_1430_BP_STD = Beer_Lambert_Error(
             N, molar_mass['CO2'],
@@ -1681,8 +1681,8 @@ def Concentration_Output(Volatile_PH, thick, Composition, N=500000, T=25, P=1):
             density[kk] * 0.025,
             thick['Thickness'][kk],
             thick['Sigma_Thickness'][kk],
-            epsilon['eps_CO2'][kk],
-            epsilon['sigma_eps_CO2'][kk]
+            epsilon['epsilon_CO2'][kk],
+            epsilon['sigma_epsilon_CO2'][kk]
             )
         H2Om_5200_M_STD = Beer_Lambert_Error(
             N, molar_mass['H2O'],
@@ -1692,8 +1692,8 @@ def Concentration_Output(Volatile_PH, thick, Composition, N=500000, T=25, P=1):
             density[kk] * 0.025,
             thick['Thickness'][kk],
             thick['Sigma_Thickness'][kk],
-            epsilon['eps_H2Om_5200'][kk],
-            epsilon['sigma_eps_H2Om_5200'][kk]
+            epsilon['epsilon_H2Om_5200'][kk],
+            epsilon['sigma_epsilon_H2Om_5200'][kk]
             )
         OH_4500_M_STD = Beer_Lambert_Error(
             N, molar_mass['H2O'],
@@ -1703,8 +1703,8 @@ def Concentration_Output(Volatile_PH, thick, Composition, N=500000, T=25, P=1):
             density[kk] * 0.025,
             thick['Thickness'][kk],
             thick['Sigma_Thickness'][kk],
-            epsilon['eps_OH_4500'][kk],
-            epsilon['sigma_eps_OH_4500'][kk]
+            epsilon['epsilon_OH_4500'][kk],
+            epsilon['sigma_epsilon_OH_4500'][kk]
             )
         # Multiply by 1e4 to convert CO2 uncertainties to ppm
         CO2_1515_BP_STD *= 10000
@@ -1757,14 +1757,14 @@ def Concentration_Output(Volatile_PH, thick, Composition, N=500000, T=25, P=1):
                     Volatile_PH['PH_1635_BP'][ll],
                     density[ll],
                     thick['Thickness'][ll],
-                    epsilon['eps_H2Om_1635'][ll],
+                    epsilon['epsilon_H2Om_1635'][ll],
                     )
                 OH_4500_M = Beer_Lambert(
                     molar_mass['H2O'],
                     Volatile_PH['PH_4500_M'][ll],
                     density[ll],
                     thick['Thickness'][ll],
-                    epsilon['eps_OH_4500'][ll],
+                    epsilon['epsilon_OH_4500'][ll],
                     )
                 Sat_Composition.loc[ll, 'H2O'] = H2Om_1635_BP + OH_4500_M
                 mol_sat, density_sat = Density_Calculation(Sat_Composition,
@@ -1776,42 +1776,42 @@ def Concentration_Output(Volatile_PH, thick, Composition, N=500000, T=25, P=1):
                 Volatile_PH['PH_3550_M'][ll],
                 density_sat,
                 thick['Thickness'][ll],
-                epsilon['eps_H2OT_3550'][ll],
+                epsilon['epsilon_H2OT_3550'][ll],
                 )
             H2Om_1635_BP = Beer_Lambert(
                 molar_mass['H2O'],
                 Volatile_PH['PH_1635_BP'][ll],
                 density_sat,
                 thick['Thickness'][ll],
-                epsilon['eps_H2Om_1635'][ll],
+                epsilon['epsilon_H2Om_1635'][ll],
                 )
             CO2_1515_BP = Beer_Lambert(
                 molar_mass['CO2'],
                 Volatile_PH['PH_1515_BP'][ll],
                 density_sat,
                 thick['Thickness'][ll],
-                epsilon['eps_CO2'][ll],
+                epsilon['epsilon_CO2'][ll],
                 )
             CO2_1430_BP = Beer_Lambert(
                 molar_mass['CO2'],
                 Volatile_PH['PH_1430_BP'][ll],
                 density_sat,
                 thick['Thickness'][ll],
-                epsilon['eps_CO2'][ll],
+                epsilon['epsilon_CO2'][ll],
                 )
             H2Om_5200_M = Beer_Lambert(
                 molar_mass['H2O'],
                 Volatile_PH['PH_5200_M'][ll],
                 density_sat,
                 thick['Thickness'][ll],
-                epsilon['eps_H2Om_5200'][ll],
+                epsilon['epsilon_H2Om_5200'][ll],
                 )
             OH_4500_M = Beer_Lambert(
                 molar_mass['H2O'],
                 Volatile_PH['PH_4500_M'][ll],
                 density_sat,
                 thick['Thickness'][ll],
-                epsilon['eps_OH_4500'][ll],
+                epsilon['epsilon_OH_4500'][ll],
                 )
             CO2_1515_BP *= 10000
             CO2_1430_BP *= 10000
@@ -1824,8 +1824,8 @@ def Concentration_Output(Volatile_PH, thick, Composition, N=500000, T=25, P=1):
                 density_sat * 0.025,
                 thick['Thickness'][ll],
                 thick['Sigma_Thickness'][ll],
-                epsilon['eps_H2OT_3550'][ll],
-                epsilon['sigma_eps_H2OT_3550'][ll]
+                epsilon['epsilon_H2OT_3550'][ll],
+                epsilon['sigma_epsilon_H2OT_3550'][ll]
             )
             H2Om_1635_BP_STD = Beer_Lambert_Error(
                 N, molar_mass['H2O'],
@@ -1835,8 +1835,8 @@ def Concentration_Output(Volatile_PH, thick, Composition, N=500000, T=25, P=1):
                 density_sat * 0.025,
                 thick['Thickness'][ll],
                 thick['Sigma_Thickness'][ll],
-                epsilon['eps_H2Om_1635'][ll],
-                epsilon['sigma_eps_H2Om_1635'][ll]
+                epsilon['epsilon_H2Om_1635'][ll],
+                epsilon['sigma_epsilon_H2Om_1635'][ll]
             )
             CO2_1515_BP_STD = Beer_Lambert_Error(
                 N, molar_mass['CO2'],
@@ -1846,8 +1846,8 @@ def Concentration_Output(Volatile_PH, thick, Composition, N=500000, T=25, P=1):
                 density_sat * 0.025,
                 thick['Thickness'][ll],
                 thick['Sigma_Thickness'][ll],
-                epsilon['eps_CO2'][ll],
-                epsilon['sigma_eps_CO2'][ll]
+                epsilon['epsilon_CO2'][ll],
+                epsilon['sigma_epsilon_CO2'][ll]
             )
             CO2_1430_BP_STD = Beer_Lambert_Error(
                 N, molar_mass['CO2'],
@@ -1857,8 +1857,8 @@ def Concentration_Output(Volatile_PH, thick, Composition, N=500000, T=25, P=1):
                 density_sat * 0.025,
                 thick['Thickness'][ll],
                 thick['Sigma_Thickness'][ll],
-                epsilon['eps_CO2'][ll],
-                epsilon['sigma_eps_CO2'][ll]
+                epsilon['epsilon_CO2'][ll],
+                epsilon['sigma_epsilon_CO2'][ll]
             )
             H2Om_5200_M_STD = Beer_Lambert_Error(
                 N, molar_mass['H2O'],
@@ -1868,8 +1868,8 @@ def Concentration_Output(Volatile_PH, thick, Composition, N=500000, T=25, P=1):
                 density_sat * 0.025,
                 thick['Thickness'][ll],
                 thick['Sigma_Thickness'][ll],
-                epsilon['eps_H2Om_5200'][ll],
-                epsilon['sigma_eps_H2Om_5200'][ll]
+                epsilon['epsilon_H2Om_5200'][ll],
+                epsilon['sigma_epsilon_H2Om_5200'][ll]
             )
             OH_4500_M_STD = Beer_Lambert_Error(
                 N, molar_mass['H2O'],
@@ -1879,8 +1879,8 @@ def Concentration_Output(Volatile_PH, thick, Composition, N=500000, T=25, P=1):
                 density_sat * 0.025,
                 thick['Thickness'][ll],
                 thick['Sigma_Thickness'][ll],
-                epsilon['eps_OH_4500'][ll],
-                epsilon['sigma_eps_OH_4500'][ll]
+                epsilon['epsilon_OH_4500'][ll],
+                epsilon['sigma_epsilon_OH_4500'][ll]
             )
             CO2_1515_BP_STD *= 10000
             CO2_1430_BP_STD *= 10000
