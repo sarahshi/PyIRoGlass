@@ -188,7 +188,7 @@ class test_conc_outputs(unittest.TestCase):
 
     def test_concentration(self):  # OL53
 
-        density_epsilon, mega_spreadsheet = pig.calculate_concentration(
+        density_epsilon, mega_spreadsheet = pig.calculate_concentrations(
             self.PH, self.thickness, self.MI_Composition,
             self.N, self.T_room, self.P_room)
         expected_H2O = 4.03892743514451
@@ -198,14 +198,14 @@ class test_conc_outputs(unittest.TestCase):
                 mega_spreadsheet['H2OT_MEAN'].iloc[0]),
             expected_H2O,
             self.decimalPlace,
-            msg="H2Ot test values from the calculate_concentration "
+            msg="H2Ot test values from the calculate_concentrations "
             "function do not agree")
         self.assertAlmostEqual(
             float(
                 mega_spreadsheet['CO2_MEAN'].iloc[0]),
             expected_CO2,
             self.decimalPlace,
-            msg="CO2m test values from the calculate_concentration "
+            msg="CO2m test values from the calculate_concentrations "
             "function do not agree")
 
 
@@ -258,7 +258,7 @@ class test_conc_outputs_saturated(unittest.TestCase):  # OL49
 
     def test_concentration(self):
 
-        density_epsilon, mega_spreadsheet = pig.calculate_concentration(
+        density_epsilon, mega_spreadsheet = pig.calculate_concentrations(
             self.PH, self.thickness, self.MI_Composition,
             self.N, self.T_room, self.P_room)
         expected_H2O = 2.54389275724829
@@ -268,14 +268,14 @@ class test_conc_outputs_saturated(unittest.TestCase):  # OL49
                 mega_spreadsheet['H2OT_MEAN'].iloc[0]),
             expected_H2O,
             self.decimalPlace,
-            msg="H2Ot test values from the saturated calculate_concentration "
+            msg="H2Ot test values from the saturated calculate_concentrations "
             "function do not agree")
         self.assertAlmostEqual(
             float(
                 mega_spreadsheet['CO2_MEAN'].iloc[0]),
             expected_CO2,
             self.decimalPlace,
-            msg="CO2m test values from the saturated calculate_concentration "
+            msg="CO2m test values from the saturated calculate_concentrations "
             "function do not agree")
 
 
