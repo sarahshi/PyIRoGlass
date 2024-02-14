@@ -48,7 +48,7 @@ class test_loading_csv(unittest.TestCase):
                 os.path.realpath(__file__)),
             '../Inputs/ChemThick_Template.csv')
         loader = pig.SampleDataLoader(chemistry_thickness_path=file_path)
-        chemistry, thickness = loader.load_chemistry_thickness(file_path)
+        chemistry, thickness = loader.load_chemistry_thickness()
 
         # Assuming that the PCA matrix should not be empty after reading a
         # valid .npz file. Adjust based on your test data
@@ -70,7 +70,7 @@ class test_loading_csv(unittest.TestCase):
         loader = pig.SampleDataLoader(spectrum_path=dir_path, 
                                       chemistry_thickness_path=file_path)
         (files, data, chemistry, thickness, 
-         export_path, data_export_path) = loader.load_all_data(file_path)
+         export_path, data_export_path) = loader.load_all_data()
 
         self.assertEqual(len(files), 97)  # Adjust based on your test data
         self.assertEqual(chemistry.shape, (9, 11))

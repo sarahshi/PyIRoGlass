@@ -189,8 +189,7 @@ class test_conc_outputs(unittest.TestCase):
     def test_concentration(self):  # OL53
 
         density_epsilon, mega_spreadsheet = pig.calculate_concentrations(
-            self.PH, self.thickness, self.MI_Composition,
-            self.N, self.T_room, self.P_room)
+            self.PH, self.MI_Composition, self.thickness)
         expected_H2O = 4.03892743514451
         expected_CO2 = 727.658175499597
         self.assertAlmostEqual(
@@ -259,8 +258,7 @@ class test_conc_outputs_saturated(unittest.TestCase):  # OL49
     def test_concentration(self):
 
         density_epsilon, mega_spreadsheet = pig.calculate_concentrations(
-            self.PH, self.thickness, self.MI_Composition,
-            self.N, self.T_room, self.P_room)
+            self.PH, self.MI_Composition, self.thickness)
         expected_H2O = 2.54389275724829
         expected_CO2 = 748.715067109224
         self.assertAlmostEqual(
