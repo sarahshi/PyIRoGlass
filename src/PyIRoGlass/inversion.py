@@ -7,7 +7,7 @@ import numpy as np
 # %% Functions for performing the Newtonian inversion
 
 
-def Inversion(comp, epsilon, sigma_comp, sigma_epsilon):
+def inversion(comp, epsilon, sigma_comp, sigma_epsilon):
 
     """
     Perform a Newtonian inversion on a given set of composition and absorbance
@@ -133,7 +133,7 @@ def Inversion(comp, epsilon, sigma_comp, sigma_epsilon):
     return mest_f, covm_est_f, covepsilon_est_f
 
 
-def Least_Squares(comp, epsilon, sigma_comp, sigma_epsilon):
+def least_squares(comp, epsilon, sigma_comp, sigma_epsilon):
 
     """
     Perform a least squares regression on a given set of composition and
@@ -171,7 +171,7 @@ def Least_Squares(comp, epsilon, sigma_comp, sigma_epsilon):
     return mls, covls
 
 
-def Calculate_Calibration_Error(covariance_matrix):
+def calculate_calibration_error(covariance_matrix):
 
     """
     Calculate the calibration error based on the diagonal elements of
@@ -188,7 +188,7 @@ def Calculate_Calibration_Error(covariance_matrix):
     return 2 * np.sqrt(np.mean(diagonal))
 
 
-def Calculate_Epsilon(m, composition):
+def calculate_epsilon(m, composition):
 
     """
     Calculate epsilon values using coefficients and composition.
@@ -204,7 +204,7 @@ def Calculate_Epsilon(m, composition):
     return m[0] + m[1] * composition
 
 
-def Calculate_SEE(residuals):
+def calculate_SEE(residuals):
 
     """
     Calculate the standard error of estimate given an array of residuals.
@@ -219,7 +219,7 @@ def Calculate_SEE(residuals):
     return np.sqrt(np.sum(residuals ** 2)) / (len(residuals) - 2)
 
 
-def Calculate_R2(actual_values, predicted_values):
+def calculate_R2(actual_values, predicted_values):
 
     """
     Calculate the coefficient of determination given actual and predicted
@@ -239,7 +239,7 @@ def Calculate_R2(actual_values, predicted_values):
     return 1 - (residual_sum_of_squares / total_sum_of_squares)
 
 
-def Calculate_RMSE(residuals):
+def calculate_RMSE(residuals):
 
     """
     Calculate the root mean squared error given an array of residuals.
@@ -254,7 +254,7 @@ def Calculate_RMSE(residuals):
     return np.sqrt(np.mean(residuals ** 2))
 
 
-def Inversion_Fit_Errors(comp, epsilon, mest_f, covm_est_f, covepsilon_est_f):
+def inversion_fit_errors(comp, epsilon, mest_f, covm_est_f, covepsilon_est_f):
 
     """
     Calculate error metrics for a given set of data.
@@ -276,11 +276,11 @@ def Inversion_Fit_Errors(comp, epsilon, mest_f, covm_est_f, covepsilon_est_f):
             rmse_inv: A float representing the root mean squared error.
     """
 
-    epsilon_final_estimate = Calculate_Epsilon(mest_f, comp)
+    epsilon_final_estimate = calculate_epsilon(mest_f, comp)
     residuals = epsilon_final_estimate - epsilon
-    E_calib = Calculate_Calibration_Error(covepsilon_est_f)
-    SEE_inv = Calculate_SEE(residuals)
-    R2_inv = Calculate_R2(epsilon, epsilon_final_estimate)
-    RMSE_inv = Calculate_RMSE(residuals)
+    E_calib = calculate_calibration_error(covepsilon_est_f)
+    SEE_inv = calculate_SEE(residuals)
+    R2_inv = calculate_R2(epsilon, epsilon_final_estimate)
+    RMSE_inv = calculate_RMSE(residuals)
 
     return E_calib, SEE_inv, R2_inv, RMSE_inv

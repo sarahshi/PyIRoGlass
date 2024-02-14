@@ -162,7 +162,7 @@ def peakdetect(y_axis, x_axis=None, lookahead=200, delta=0):
 
 
 
-def PeakID(ref_spec, wn_high, wn_low, peak_heigh_min_delta, peak_search_width,
+def peakID(ref_spec, wn_high, wn_low, peak_heigh_min_delta, peak_search_width,
            savgol_filter_width, smoothing_wn_width=None, remove_baseline=False,
            plotting=False, filename=None):
 
@@ -234,7 +234,7 @@ def PeakID(ref_spec, wn_high, wn_low, peak_heigh_min_delta, peak_search_width,
     return peaks, troughs
 
 
-def Thickness_Calc(n, positions):
+def calculate_thickness(n, positions):
 
     """
     Calculates thicknesses of glass wafers based on the refractive index of the
@@ -252,7 +252,7 @@ def Thickness_Calc(n, positions):
     return 1/(2 * n * np.abs(np.diff(positions)))
 
 
-def Thickness_Process(dfs_dict, n, wn_high, wn_low,
+def calculate_mean_thickness(dfs_dict, n, wn_high, wn_low,
                       remove_baseline=False, plotting=False, phaseol=True):
 
     """
@@ -315,7 +315,7 @@ def Thickness_Process(dfs_dict, n, wn_high, wn_low,
 
     for filename, data in dfs_dict.items():
         try:
-            peaks, troughs = PeakID(data, wn_high, wn_low, filename=filename,
+            peaks, troughs = peakID(data, wn_high, wn_low, filename=filename,
                                     plotting=plotting,
                                     savgol_filter_width=savgol_filter_width,
                                     smoothing_wn_width=smoothing_wn_width,
@@ -340,14 +340,14 @@ def Thickness_Process(dfs_dict, n, wn_high, wn_low,
                                           abs(x - np.mean(troughs_diff))
                                           < 2 * np.std(troughs_diff)])
 
-            t_peaks = (Thickness_Calc(n, peaks[:, 0]) * 1e4).round(2)
+            t_peaks = (calculate_thickness(n, peaks[:, 0]) * 1e4).round(2)
             t_peaks_filt = np.array([x for x in t_peaks if
                                      abs(x - np.mean(t_peaks))
                                      < np.std(t_peaks)])
             mean_t_peaks_filt = np.mean(t_peaks_filt).round(2)
             std_t_peaks_filt = np.std(t_peaks_filt).round(2)
 
-            t_troughs = (Thickness_Calc(n, troughs[:, 0]) * 1e4).round(2)
+            t_troughs = (calculate_thickness(n, troughs[:, 0]) * 1e4).round(2)
             t_troughs_filt = [x for x in t_troughs if
                               abs(x - np.mean(t_troughs))
                               < np.std(t_troughs)]
@@ -388,7 +388,7 @@ def Thickness_Process(dfs_dict, n, wn_high, wn_low,
     return ThickDF
 
 
-def Reflectance_Index(XFo):
+def reflectance_index(XFo):
 
     """
     Calculates the reflectance index for a given forsterite composition.
