@@ -49,8 +49,7 @@ class test_density_epsilon_calculation(unittest.TestCase):
 
     def test_density_calculation(self):
 
-        mol, density = pig.calculate_density(
-            self.MI_Composition, self.T_room, self.P_room)
+        mol, density = pig.calculate_density(self.MI_Composition, self.T_room, self.P_room)
         result = float(density.values)
         expected = 2702.703558
         self.assertAlmostEqual(
@@ -62,8 +61,7 @@ class test_density_epsilon_calculation(unittest.TestCase):
 
     def test_epsilon_calculation(self):
 
-        epsilon = pig.calculate_epsilon(self.MI_Composition_dry, 
-                                        self.T_room, self.P_room)
+        epsilon = pig.calculate_epsilon(self.MI_Composition_dry, self.T_room, self.P_room)
         tau = float(epsilon['Tau'].iloc[0])
         expected_tau = 0.682894853
         epsilon_h2ot = float(epsilon['epsilon_H2Ot_3550'].iloc[0])
