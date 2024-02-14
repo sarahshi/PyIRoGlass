@@ -163,7 +163,7 @@ def peakdetect(y_axis, x_axis=None, lookahead=200, delta=0):
 
 
 def peakID(ref_spec, wn_high, wn_low, peak_heigh_min_delta, peak_search_width,
-           savgol_filter_width, smoothing_wn_width=None, remove_baseline=False,
+           savgol_filter_width, smoothing_wn_width=None, remove_baseline=True,
            plotting=False, filename=None):
 
     """
@@ -253,7 +253,7 @@ def calculate_thickness(n, positions):
 
 
 def calculate_mean_thickness(dfs_dict, n, wn_high, wn_low,
-                      remove_baseline=False, plotting=False, phaseol=True):
+                             remove_baseline=True, plotting=False, phaseol=True):
 
     """
     Calculates thickness of glass wafers based on the refractive index of
