@@ -800,39 +800,21 @@ def calculate_baselines(dfs_dict, export_path):
         try:
             # Three repeat baselines for the OH_{4500}
             OH_4500_peak_ranges = [(4250, 4675), (4225, 4650), (4275, 4700)]
-            OH_4500_results = list(
-                map(
-                    lambda peak_range: {
-                        "peak_fit": (
-                            result := NIR_process(
-                                data, peak_range[0], peak_range[1], "OH"
-                            )
-                        )[0],
-                        "peak_krige": result[1],
-                        "PH_krige": result[2],
-                        "STN": result[3],
-                    },
-                    OH_4500_peak_ranges,
-                )
-            )
+            OH_4500_results = list(map(lambda peak_range: {
+                'peak_fit': (result := NIR_process(data, peak_range[0], peak_range[1], 'OH'))[0],
+                'peak_krige': result[1],
+                'PH_krige': result[2],
+                'STN': result[3]
+            }, OH_4500_peak_ranges))
 
             # Three repeat baselines for the H2Om_{5200}
             H2Om_5200_peak_ranges = [(4875, 5400), (4850, 5375), (4900, 5425)]
-            H2Om_5200_results = list(
-                map(
-                    lambda peak_range: {
-                        "peak_fit": (
-                            result := NIR_process(
-                                data, peak_range[0], peak_range[1], "H2Om"
-                            )
-                        )[0],
-                        "peak_krige": result[1],
-                        "PH_krige": result[2],
-                        "STN": result[3],
-                    },
-                    H2Om_5200_peak_ranges,
-                )
-            )
+            H2Om_5200_results = list(map(lambda peak_range: {
+                'peak_fit': (result := NIR_process(data, peak_range[0], peak_range[1], 'H2Om'))[0],
+                'peak_krige': result[1],
+                'PH_krige': result[2],
+                'STN': result[3]
+            }, H2Om_5200_peak_ranges))
 
             # Kriged peak heights
             PH_4500_krige = [result["PH_krige"] for result in
@@ -875,9 +857,7 @@ def calculate_baselines(dfs_dict, export_path):
             # Three repeat baselines for the H2Ot_{3550}
             H2Ot_3550_peak_ranges = [(1900, 4400), (2100, 4200), (2300, 4000)]
             H2Ot_3550_results = list(map(lambda peak_range: {
-                'peak_fit': (result := MIR_process(data,
-                                                   peak_range[0],
-                                                   peak_range[1]))[0],
+                'peak_fit': (result := MIR_process(data, peak_range[0], peak_range[1]))[0],
                 'plot_output': result[1],
                 'PH': result[2],
             }, H2Ot_3550_peak_ranges))
