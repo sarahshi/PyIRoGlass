@@ -194,7 +194,7 @@ class test_conc_outputs(unittest.TestCase):
         expected_CO2 = 727.658175499597
         self.assertAlmostEqual(
             float(
-                mega_spreadsheet['H2OT_MEAN'].iloc[0]),
+                mega_spreadsheet['H2Ot_MEAN'].iloc[0]),
             expected_H2O,
             self.decimalPlace,
             msg="H2Ot test values from the calculate_concentrations "
@@ -263,7 +263,7 @@ class test_conc_outputs_saturated(unittest.TestCase):  # OL49
         expected_CO2 = 748.715067109224
         self.assertAlmostEqual(
             float(
-                mega_spreadsheet['H2OT_MEAN'].iloc[0]),
+                mega_spreadsheet['H2Ot_MEAN'].iloc[0]),
             expected_H2O,
             self.decimalPlace,
             msg="H2Ot test values from the saturated calculate_concentrations "
