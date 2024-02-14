@@ -76,7 +76,7 @@ class test_thickness(unittest.TestCase):
             remove_baseline=False,
             plotting=False,
             phaseol=True)
-        result = float(thickness_results['Thickness_M'])
+        result = float(thickness_results['Thickness_M'].iloc[0])
         expected = 79.81
         self.assertAlmostEqual(
             result,

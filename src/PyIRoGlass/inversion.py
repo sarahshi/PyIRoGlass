@@ -276,7 +276,7 @@ def inversion_fit_errors(comp, epsilon, mest_f, covm_est_f, covepsilon_est_f):
             rmse_inv: A float representing the root mean squared error.
     """
 
-    epsilon_final_estimate = calculate_epsilon(mest_f, comp)
+    epsilon_final_estimate = calculate_epsilon_inversion(mest_f, comp)
     residuals = epsilon_final_estimate - epsilon
     E_calib = calculate_calibration_error(covepsilon_est_f)
     SEE_inv = calculate_SEE(residuals)
