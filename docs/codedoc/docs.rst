@@ -18,7 +18,7 @@ Building-blocks functions for fitting baselines and peaks
 
 .. autofunction:: PyIRoGlass.linear
 
-.. autofunction:: PyIRoGlass.Carbonate
+.. autofunction:: PyIRoGlass.carbonate
 
 .. autofunction:: PyIRoGlass.als_baseline
 
