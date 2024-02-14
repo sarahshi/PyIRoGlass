@@ -64,24 +64,37 @@ class SampleDataLoader:
         self.spectrum_path = spectrum_path
         self.chemistry_thickness_path = chemistry_thickness_path
         self.export_path = export_path
+        self.initialize_export_paths(export_path)
+
+
+    def initialize_export_paths(self, export_path):
+
+        """
+        Initializes the export paths for various data outputs, such as figures,
+        plot files, and final data. This method creates the necessary
+        directories if they do not exist. If an export path is provided, it is
+        used as the base directory for all exports. Otherwise, a default
+        directory named 'export_data' within the current working directory
+        is used.
+        """
 
         output_dirs = [
-            "FIGURES",
-            "PLOTFILES",
-            "NPZTXTFILES",
-            "LOGFILES",
-            "PKLFILES",
-            "BLPEAKFILES",
-            "FINALDATA",
+            "FIGURES", "PLOTFILES", "NPZTXTFILES", "LOGFILES",
+            "PKLFILES", "BLPEAKFILES", "FINALDATA"
         ]
         add_dirs = ["TRACE", "HISTOGRAM", "PAIRWISE", "MODELFIT"]
+
+        # Default directory for data export if export_path is not provided
+        default_export_dir = "Samples" if export_path is None else export_path
 
         paths = {}
         for dir_name in output_dirs:
             if dir_name == "FINALDATA":
                 full_path = os.path.join(os.getcwd(), dir_name)
             else:
-                full_path = os.path.join(os.getcwd(), dir_name, export_path)
+                # For all other directories, nest them within the 'export_path' or default directory
+                full_path = os.path.join(os.getcwd(), dir_name, default_export_dir)
+
             os.makedirs(full_path, exist_ok=True)
             paths[dir_name] = full_path
 
@@ -89,7 +102,9 @@ class SampleDataLoader:
         for add_dir in add_dirs:
             os.makedirs(os.path.join(plotfile_path, add_dir), exist_ok=True)
 
-        self.data_export_path = os.path.join(paths["FINALDATA"], export_path)
+        # For 'data_export_path', use 'FINALDATA' directly without nesting further
+        self.data_export_path = os.path.join(paths["FINALDATA"], default_export_dir)
+
 
     def load_spectrum_directory(self, wn_high=5500, wn_low=1000):
 
@@ -98,7 +113,7 @@ class SampleDataLoader:
         """
 
         if self.spectrum_path is None:
-            return [], {}
+            raise ValueError("Spectrum path is not provided.")
 
         paths = sorted(glob.glob(os.path.join(self.spectrum_path, "*")))
 
@@ -134,34 +149,16 @@ class SampleDataLoader:
 
         return self.files, self.dfs_dict
 
+
     def load_chemistry_thickness(self):
 
         """
         Loads glass chemistry and thickness data from a CSV file.
         """
 
-        if self.chemistry_thickness_path is None or not os.path.exists(
-            self.chemistry_thickness_path
-        ):
-            # Return empty DataFrames if no file path is provided
-            empty_chemistry = pd.DataFrame(
-                columns=[
-                    "SiO2",
-                    "TiO2",
-                    "Al2O3",
-                    "Fe2O3",
-                    "FeO",
-                    "MnO",
-                    "MgO",
-                    "CaO",
-                    "Na2O",
-                    "K2O",
-                    "P2O5",
-                ]
-            )
-            empty_thickness = pd.DataFrame(columns=["Thickness",
-                                                    "Sigma_Thickness"])
-            return empty_chemistry, empty_thickness
+        if (self.chemistry_thickness_path is None or
+                not os.path.exists(self.chemistry_thickness_path)):
+            raise ValueError("Chemistry thickness path is not provided or does not exist.")
 
         chem_thickness = pd.read_csv(self.chemistry_thickness_path)
         chem_thickness.set_index("Sample", inplace=True)
@@ -189,6 +186,7 @@ class SampleDataLoader:
 
         return self.chemistry, self.thickness
 
+
     def load_all_data(self, wn_high=5500, wn_low=1000):
 
         """
@@ -204,6 +202,12 @@ class SampleDataLoader:
             wn_low (int, optional): The lowest wavenumber to include in the
                 spectral data output.
         """
+
+        if self.spectrum_path is None:
+            raise ValueError("Spectrum path is not provided.")
+
+        if self.chemistry_thickness_path is None:
+            raise ValueError("Chemistry thickness path is not provided.")
 
         files, dfs_dict = self.load_spectrum_directory(wn_high=wn_high,
                                                        wn_low=wn_low)
@@ -1301,7 +1305,7 @@ def calculate_density(composition, T=25, P=1, model="LS"):
     return mol, density
 
 
-def calculate_epsilon(composition, T, P):
+def calculate_epsilon(composition, T=25, P=1):
 
     """
     The calculate_epsilon function computes the extinction coefficients

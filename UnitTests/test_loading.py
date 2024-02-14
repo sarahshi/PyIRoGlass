@@ -32,15 +32,13 @@ class test_loading_csv(unittest.TestCase):
 
     def test_load_samplecsvs(self):
 
-        file_path = os.path.join(
+        dir_path = os.path.join(
             os.path.dirname(
                 os.path.realpath(__file__)),
             '../Inputs/TransmissionSpectra/Fuego/')
-        # FILES = sorted(glob.glob(file_path + "*"))
 
-        loader = pig.SampleDataLoader(spectrum_path=file_path)
+        loader = pig.SampleDataLoader(spectrum_path=dir_path)
         files, dfs_dict = loader.load_spectrum_directory()
-        # files, dfs_dict = pig.Load_SampleCSV(FILES, 5500, 1000)
         self.assertEqual(len(files), 97)  # Adjust based on your test data
 
     def test_load_chemthick(self):
@@ -56,6 +54,26 @@ class test_loading_csv(unittest.TestCase):
         # valid .npz file. Adjust based on your test data
         self.assertEqual(chemistry.shape, (9, 11))
         # Adjust based on your test data
+        self.assertEqual(thickness.shape, (9, 2))
+
+    def test_load_dir_chemthick(self):
+
+        dir_path = os.path.join(
+            os.path.dirname(
+                os.path.realpath(__file__)),
+            '../Inputs/TransmissionSpectra/Fuego/')
+
+        file_path = os.path.join(
+            os.path.dirname(
+                os.path.realpath(__file__)),
+            '../Inputs/ChemThick_Template.csv')
+        loader = pig.SampleDataLoader(spectrum_path=dir_path, 
+                                      chemistry_thickness_path=file_path)
+        (files, data, chemistry, thickness, 
+         export_path, data_export_path) = loader.load_all_data(file_path)
+
+        self.assertEqual(len(files), 97)  # Adjust based on your test data
+        self.assertEqual(chemistry.shape, (9, 11))
         self.assertEqual(thickness.shape, (9, 2))
 
 
