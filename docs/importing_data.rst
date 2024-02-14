@@ -45,6 +45,16 @@ For example, here a screenshot of a CSV spreadsheet containing the glass composi
 
 For the liquid composition, ``PyIRoGlass`` allows users to specify how they partition Fe between ferrous and ferric iron, because glass density changes due to the proportion of Fe\ :sup:`3+`. To avoid ambiguity, the ChemThick file handles this by providing two columns for FeO and Fe\ :sub:`2`O\ :sub:`3` . If the speciation is unknown, input all Fe as FeO and leave the Fe\ :sub:`2`O\ :sub:`3`  cells empty. This will not constitute the largest uncertainty, as the molar absorptivities and thicknesses impact concentrations more significantly. 
 
+=================
+Importing Package
+=================
+
+We import the package PyIRoGlass in Python. 
+
+.. code-block:: python
+
+   import PyIRoGlass as pig
+
 ========================================
 PyIRoGlass for Transmission FTIR Spectra
 ========================================
