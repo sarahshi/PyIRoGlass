@@ -61,7 +61,7 @@ class test_density_epsilon_calculation(unittest.TestCase):
 
     def test_epsilon_calculation(self):
 
-        epsilon = pig.calculate_epsilons(self.MI_Composition_dry, self.T_room, self.P_room)
+        epsilon = pig.calculate_epsilon(self.MI_Composition_dry, self.T_room, self.P_room)
         tau = float(epsilon['Tau'].iloc[0])
         expected_tau = 0.682894853
         epsilon_h2ot = float(epsilon['epsilon_H2Ot_3550'].iloc[0])
@@ -73,19 +73,19 @@ class test_density_epsilon_calculation(unittest.TestCase):
             expected_tau,
             self.decimalPlace,
             msg="Tau test and expected values from the "
-            "calculate_epsilons function do not agree")
+            "calculate_epsilon function do not agree")
         self.assertAlmostEqual(
             epsilon_h2ot,
             expected_epsilon_h2ot,
             self.decimalPlace,
             msg="epsilon_H2Ot test and expected values from the "
-            "calculate_epsilons function do not agree")
+            "calculate_epsilon function do not agree")
         self.assertAlmostEqual(
             sigma_epsilon_h2ot,
             expected_sigma_epsilon_h2ot,
             self.decimalPlace,
             msg="sigma_epsilon_H2Ot test and expected values from the "
-            "calculate_epsilons function do not agree")
+            "calculate_epsilon function do not agree")
 
 
 if __name__ == '__main__':
