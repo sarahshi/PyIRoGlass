@@ -188,7 +188,7 @@ def calculate_calibration_error(covariance_matrix):
     return 2 * np.sqrt(np.mean(diagonal))
 
 
-def calculate_epsilon(m, composition):
+def calculate_epsilon_inversion(m, composition):
 
     """
     Calculate epsilon values using coefficients and composition.
