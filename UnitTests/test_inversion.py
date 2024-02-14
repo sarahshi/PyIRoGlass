@@ -72,14 +72,14 @@ class test_inversion(unittest.TestCase):
 
         m = np.array([0, 1])
         comp = 1
-        eps = pig.calculate_epsilon(m, comp)
+        eps = pig.calculate_epsilon_inversion(m, comp)
         expected_eps = 1
         self.assertAlmostEqual(
             eps,
             expected_eps,
             self.decimalPlace,
             msg="epsilon test and expected values from the "
-            "calculate_epsilon function do not agree")
+            "calculate_epsilon_inversion function do not agree")
 
     def test_residuals(self):
 
