@@ -1195,7 +1195,7 @@ def beer_lambert_error(N, molar_mass,
     return concentration_std
 
 
-def calculate_density(composition, T=25, P=1, model="LS"):
+def calculate_density(composition, T, P, model="LS"):
 
     """
     The calculate_density function inputs the MI composition file and outputs
@@ -1305,7 +1305,7 @@ def calculate_density(composition, T=25, P=1, model="LS"):
     return mol, density
 
 
-def calculate_epsilon(composition, T=25, P=1):
+def calculate_epsilon(composition, T, P):
 
     """
     The calculate_epsilon function computes the extinction coefficients
