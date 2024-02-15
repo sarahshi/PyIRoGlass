@@ -526,14 +526,13 @@ def NIR_process(data, wn_low, wn_high, peak):
         peak (str): The H2Om or OH peak of interest.
 
     Returns:
-        Tuple containing the following elements:
-            peak_fit (pd.DataFrame): A DataFrame of the absorbance data in
-                the region of interest, median filtered data, baseline
-                subtracted absorbance, and the subtracted peak.
-            peak_krige (pd.DataFrame): A DataFrame of the kriged data output,
-                including the absorbance and standard deviation.
-            PH_krige (float): The peak height obtained after kriging.
-            STN (float): The signal to noise ratio.
+        peak_fit (pd.DataFrame): A DataFrame of the absorbance data in
+            the region of interest, median filtered data, baseline
+            subtracted absorbance, and the subtracted peak.
+        peak_krige (pd.DataFrame): A DataFrame of the kriged data output,
+            including the absorbance and standard deviation.
+        PH_krige (float): The peak height obtained after kriging.
+        STN (float): The signal to noise ratio.
     """
 
     data_H2O = data.loc[wn_low:wn_high]
@@ -619,13 +618,12 @@ def MIR_process(data, wn_low, wn_high):
         peak (str): The H2O or OH peak of interest.
 
     Returns:
-        Tuple containing the following elements:
-            data_output (pd.DataFrame): A DataFrame of the absorbance data in
-                the region of interest, median filtered data, baseline
-                subtracted absorbance, and the subtracted peak.
-            krige_out (pd.DataFrame): A DataFrame of the kriged data output,
-                including the absorbance and standard deviation.
-            PH_krige (float): The peak height obtained after kriging.
+        data_output (pd.DataFrame): A DataFrame of the absorbance data in
+            the region of interest, median filtered data, baseline
+            subtracted absorbance, and the subtracted peak.
+        krige_out (pd.DataFrame): A DataFrame of the kriged data output,
+            including the absorbance and standard deviation.
+        PH_krige (float): The peak height obtained after kriging.
     """
 
     data_H2Ot_3550 = data.loc[wn_low:wn_high]

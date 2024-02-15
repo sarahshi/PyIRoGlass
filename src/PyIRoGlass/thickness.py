@@ -84,7 +84,7 @@ def peakdetect(y_axis, x_axis=None, lookahead=200, delta=0):
         and negative peaks, respectively. Each element of the lists is a
         tuple of (position, peak_value). To get the average peak value,
         use: np.mean(max_peaks, 0)[1]. To unpack one of the lists into x, y
-        coordinates, use: x, y = zip(*max_peaks).
+        coordinates, use: x, y = zip(max_peaks).
 
     Notes:
         This function comes from https://github.com/avhn/peakdetect. I pulled
@@ -394,7 +394,7 @@ def reflectance_index(XFo):
     """
     Calculates the reflectance index for a given forsterite composition.
     The reflectance index is calculated based on values from Deer, Howie,
-        and Zussman, 3rd Edition.
+    and Zussman, 3rd Edition.
 
     Parameters:
         XFo (float): The mole fraction of forsterite in the sample.
