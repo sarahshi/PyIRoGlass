@@ -514,15 +514,13 @@ def NIR_process(data, wn_low, wn_high, peak):
     then fits a baseline and subtracts it to determine the peak absorbance.
     Next, the data are kriged to further reduce noise and obtain peak height.
     Finally, the signal to noise ratio is calculated, and a warning is issued
-    if the ratio is high.  The function is used three times with different
+    if the ratio is high. The function is used three times with different
     H2Om wavenumber ranges for uncertainty assessment.
 
     Parameters:
         data (pd.DataFrame): A DataFrame of absorbance data.
-        wn_low (int): The Near-IR H2Om or OH wavenumber of interest lower
-            bound.
-        wn_high (int): The Near-IR H2Om or OH wavenumber of interest upper
-            bound.
+        wn_low (int): The lower bound wavenumber for NIR H2Om or OH.
+        wn_high (int): The higher bound wavenumber for NIR H2Om or OH.
         peak (str): The H2Om or OH peak of interest.
 
     Returns:
@@ -613,9 +611,8 @@ def MIR_process(data, wn_low, wn_high):
 
     Parameters:
         data (pd.DataFrame): A DataFrame of absorbance data.
-        wn_low (int): The Near-IR H2O/OH wavenumber of interest lower bound.
-        wn_high (int): The Near-IR H2O/OH wavenumber of interest upper bound.
-        peak (str): The H2O or OH peak of interest.
+        wn_low (int): The lower bound wavenumber for MIR H2Ot, 3550.
+        wn_high (int): The higher bound wavenumber for MIR H2Ot, 3550.
 
     Returns:
         data_output (pd.DataFrame): A DataFrame of the absorbance data in
