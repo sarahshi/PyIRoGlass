@@ -75,7 +75,7 @@ def peakdetect(y_axis, x_axis=None, lookahead=200, delta=0):
             and the following points, before a peak may be considered a peak.
             Useful to hinder the function from picking up false peaks towards
             the end of the signal. To work well, delta should be set to
-            delta >= RMSnoise * 5. Defaults to 0. When omitted, it can decrease
+            delta >= RMSnoise x 5. Defaults to 0. When omitted, it can decrease
             the speed by 20%, but when used correctly, it can double the speed
             of the function.
 

@@ -11,6 +11,7 @@ Data Imports
 .. autoclass:: PyIRoGlass.VectorLoader
    :members:
 
+
 Building-blocks functions for fitting baselines and peaks
 =========================================================
 
@@ -102,3 +103,4 @@ Functions for molar absorptivity inversions
 .. autofunction:: PyIRoGlass.calculate_RMSE
 
 .. autofunction:: PyIRoGlass.inversion_fit_errors
+

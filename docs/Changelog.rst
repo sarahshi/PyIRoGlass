@@ -3,6 +3,11 @@ Change Log
 ==========
 
 
+Version 0.4.1
+=============
+Updating functions loading data to be in object-oriented structure. Streamlining and separating out plotting functions from remaining code. Removing excess variables. Renaming for consistency with Python function guidance. Correcting for pep8. Working through reviewer comments from Volcanica!
+
+
 Version 0.3.1
 =============
 Updating molar absorptivity inversion to add Brounce et al., 2021 value for carbonate. Paper submitted to Volcanica!
