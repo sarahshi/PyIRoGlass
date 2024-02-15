@@ -261,6 +261,7 @@ def calculate_mean_thickness(dfs_dict, n, wn_high, wn_low,
     Thicknesses for each interference fringe, starting at both the peaks
     and troughs of the fringes are determined. These thicknesses are then
     averaged over the interval of interest.
+
     Parameters:
         dfs_dict (dictionary): dictionary containing FTIR data for each
             file
