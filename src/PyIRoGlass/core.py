@@ -540,7 +540,7 @@ def NIR_process(data, wn_low, wn_high, peak):
             including the absorbance and standard deviation.
         PH_krige (float): The peak height obtained after kriging.
         STN (float): The signal to noise ratio.
-
+    
     """
 
     data_H2O = data.loc[wn_low:wn_high]
@@ -631,7 +631,7 @@ def MIR_process(data, wn_low, wn_high):
         krige_out (pd.DataFrame): A DataFrame of the kriged data output,
             including the absorbance and standard deviation.
         PH_krige (float): The peak height obtained after kriging.
-
+    
     """
 
     data_H2Ot_3550 = data.loc[wn_low:wn_high]
