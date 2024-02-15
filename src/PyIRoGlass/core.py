@@ -49,6 +49,7 @@ class SampleDataLoader:
         load_chemistry_thickness(chemistry_thickness_path):
             Loads glass chemistry and thickness data from a specified CSV file,
             setting the 'Sample' column as the index.
+
     """
 
     def __init__(self,
@@ -255,6 +256,7 @@ class VectorLoader:
             Loads predetermined principal components from an NPZ file.
         load_wavenumber(file_name):
             Loads predetermined wavenumbers from an NPZ file.
+
     """
 
     def __init__(
@@ -285,6 +287,7 @@ class VectorLoader:
 
         Returns:
             PC_matrix (matrix): Matrix containing the principal components.
+
         """
 
         file_path = os.path.join(self.base_path, file_name)
@@ -306,6 +309,7 @@ class VectorLoader:
 
         Returns:
             Wavenumber (np.ndarray): An array of wavenumbers.
+
         """
 
         file_path = os.path.join(self.base_path, file_name)
@@ -332,6 +336,7 @@ def gauss(x, mu, sd, A=1):
 
     Returns:
         G (np.ndarray): The Gaussian fit.
+
     """
 
     G = A * np.exp(-((x - mu) ** 2) / (2 * sd**2))
@@ -351,6 +356,7 @@ def linear(x, m, b):
 
     Returns:
         tilt_offset (np.ndarray): Linear offset.
+
     """
 
     tilt_offset = m * np.arange(0, x.size) + b
@@ -380,6 +386,7 @@ def carbonate(P, x, PCmatrix, H2Om1635_PCmatrix, Nvectors=5):
 
     Returns:
         model_data (np.ndarray): Model data for the carbonate spectra.
+
     """
 
     PC_Weights = np.array([P[0:Nvectors]])
@@ -429,6 +436,7 @@ def als_baseline(intensities, asymmetry_param=0.05, smoothness_param=5e5,
 
     Returns:
         z (np.ndarray): Baseline of the input signal.
+
     """
 
     smoother = WhittakerSmoother(intensities, smoothness_param, deriv_order=2)
@@ -471,6 +479,7 @@ class WhittakerSmoother(object):
         y (array-like): Input signal to be smoothed.
         upper_bands (array-like): Upper triangular bands of the matrix used
             for smoothing.
+
     """
 
     def __init__(self, signal, smoothness_param, deriv_order=1):
@@ -531,6 +540,7 @@ def NIR_process(data, wn_low, wn_high, peak):
             including the absorbance and standard deviation.
         PH_krige (float): The peak height obtained after kriging.
         STN (float): The signal to noise ratio.
+
     """
 
     data_H2O = data.loc[wn_low:wn_high]
@@ -621,6 +631,7 @@ def MIR_process(data, wn_low, wn_high):
         krige_out (pd.DataFrame): A DataFrame of the kriged data output,
             including the absorbance and standard deviation.
         PH_krige (float): The peak height obtained after kriging.
+
     """
 
     data_H2Ot_3550 = data.loc[wn_low:wn_high]
@@ -671,6 +682,7 @@ def MCMC(data, uncert, indparams, log, savefile):
 
     Returns:
         mc3_output (mc3.output): The output of the Monte Carlo-Markov Chain.
+
     """
 
     # Define initial values, limits, and step sizes for parameters
@@ -749,6 +761,7 @@ def calculate_baselines(dfs_dict, export_path):
             and other analysis results.
         failures (list): A list of file identifiers for which the analysis
             failed, possibly due to data issues or processing errors.
+
     """
 
     path_beg = os.getcwd() + "/"
@@ -1116,6 +1129,7 @@ def beer_lambert(molar_mass, absorbance, density, thickness, epsilon):
         concentration from absorbance is:
         concentration = (1e6*molar_mass*absorbance)/(density*thickness*epsilon)
         # https://sites.fas.harvard.edu/~scphys/nsta/error_propagation.pdf
+
     """
 
     concentration = pd.Series(dtype='float')
@@ -1173,6 +1187,7 @@ def beer_lambert_error(N, molar_mass,
         concentration distribution.
 
         # https://astrofrog.github.io/py4sci/_static/Practice%20Problem%20-%20Monte-Carlo%20Error%20Propagation%20-%20Sample%20Solution.html
+
     """
 
     gaussian_concentration = (
@@ -1214,6 +1229,7 @@ def calculate_density(composition, T, P, model="LS"):
             the glass composition
         density (float): glass density at room temperature and pressure
             (in kg/m^3)
+
     """
 
     # Define a dictionary of molar masses for each oxide
@@ -1955,6 +1971,7 @@ def plot_H2Om_OH(data, files, als_bls, ax_top=None, ax_bottom=None):
         input. The function modifies the provided `ax_top` and `ax_bottom`
         axes in place if they are provided; otherwise, it creates a new
         figure and axes for plotting.
+
     """
 
     if ax_top is None or ax_bottom is None:
@@ -2222,6 +2239,7 @@ def plot_H2Ot_3550(data, files, als_bls, ax=None):
         the function creates a new figure and axis for plotting, which might
         not be ideal for integrating this plot into multi-panel figures or
         more complex visual layouts.
+
     """
 
     if ax is None:
@@ -2329,6 +2347,7 @@ def derive_carbonate(data, files, mc3_output, export_path=None):
         baselines (pd.DataFrame): DataFrame containing an ensemble of
             baseline fits derived from the posterior distribution to represent
             uncertainty in the baseline estimation. Indexed by wavenumber.
+
     """
 
     vector_loader = VectorLoader()
@@ -2469,6 +2488,7 @@ def plot_carbonate(data, files, mc3_output, ax=None):
         the function creates a new figure and axis for plotting, which might
         not be ideal for integrating this plot into multi-panel figures or
         more complex visual layouts.
+
     """
 
     if ax is None:
@@ -2565,6 +2585,7 @@ def plot_trace(posterior, title, zchain=None, pnames=None, thinning=50,
     Returns:
         axes (1D list of matplotlib.axes.Axes): List of axes containing
             the marginal posterior distributions.
+
     """
 
     # Get indices for samples considered in final analysis:
@@ -2670,6 +2691,7 @@ def plot_modelfit(data, uncert, indparams, model, title, nbins=75,
     Returns:
         ax (matplotlib.axes.Axes): Axes instance containing the marginal
         posterior distributions.
+
     """
 
     # Bin down array:
