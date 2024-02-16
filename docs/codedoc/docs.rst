@@ -5,10 +5,10 @@ PyIRoGlass Documentation
 Data Imports 
 ============
 
-.. automodule:: PyIRoGlass.SampleDataLoader
+.. autoclass:: PyIRoGlass.SampleDataLoader
    :members:
 
-.. automodule:: PyIRoGlass.VectorLoader
+.. autoclass:: PyIRoGlass.VectorLoader
    :members:
 
 
