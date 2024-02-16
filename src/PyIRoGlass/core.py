@@ -1423,14 +1423,12 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
             Default is 1 bar.
 
     Returns:
-        density_epsilon (pd.DataFrame): DataFrame containing density ('Density'
-            column) and extinction coefficient ('epsilon' column) for each
-            sample, providing insight into the properties of the glass under
-            analysis.
-        spreadsheet_f (pd.DataFrame): DataFrame containing calculated volatile
+        concentrations_df (pd.DataFrame): DataFrame containing calculated volatile
             concentrations and their uncertainties for each sample, including
             columns for mean and standard deviation of H2O and CO2 species
-            concentrations.
+            concentrations. ALso contains density ('Density' column) and
+            extinction coefficient ('epsilon' column) for each sample,
+            providing insight into the properties of the glass under analysis.
 
     Note:
         The function assumes that the input composition includes all relevant
@@ -1457,7 +1455,7 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
     }
 
     # Create DataFrames to store volatile data:
-    spreadsheet = pd.DataFrame(
+    concentrations = pd.DataFrame(
         columns=[
             "H2Ot_MEAN",
             "H2Ot_STD",
@@ -1480,7 +1478,7 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
     )
 
     # Dataframe for saturated concentrations
-    spreadsheet_sat = pd.DataFrame(columns=spreadsheet.columns)
+    concentrations_sat = pd.DataFrame(columns=concentrations.columns)
 
     # Dataframe for storing glass density data
     density_df = pd.DataFrame(columns=["Density"])
@@ -1639,7 +1637,7 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
 
         # Save volatile concentrations and uncertainties to DataFrame
         density_df.loc[kk] = pd.Series({"Density": density[kk]})
-        spreadsheet.loc[kk] = pd.Series(
+        concentrations.loc[kk] = pd.Series(
             {
                 "H2Ot_3550_M": H2Ot_3550_M,
                 "H2Ot_3550_STD": H2Ot_3550_M_STD,
@@ -1663,19 +1661,19 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
     # Beer-Lambert calculation again, and have total H2O = H2Om + OH-
     for ll in Volatile_PH.index:
         if Volatile_PH["H2Ot_3550_SAT"][ll] == "-":
-            H2Ot_3550_M = spreadsheet["H2Ot_3550_M"][ll]
-            H2Om_1635_BP = spreadsheet["H2Om_1635_BP"][ll]
-            CO2_1515_BP = spreadsheet["CO2_1515_BP"][ll]
-            CO2_1430_BP = spreadsheet["CO2_1430_BP"][ll]
-            H2Om_5200_M = spreadsheet["H2Om_5200_M"][ll]
-            OH_4500_M = spreadsheet["OH_4500_M"][ll]
+            H2Ot_3550_M = concentrations["H2Ot_3550_M"][ll]
+            H2Om_1635_BP = concentrations["H2Om_1635_BP"][ll]
+            CO2_1515_BP = concentrations["CO2_1515_BP"][ll]
+            CO2_1430_BP = concentrations["CO2_1430_BP"][ll]
+            H2Om_5200_M = concentrations["H2Om_5200_M"][ll]
+            OH_4500_M = concentrations["OH_4500_M"][ll]
 
-            H2Ot_3550_M_STD = spreadsheet["H2Ot_3550_STD"][ll]
-            H2Om_1635_BP_STD = spreadsheet["H2Om_1635_STD"][ll]
-            CO2_1515_BP_STD = spreadsheet["CO2_1515_STD"][ll]
-            CO2_1430_BP_STD = spreadsheet["CO2_1430_STD"][ll]
-            H2Om_5200_M_STD = spreadsheet["H2Om_5200_STD"][ll]
-            OH_4500_M_STD = spreadsheet["OH_4500_STD"][ll]
+            H2Ot_3550_M_STD = concentrations["H2Ot_3550_STD"][ll]
+            H2Om_1635_BP_STD = concentrations["H2Om_1635_STD"][ll]
+            CO2_1515_BP_STD = concentrations["CO2_1515_STD"][ll]
+            CO2_1430_BP_STD = concentrations["CO2_1430_STD"][ll]
+            H2Om_5200_M_STD = concentrations["H2Om_5200_STD"][ll]
+            OH_4500_M_STD = concentrations["OH_4500_STD"][ll]
             density_sat = density_df["Density"][ll]
 
         elif Volatile_PH["H2Ot_3550_SAT"][ll] == "*":
@@ -1820,7 +1818,7 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
             CO2_1430_BP_STD *= 10000
 
         density_sat_df.loc[ll] = pd.Series({"Density_Sat": density_sat})
-        spreadsheet_sat.loc[ll] = pd.Series(
+        concentrations_sat.loc[ll] = pd.Series(
             {
                 "H2Ot_3550_M": H2Ot_3550_M,
                 "H2Ot_3550_SAT": Volatile_PH["H2Ot_3550_SAT"][ll],
@@ -1847,36 +1845,37 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
         )
 
     # Create final spreadsheet
-    spreadsheet_f = pd.concat([spreadsheet_sat, stnerror], axis=1)
-    density_epsilon = pd.concat([density_df, density_sat_df, epsilon], axis=1)
+    concentrations_df = pd.concat([concentrations_sat, stnerror, 
+                                   density_df, density_sat_df, epsilon],
+                                   axis=1)
 
     # Output different values depending on saturation.
-    for m in spreadsheet.index:
-        if spreadsheet["H2Ot_3550_SAT"][m] == "*":
-            H2O_mean = (spreadsheet["H2Om_1635_BP"][m] +
-                        spreadsheet["OH_4500_M"][m])
+    for m in concentrations.index:
+        if concentrations["H2Ot_3550_SAT"][m] == "*":
+            H2O_mean = (concentrations["H2Om_1635_BP"][m] +
+                        concentrations["OH_4500_M"][m])
             H2O_std = (
-                (spreadsheet["H2Om_1635_STD"][m] ** 2)
-                + (spreadsheet["OH_4500_STD"][m] ** 2)
+                (concentrations["H2Om_1635_STD"][m] ** 2)
+                + (concentrations["OH_4500_STD"][m] ** 2)
             ) ** (1 / 2) / 2
 
-        elif spreadsheet["H2Ot_3550_SAT"][m] == "-":
-            H2O_mean = spreadsheet["H2Ot_3550_M"][m]
-            H2O_std = spreadsheet["H2Ot_3550_STD"][m]
+        elif concentrations["H2Ot_3550_SAT"][m] == "-":
+            H2O_mean = concentrations["H2Ot_3550_M"][m]
+            H2O_std = concentrations["H2Ot_3550_STD"][m]
         mean_vol.loc[m] = pd.Series({"H2Ot_MEAN": H2O_mean,
                                      "H2Ot_STD": H2O_std})
-    mean_vol["CO2_MEAN"] = (spreadsheet["CO2_1515_BP"] +
-                            spreadsheet["CO2_1430_BP"]) / 2
+    mean_vol["CO2_MEAN"] = (concentrations["CO2_1515_BP"] +
+                            concentrations["CO2_1430_BP"]) / 2
     mean_vol["CO2_STD"] = (
-        (spreadsheet["CO2_1515_STD"] ** 2) + (spreadsheet["CO2_1430_STD"] ** 2)
+        (concentrations["CO2_1515_STD"] ** 2) + (concentrations["CO2_1430_STD"] ** 2)
     ) ** (1 / 2) / 2
 
-    spreadsheet_f["H2Ot_MEAN"] = mean_vol["H2Ot_MEAN"]
-    spreadsheet_f["H2Ot_STD"] = mean_vol["H2Ot_STD"]
-    spreadsheet_f["CO2_MEAN"] = mean_vol["CO2_MEAN"]
-    spreadsheet_f["CO2_STD"] = mean_vol["CO2_STD"]
+    concentrations_df["H2Ot_MEAN"] = mean_vol["H2Ot_MEAN"]
+    concentrations_df["H2Ot_STD"] = mean_vol["H2Ot_STD"]
+    concentrations_df["CO2_MEAN"] = mean_vol["CO2_MEAN"]
+    concentrations_df["CO2_STD"] = mean_vol["CO2_STD"]
 
-    return density_epsilon, spreadsheet_f
+    return concentrations_df
 
 
 # %% Plotting Functions

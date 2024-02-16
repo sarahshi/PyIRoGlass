@@ -67,10 +67,20 @@ CONC_conc = CONC[['CO2_MEAN', 'CO2_STD']]
 
 merge = MEGA_SPREADSHEET.merge(HJ_peaks, on='Sample ID')
 merge = merge.merge(CONC, on='Sample ID')
+merge = merge.merge(DE, on='Sample ID')
 merge = merge.set_index('Sample ID')
 merge.to_csv('PHComparison.csv')
-
 merge
+
+# %% 
+
+standards = pd.read_csv('PyIRoGlass_Standards.csv', index_col=0)
+
+merge1 = MEGA_SPREADSHEET.merge(standards, on='Sample ID')
+merge1 = merge1.merge(CONC, on='Sample ID')
+merge1 = merge1.set_index('Sample ID')
+merge1.to_csv('Comparison_Standards.csv')
+merge1
 
 # %%
 
@@ -87,16 +97,21 @@ badspec = np.array(['CI_IPGP_B6_1_50x50_256s_sp1', 'CI_IPGP_B6_2_50x50_256s_sp1'
                     'CI_Ref_bas_3_1_100x100_256s_051423_sp1', 'CI_Ref_bas_3_2_100x100_256s_051423_sp1', 'CI_Ref_bas_3_3_100x100_256s_sp1', 
                     'CI_Ref_bas_4_1_100x100_256s_sp1', 'CI_Ref_bas_4_1_100x100_256s_sp2',
                     'LMT_BA3_2_50x50_256s_sp1', 'LMT_BA3_2_50x50_256s_sp2', 'CI_LMT_BA5_2_50x50x_256s_sp1', 
-                    'ND70_02_01_06032022_150x150_sp1',
-                    'ND70_5_2_29June2022_150x150_sp2',  
+                    'ND70_02-01_30June2022_150x150_sp1', 'ND70_02-01_30June2022_150x150_sp2', 'ND70_02-01_30June2022_150x150_sp3', 
+                    'ND70_02-01_30June2022_150x150_sp4',
+                    # 'ND70_02_01_06032022_150x150_sp1', # 'ND70_02_01_06032022_150x150_sp2', 'ND70_02_01_06032022_150x150_sp3',
+                    'ND70_5_2_29June2022_150x150_sp2', 'ND70_5_2_29June2022_150x150_sp3',
                     'ND70_05_02_06032022_150x150_sp1', 'ND70_05_02_06032022_150x150_sp2', 'ND70_05_02_06032022_150x150_sp3',
-                    'ND70_05_03_06032022_80x100_sp3', 'ND70_0503_29June2022_95x80_256s_sp2',
-                    'ND70_06_02_75um', 'ND70_6-2_08042022_150x150_sp1', 'ND70_6-2_08042022_150x150_sp2', 'ND70_6-2_08042022_150x150_sp3'
+                    'ND70_05_03_06032022_80x100_sp3', 'ND70_0503_29June2022_100x60_256s_sp1', 'ND70_0503_29June2022_95x80_256s_sp2',
+                    'ND70_05_03_06032022_150x50_sp1', 'ND70_05_03_06032022_200x50_sp2', 'ND70_05_03_06032022_80x100_sp3', 
+                    'ND70_5_2_29June2022_150x150_256s_sp1', 
+                    'ND70_06_02_75um', 'ND70_6-2_08042022_150x150_sp1', 'ND70_6-2_08042022_150x150_sp2', 'ND70_6-2_08042022_150x150_sp3',
+                    'ND70_6_2_chip4_100x100_256s_sp1'
                     ])
 
-merge = merge[~merge.index.isin(badspec)]
-merge = merge[~merge.index.str.contains('map_actual_focusedProperly', case=False, na=False)]
 
+merge = merge[~merge.index.isin(badspec)]
+merge = merge[~merge.index.str.contains('map', case=False, na=False)]
 merge
 
 # %% 
@@ -163,7 +178,6 @@ sz = 80
 ticks = np.arange(0, 3, 0.5)
 tick_labels = [str(t) if t % 0.5 == 0 else "" for t in ticks]
 
-
 merge['PH_1515_norm'] = merge['PH_1515']/merge.Thickness*50
 merge['PH_1515_BP_norm'] = merge.PH_1515_BP/merge.Thickness*50
 merge['PH_1515_STD_norm'] = merge.PH_1515_STD/merge.Thickness*50
@@ -173,7 +187,6 @@ merge['PH_1430_STD_norm'] = merge.PH_1430_STD/merge.Thickness*50
 merge['Py_Devol_1430'] = merge['PH_1430_BP_norm'] / merge['PH_1430_norm']
 merge['Py_Devol_1515'] = merge['PH_1515_BP_norm'] / merge['PH_1515_norm']
 
-
 # Calculate the mean and standard deviation
 mean_1430 = np.mean(merge['Py_Devol_1430'])
 std_1430 = np.std(merge['Py_Devol_1430'])
@@ -181,12 +194,17 @@ std_1430 = np.std(merge['Py_Devol_1430'])
 mean_1515 = np.mean(merge['Py_Devol_1515'])
 std_1515 = np.std(merge['Py_Devol_1515'])
 
-# Filter dataframe
-merge_int = merge[abs(merge['Py_Devol_1430'] - mean_1430) < 1.5 * std_1430]
-merge_filt = merge_int[abs(merge_int['Py_Devol_1515'] - mean_1515) < 1.5 * std_1515]
+merge_no_nd70 = merge[~merge.index.astype(str).str.contains('ND70')]
+merge_int_no_nd70 = merge_no_nd70[abs(merge_no_nd70['Py_Devol_1430'] - mean_1430) < 2 * std_1430]
+merge_filt_no_nd70 = merge_int_no_nd70[abs(merge_int_no_nd70['Py_Devol_1515'] - mean_1515) < 2 * std_1515]
+merge_nd70 = merge[merge.index.astype(str).str.contains('ND70')]
+
+merge_filt = pd.concat([merge_filt_no_nd70, merge_nd70])
 
 merge_filt.to_csv('PHComparison_lim.csv')
 merge_filt
+
+merge_nd70.to_csv('PHComparison_ND70.csv')
 
 DE_filt = DE[DE.index.isin(merge_filt.index)].drop(columns=['Sample ID', 'Density'])
 DE_filt['Repeats'] = merge_filt['Repeats']
@@ -298,6 +316,167 @@ plt.tight_layout()
 
 # %% 
 
+
+# %% 
+from scipy.optimize import curve_fit
+
+def func(x, a):
+    return a * x
+
+abs_df = pd.read_csv('PHComparison_ND70_ERDA_NRA.csv', index_col=0)
+
+co2_nra = abs_df['NRA_CO2']/10000 
+co2_nra_std = abs_df['NRA_CO2_STD']/10000 
+
+co2_y_1430 = 44.01*abs_df['PH_1430_BP']/(abs_df['Density_Sat']*(abs_df['Thickness']/1e6))
+co2_y_1515 = 44.01*abs_df['PH_1515_BP']/(abs_df['Density_Sat']*(abs_df['Thickness']/1e6))
+
+sigma_co2_y_1430 = co2_y_1430 * np.sqrt( (abs_df['PH_1430_STD']/abs_df['PH_1430_BP'])**2 + (0.025**2) + (3/abs_df['Thickness'])**2 )
+sigma_co2_y_1515 = co2_y_1515 * np.sqrt( (abs_df['PH_1515_STD']/abs_df['PH_1515_BP'])**2 + (0.025**2) + (3/abs_df['Thickness'])**2 )
+
+
+
+# %% 
+
+def inversion(comp, epsilon, sigma_comp, sigma_epsilon):
+
+    N = len(comp)
+    G = np.array([comp]).T
+    mls = np.linalg.solve(np.dot(G.T, G), np.dot(G.T, epsilon))
+
+    # Regular least squares for starting value. 
+    covls = np.linalg.inv(np.dot(G.T, G))
+
+    # A priori solution is least squares solution. 
+    xbar = np.concatenate([epsilon, mls])
+
+    # Trial solution based on least squares 
+    xg = xbar
+
+    # Gradient vector, needs to change for multiple parameters. 
+    Fg = np.zeros((N, N+1))
+
+    # Covariance, large for model parameters 
+    covx = np.zeros((N+1, N+1))
+    covx[:N, :N] = np.diag(sigma_epsilon**2)
+    scale = 1
+    covx[N, N] = scale * covls[0, 0]
+
+    Nit = 100
+    epsilon_pre_all = np.zeros((N, Nit))
+    mest_all = np.zeros((1, Nit))
+    epsilon_linear_all = np.zeros((N, Nit))
+
+    for i in range(Nit): 
+        f = -xg[:N] + (xg[N]*comp)
+        Ef = np.dot(f.T, f)
+
+        if (i == 0) or (i % 10 == 0):
+            print(f'Error in implicit equation at iteration {i} = {Ef}')
+
+        Fg[:N, :N] = -np.eye(N)
+        Fg[:N, N] = comp
+
+        epsi = 0
+        left = Fg.T
+        right = np.dot(Fg, covx).dot(Fg.T) + (epsi*np.eye(N))
+        solve = np.linalg.solve(right.T, left.T).T
+        MO = np.dot(covx, solve)
+        xg2 = xbar + np.dot(MO, (np.dot(Fg, (xg-xbar))-f))
+        xg = xg2
+
+        mest = xg[N]
+        epsilon_pre = xg[:N]
+        epsilon_linear = mest*comp
+        epsilon_pre_all[:, i] = epsilon_pre
+        mest_all[:, i] = mest
+        epsilon_linear_all[:, i] = epsilon_linear
+
+    MO2 = np.dot(MO, Fg)
+    covx_est = np.dot(MO2, covx).dot(MO2.T)
+
+    covepsilon_est_f = covx_est[:N, :N]
+    vepsilon = np.diag(covepsilon_est_f)
+    E_calib = 2*np.sqrt(np.mean(vepsilon))
+
+    vc = covx_est[N, N]
+    epsilon_pre = xg[:N]
+    comp_pre = xg[N:]
+
+    mest_f = xg[N]
+    epsilon_linear = mest_f*comp
+    epsilon_ls = mls[0]*comp
+
+    print('mls ' + str(mls))
+    print('95% CI ' + str(2*np.sqrt(np.diag(covls))))
+    print('mest ' + str(mest_f))
+    print('95% CI final ' + str(2*np.sqrt(vc)))
+
+    return mls, mest_f, covls, vc, covepsilon_est_f, comp_pre, epsilon_pre, epsilon_linear
+
+
+mls_1430, mest_f_1430, covls_1430, covm_est_f_1430, covepsilon_est_f_1430, volatile_pre_1430, epsilon_pre_1430, epsilon_linear_1430 = inversion(co2_nra, co2_y_1430, co2_nra_std, sigma_co2_y_1430)
+
+# %%
+
+co2_popt_1430, co2_pcov_1430 = curve_fit(func, co2_nra, co2_y_1430)
+plt.figure(figsize=(8, 8))
+plt.scatter(co2_nra, co2_y_1430, marker='o', s=100, ec='k', lw=0.5, zorder=20)
+plt.errorbar(co2_nra, co2_y_1430, xerr = co2_nra_std, yerr = sigma_co2_y_1430, ls = 'none', lw = 0.5, c = 'k', zorder=10) 
+plt.plot(co2_nra, func(co2_nra, co2_popt_1430),"r--")
+plt.title('$Ɛ_{CO_{2, 1430}}$ = ' + str(round(co2_popt_1430[0], 3)) + ' L/mol$\cdot$cm')
+plt.xlabel('CO$_2$ (wt.%)')
+plt.ylabel('44.01*PH_1430*Density*Thickness')
+plt.show()
+
+co2_popt_1515, co2_pcov_1515 = curve_fit(func, co2_nra, co2_y_1515)
+plt.figure(figsize=(8, 8))
+plt.scatter(co2_nra, co2_y_1515, marker='o', s=100, ec='k', lw=0.5)
+plt.plot(co2_nra, func(co2_nra, co2_popt_1515),"r--")
+plt.title('$Ɛ_{CO_{2, 1515}}$ = ' + str(round(co2_popt_1515[0], 3)) + ' L/mol$\cdot$cm')
+plt.xlabel('CO$_2$ (wt.%)')
+plt.ylabel('44.01*PH_1515*Density*Thickness')
+plt.show()
+
+# %% 
+
+co2_y_1430_area = 44.01*((abs_df['PH_1430_BP'])*(np.sqrt(2*np.pi*(abs_df['STD_1430_BP']/2)**2))) / (abs_df['Density_Sat']*(abs_df['Thickness']/1e6))
+co2_y_1515_area = 44.01*((abs_df['PH_1515_BP'])*(np.sqrt(2*np.pi*(abs_df['STD_1515_BP']/2)**2))) / (abs_df['Density_Sat']*(abs_df['Thickness']/1e6))
+
+co2_popt_1430_area, co2_pcov_1430_area = curve_fit(func, co2_nra, co2_y_1430_area)
+plt.figure(figsize=(8, 8))
+plt.scatter(co2_nra, co2_y_1430_area, marker='o', s=100, ec='k', lw=0.5)
+plt.plot(co2_nra, func(co2_nra, co2_popt_1430_area),"r--")
+plt.title('$Ɛ_{CO_{2, 1430}}$ = ' + str(round(co2_popt_1430_area[0], 3)) + ' L/mol$\cdot$cm$^2$')
+plt.xlabel('CO$_2$ (wt.%)')
+plt.ylabel('44.01*Area_1430*Density*Thickness')
+
+co2_popt_1515_area, co2_pcov_1515_area = curve_fit(func, co2_nra, co2_y_1515_area)
+plt.figure(figsize=(8, 8))
+plt.scatter(co2_nra, co2_y_1515_area, marker='o', s=100, ec='k', lw=0.5)
+plt.plot(co2_nra, func(co2_nra, co2_popt_1515_area),"r--")
+plt.title('$Ɛ_{CO_{2, 1515}}$ = ' + str(round(co2_popt_1515_area[0], 3)) + ' L/mol$\cdot$cm$^2$')
+plt.xlabel('CO$_2$ (wt.%)')
+plt.ylabel('44.01*Area_1515*Density*Thickness')
+
+# %% 
+
+abs_df_lim = abs_df[abs_df['H2OT_3550_SAT?'] == '-']
+h2o_y = 18.01528*abs_df_lim['PH_3550_M']/(abs_df_lim['Density_Sat']*(abs_df_lim['Thickness']/1e6))
+h2o_nra = abs_df_lim['ERDA_H2O'] 
+
+h2o_popt, h2o_pcov = curve_fit(func, h2o_nra, h2o_y)
+plt.figure(figsize=(8, 8))
+plt.scatter(h2o_nra, h2o_y, marker='o', s=100, ec='k', lw=0.5)
+plt.plot(h2o_nra, func(h2o_nra, h2o_popt),"r--")
+plt.title('$Ɛ_{H_2O,_{3550}}$ = ' + str(round(h2o_popt[0], 3)) + ' L/mol$\cdot$cm')
+plt.xlabel('H$_2$O (wt.%)')
+plt.ylabel('18.01*PH_3550*Density*Thickness')
+plt.show()
+
+# %% 
+# %% 
+
 def Error_Prop(mean_std, mean_mean, std_mean): 
     
     sigma_analysis = mean_std/mean_mean
@@ -308,34 +487,36 @@ def Error_Prop(mean_std, mean_mean, std_mean):
 
     return uncert_prop
 
-
 col_means = ['PH_1515_norm', 'PH_1515_BP_norm', 'PH_1515_STD_norm', 'PH_1430_norm', 'PH_1430_BP_norm', 'PH_1430_STD_norm', 
              'Py_Devol_1430', 'Py_Devol_1515', 'H2OT_MEAN', 'H2OT_STD', 'CO2_MEAN', 'CO2_STD']
-
 counts = merge_filt.groupby('Repeats')['PH_1515_norm'].count()
-counts.to_csv('counts.csv')
 
 std = merge_filt.groupby('Repeats')[col_means].std()
-std.to_csv('std.csv')
+# std.to_csv('std.csv')
 
 means = merge_filt.groupby('Repeats')[col_means].mean()
 means['PH_1515_STD_net'] = Error_Prop(means['PH_1515_STD_norm'], means['PH_1515_BP_norm'], std['PH_1515_BP_norm'])
 means['PH_1430_STD_net'] = Error_Prop(means['PH_1430_STD_norm'], means['PH_1430_BP_norm'], std['PH_1430_BP_norm'])
 means['H2OT_STD_net'] = Error_Prop(means['H2OT_STD'], means['H2OT_MEAN'], std['H2OT_MEAN'])
 means['CO2_STD_net']  = Error_Prop(means['CO2_STD'], means['CO2_MEAN'], std['CO2_MEAN'])
-means.to_csv('means.csv')
+means['Counts'] = counts
+# means.to_csv('nd70_statistics.csv')
 
 # %% 
 
-means1 = merge_filt.groupby('Sub_Repeats')[col_means].mean()
-std1 = merge_filt.groupby('Sub_Repeats')[col_means].std()
 
-means1['PH_1515_STD_net'] = Error_Prop(means1['PH_1515_STD_norm'], means1['PH_1515_BP_norm'], std1['PH_1515_BP_norm'])
-means1['PH_1430_STD_net'] = Error_Prop(means1['PH_1430_STD_norm'], means1['PH_1430_BP_norm'], std1['PH_1430_BP_norm'])
+col_means_lim = ['H2OT_MEAN', 'H2OT_STD', 'CO2_MEAN', 'CO2_STD']
+counts1 = merge1.groupby('Repeats')['H2OT_MEAN'].count()
+
+std1 = merge1.groupby('Repeats')[col_means_lim].std()
+# std.to_csv('std.csv')
+
+means1 = merge1.groupby('Repeats')[col_means_lim].mean()
 means1['H2OT_STD_net'] = Error_Prop(means1['H2OT_STD'], means1['H2OT_MEAN'], std1['H2OT_MEAN'])
 means1['CO2_STD_net']  = Error_Prop(means1['CO2_STD'], means1['CO2_MEAN'], std1['CO2_MEAN'])
-means1.to_csv('means_sub.csv')
-
+means1['Counts'] = counts1
+# means1.to_csv('standard_statistics.csv')
+means1
 
 # %% 
 

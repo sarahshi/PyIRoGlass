@@ -70,17 +70,17 @@ for hj_file_path, data in DICT_filt.items():
     column_names = ["Wavenumber", "Absorbance"]
     csv_data = pd.read_csv(standards_path+common_part+'.csv', names=column_names)
     csv_data = csv_data.set_index('Wavenumber')
-    ax.plot(csv_data[1250:2400].index, csv_data[1250:2400].Absorbance, label='FTIR Spectrum')
+    ax.plot(csv_data.loc[1250:2400].index, csv_data.loc[1250:2400].Absorbance, label='FTIR Spectrum')
 
     hj_data = pd.read_csv(hj_path+common_part+'_fitted_baseline.csv', names=column_names)
     hj_data = hj_data.set_index('Wavenumber')
-    ax.plot(hj_data[1250:2400].index, hj_data[1250:2400].Absorbance, label='Devolatilized Baseline')
+    ax.plot(hj_data.loc[1250:2400].index, hj_data[1250:2400].Absorbance, label='Devolatilized Baseline')
 
     mc3_output = np.load(npz_path+common_part+'.npz')
     Nvectors=5
     PC_BP = mc3_output['bestp'][0:Nvectors]
     PC_STD = mc3_output['stdp'][0:Nvectors]
-    Baseline_Solve_BP = PC_BP * PCmatrix.T
+    Baseline_Solve_BP = PC_BP @ PCmatrix.T
     Baseline_Solve_BP = np.asarray(Baseline_Solve_BP).ravel()
 
     m_BP, b_BP = mc3_output['bestp'][-2:None]
@@ -96,27 +96,6 @@ for hj_file_path, data in DICT_filt.items():
     ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
     plt.savefig('png/'+common_part+'_BLcomp.png', bbox_inches='tight', pad_inches = 0.025)
 
-
-# badspec = np.array(['CI_IPGP_B6_1_50x50_256s_sp1', 'CI_IPGP_B6_2_50x50_256s_sp1', 'CI_IPGP_B6_1_50x50_256s_sp2', 'CI_IPGP_NBO_2_2_1_100x100_256s_sp1', 
-#                     'CI_Ref_13_1_100x100_256s_sp1', 'CI_Ref_13_1_100x100_256s_sp2', 'CI_Ref_13_1_100x100_256s_sp3', 'CI_Ref_13_1_100x100_256s_sp4', 
-#                     'CI_Ref_22_1_100x100_256s_sp1', 'CI_Ref_22_1_100x100_256s_sp2', 'CI_Ref_22_1_100x100_256s_sp3', 
-#                     'CI_Ref_23_1_100x100_256s_040523_sp1', 'CI_Ref_23_1_100x100_256s_040523_sp3', 'CI_Ref_23_1_100x100_256s_sp4', 'CI_Ref_23_1_100x100_256s_sp5',
-#                     'CI_Ref_25_1_100x100_256s_sp3',
-#                     'CI_Ref_bas_1_1_100x100_256s_sp1', 'CI_Ref_bas_1_1_100x100_256s_sp2', 
-#                     'CI_Ref_bas_1_2_100x100_256s_sp1', 'CI_Ref_bas_1_2_100x100_256s_sp2', 
-#                     'CI_Ref_bas_2_1_100x100_256s_sp1', 
-#                     'CI_Ref_bas_2_2_100x100_256s_4sp1', 'CI_Ref_bas_2_2_100x100_256s_sp2', 'CI_Ref_bas_2_2_100x100_256s_sp3', 
-#                     'CI_Ref_bas_2_3_100x100_256s_sp1', 
-#                     'CI_Ref_bas_3_1_100x100_256s_051423_sp1', 'CI_Ref_bas_3_2_100x100_256s_051423_sp1', 'CI_Ref_bas_3_3_100x100_256s_sp1', 
-#                     'CI_Ref_bas_4_1_100x100_256s_sp1', 'CI_Ref_bas_4_1_100x100_256s_sp2',
-#                     'LMT_BA3_2_50x50_256s_sp1', 'LMT_BA3_2_50x50_256s_sp2', 'CI_LMT_BA5_2_50x50x_256s_sp1', 
-#                     'ND70_02_01_06032022_150x150_sp1',
-#                     'ND70_5_2_29June2022_150x150_sp2',  'ND70_05_02_06032022_150x150_sp1', 'ND70_05_02_06032022_150x150_sp2', 'ND70_05_02_06032022_150x150_sp3',
-#                     'ND70_05_03_06032022_80x100_sp3', 'ND70_0503_29June2022_95x80_256s_sp2',
-#                     'ND70_06_02_75um', 'ND70_6-2_08042022_150x150_sp1', 'ND70_6-2_08042022_150x150_sp2', 'ND70_6-2_08042022_150x150_sp3'])
-# badspec_with_suffix = [item + '_fitted_baseline' for item in badspec]
-
-
 # %% 
 
 import shutil
@@ -129,8 +108,8 @@ DFS_DICT_ND70 = {key: value for key, value in DFS_DICT_ND70.items() if 'INSOL_' 
 adjusted_DFS_DICT = {key.replace("_fitted_baseline", ""): value for key, value in DFS_DICT_ND70.items()}
 
 # source_directory = '../Inputs/TransmissionSpectra/Standards/'  
-# source_directory = '../FIGURES/STD/' 
-source_directory = 'png/' 
+source_directory = '../FIGURES/STD/' 
+# source_directory = 'png/' 
 destination_directory = os.path.expanduser('ND70Spec/')  # Adjust the path if needed
 
 # Iterate over all files in the source directory
@@ -144,6 +123,11 @@ for filename in os.listdir(source_directory):
         # Copy the file
         shutil.copy(source_file_path, destination_file_path)
 
+
+# For the PNGs 
+
+# source_directory = 'png/' 
+# destination_directory = os.path.expanduser('ND70Spec/')  # Adjust the path if needed
 
 # for filename in os.listdir(source_directory):
 #     # Remove the _BLcomp.png suffix and the file extension from the filename
@@ -304,8 +288,8 @@ plt.show()
 
 standards_path = path_par + 'Inputs/TransmissionSpectra/Standards/'
 
-keys_of_interest = ['ND70_02-01_30June2022_150x150_sp2', 'ND70_03-01_30June2022_150x150_sp1',
-                    'ND70_4-2_150x150_08042022_sp1', 'ND70_5_2_29June2022_150x150_sp1', 
+keys_of_interest = ['ND70_2_01_100x100_256s_20231013_sp8', 'ND70_03-01_30June2022_150x150_sp1',
+                    'ND70_4-2_150x150_08042022_sp1', 'ND70_5_02_100x100_256s_20231013_sp2', 
                     'ND70_6_2_chip3_100x100_256s_sp1'] # ND70_05_03_06032022_150x50_sp1
 shortened = ['ND70-2-01', 'ND70-3-01', 'ND70-4-02', 'ND70-5-02', 'ND70-6-02']
 annotate = ['A.', 'B.', 'C.', 'D.', 'E.']
