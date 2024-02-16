@@ -536,11 +536,10 @@ def NIR_process(data, wn_low, wn_high, peak):
         peak_fit (pd.DataFrame): A DataFrame of the absorbance data in
             the region of interest, median filtered data, baseline
             subtracted absorbance, and the subtracted peak.
-        peak_krige (pd.DataFrame): A DataFrame of the kriged data output,
-            including the absorbance and standard deviation.
+        krige_out (pd.DataFrame): A DataFrame of the kriged data output.
         PH_krige (float): The peak height obtained after kriging.
         STN (float): The signal to noise ratio.
-    
+
     """
 
     data_H2O = data.loc[wn_low:wn_high]
@@ -625,13 +624,12 @@ def MIR_process(data, wn_low, wn_high):
         wn_high (int): The higher bound wavenumber for MIR H2Ot, 3550.
 
     Returns:
-        data_output (pd.DataFrame): A DataFrame of the absorbance data in
-            the region of interest, median filtered data, baseline
-            subtracted absorbance, and the subtracted peak.
-        krige_out (pd.DataFrame): A DataFrame of the kriged data output,
-            including the absorbance and standard deviation.
+        data_output (pd.DataFrame): A DataFrame of absorbance data, 
+            median filtered data, baseline subtracted absorbance,
+            and the subtracted peak.
+        krige_out (pd.DataFrame): A DataFrame of the kriged data output.
         PH_krige (float): The peak height obtained after kriging.
-    
+
     """
 
     data_H2Ot_3550 = data.loc[wn_low:wn_high]
@@ -752,13 +750,13 @@ def calculate_baselines(dfs_dict, export_path):
             sample. The spectral data is expected to have columns for
             wavenumbers and absorbance values.
         export_path (str, None): The directory path where the output files
-            (CSVs, figures, logs, etc.) should be saved. If `None`, no
+            (CSVs, figures, logs, etc.) should be saved. If None, no
             files will be saved.
 
     Returns:
-        Volatile_PH (pd.DataFrame): A DataFrame consolidating the peak heights
-            for volatile components across all samples, alongside PCA outcomes
-            and other analysis results.
+        data_output (pd.DataFrame): A DataFrame of absorbance data, 
+            median filtered data, baseline subtracted absorbance,
+            and the subtracted peak.
         failures (list): A list of file identifiers for which the analysis
             failed, possibly due to data issues or processing errors.
 
