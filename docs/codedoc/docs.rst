@@ -6,10 +6,10 @@ Data Imports
 ============
 
 .. autoclass:: PyIRoGlass.SampleDataLoader
-   :members:
+   :no-index:
 
 .. autoclass:: PyIRoGlass.VectorLoader
-   :members:
+   :no-index:
 
 
 Building-blocks functions for fitting baselines and peaks
@@ -26,9 +26,12 @@ Building-blocks functions for fitting baselines and peaks
 .. autoclass:: PyIRoGlass.WhittakerSmoother
    :members:
 
+
 .. autofunction:: PyIRoGlass.NIR_process
 
+
 .. autofunction:: PyIRoGlass.MIR_process
+
 
 .. autofunction:: PyIRoGlass.MCMC
 

@@ -534,8 +534,8 @@ def NIR_process(data, wn_low, wn_high, peak):
 
     Returns:
         peak_fit (pd.DataFrame): A DataFrame of the absorbance data in
-            the region of interest, median filtered data, baseline
-            subtracted absorbance, and the subtracted peak.
+                the region of interest, median filtered data, baseline
+                subtracted absorbance, and the subtracted peak.
         krige_out (pd.DataFrame): A DataFrame of the kriged data output.
         PH_krige (float): The peak height obtained after kriging.
         STN (float): The signal to noise ratio.
@@ -625,8 +625,8 @@ def MIR_process(data, wn_low, wn_high):
 
     Returns:
         data_output (pd.DataFrame): A DataFrame of absorbance data, 
-            median filtered data, baseline subtracted absorbance,
-            and the subtracted peak.
+                median filtered data, baseline subtracted absorbance,
+                and the subtracted peak.
         krige_out (pd.DataFrame): A DataFrame of the kriged data output.
         PH_krige (float): The peak height obtained after kriging.
 
