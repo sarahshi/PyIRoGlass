@@ -42,8 +42,16 @@ class SampleDataLoader:
             containing glass chemistry and thickness data.
 
     Methods:
-        load_spectrum_directory(paths, wn_high=5500, wn_low=1000):
-        load_chemistry_thickness(chemistry_thickness_path)
+        load_spectrum_directory(paths, wn_high=5500, wn_low=1000): Loads
+            spectral data from CSV files within a specified wavenumber
+            range, ensuring that the wavenumbers are in ascending order and
+            skipping headers if present.
+        load_chemistry_thickness(chemistry_thickness_path): Loads glass
+            chemistry and thickness data from a CSV file, setting the 'Sample'
+            column as the index.
+        load_all_data(paths, chemistry_thickness_path, wn_high=5500, wn_low=1000): 
+            Loads both spectral data from CSV files and chemistry thickness data
+            from a CSV file.
 
     """
 
@@ -104,12 +112,6 @@ class SampleDataLoader:
 
     def load_spectrum_directory(self, wn_high=5500, wn_low=1000):
 
-        """
-        Loads spectral data from CSV files within a specified wavenumber
-        range, ensuring that the wavenumbers are in ascending order and
-        skipping headers if present.
-        """
-
         if self.spectrum_path is None:
             raise ValueError("Spectrum path is not provided.")
 
@@ -150,11 +152,6 @@ class SampleDataLoader:
 
     def load_chemistry_thickness(self):
 
-        """
-        Loads glass chemistry and thickness data from a CSV file,
-        setting the 'Sample' column as the index.
-        """
-
         if (self.chemistry_thickness_path is None or
                 not os.path.exists(self.chemistry_thickness_path)):
             raise ValueError("Chemistry thickness path is not provided or does not exist.")
@@ -187,20 +184,6 @@ class SampleDataLoader:
 
 
     def load_all_data(self, wn_high=5500, wn_low=1000):
-
-        """
-        Loads both spectral data from CSV files and chemistry thickness data
-        from a CSV file.
-
-        Parameters:
-            spectrum_paths (list[str], optional): A list of paths to CSV files
-                containing spectral data. Defaults to the initialized
-                spectrum_path if not provided.
-            wn_high (int, optional): The highest wavenumber to include in the
-                spectral data output.
-            wn_low (int, optional): The lowest wavenumber to include in the
-                spectral data output.
-        """
 
         if self.spectrum_path is None:
             raise ValueError("Spectrum path is not provided.")
@@ -250,8 +233,8 @@ class VectorLoader:
         H2Om_PC (np.ndarray): The matrix of H2O-modified principal components.
 
     Methods:
-        load_PC(file_name)
-        load_wavenumber(file_name)
+        load_PC(file_name): Loads baseline principal components from an NPZ file.
+        load_wavenumber(file_name): Loads wavenumbers from an NPZ file
 
     """
 
@@ -270,18 +253,6 @@ class VectorLoader:
 
     def load_PC(self, file_name):
 
-        """
-        Loads predetermined principal components from an NPZ file.
-
-        Parameters:
-            file_name (str): The file name of an NPZ file containing principal
-                components.
-
-        Returns:
-            PC_matrix (matrix): Matrix containing the principal components.
-
-        """
-
         file_path = os.path.join(self.base_path, file_name)
         npz = np.load(file_path)
         PC_DF = pd.DataFrame(npz["data"], columns=npz["columns"])
@@ -292,17 +263,6 @@ class VectorLoader:
         return PC_matrix
 
     def load_wavenumber(self, file_name):
-
-        """
-        Loads predetermined wavenumbers from an NPZ file.
-
-        Parameters:
-            file_name (str): Path to a CSV file containing wavenumbers.
-
-        Returns:
-            Wavenumber (np.ndarray): An array of wavenumbers.
-
-        """
 
         file_path = os.path.join(self.base_path, file_name)
         npz = np.load(file_path)
