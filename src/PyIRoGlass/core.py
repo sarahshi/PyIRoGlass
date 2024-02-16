@@ -532,14 +532,6 @@ def NIR_process(data, wn_low, wn_high, peak):
         wn_high (int): The higher bound wavenumber for NIR H2Om or OH.
         peak (str): The H2Om or OH peak of interest.
 
-    Returns:
-        peak_fit (pd.DataFrame): A DataFrame of the absorbance data in
-                the region of interest, median filtered data, baseline
-                subtracted absorbance, and the subtracted peak.
-        krige_out (pd.DataFrame): A DataFrame of the kriged data output.
-        PH_krige (float): The peak height obtained after kriging.
-        STN (float): The signal to noise ratio.
-
     """
 
     data_H2O = data.loc[wn_low:wn_high]
@@ -622,13 +614,6 @@ def MIR_process(data, wn_low, wn_high):
         data (pd.DataFrame): A DataFrame of absorbance data.
         wn_low (int): The lower bound wavenumber for MIR H2Ot, 3550.
         wn_high (int): The higher bound wavenumber for MIR H2Ot, 3550.
-
-    Returns:
-        data_output (pd.DataFrame): A DataFrame of absorbance data, 
-                median filtered data, baseline subtracted absorbance,
-                and the subtracted peak.
-        krige_out (pd.DataFrame): A DataFrame of the kriged data output.
-        PH_krige (float): The peak height obtained after kriging.
 
     """
 
