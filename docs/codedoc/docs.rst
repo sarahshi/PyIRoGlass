@@ -1,16 +1,15 @@
-PyIRoGlass Documentation
-========================
+PyIRoGlass Documentation of Building-Block Functions
+====================================================
 
 
 Data Imports 
 ============
 
 .. automodule:: PyIRoGlass.SampleDataLoader
-   :members: load_spectrum_directory, load_chemistry_thickness, load_all_data
-
+   :members:
 
 .. automodule:: PyIRoGlass.VectorLoader
-   :members: load_PC, load_wavenumber
+   :members:
 
 
 Building-blocks functions for fitting baselines and peaks
