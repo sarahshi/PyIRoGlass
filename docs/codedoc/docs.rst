@@ -1,5 +1,5 @@
-PyIRoGlass Documentation of Building-Block Functions
-====================================================
+PyIRoGlass Documentation
+========================
 
 
 Data Imports 

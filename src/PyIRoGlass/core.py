@@ -43,12 +43,7 @@ class SampleDataLoader:
 
     Methods:
         load_spectrum_directory(paths, wn_high=5500, wn_low=1000):
-            Loads spectral data from CSV files within a specified wavenumber
-            range, ensuring that the wavenumbers are in ascending order and
-            skipping headers if present.
-        load_chemistry_thickness(chemistry_thickness_path):
-            Loads glass chemistry and thickness data from a specified CSV file,
-            setting the 'Sample' column as the index.
+        load_chemistry_thickness(chemistry_thickness_path)
 
     """
 
@@ -110,7 +105,9 @@ class SampleDataLoader:
     def load_spectrum_directory(self, wn_high=5500, wn_low=1000):
 
         """
-        Loads spectral data from CSV files within a specified wavenumber range.
+        Loads spectral data from CSV files within a specified wavenumber
+        range, ensuring that the wavenumbers are in ascending order and
+        skipping headers if present.
         """
 
         if self.spectrum_path is None:
@@ -154,7 +151,8 @@ class SampleDataLoader:
     def load_chemistry_thickness(self):
 
         """
-        Loads glass chemistry and thickness data from a CSV file.
+        Loads glass chemistry and thickness data from a CSV file,
+        setting the 'Sample' column as the index.
         """
 
         if (self.chemistry_thickness_path is None or
@@ -252,10 +250,8 @@ class VectorLoader:
         H2Om_PC (np.ndarray): The matrix of H2O-modified principal components.
 
     Methods:
-        load_PC(file_name):
-            Loads predetermined principal components from an NPZ file.
-        load_wavenumber(file_name):
-            Loads predetermined wavenumbers from an NPZ file.
+        load_PC(file_name)
+        load_wavenumber(file_name)
 
     """
 
