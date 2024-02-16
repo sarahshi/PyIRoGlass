@@ -275,15 +275,15 @@ def calculate_mean_thickness(dfs_dict, n, wn_high, wn_low,
 
     Returns:
         ThickDF (pd.DataFrame): a dataframe containing the thickness
-            calculations for each file
+        calculations for each file. 
 
     Notes:
-        smoothing_wn_width (float): width of the Savitzky-Golay smoothing
-            window, if not used, set to None
-        peak_heigh_min_delta (float): minimum height difference between a
-            peak and its surrounding points
-        peak_search_width (float): the distance (in wavenumbers) to look on
-            either side of a peak to find the corresponding trough
+        smoothing_wn_width (float): Width of the Savitzky-Golay smoothing
+        window, if not used, set to None. 
+        peak_heigh_min_delta (float): Minimum height difference between a
+        peak and its surrounding points.
+        peak_search_width (float): Distance (in wavenumbers) to look on
+        either side of a peak to find the corresponding trough.
     """
 
     ThickDF = pd.DataFrame(

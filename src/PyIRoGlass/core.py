@@ -259,15 +259,11 @@ class VectorLoader:
 
     """
 
-    def __init__(
-        self,
-        base_path=os.path.dirname(__file__),
-        baseline_PC_path="BaselineAvgPC.npz",
-        H2Om_PC_path="H2Om1635PC.npz",
-    ):
-        self.base_path = base_path
-        self.baseline_PC_path = baseline_PC_path
-        self.H2Om_PC_path = H2Om_PC_path
+    def __init__(self):
+
+        self.base_path = os.path.dirname(__file__)
+        self.baseline_PC_path = "BaselineAvgPC.npz"
+        self.H2Om_PC_path = "H2Om1635PC.npz"
         self.wn_high = 2400
         self.wn_low = 1250
 
@@ -532,6 +528,15 @@ def NIR_process(data, wn_low, wn_high, peak):
         wn_high (int): The higher bound wavenumber for NIR H2Om or OH.
         peak (str): The H2Om or OH peak of interest.
 
+    Returns:
+        peak_fit (pd.DataFrame): A DataFrame of the absorbance data in
+        the region of interest, median filtered data, baseline
+        subtracted absorbance, and the subtracted peak.
+        krige_out (pd.DataFrame): A DataFrame of kriged data output.
+        PH_krige (float): The peak height obtained after kriging.
+        STN (float): The signal to noise ratio.
+
+
     """
 
     data_H2O = data.loc[wn_low:wn_high]
@@ -614,6 +619,13 @@ def MIR_process(data, wn_low, wn_high):
         data (pd.DataFrame): A DataFrame of absorbance data.
         wn_low (int): The lower bound wavenumber for MIR H2Ot, 3550.
         wn_high (int): The higher bound wavenumber for MIR H2Ot, 3550.
+
+    Returns:
+        data_output (pd.DataFrame): A DataFrame of absorbance data, 
+        median filtered data, baseline subtracted absorbance,
+        and the subtracted peak.
+        krige_out (pd.DataFrame): A DataFrame of kriged data output.
+        PH_krige (float): The peak height obtained after kriging.
 
     """
 
@@ -1111,6 +1123,7 @@ def beer_lambert(molar_mass, absorbance, density, thickness, epsilon):
         proportional to its concentration. The formula for calculating
         concentration from absorbance is:
         concentration = (1e6*molar_mass*absorbance)/(density*thickness*epsilon)
+
         # https://sites.fas.harvard.edu/~scphys/nsta/error_propagation.pdf
 
     """
@@ -1431,7 +1444,7 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
     The calculate_concentrations function calculates the concentrations
     and uncertainties of volatile components (H2O peak (3550 cm^-1),
     molecular H2O peak (1635 cm^-1), and carbonate peaks (1515 and
-    1430 cm^-1)) in a glass sample based on peak height data, sample
+    1430 cm^-1) in a glass sample based on peak height data, sample
     composition, and wafer thickness. This function uses the Beer-Lambert
     law for absorbance to estimate concentrations and applies Monte Carlo
     simulations to quantify uncertainties. It iteratively adjusts for the
@@ -1944,8 +1957,8 @@ def plot_H2Om_OH(data, files, als_bls, ax_top=None, ax_bottom=None):
 
     Returns:
         None: This function does not return any value. It generates a plot
-            visualizing the spectral data, baseline fits, and peak fits for the
-            provided sample.
+        visualizing the spectral data, baseline fits, and peak fits for the
+        provided sample.
 
     Note:
         The function is designed to work within a larger analytical framework,
@@ -2211,8 +2224,8 @@ def plot_H2Ot_3550(data, files, als_bls, ax=None):
 
     Returns:
         None: This function does not return any value. It generates a plot
-            visualizing the MIR spectral data, baseline fit, and filtered
-            peak fit for the H2Ot peak at 3550 cm^-1.
+        visualizing the MIR spectral data, baseline fit, and filtered
+        peak fit for the H2Ot peak at 3550 cm^-1.
 
     Note:
         The function is designed to work as part of a larger spectroscopic
@@ -2567,7 +2580,7 @@ def plot_trace(posterior, title, zchain=None, pnames=None, thinning=50,
 
     Returns:
         axes (1D list of matplotlib.axes.Axes): List of axes containing
-            the marginal posterior distributions.
+        the marginal posterior distributions.
 
     """
 
