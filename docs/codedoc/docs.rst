@@ -5,11 +5,12 @@ PyIRoGlass Documentation
 Data Imports 
 ============
 
-.. autoclass:: PyIRoGlass.SampleDataLoader
-   :members:
+.. automodule:: PyIRoGlass.SampleDataLoader
+   :members: load_spectrum_directory, load_chemistry_thickness, load_all_data
 
-.. autoclass:: PyIRoGlass.VectorLoader
-   :members:
+
+.. automodule:: PyIRoGlass.VectorLoader
+   :members: load_PC, load_wavenumber
 
 
 Building-blocks functions for fitting baselines and peaks
