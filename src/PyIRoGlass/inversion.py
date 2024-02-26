@@ -11,7 +11,7 @@ def inversion(comp, epsilon, sigma_comp, sigma_epsilon):
 
     """
     Perform a Newtonian inversion on a given set of composition and absorbance
-        coefficient data.
+    coefficient data.
 
     Parameters:
         comp (np.ndarray): A 1D array containing the composition data.
@@ -137,7 +137,7 @@ def least_squares(comp, epsilon, sigma_comp, sigma_epsilon):
 
     """
     Perform a least squares regression on a given set of composition and
-        absorbance coefficient data.
+    absorbance coefficient data.
 
     Parameters:
         comp (np.ndarray): A 1D array containing the composition data.
@@ -175,7 +175,7 @@ def calculate_calibration_error(covariance_matrix):
 
     """
     Calculate the calibration error based on the diagonal elements of
-        a covariance matrix.
+    a covariance matrix.
 
     Parameters:
         covariance_matrix (np.ndarray): A covariance matrix.
@@ -223,7 +223,7 @@ def calculate_R2(actual_values, predicted_values):
 
     """
     Calculate the coefficient of determination given actual and predicted
-        values.
+    values.
 
     Parameters:
         actual_values (np.ndarray): An array of actual values.

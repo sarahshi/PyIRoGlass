@@ -42,13 +42,17 @@ class SampleDataLoader:
             containing glass chemistry and thickness data.
 
     Methods:
-        load_spectrum_directory(paths, wn_high=5500, wn_low=1000):
-            Loads spectral data from CSV files within a specified wavenumber
+        load_spectrum_directory(paths, wn_high=5500, wn_low=1000): Loads
+            spectral data from CSV files within a specified wavenumber
             range, ensuring that the wavenumbers are in ascending order and
             skipping headers if present.
-        load_chemistry_thickness(chemistry_thickness_path):
-            Loads glass chemistry and thickness data from a specified CSV file,
-            setting the 'Sample' column as the index.
+        load_chemistry_thickness(chemistry_thickness_path): Loads glass
+            chemistry and thickness data from a CSV file, setting the 'Sample'
+            column as the index.
+        load_all_data(paths, chemistry_thickness_path, wn_high=5500, wn_low=1000): 
+            Loads both spectral data from CSV files and chemistry thickness data
+            from a CSV file.
+
     """
 
     def __init__(self,
@@ -108,10 +112,6 @@ class SampleDataLoader:
 
     def load_spectrum_directory(self, wn_high=5500, wn_low=1000):
 
-        """
-        Loads spectral data from CSV files within a specified wavenumber range.
-        """
-
         if self.spectrum_path is None:
             raise ValueError("Spectrum path is not provided.")
 
@@ -152,10 +152,6 @@ class SampleDataLoader:
 
     def load_chemistry_thickness(self):
 
-        """
-        Loads glass chemistry and thickness data from a CSV file.
-        """
-
         if (self.chemistry_thickness_path is None or
                 not os.path.exists(self.chemistry_thickness_path)):
             raise ValueError("Chemistry thickness path is not provided or does not exist.")
@@ -188,20 +184,6 @@ class SampleDataLoader:
 
 
     def load_all_data(self, wn_high=5500, wn_low=1000):
-
-        """
-        Loads both spectral data from CSV files and chemistry thickness data
-        from a CSV file.
-
-        Parameters:
-            spectrum_paths (list[str], optional): A list of paths to CSV files
-                containing spectral data. Defaults to the initialized
-                spectrum_path if not provided.
-            wn_high (int, optional): The highest wavenumber to include in the
-                spectral data output.
-            wn_low (int, optional): The lowest wavenumber to include in the
-                spectral data output.
-        """
 
         if self.spectrum_path is None:
             raise ValueError("Spectrum path is not provided.")
@@ -251,21 +233,16 @@ class VectorLoader:
         H2Om_PC (np.ndarray): The matrix of H2O-modified principal components.
 
     Methods:
-        load_PC(file_name):
-            Loads predetermined principal components from an NPZ file.
-        load_wavenumber(file_name):
-            Loads predetermined wavenumbers from an NPZ file.
+        load_PC(file_name): Loads baseline principal components from an NPZ file.
+        load_wavenumber(file_name): Loads wavenumbers from an NPZ file
+
     """
 
-    def __init__(
-        self,
-        base_path=os.path.dirname(__file__),
-        baseline_PC_path="BaselineAvgPC.npz",
-        H2Om_PC_path="H2Om1635PC.npz",
-    ):
-        self.base_path = base_path
-        self.baseline_PC_path = baseline_PC_path
-        self.H2Om_PC_path = H2Om_PC_path
+    def __init__(self):
+
+        self.base_path = os.path.dirname(__file__)
+        self.baseline_PC_path = "BaselineAvgPC.npz"
+        self.H2Om_PC_path = "H2Om1635PC.npz"
         self.wn_high = 2400
         self.wn_low = 1250
 
@@ -275,17 +252,6 @@ class VectorLoader:
         self.H2Om_PC = self.load_PC(self.H2Om_PC_path)
 
     def load_PC(self, file_name):
-
-        """
-        Loads predetermined principal components from an NPZ file.
-
-        Parameters:
-            file_name (str): The file name of an NPZ file containing principal
-                components.
-
-        Returns:
-            PC_matrix (matrix): Matrix containing the principal components.
-        """
 
         file_path = os.path.join(self.base_path, file_name)
         npz = np.load(file_path)
@@ -297,16 +263,6 @@ class VectorLoader:
         return PC_matrix
 
     def load_wavenumber(self, file_name):
-
-        """
-        Loads predetermined wavenumbers from an NPZ file.
-
-        Parameters:
-            file_name (str): Path to a CSV file containing wavenumbers.
-
-        Returns:
-            Wavenumber (np.ndarray): An array of wavenumbers.
-        """
 
         file_path = os.path.join(self.base_path, file_name)
         npz = np.load(file_path)
@@ -332,6 +288,7 @@ def gauss(x, mu, sd, A=1):
 
     Returns:
         G (np.ndarray): The Gaussian fit.
+
     """
 
     G = A * np.exp(-((x - mu) ** 2) / (2 * sd**2))
@@ -351,6 +308,7 @@ def linear(x, m, b):
 
     Returns:
         tilt_offset (np.ndarray): Linear offset.
+
     """
 
     tilt_offset = m * np.arange(0, x.size) + b
@@ -380,6 +338,7 @@ def carbonate(P, x, PCmatrix, H2Om1635_PCmatrix, Nvectors=5):
 
     Returns:
         model_data (np.ndarray): Model data for the carbonate spectra.
+
     """
 
     PC_Weights = np.array([P[0:Nvectors]])
@@ -429,6 +388,7 @@ def als_baseline(intensities, asymmetry_param=0.05, smoothness_param=5e5,
 
     Returns:
         z (np.ndarray): Baseline of the input signal.
+
     """
 
     smoother = WhittakerSmoother(intensities, smoothness_param, deriv_order=2)
@@ -471,6 +431,7 @@ class WhittakerSmoother(object):
         y (array-like): Input signal to be smoothed.
         upper_bands (array-like): Upper triangular bands of the matrix used
             for smoothing.
+
     """
 
     def __init__(self, signal, smoothness_param, deriv_order=1):
@@ -514,26 +475,24 @@ def NIR_process(data, wn_low, wn_high, peak):
     then fits a baseline and subtracts it to determine the peak absorbance.
     Next, the data are kriged to further reduce noise and obtain peak height.
     Finally, the signal to noise ratio is calculated, and a warning is issued
-    if the ratio is high.  The function is used three times with different
+    if the ratio is high. The function is used three times with different
     H2Om wavenumber ranges for uncertainty assessment.
 
     Parameters:
         data (pd.DataFrame): A DataFrame of absorbance data.
-        wn_low (int): The Near-IR H2Om or OH wavenumber of interest lower
-            bound.
-        wn_high (int): The Near-IR H2Om or OH wavenumber of interest upper
-            bound.
+        wn_low (int): The lower bound wavenumber for NIR H2Om or OH.
+        wn_high (int): The higher bound wavenumber for NIR H2Om or OH.
         peak (str): The H2Om or OH peak of interest.
 
     Returns:
-        Tuple containing the following elements:
-            peak_fit (pd.DataFrame): A DataFrame of the absorbance data in
-                the region of interest, median filtered data, baseline
-                subtracted absorbance, and the subtracted peak.
-            peak_krige (pd.DataFrame): A DataFrame of the kriged data output,
-                including the absorbance and standard deviation.
-            PH_krige (float): The peak height obtained after kriging.
-            STN (float): The signal to noise ratio.
+        peak_fit (pd.DataFrame): A DataFrame of the absorbance data in
+        the region of interest, median filtered data, baseline
+        subtracted absorbance, and the subtracted peak.
+        krige_out (pd.DataFrame): A DataFrame of kriged data output.
+        PH_krige (float): The peak height obtained after kriging.
+        STN (float): The signal to noise ratio.
+
+
     """
 
     data_H2O = data.loc[wn_low:wn_high]
@@ -614,18 +573,16 @@ def MIR_process(data, wn_low, wn_high):
 
     Parameters:
         data (pd.DataFrame): A DataFrame of absorbance data.
-        wn_low (int): The Near-IR H2O/OH wavenumber of interest lower bound.
-        wn_high (int): The Near-IR H2O/OH wavenumber of interest upper bound.
-        peak (str): The H2O or OH peak of interest.
+        wn_low (int): The lower bound wavenumber for MIR H2Ot, 3550.
+        wn_high (int): The higher bound wavenumber for MIR H2Ot, 3550.
 
     Returns:
-        Tuple containing the following elements:
-            data_output (pd.DataFrame): A DataFrame of the absorbance data in
-                the region of interest, median filtered data, baseline
-                subtracted absorbance, and the subtracted peak.
-            krige_out (pd.DataFrame): A DataFrame of the kriged data output,
-                including the absorbance and standard deviation.
-            PH_krige (float): The peak height obtained after kriging.
+        data_output (pd.DataFrame): A DataFrame of absorbance data, 
+        median filtered data, baseline subtracted absorbance,
+        and the subtracted peak.
+        krige_out (pd.DataFrame): A DataFrame of kriged data output.
+        PH_krige (float): The peak height obtained after kriging.
+
     """
 
     data_H2Ot_3550 = data.loc[wn_low:wn_high]
@@ -676,6 +633,7 @@ def MCMC(data, uncert, indparams, log, savefile):
 
     Returns:
         mc3_output (mc3.output): The output of the Monte Carlo-Markov Chain.
+
     """
 
     # Define initial values, limits, and step sizes for parameters
@@ -745,15 +703,16 @@ def calculate_baselines(dfs_dict, export_path):
             sample. The spectral data is expected to have columns for
             wavenumbers and absorbance values.
         export_path (str, None): The directory path where the output files
-            (CSVs, figures, logs, etc.) should be saved. If `None`, no
+            (CSVs, figures, logs, etc.) should be saved. If None, no
             files will be saved.
 
     Returns:
-        Volatile_PH (pd.DataFrame): A DataFrame consolidating the peak heights
-            for volatile components across all samples, alongside PCA outcomes
-            and other analysis results.
+        data_output (pd.DataFrame): A DataFrame of absorbance data, 
+            median filtered data, baseline subtracted absorbance,
+            and the subtracted peak.
         failures (list): A list of file identifiers for which the analysis
             failed, possibly due to data issues or processing errors.
+
     """
 
     path_beg = os.getcwd() + "/"
@@ -1120,7 +1079,9 @@ def beer_lambert(molar_mass, absorbance, density, thickness, epsilon):
         proportional to its concentration. The formula for calculating
         concentration from absorbance is:
         concentration = (1e6*molar_mass*absorbance)/(density*thickness*epsilon)
+
         # https://sites.fas.harvard.edu/~scphys/nsta/error_propagation.pdf
+
     """
 
     concentration = pd.Series(dtype='float')
@@ -1178,6 +1139,7 @@ def beer_lambert_error(N, molar_mass,
         concentration distribution.
 
         # https://astrofrog.github.io/py4sci/_static/Practice%20Problem%20-%20Monte-Carlo%20Error%20Propagation%20-%20Sample%20Solution.html
+
     """
 
     gaussian_concentration = (
@@ -1219,6 +1181,7 @@ def calculate_density(composition, T, P, model="LS"):
             the glass composition
         density (float): glass density at room temperature and pressure
             (in kg/m^3)
+
     """
 
     # Define a dictionary of molar masses for each oxide
@@ -1437,7 +1400,7 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
     The calculate_concentrations function calculates the concentrations
     and uncertainties of volatile components (H2O peak (3550 cm^-1),
     molecular H2O peak (1635 cm^-1), and carbonate peaks (1515 and
-    1430 cm^-1)) in a glass sample based on peak height data, sample
+    1430 cm^-1) in a glass sample based on peak height data, sample
     composition, and wafer thickness. This function uses the Beer-Lambert
     law for absorbance to estimate concentrations and applies Monte Carlo
     simulations to quantify uncertainties. It iteratively adjusts for the
@@ -1460,14 +1423,12 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
             Default is 1 bar.
 
     Returns:
-        density_epsilon (pd.DataFrame): DataFrame containing density ('Density'
-            column) and extinction coefficient ('epsilon' column) for each
-            sample, providing insight into the properties of the glass under
-            analysis.
-        spreadsheet_f (pd.DataFrame): DataFrame containing calculated volatile
+        concentrations_df (pd.DataFrame): DataFrame containing calculated volatile
             concentrations and their uncertainties for each sample, including
             columns for mean and standard deviation of H2O and CO2 species
-            concentrations.
+            concentrations. ALso contains density ('Density' column) and
+            extinction coefficient ('epsilon' column) for each sample,
+            providing insight into the properties of the glass under analysis.
 
     Note:
         The function assumes that the input composition includes all relevant
@@ -1494,7 +1455,7 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
     }
 
     # Create DataFrames to store volatile data:
-    spreadsheet = pd.DataFrame(
+    concentrations = pd.DataFrame(
         columns=[
             "H2Ot_MEAN",
             "H2Ot_STD",
@@ -1517,7 +1478,7 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
     )
 
     # Dataframe for saturated concentrations
-    spreadsheet_sat = pd.DataFrame(columns=spreadsheet.columns)
+    concentrations_sat = pd.DataFrame(columns=concentrations.columns)
 
     # Dataframe for storing glass density data
     density_df = pd.DataFrame(columns=["Density"])
@@ -1676,7 +1637,7 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
 
         # Save volatile concentrations and uncertainties to DataFrame
         density_df.loc[kk] = pd.Series({"Density": density[kk]})
-        spreadsheet.loc[kk] = pd.Series(
+        concentrations.loc[kk] = pd.Series(
             {
                 "H2Ot_3550_M": H2Ot_3550_M,
                 "H2Ot_3550_STD": H2Ot_3550_M_STD,
@@ -1700,19 +1661,19 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
     # Beer-Lambert calculation again, and have total H2O = H2Om + OH-
     for ll in Volatile_PH.index:
         if Volatile_PH["H2Ot_3550_SAT"][ll] == "-":
-            H2Ot_3550_M = spreadsheet["H2Ot_3550_M"][ll]
-            H2Om_1635_BP = spreadsheet["H2Om_1635_BP"][ll]
-            CO2_1515_BP = spreadsheet["CO2_1515_BP"][ll]
-            CO2_1430_BP = spreadsheet["CO2_1430_BP"][ll]
-            H2Om_5200_M = spreadsheet["H2Om_5200_M"][ll]
-            OH_4500_M = spreadsheet["OH_4500_M"][ll]
+            H2Ot_3550_M = concentrations["H2Ot_3550_M"][ll]
+            H2Om_1635_BP = concentrations["H2Om_1635_BP"][ll]
+            CO2_1515_BP = concentrations["CO2_1515_BP"][ll]
+            CO2_1430_BP = concentrations["CO2_1430_BP"][ll]
+            H2Om_5200_M = concentrations["H2Om_5200_M"][ll]
+            OH_4500_M = concentrations["OH_4500_M"][ll]
 
-            H2Ot_3550_M_STD = spreadsheet["H2Ot_3550_STD"][ll]
-            H2Om_1635_BP_STD = spreadsheet["H2Om_1635_STD"][ll]
-            CO2_1515_BP_STD = spreadsheet["CO2_1515_STD"][ll]
-            CO2_1430_BP_STD = spreadsheet["CO2_1430_STD"][ll]
-            H2Om_5200_M_STD = spreadsheet["H2Om_5200_STD"][ll]
-            OH_4500_M_STD = spreadsheet["OH_4500_STD"][ll]
+            H2Ot_3550_M_STD = concentrations["H2Ot_3550_STD"][ll]
+            H2Om_1635_BP_STD = concentrations["H2Om_1635_STD"][ll]
+            CO2_1515_BP_STD = concentrations["CO2_1515_STD"][ll]
+            CO2_1430_BP_STD = concentrations["CO2_1430_STD"][ll]
+            H2Om_5200_M_STD = concentrations["H2Om_5200_STD"][ll]
+            OH_4500_M_STD = concentrations["OH_4500_STD"][ll]
             density_sat = density_df["Density"][ll]
 
         elif Volatile_PH["H2Ot_3550_SAT"][ll] == "*":
@@ -1857,7 +1818,7 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
             CO2_1430_BP_STD *= 10000
 
         density_sat_df.loc[ll] = pd.Series({"Density_Sat": density_sat})
-        spreadsheet_sat.loc[ll] = pd.Series(
+        concentrations_sat.loc[ll] = pd.Series(
             {
                 "H2Ot_3550_M": H2Ot_3550_M,
                 "H2Ot_3550_SAT": Volatile_PH["H2Ot_3550_SAT"][ll],
@@ -1884,36 +1845,37 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
         )
 
     # Create final spreadsheet
-    spreadsheet_f = pd.concat([spreadsheet_sat, stnerror], axis=1)
-    density_epsilon = pd.concat([density_df, density_sat_df, epsilon], axis=1)
+    concentrations_df = pd.concat([concentrations_sat, stnerror, 
+                                   density_df, density_sat_df, epsilon],
+                                   axis=1)
 
     # Output different values depending on saturation.
-    for m in spreadsheet.index:
-        if spreadsheet["H2Ot_3550_SAT"][m] == "*":
-            H2O_mean = (spreadsheet["H2Om_1635_BP"][m] +
-                        spreadsheet["OH_4500_M"][m])
+    for m in concentrations.index:
+        if concentrations["H2Ot_3550_SAT"][m] == "*":
+            H2O_mean = (concentrations["H2Om_1635_BP"][m] +
+                        concentrations["OH_4500_M"][m])
             H2O_std = (
-                (spreadsheet["H2Om_1635_STD"][m] ** 2)
-                + (spreadsheet["OH_4500_STD"][m] ** 2)
+                (concentrations["H2Om_1635_STD"][m] ** 2)
+                + (concentrations["OH_4500_STD"][m] ** 2)
             ) ** (1 / 2) / 2
 
-        elif spreadsheet["H2Ot_3550_SAT"][m] == "-":
-            H2O_mean = spreadsheet["H2Ot_3550_M"][m]
-            H2O_std = spreadsheet["H2Ot_3550_STD"][m]
+        elif concentrations["H2Ot_3550_SAT"][m] == "-":
+            H2O_mean = concentrations["H2Ot_3550_M"][m]
+            H2O_std = concentrations["H2Ot_3550_STD"][m]
         mean_vol.loc[m] = pd.Series({"H2Ot_MEAN": H2O_mean,
                                      "H2Ot_STD": H2O_std})
-    mean_vol["CO2_MEAN"] = (spreadsheet["CO2_1515_BP"] +
-                            spreadsheet["CO2_1430_BP"]) / 2
+    mean_vol["CO2_MEAN"] = (concentrations["CO2_1515_BP"] +
+                            concentrations["CO2_1430_BP"]) / 2
     mean_vol["CO2_STD"] = (
-        (spreadsheet["CO2_1515_STD"] ** 2) + (spreadsheet["CO2_1430_STD"] ** 2)
+        (concentrations["CO2_1515_STD"] ** 2) + (concentrations["CO2_1430_STD"] ** 2)
     ) ** (1 / 2) / 2
 
-    spreadsheet_f["H2Ot_MEAN"] = mean_vol["H2Ot_MEAN"]
-    spreadsheet_f["H2Ot_STD"] = mean_vol["H2Ot_STD"]
-    spreadsheet_f["CO2_MEAN"] = mean_vol["CO2_MEAN"]
-    spreadsheet_f["CO2_STD"] = mean_vol["CO2_STD"]
+    concentrations_df["H2Ot_MEAN"] = mean_vol["H2Ot_MEAN"]
+    concentrations_df["H2Ot_STD"] = mean_vol["H2Ot_STD"]
+    concentrations_df["CO2_MEAN"] = mean_vol["CO2_MEAN"]
+    concentrations_df["CO2_STD"] = mean_vol["CO2_STD"]
 
-    return density_epsilon, spreadsheet_f
+    return concentrations_df
 
 
 # %% Plotting Functions
@@ -1950,8 +1912,8 @@ def plot_H2Om_OH(data, files, als_bls, ax_top=None, ax_bottom=None):
 
     Returns:
         None: This function does not return any value. It generates a plot
-            visualizing the spectral data, baseline fits, and peak fits for the
-            provided sample.
+        visualizing the spectral data, baseline fits, and peak fits for the
+        provided sample.
 
     Note:
         The function is designed to work within a larger analytical framework,
@@ -1960,6 +1922,7 @@ def plot_H2Om_OH(data, files, als_bls, ax_top=None, ax_bottom=None):
         input. The function modifies the provided `ax_top` and `ax_bottom`
         axes in place if they are provided; otherwise, it creates a new
         figure and axes for plotting.
+
     """
 
     if ax_top is None or ax_bottom is None:
@@ -2216,8 +2179,8 @@ def plot_H2Ot_3550(data, files, als_bls, ax=None):
 
     Returns:
         None: This function does not return any value. It generates a plot
-            visualizing the MIR spectral data, baseline fit, and filtered
-            peak fit for the H2Ot peak at 3550 cm^-1.
+        visualizing the MIR spectral data, baseline fit, and filtered
+        peak fit for the H2Ot peak at 3550 cm^-1.
 
     Note:
         The function is designed to work as part of a larger spectroscopic
@@ -2227,6 +2190,7 @@ def plot_H2Ot_3550(data, files, als_bls, ax=None):
         the function creates a new figure and axis for plotting, which might
         not be ideal for integrating this plot into multi-panel figures or
         more complex visual layouts.
+
     """
 
     if ax is None:
@@ -2334,6 +2298,7 @@ def derive_carbonate(data, files, mc3_output, export_path=None):
         baselines (pd.DataFrame): DataFrame containing an ensemble of
             baseline fits derived from the posterior distribution to represent
             uncertainty in the baseline estimation. Indexed by wavenumber.
+
     """
 
     vector_loader = VectorLoader()
@@ -2474,6 +2439,7 @@ def plot_carbonate(data, files, mc3_output, ax=None):
         the function creates a new figure and axis for plotting, which might
         not be ideal for integrating this plot into multi-panel figures or
         more complex visual layouts.
+
     """
 
     if ax is None:
@@ -2569,7 +2535,8 @@ def plot_trace(posterior, title, zchain=None, pnames=None, thinning=50,
 
     Returns:
         axes (1D list of matplotlib.axes.Axes): List of axes containing
-            the marginal posterior distributions.
+        the marginal posterior distributions.
+
     """
 
     # Get indices for samples considered in final analysis:
@@ -2675,6 +2642,7 @@ def plot_modelfit(data, uncert, indparams, model, title, nbins=75,
     Returns:
         ax (matplotlib.axes.Axes): Axes instance containing the marginal
         posterior distributions.
+
     """
 
     # Bin down array:
