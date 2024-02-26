@@ -188,20 +188,20 @@ class test_conc_outputs(unittest.TestCase):
 
     def test_concentration(self):  # OL53
 
-        density_epsilon, mega_spreadsheet = pig.calculate_concentrations(
+        concentrations = pig.calculate_concentrations(
             self.PH, self.MI_Composition, self.thickness)
         expected_H2O = 4.03892743514451
         expected_CO2 = 727.658175499597
         self.assertAlmostEqual(
             float(
-                mega_spreadsheet['H2Ot_MEAN'].iloc[0]),
+                concentrations['H2Ot_MEAN'].iloc[0]),
             expected_H2O,
             self.decimalPlace,
             msg="H2Ot test values from the calculate_concentrations "
             "function do not agree")
         self.assertAlmostEqual(
             float(
-                mega_spreadsheet['CO2_MEAN'].iloc[0]),
+                concentrations['CO2_MEAN'].iloc[0]),
             expected_CO2,
             self.decimalPlace,
             msg="CO2m test values from the calculate_concentrations "
@@ -257,20 +257,20 @@ class test_conc_outputs_saturated(unittest.TestCase):  # OL49
 
     def test_concentration(self):
 
-        density_epsilon, mega_spreadsheet = pig.calculate_concentrations(
+        concentrations = pig.calculate_concentrations(
             self.PH, self.MI_Composition, self.thickness)
         expected_H2O = 2.54389275724829
         expected_CO2 = 748.715067109224
         self.assertAlmostEqual(
             float(
-                mega_spreadsheet['H2Ot_MEAN'].iloc[0]),
+                concentrations['H2Ot_MEAN'].iloc[0]),
             expected_H2O,
             self.decimalPlace,
             msg="H2Ot test values from the saturated calculate_concentrations "
             "function do not agree")
         self.assertAlmostEqual(
             float(
-                mega_spreadsheet['CO2_MEAN'].iloc[0]),
+                concentrations['CO2_MEAN'].iloc[0]),
             expected_CO2,
             self.decimalPlace,
             msg="CO2m test values from the saturated calculate_concentrations "
