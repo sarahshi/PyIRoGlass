@@ -45,6 +45,16 @@ For example, here a screenshot of a CSV spreadsheet containing the glass composi
 
 For the liquid composition, ``PyIRoGlass`` allows users to specify how they partition Fe between ferrous and ferric iron, because glass density changes due to the proportion of Fe\ :sup:`3+`. To avoid ambiguity, the ChemThick file handles this by providing two columns for FeO and Fe\ :sub:`2`O\ :sub:`3` . If the speciation is unknown, input all Fe as FeO and leave the Fe\ :sub:`2`O\ :sub:`3`  cells empty. This will not constitute the largest uncertainty, as the molar absorptivities and thicknesses impact concentrations more significantly. 
 
+=================
+Importing Package
+=================
+
+We import the package PyIRoGlass in Python. 
+
+.. code-block:: python
+
+   import PyIRoGlass as pig
+
 ========================================
 PyIRoGlass for Transmission FTIR Spectra
 ========================================
@@ -54,8 +64,8 @@ We use the os package in Python to facilitate navigation to various directories 
 .. code-block:: python
 
     PATH = os.getcwd() + '/Inputs/TransmissionSpectra/YourDirectoryName/'
-    FILES = sorted(glob.glob(PATH + "*"))
-    DFS_FILES, DFS_DICT = pig.Load_SampleCSV(FILES, wn_high = 5500, wn_low = 1000)
+    loader = pig.SampleDataLoader(spectrum_path=PATH)
+    DFS_FILES, DFS_DICT = loader.load_spectrum_directory(FILES)
 
 pig.Load_SampleCSV returns DFS_FILES, a list of all the spectra names (without .CSV), and DFS_DICT, a dictionary of the wavenumber and absorbance of each sample. 
 
@@ -64,7 +74,8 @@ To load the CSV containing glass chemistry and thickness information, provide th
 .. code-block:: python
 
     CHEMTHICK_PATH = os.getcwd() + '/Inputs/ChemThick.csv'
-    MICOMP, THICKNESS = pig.Load_ChemistryThickness(CHEMTHICK_PATH)
+    loader = pig.SampleDataLoader(chemistry_thickness_path=CHEMTHICK_PATH)
+    MICOMP, THICKNESS = loader.load_chemistry_thickness(CHEMTHICK_PATH)
 
 Inspect each returned data type to ensure that the data imports are successful. 
 
@@ -78,21 +89,21 @@ Loading reflectance FTIR spectra occurs through a near-identical process. Define
 .. code-block:: python
 
     REF_PATH = os.getcwd() + '/Inputs/ReflectanceSpectra/YourDirectoryName/'
-    REF_FILES, REF_DICT = pig.Load_SampleCSV(REF_FILES, wn_high = wn_high, wn_low = wn_low)
-    REF_FILES = sorted(glob.glob(REF_PATH + "*"))
+    loader = pig.SampleDataLoader(spectrum_path=PATH)
+    REF_FILES, REF_DICT = loader.load_spectrum_directory(REF_PATH, wn_high=wn_high, wn_low=wn_low)
 
 For olivine, specify the following wavenumber range based on :cite:t:`NicholsandWysoczanski2007` and calculate the relevant reflectance index :math:`n` from :cite:t:`DHZ1992`. 
 
 .. code-block:: python
 
-    REF_FILES, REF_DICT = pig.Load_SampleCSV(REF_FILES, wn_high = 2700, wn_low = 2100)
-    n_ol = pig.ReflectanceIndex(XFo) 
+    REF_FILES, REF_DICT = loader.load_spectrum_directory(REF_PATH, wn_high=2700, wn_low=2100)
+    n_ol = pig.reflectance_index(XFo) 
 
 For glass, specify the following wavenumber range based on :cite:t:`NicholsandWysoczanski2007` and enter the relevant reflectance index :math:`n`. We use the reflectance index for basaltic glasses from :cite:t:`NicholsandWysoczanski2007` here. 
 
 .. code-block:: python
 
-    REF_FILES, REF_DICT = pig.Load_SampleCSV(REF_FILES, wn_high = 2850, wn_low = 1700)
+    REF_FILES, REF_DICT = loader.load_spectrum_directory(REF_PATH, wn_high=2850, wn_low=1700)
     n_gl = 1.546 
 
 

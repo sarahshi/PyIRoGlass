@@ -19,7 +19,7 @@ Read the [documentation](https://pyiroglass.readthedocs.io/en/latest/) for a run
 If you do not have Python installed locally, run PyIRoGlass on [Google Colab](https://colab.research.google.com/github/SarahShi/PyIRoGlass/blob/main/PyIRoGlass_RUN_colab.ipynb).
 
 ## Run and Install Locally
-Obtain a version of Python between 3.7 and 3.11 if you do not already have it installed. PyIRoGlass can be installed with one line. Open terminal and type the following:
+Obtain a version of Python between 3.8 and 3.12 if you do not already have it installed. PyIRoGlass can be installed with one line. Open terminal and type the following:
 
 ```
 pip install PyIRoGlass
