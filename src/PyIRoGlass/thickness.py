@@ -288,14 +288,14 @@ def calculate_mean_thickness(dfs_dict, n, wn_high, wn_low,
 
     ThickDF = pd.DataFrame(
         columns=[
+            'Thickness_M',
+            'Thickness_STD',
             'Peak_Thicknesses',
             'Peak_Thickness_M',
             'Peak_Thickness_STD',
             'Trough_Thicknesses',
             'Trough_Thickness_M',
-            'Trough_Thickness_STD',
-            'Thickness_M',
-            'Thickness_STD'
+            'Trough_Thickness_STD'
             ]
             )
 
@@ -363,6 +363,8 @@ def calculate_mean_thickness(dfs_dict, n, wn_high, wn_low,
                 ).round(2)
 
             ThickDF.loc[f"{filename}"] = pd.Series({
+                'Thickness_M': mean_t,
+                'Thickness_STD': std_t,
                 'Peak_Thicknesses': t_peaks_filt,
                 'Peak_Thickness_M': mean_t_peaks_filt,
                 'Peak_Thickness_STD': std_t_peaks_filt,
@@ -372,9 +374,7 @@ def calculate_mean_thickness(dfs_dict, n, wn_high, wn_low,
                 'Trough_Thickness_M': mean_t_troughs_filt,
                 'Trough_Thickness_STD': std_t_troughs_filt,
                 'Trough_Loc': troughs_loc_filt,
-                'Trough_Diff': troughs_diff_filt,
-                'Thickness_M': mean_t,
-                'Thickness_STD': std_t
+                'Trough_Diff': troughs_diff_filt
                 })
 
         except Exception as e:

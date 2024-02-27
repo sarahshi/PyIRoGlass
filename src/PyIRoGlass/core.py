@@ -548,7 +548,7 @@ def NIR_process(data, wn_low, wn_high, peak):
     PH_krige_index = int(
         data_output["Peak_Subtract"][
             data_output["Peak_Subtract"] == PH_max
-        ].index.to_numpy()
+        ].index.to_numpy()[0]
     )
     PH_std = (
         data_output["Peak_Subtract"]

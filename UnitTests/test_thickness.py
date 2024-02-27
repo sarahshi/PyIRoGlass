@@ -77,6 +77,7 @@ class test_thickness(unittest.TestCase):
                 remove_baseline=False,
                 plotting=False,
                 phaseol=True)
+
             thickness_results_gl = pig.calculate_mean_thickness(
                 self.dfs_dict,
                 1.546,
@@ -84,11 +85,12 @@ class test_thickness(unittest.TestCase):
                 self.wn_low_gl,
                 remove_baseline=False,
                 plotting=False,
-                phaseol=True)
+                phaseol=False)
+
             result_ol = float(thickness_results_ol['Thickness_M'].iloc[0])
             expected_ol = 79.81
             result_gl = float(thickness_results_gl['Thickness_M'].iloc[0])
-            expected_gl = 88.34
+            expected_gl = 8.83
             self.assertAlmostEqual(
                 result_ol,
                 expected_ol,
@@ -103,6 +105,7 @@ class test_thickness(unittest.TestCase):
                 2,
                 msg="Glass thickness test and expected values from "
                     "calculate_mean_thickness function disagree")
+
             if thickness_results_ol.isnull().any().any():
                 self.assertTrue(thickness_results_ol.isnull().any().any(), 
                                 "Expected NaN values in the result due to processing failures.")
@@ -119,6 +122,11 @@ class test_thickness(unittest.TestCase):
 
         except Exception as e:
             self.fail(f"Unexpected exception occurred: {e}")
+
+    def test_invalid_wavenumber_range(self):
+
+        with self.assertRaises(ValueError):
+            pig.calculate_mean_thickness(self.dfs_dict, 1.546, self.wn_high_gl, self.wn_low_gl)
 
 if __name__ == '__main__':
     unittest.main()
