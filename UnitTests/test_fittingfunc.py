@@ -189,7 +189,7 @@ class test_fitting_functions(unittest.TestCase):
     def test_MCMC_exportpath(self):
 
         temp_export_path = "temp_test_dir"
-        figures_path = os.path.join(temp_export_path, "FIGURES")
+        figures_path = os.path.join("FIGURES", temp_export_path)
         os.makedirs(figures_path, exist_ok=True)
 
         Volatiles_DF, _ = pig.calculate_baselines(
