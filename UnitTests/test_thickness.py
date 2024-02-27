@@ -58,7 +58,7 @@ class test_thickness(unittest.TestCase):
         peak_heigh_min_delta_ol = 0.002
         peak_search_width_ol = 10
         peaks, _ = pig.peakID(self.df_ol, self.wn_high_ol, self.wn_low_ol,
-                              filename=self.file,
+                              filename=self.file_ol,
                               plotting=True,
                               savgol_filter_width=savgol_filter_width_ol,
                               smoothing_wn_width=smoothing_wn_width_ol,

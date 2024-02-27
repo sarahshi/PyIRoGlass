@@ -204,6 +204,7 @@ class test_plot_pyiroglass(unittest.TestCase):
     def test_plot_H2Om_OH_none(self):
 
         warnings.filterwarnings("ignore", module="matplotlib\\..*")
+        warnings.filterwarnings("ignore", category = UserWarning)
 
         before_plot_figures = len(plt.get_fignums())
 

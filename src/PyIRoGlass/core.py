@@ -1945,6 +1945,7 @@ def plot_H2Om_OH(data, files, als_bls, ax_top=None, ax_bottom=None):
     STN_5200_M = np.mean([result["STN"] for result in H2Om_5200_results])
 
     warnings.filterwarnings("ignore", module="matplotlib\\..*")
+    warnings.filterwarnings("ignore", category = UserWarning)
 
     ax_top.plot(data.index, data["Absorbance"], "k", linewidth=1.5)
     ax_top.plot(
@@ -2028,6 +2029,8 @@ def plot_H2Om_OH(data, files, als_bls, ax_top=None, ax_bottom=None):
     ax_top.tick_params(axis="y", direction="in", length=5, pad=6.5)
     ax_top.invert_xaxis()
 
+    warnings.filterwarnings("ignore", module="matplotlib\\..*")
+    warnings.filterwarnings("ignore", category = UserWarning)
     ax_bottom.plot(
         H2Om_5200_results[0]["peak_fit"].index,
         (
@@ -2127,7 +2130,6 @@ def plot_H2Om_OH(data, files, als_bls, ax_top=None, ax_bottom=None):
     )
     ax_bottom.set_xlabel(r"Wavenumber $(\mathregular{cm^{-1}})$")
     ax_bottom.set_ylabel("Absorbance")
-    warnings.filterwarnings("ignore", category=UserWarning)
     ax_bottom.legend(
         [
             r"$\mathregular{H_2O_{m, 5200}}$ Baseline Subtracted",
