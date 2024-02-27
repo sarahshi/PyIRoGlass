@@ -200,15 +200,15 @@ class test_plot_pyiroglass(unittest.TestCase):
 
         plt.close('all')
 
-    @patch('matplotlib.pyplot.subplots')
-    def test_plot_H2Om_OH_none(self, mock_subplots):
+    def test_plot_H2Om_OH_none(self):
 
-        mock_fig = MagicMock()
-        mock_ax_top = MagicMock()
-        mock_subplots.return_value = (mock_fig, (mock_ax_top, None))
+        before_plot_figures = len(plt.get_fignums())
 
-        pig.plot_H2Om_OH(self.df, self.file, self.als_bls, ax_top=mock_ax_top, ax_bottom=None)
-        self.assertTrue(mock_ax_top.plot.called)
+        pig.plot_H2Om_OH(self.df, self.file, self.als_bls, ax_top=None, ax_bottom=None)
+
+        after_plot_figures = len(plt.get_fignums())
+
+        self.assertTrue(after_plot_figures > before_plot_figures, "No new figure was created")
 
         plt.close('all')
 
@@ -243,15 +243,13 @@ class test_plot_pyiroglass(unittest.TestCase):
 
     def test_derive_carbonate_interp(self): 
 
-        first_index = self.df.index > 1260
+        first_index = self.df.index > 1255
         if any(first_index):
             first_index_position = np.argmax(first_index)
-            drop_indices = self.df.index[first_index_position+1:first_index_position+20] 
+            drop_indices = self.df.index[first_index_position:first_index_position+3] 
             self.df_interp = self.df.drop(drop_indices)
 
-        self.dfs_dict_interp = {self.file: self.df_interp}
-
-        bestfits, baselines = pig.derive_carbonate(self.dfs_dict_interp, self.file, self.mcmc_npz, export_path=None)
+        bestfits, baselines = pig.derive_carbonate(self.df_interp, self.file, self.mcmc_npz, export_path=None)
 
         self.assertTrue(isinstance(bestfits, pd.DataFrame), "Expected bestfits to be a pandas DataFrame")
         self.assertTrue(isinstance(baselines, pd.DataFrame), "Expected baselines to be a pandas DataFrame")

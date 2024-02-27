@@ -20,7 +20,9 @@ class test_thickness(unittest.TestCase):
         self.df = pd.DataFrame({'Wavenumber': self.wn, 'Absorbance': self.abs})
         self.df.set_index('Wavenumber', inplace=True)
         self.dfs_dict = {self.file: self.df}
-        self.dfs_dict_malformed = {"file1": "invalid data"}
+
+        self.dfs_malformed = pd.DataFrame({'Wavenumber': self.file, 'Absorbance': self.df})
+        self.dfs_malformed_dict = {self.file: self.dfs_malformed}
 
     def test_reflectance_index(self):
 
@@ -113,10 +115,10 @@ class test_thickness(unittest.TestCase):
     def test_exception_handling(self):
         with self.assertRaises(Exception):
             pig.calculate_mean_thickness(
-                self.dfs_dict_malformed,
+                self.dfs_malformed_dict,
                 1.546,
                 self.wn_high_ol,
-                self.wn_low_ol,
+                self.wn_low,
                 remove_baseline=True,
                 plotting=False,
                 phaseol=True

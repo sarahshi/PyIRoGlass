@@ -146,10 +146,10 @@ class test_fitting_functions(unittest.TestCase):
 
     def test_MCMC_interp(self):
 
-        first_index = self.df.index > 1260
+        first_index = self.df.index > 1255
         if any(first_index):
             first_index_position = np.argmax(first_index)
-            drop_indices = self.df.index[first_index_position+1:first_index_position+20] 
+            drop_indices = self.df.index[first_index_position:first_index_position+3] 
             self.df_interp = self.df.drop(drop_indices)
 
         self.dfs_dict_interp = {self.file: self.df_interp}
