@@ -188,9 +188,22 @@ class test_fitting_functions(unittest.TestCase):
 
     def test_MCMC_exportpath(self):
 
-        temp_export_path = "temp_test_dir"
-        figures_path = os.path.join("FIGURES", temp_export_path)
-        os.makedirs(figures_path, exist_ok=True)
+        path_beg = os.getcwd() + "/"
+        temp_export_path = os.path.join(path_beg, "temp_test_dir")
+        output_dirs = [
+            "FIGURES",
+            "PLOTFILES",
+            "NPZTXTFILES",
+            "LOGFILES",
+            "BLPEAKFILES",
+            "PKLFILES",
+        ]
+        paths = {}
+        for dir_name in output_dirs:
+            full_path = os.path.join(temp_export_path, dir_name)
+            paths[dir_name] = full_path
+            os.makedirs(full_path, exist_ok=True)
+        fpath = paths["FIGURES"]
 
         Volatiles_DF, _ = pig.calculate_baselines(
             self.dfs_dict, temp_export_path)
@@ -203,7 +216,7 @@ class test_fitting_functions(unittest.TestCase):
                     temp_export_path,
                     "output.csv")))
 
-        figure_files = glob.glob(os.path.join(figures_path, "*.pdf"))
+        figure_files = glob.glob(os.path.join(fpath, "*.pdf"))
         self.assertTrue(len(figure_files) > 0, "No figure files found in the FIGURES subdirectory.")
 
         # Cleanup
