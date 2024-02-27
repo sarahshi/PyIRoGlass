@@ -1,5 +1,6 @@
 import os
 import glob
+import shutil
 import unittest
 import numpy as np
 import pandas as pd
@@ -188,51 +189,68 @@ class test_fitting_functions(unittest.TestCase):
 
     def test_MCMC_exportpath(self):
 
-        path_beg = os.getcwd() + "/"
         temp_export_path = 'temp_test_dir'
+
         output_dirs = [
-            "FIGURES",
-            "PLOTFILES",
-            "NPZTXTFILES",
-            "LOGFILES",
-            "BLPEAKFILES",
-            "PKLFILES",
+            "FIGURES", "PLOTFILES", "NPZTXTFILES", "LOGFILES",
+            "PKLFILES", "BLPEAKFILES", "FINALDATA"
         ]
+        add_dirs = ["TRACE", "HISTOGRAM", "PAIRWISE", "MODELFIT"]
+
+        # Default directory for data export if export_path is not provided
+        default_export_dir = "Samples" if temp_export_path is None else temp_export_path
+
         paths = {}
         for dir_name in output_dirs:
-            full_path = os.path.join(path_beg, dir_name, temp_export_path)
-            paths[dir_name] = full_path
+            if dir_name == "FINALDATA":
+                full_path = os.path.join(os.getcwd(), dir_name)
+            else:
+                full_path = os.path.join(os.getcwd(), dir_name, default_export_dir)
             os.makedirs(full_path, exist_ok=True)
+            paths[dir_name] = full_path
 
-        fpath = os.path.join(paths["FIGURES"], "")
-
-        add_dirs = ["TRACE", "HISTOGRAM", "PAIRWISE", "MODELFIT"]
-        ppath = paths["PLOTFILES"]
+        plotfile_path = paths["PLOTFILES"]
         for add_dir in add_dirs:
-            os.makedirs(os.path.join(ppath, add_dir), exist_ok=True)
+            os.makedirs(os.path.join(plotfile_path, add_dir), exist_ok=True)
+        fpath = paths['FIGURES']
+        fdata = paths['FINALDATA']
 
         Volatiles_DF, _ = pig.calculate_baselines(
             self.dfs_dict, temp_export_path)
-        Volatiles_DF.to_csv(os.path.join(temp_export_path, "output.csv"))
+        Volatiles_DF.to_csv(os.path.join(fdata, "output.csv"))
 
         # Check if the result was exported correctly
         self.assertTrue(
             os.path.exists(
                 os.path.join(
-                    temp_export_path,
+                    fdata,
                     "output.csv")))
 
         figure_files = glob.glob(os.path.join(fpath, "*.pdf"))
         self.assertTrue(len(figure_files) > 0, "No figure files found in the FIGURES subdirectory.")
 
-        # Cleanup
-        for dirpath, dirnames, filenames in os.walk(temp_export_path, topdown=False):
-            for filename in filenames:
-                os.remove(os.path.join(dirpath, filename))
-            for dirname in dirnames:
-                os.rmdir(os.path.join(dirpath, dirname))
-        os.rmdir(temp_export_path)
+        def remove_dir(dir_path):
+            if os.path.exists(dir_path):
+                # Recursively delete directory and all its contents
+                shutil.rmtree(dir_path, ignore_errors=True)
 
+        # Remove subdirectories within temp_export_path for all directories except FINALDATA
+        for dir_name in output_dirs:
+            if dir_name != "FINALDATA":
+                subdirectory_path = os.path.join(os.getcwd(), dir_name, temp_export_path)
+                remove_dir(subdirectory_path)
+
+        # Remove the FINALDATA directory entirely
+        final_data_path = os.path.join(os.getcwd(), "FINALDATA")
+        remove_dir(final_data_path)
+
+        # Optionally, check and remove the top-level directories if they are empty (excluding FINALDATA as it's already removed)
+        for dir_name in output_dirs:
+            if dir_name != "FINALDATA":  # Since FINALDATA is already removed
+                top_level_dir = os.path.join(os.getcwd(), dir_name)
+                # Check if the directory is empty and remove it
+                if not os.listdir(top_level_dir):
+                    remove_dir(top_level_dir)
 
 if __name__ == '__main__':
     unittest.main()
