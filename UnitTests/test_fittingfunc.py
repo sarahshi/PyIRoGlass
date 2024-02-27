@@ -204,9 +204,12 @@ class test_fitting_functions(unittest.TestCase):
             paths[dir_name] = full_path
             os.makedirs(full_path, exist_ok=True)
 
-        # Construct file paths
         fpath = os.path.join(paths["FIGURES"], "")
-        ppath = os.path.join(paths["PLOTFILES"], "")
+
+        add_dirs = ["TRACE", "HISTOGRAM", "PAIRWISE", "MODELFIT"]
+        ppath = paths["PLOTFILES"]
+        for add_dir in add_dirs:
+            os.makedirs(os.path.join(ppath, add_dir), exist_ok=True)
 
         Volatiles_DF, _ = pig.calculate_baselines(
             self.dfs_dict, temp_export_path)
