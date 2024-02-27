@@ -55,7 +55,6 @@ class test_fitting_functions(unittest.TestCase):
     def test_NIR(self):
 
         for _, data in self.dfs_dict.items():
-            # Three repeat baselines for the H2Om_{5200}
             H2Om_5200_peak_ranges = [(4875, 5400), (4850, 5375), (4900, 5425)]
             H2Om_5200_results = list(map(lambda peak_range: {
                 'peak_fit': (result := pig.NIR_process(data, peak_range[0], peak_range[1], 'H2Om'))[0],
@@ -80,7 +79,7 @@ class test_fitting_functions(unittest.TestCase):
     def test_NIR_invalid_peak_type(self):
 
         valid_data = next(iter(self.dfs_dict.values()))
-        invalid_peak_type = "InvalidPeakType"  # Intentionally invalid peak type
+        invalid_peak_type = "InvalidPeakType"
 
         with self.assertRaises(ValueError) as context:
             pig.NIR_process(valid_data, 4875, 5400, invalid_peak_type)
@@ -147,10 +146,10 @@ class test_fitting_functions(unittest.TestCase):
 
     def test_MCMC_interp(self):
 
-        first_index = self.df.index > 1000
+        first_index = self.df.index > 1260
         if any(first_index):
             first_index_position = np.argmax(first_index)
-            drop_indices = self.df.index[first_index_position + 1:first_index_position + 11] 
+            drop_indices = self.df.index[first_index_position+1:first_index_position+20] 
             self.df_interp = self.df.drop(drop_indices)
 
         self.dfs_dict_interp = {self.file: self.df_interp}

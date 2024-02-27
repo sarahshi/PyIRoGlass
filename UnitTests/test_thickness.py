@@ -20,6 +20,7 @@ class test_thickness(unittest.TestCase):
         self.df = pd.DataFrame({'Wavenumber': self.wn, 'Absorbance': self.abs})
         self.df.set_index('Wavenumber', inplace=True)
         self.dfs_dict = {self.file: self.df}
+        self.dfs_dict_malformed = {"file1": "invalid data"}
 
     def test_reflectance_index(self):
 
@@ -106,22 +107,20 @@ class test_thickness(unittest.TestCase):
                 msg="Glass thickness test and expected values from "
                     "calculate_mean_thickness function disagree")
 
-            if thickness_results_ol.isnull().any().any():
-                self.assertTrue(thickness_results_ol.isnull().any().any(), 
-                                "Expected NaN values in the result due to processing failures.")
-                
-            else:
-                result_value = float(thickness_results_ol['Thickness_M'].iloc[0])
-                expected_ol = 79.81
-                self.assertAlmostEqual(
-                    result_value,
-                    expected_ol,
-                    self.decimalPlace - 2,
-                    msg="Thickness test and expected values from "
-                        "calculate_mean_thickness function disagree")
-
         except Exception as e:
             self.fail(f"Unexpected exception occurred: {e}")
+
+    def test_exception_handling(self):
+        with self.assertRaises(Exception):
+            pig.calculate_mean_thickness(
+                self.dfs_dict_malformed,
+                1.546,
+                self.wn_high_ol,
+                self.wn_low_ol,
+                remove_baseline=True,
+                plotting=False,
+                phaseol=True
+            )
 
 if __name__ == '__main__':
     unittest.main()

@@ -160,7 +160,7 @@ class test_plotting_modelfit(unittest.TestCase):
         mock_savefig.assert_not_called()
         plt.close('all')
 
-class test_plotting_H2Om_OH(unittest.TestCase):
+class test_plot_pyiroglass(unittest.TestCase):
 
     def setUp(self):
 
@@ -201,6 +201,18 @@ class test_plotting_H2Om_OH(unittest.TestCase):
         plt.close('all')
 
     @patch('matplotlib.pyplot.subplots')
+    def test_plot_H2Om_OH_none(self, mock_subplots):
+
+        mock_fig = MagicMock()
+        mock_ax_top = MagicMock()
+        mock_subplots.return_value = (mock_fig, (mock_ax_top, None))
+
+        pig.plot_H2Om_OH(self.df, self.file, self.als_bls, ax_top=mock_ax_top, ax_bottom=None)
+        self.assertTrue(mock_ax_top.plot.called)
+
+        plt.close('all')
+
+    @patch('matplotlib.pyplot.subplots')
     def test_plot_H2Ot_3550(self, mock_subplots):
 
         mock_fig = MagicMock()
@@ -218,7 +230,6 @@ class test_plotting_H2Om_OH(unittest.TestCase):
         self.assertTrue(isinstance(bestfits, pd.DataFrame), "Expected bestfits to be a pandas DataFrame")
         self.assertTrue(isinstance(baselines, pd.DataFrame), "Expected baselines to be a pandas DataFrame")
 
-
     @patch('matplotlib.pyplot.subplots')
     def test_plot_carbonate(self, mock_subplots):
 
@@ -229,6 +240,22 @@ class test_plotting_H2Om_OH(unittest.TestCase):
         pig.plot_carbonate(self.df, self.file, self.mcmc_npz, ax=mock_ax)
         self.assertTrue(mock_ax.plot.called)
         plt.close('all')
+
+    def test_derive_carbonate_interp(self): 
+
+        first_index = self.df.index > 1260
+        if any(first_index):
+            first_index_position = np.argmax(first_index)
+            drop_indices = self.df.index[first_index_position+1:first_index_position+20] 
+            self.df_interp = self.df.drop(drop_indices)
+
+        self.dfs_dict_interp = {self.file: self.df_interp}
+
+        bestfits, baselines = pig.derive_carbonate(self.dfs_dict_interp, self.file, self.mcmc_npz, export_path=None)
+
+        self.assertTrue(isinstance(bestfits, pd.DataFrame), "Expected bestfits to be a pandas DataFrame")
+        self.assertTrue(isinstance(baselines, pd.DataFrame), "Expected baselines to be a pandas DataFrame")
+
 
 if __name__ == '__main__':
     unittest.main()
