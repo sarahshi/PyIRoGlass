@@ -180,7 +180,6 @@ class test_plotting_H2Om_OH(unittest.TestCase):
             self.als_bls = pickle.load(handle)
 
     @patch('matplotlib.pyplot.subplots')
-    @patch('matplotlib.pyplot.Figure.savefig')
     def test_plot_H2Om_OH_savefile(self, mock_subplots):
 
         mock_fig = MagicMock()
