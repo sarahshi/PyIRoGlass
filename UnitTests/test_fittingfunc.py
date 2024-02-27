@@ -189,7 +189,7 @@ class test_fitting_functions(unittest.TestCase):
     def test_MCMC_exportpath(self):
 
         path_beg = os.getcwd() + "/"
-        temp_export_path = os.path.join(path_beg, "temp_test_dir")
+        temp_export_path = 'temp_test_dir'
         output_dirs = [
             "FIGURES",
             "PLOTFILES",
@@ -200,7 +200,7 @@ class test_fitting_functions(unittest.TestCase):
         ]
         paths = {}
         for dir_name in output_dirs:
-            full_path = os.path.join(temp_export_path, dir_name)
+            full_path = os.path.join(path_beg, dir_name, temp_export_path)
             paths[dir_name] = full_path
             os.makedirs(full_path, exist_ok=True)
         fpath = paths["FIGURES"]
