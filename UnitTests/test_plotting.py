@@ -3,6 +3,7 @@ from unittest.mock import patch, MagicMock
 
 import os
 import pickle
+import warnings
 import numpy as np
 import pandas as pd
 import PyIRoGlass as pig
@@ -201,6 +202,8 @@ class test_plot_pyiroglass(unittest.TestCase):
         plt.close('all')
 
     def test_plot_H2Om_OH_none(self):
+
+        warnings.filterwarnings("ignore", module="matplotlib\\..*")
 
         before_plot_figures = len(plt.get_fignums())
 
