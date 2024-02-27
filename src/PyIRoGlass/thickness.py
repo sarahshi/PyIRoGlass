@@ -75,7 +75,7 @@ def peakdetect(y_axis, x_axis=None, lookahead=200, delta=0):
             and the following points, before a peak may be considered a peak.
             Useful to hinder the function from picking up false peaks towards
             the end of the signal. To work well, delta should be set to
-            delta >= RMSnoise * 5. Defaults to 0. When omitted, it can decrease
+            delta >= RMSnoise x 5. Defaults to 0. When omitted, it can decrease
             the speed by 20%, but when used correctly, it can double the speed
             of the function.
 
@@ -84,7 +84,7 @@ def peakdetect(y_axis, x_axis=None, lookahead=200, delta=0):
         and negative peaks, respectively. Each element of the lists is a
         tuple of (position, peak_value). To get the average peak value,
         use: np.mean(max_peaks, 0)[1]. To unpack one of the lists into x, y
-        coordinates, use: x, y = zip(*max_peaks).
+        coordinates, use: x, y = zip(max_peaks).
 
     Notes:
         This function comes from https://github.com/avhn/peakdetect. I pulled
@@ -261,6 +261,7 @@ def calculate_mean_thickness(dfs_dict, n, wn_high, wn_low,
     Thicknesses for each interference fringe, starting at both the peaks
     and troughs of the fringes are determined. These thicknesses are then
     averaged over the interval of interest.
+
     Parameters:
         dfs_dict (dictionary): dictionary containing FTIR data for each
             file
@@ -274,15 +275,15 @@ def calculate_mean_thickness(dfs_dict, n, wn_high, wn_low,
 
     Returns:
         ThickDF (pd.DataFrame): a dataframe containing the thickness
-            calculations for each file
+        calculations for each file. 
 
     Notes:
-        smoothing_wn_width (float): width of the Savitzky-Golay smoothing
-            window, if not used, set to None
-        peak_heigh_min_delta (float): minimum height difference between a
-            peak and its surrounding points
-        peak_search_width (float): the distance (in wavenumbers) to look on
-            either side of a peak to find the corresponding trough
+        smoothing_wn_width (float): Width of the Savitzky-Golay smoothing
+        window, if not used, set to None. 
+        peak_heigh_min_delta (float): Minimum height difference between a
+        peak and its surrounding points.
+        peak_search_width (float): Distance (in wavenumbers) to look on
+        either side of a peak to find the corresponding trough.
     """
 
     ThickDF = pd.DataFrame(
@@ -393,7 +394,7 @@ def reflectance_index(XFo):
     """
     Calculates the reflectance index for a given forsterite composition.
     The reflectance index is calculated based on values from Deer, Howie,
-        and Zussman, 3rd Edition.
+    and Zussman, 3rd Edition.
 
     Parameters:
         XFo (float): The mole fraction of forsterite in the sample.
