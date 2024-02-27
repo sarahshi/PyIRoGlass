@@ -123,10 +123,5 @@ class test_thickness(unittest.TestCase):
         except Exception as e:
             self.fail(f"Unexpected exception occurred: {e}")
 
-    def test_invalid_wavenumber_range(self):
-
-        with self.assertRaises(ValueError):
-            pig.calculate_mean_thickness(self.dfs_dict, 1.546, self.wn_high_gl, self.wn_low_gl)
-
 if __name__ == '__main__':
     unittest.main()

@@ -86,5 +86,10 @@ class test_loading_csv(unittest.TestCase):
             loader = pig.SampleDataLoader(chemistry_thickness_path=None)
             loader.load_chemistry_thickness()
 
+    def test_spectrum_chemistry_thickness_path_none(self):
+        with self.assertRaises(ValueError):
+            loader = pig.SampleDataLoader(spectrum_path=None, chemistry_thickness_path=None)
+            loader.load_all_data()
+
 if __name__ == '__main__':
     unittest.main()

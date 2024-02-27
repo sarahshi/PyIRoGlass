@@ -1,4 +1,5 @@
 import os
+import glob
 import unittest
 import numpy as np
 import pandas as pd
@@ -201,8 +202,12 @@ class test_fitting_functions(unittest.TestCase):
                     temp_export_path,
                     "output.csv")))
 
+        figure_files = glob.glob(os.path.join(temp_export_path, "*.pdf"))
+        self.assertTrue(len(figure_files) > 0, "No figure files found in the export path.")
+
         # Cleanup
-        os.remove(os.path.join(temp_export_path, "output.csv"))
+        for file_path in glob.glob(os.path.join(temp_export_path, "*")):
+            os.remove(file_path)
         os.rmdir(temp_export_path)
 
 
