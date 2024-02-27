@@ -53,17 +53,18 @@ class test_fitting_functions(unittest.TestCase):
     def test_NIR(self):
 
         for _, data in self.dfs_dict.items():
-            _, _, PH_5200_krige_1, _ = pig.NIR_process(
-                data, 4875, 5400, 'H2Om')
-            _, _, PH_5200_krige_2, _ = pig.NIR_process(
-                data, 4850, 5375, 'H2Om')
-            _, _, PH_5200_krige_3, _ = pig.NIR_process(
-                data, 4900, 5425, 'H2Om')
+            # Three repeat baselines for the H2Om_{5200}
+            H2Om_5200_peak_ranges = [(4875, 5400), (4850, 5375), (4900, 5425)]
+            H2Om_5200_results = list(map(lambda peak_range: {
+                'peak_fit': (result := pig.NIR_process(data, peak_range[0], peak_range[1], 'H2Om'))[0],
+                'peak_krige': result[1],
+                'PH_krige': result[2],
+                'STN': result[3]
+            }, H2Om_5200_peak_ranges))
 
-            # Kriged peak heights
-            PH_5200_krige_M = np.mean([PH_5200_krige_1,
-                                       PH_5200_krige_2,
-                                       PH_5200_krige_3])
+            PH_5200_krige = [result["PH_krige"] for result in
+                            H2Om_5200_results]
+            PH_5200_krige_M = np.mean(PH_5200_krige)
 
         result = PH_5200_krige_M
         expected = 0.008959072
@@ -88,13 +89,16 @@ class test_fitting_functions(unittest.TestCase):
     def test_MIR(self):
 
         for _, data in self.dfs_dict.items():
-            _, _, PH_3550_1, _ = pig.MIR_process(
-                data, 1900, 4400)
-            _, _, PH_3550_2, _ = pig.MIR_process(
-                data, 2100, 4200)
-            _, _, PH_3550_3, _ = pig.MIR_process(
-                data, 2300, 4000)
-            PH_3550_M = np.mean([PH_3550_1, PH_3550_2, PH_3550_3])
+
+            H2Ot_3550_peak_ranges = [(1900, 4400), (2100, 4200), (2300, 4000)]
+            H2Ot_3550_results = list(map(lambda peak_range: {
+                'peak_fit': (result := pig.MIR_process(data, peak_range[0], peak_range[1]))[0],
+                'plot_output': result[1],
+                'PH': result[2],
+            }, H2Ot_3550_peak_ranges))
+
+            PH_3550 = [result["PH"] for result in H2Ot_3550_results]
+            PH_3550_M = np.mean(PH_3550)
 
         result = PH_3550_M
         expected = 1.523342931

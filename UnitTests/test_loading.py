@@ -86,15 +86,5 @@ class test_loading_csv(unittest.TestCase):
             loader = pig.SampleDataLoader(chemistry_thickness_path=None)
             loader.load_chemistry_thickness()
 
-    def test_invalid_csv_format(self):
-        # Assuming you have an invalid CSV file for this test
-        invalid_csv_path = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)),
-            'path/to/your/invalid_csv_file.csv'
-        )
-        with self.assertRaises(ValueError):
-            loader = pig.SampleDataLoader(spectrum_path=invalid_csv_path)
-            loader.load_spectrum_directory()
-
 if __name__ == '__main__':
     unittest.main()

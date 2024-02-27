@@ -50,7 +50,7 @@ class test_density_epsilon_calculation(unittest.TestCase):
     def test_density_calculation(self):
 
         _, density_ls = pig.calculate_density(self.MI_Composition, self.T_room, self.P_room, model='LS')
-        result_ls = float(density_ls.values)
+        result_ls = float(density_ls.values[0])
         expected_ls = 2702.703558
         self.assertAlmostEqual(
             result_ls,
@@ -60,7 +60,7 @@ class test_density_epsilon_calculation(unittest.TestCase):
             "calculate_density function with LS do not agree")
 
         _, density_it = pig.calculate_density(self.MI_Composition, self.T_room, self.P_room, model='IT')
-        result_it = float(density_it.values)
+        result_it = float(density_it.values[0])
         expected_it = 2750.959065
         self.assertAlmostEqual(
             result_it,

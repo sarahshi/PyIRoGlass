@@ -35,7 +35,7 @@ class test_thickness(unittest.TestCase):
     def test_calc_thickness(self):
 
         thickness = float(pig.calculate_thickness(
-            1.7097733333333334, np.array([0, 50])))
+            1.7097733333333334, np.array([0, 50]))[0])
         expected_thickness = 0.00584873
         self.assertAlmostEqual(
             thickness,
