@@ -74,6 +74,17 @@ class test_fitting_functions(unittest.TestCase):
             msg="H2Om5200 peak height test and expected values from the "
             "NearIR_Process function do not agree")
 
+    def test_NIR_invalid_peak_type(self):
+
+        valid_data = next(iter(self.dfs_dict.values()))
+        invalid_peak_type = "InvalidPeakType"  # Intentionally invalid peak type
+
+        with self.assertRaises(ValueError) as context:
+            pig.NIR_process(valid_data, 4875, 5400, invalid_peak_type)
+
+        self.assertTrue(f"Invalid peak type: {invalid_peak_type}" 
+                        in str(context.exception))
+
     def test_MIR(self):
 
         for _, data in self.dfs_dict.items():
@@ -112,21 +123,63 @@ class test_fitting_functions(unittest.TestCase):
             expected_H2Om_5200,
             self.decimalPlace,
             msg="H2Om_5200 peak height test and expected values from the "
-            "Run_All_Spectra function do not agree")
+            "calculate_baselines function do not agree")
 
         self.assertAlmostEqual(
             result_H2Ot_3550,
             expected_H2Ot_3550,
             self.decimalPlace,
             msg="H2Ot_3550 peak height test and expected values from the "
-            "Run_All_Spectra function do not agree")
+            "calculate_baselines function do not agree")
 
         self.assertAlmostEqual(
             result_CO2_1515,
             expected_CO2_1515,
             self.decimalPlace - 3,
             msg="CO2_1515 peak height test and expected values from the "
-            "Run_All_Spectra function do not agree")
+            "calculate_baselines function do not agree")
+
+    def test_MCMC_interp(self):
+
+        first_index = self.df.index > 1000
+        if any(first_index):
+            first_index_position = np.argmax(first_index)
+            drop_indices = self.df.index[first_index_position + 1:first_index_position + 11] 
+            self.df_interp = self.df.drop(drop_indices)
+
+        self.dfs_dict_interp = {self.file: self.df_interp}
+
+        Volatiles_DF, _ = pig.calculate_baselines(self.dfs_dict_interp, None)
+
+        result_H2Om_5200 = float(Volatiles_DF['PH_5200_M'].iloc[0])
+        expected_H2Om_5200 = 0.00895907201720743
+
+        result_H2Ot_3550 = float(Volatiles_DF['PH_3550_M'].iloc[0])
+        expected_H2Ot_3550 = 1.52334293070956
+
+        result_CO2_1515 = float(Volatiles_DF['PH_1515_BP'].iloc[0])
+        expected_CO2_1515 = 0.057289618537916066
+
+        self.assertAlmostEqual(
+            result_H2Om_5200,
+            expected_H2Om_5200,
+            self.decimalPlace,
+            msg="H2Om_5200 peak height test and expected values from the "
+            "calculate_baselines function do not agree")
+
+        self.assertAlmostEqual(
+            result_H2Ot_3550,
+            expected_H2Ot_3550,
+            self.decimalPlace,
+            msg="H2Ot_3550 peak height test and expected values from the "
+            "calculate_baselines function do not agree")
+
+        self.assertAlmostEqual(
+            result_CO2_1515,
+            expected_CO2_1515,
+            self.decimalPlace - 3,
+            msg="CO2_1515 peak height test and expected values from the "
+            "calculate_baselines function do not agree")
 
     def test_MCMC_exportpath(self):
 
