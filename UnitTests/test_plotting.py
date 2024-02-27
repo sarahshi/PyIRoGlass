@@ -170,17 +170,24 @@ class test_plotting_H2Om_OH(unittest.TestCase):
         self.df = pd.DataFrame({'Wavenumber': self.wn, 'Absorbance': self.abs})
         self.df.set_index('Wavenumber', inplace=True)
 
-        file_path = os.path.join(
+        pkl_file_path = os.path.join(
             os.path.dirname(
                 os.path.realpath(__file__)),
             '../docs/examples/transmission_ftir/PKLFILES/'
             'RESULTS/AC4_OL53_101220_256s_30x30_a.pkl')
-
-        with open(file_path, "rb") as handle:
+        with open(pkl_file_path, "rb") as handle:
             self.als_bls = pickle.load(handle)
 
+        file_path = os.path.join(
+            os.path.dirname(
+                os.path.realpath(__file__)),
+            '../docs/examples/transmission_ftir/NPZTXTFILES/'
+            'RESULTS/AC4_OL53_101220_256s_30x30_a.npz')
+        self.mcmc_npz = np.load(file_path)
+
+
     @patch('matplotlib.pyplot.subplots')
-    def test_plot_H2Om_OH_savefile(self, mock_subplots):
+    def test_plot_H2Om_OH(self, mock_subplots):
 
         mock_fig = MagicMock()
         mock_ax_top = MagicMock()
@@ -188,9 +195,40 @@ class test_plotting_H2Om_OH(unittest.TestCase):
         mock_subplots.return_value = (mock_fig, (mock_ax_top, mock_ax_bottom))
 
         pig.plot_H2Om_OH(self.df, self.file, self.als_bls, ax_top=mock_ax_top, ax_bottom=mock_ax_bottom)
+        self.assertTrue(mock_ax_top.plot.called)
+        self.assertTrue(mock_ax_bottom.plot.called)
 
         plt.close('all')
 
+    @patch('matplotlib.pyplot.subplots')
+    def test_plot_H2Ot_3550(self, mock_subplots):
+
+        mock_fig = MagicMock()
+        mock_ax = MagicMock()
+        mock_subplots.return_value = (mock_fig, mock_ax)
+
+        pig.plot_H2Ot_3550(self.df, self.file, self.als_bls, ax=mock_ax)
+        self.assertTrue(mock_ax.plot.called)
+        plt.close('all')
+
+    def test_derive_carbonate(self): 
+
+        bestfits, baselines = pig.derive_carbonate(self.df, self.file, self.mcmc_npz, export_path=None)
+
+        self.assertTrue(isinstance(bestfits, pd.DataFrame), "Expected bestfits to be a pandas DataFrame")
+        self.assertTrue(isinstance(baselines, pd.DataFrame), "Expected baselines to be a pandas DataFrame")
+
+
+    @patch('matplotlib.pyplot.subplots')
+    def test_plot_carbonate(self, mock_subplots):
+
+        mock_fig = MagicMock()
+        mock_ax = MagicMock()
+        mock_subplots.return_value = (mock_fig, mock_ax)
+
+        pig.plot_carbonate(self.df, self.file, self.mcmc_npz, ax=mock_ax)
+        self.assertTrue(mock_ax.plot.called)
+        plt.close('all')
 
 if __name__ == '__main__':
     unittest.main()
