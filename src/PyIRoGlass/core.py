@@ -42,16 +42,16 @@ class SampleDataLoader:
             containing glass chemistry and thickness data.
 
     Methods:
-        load_spectrum_directory(paths, wn_high=5500, wn_low=1000): Loads
+        load_spectrum_directory(paths, wn_high, wn_low): Loads
             spectral data from CSV files within a specified wavenumber
             range, ensuring that the wavenumbers are in ascending order and
             skipping headers if present.
         load_chemistry_thickness(chemistry_thickness_path): Loads glass
             chemistry and thickness data from a CSV file, setting the 'Sample'
             column as the index.
-        load_all_data(paths, chemistry_thickness_path, wn_high=5500, wn_low=1000): 
-            Loads both spectral data from CSV files and chemistry thickness data
-            from a CSV file.
+        load_all_data(paths, chemistry_thickness_path, wn_high, wn_low):
+            Loads both spectral data from CSV files and chemistry thickness
+            data from a CSV file.
 
     """
 
@@ -69,7 +69,6 @@ class SampleDataLoader:
         self.chemistry_thickness_path = chemistry_thickness_path
         self.export_path = export_path
         self.initialize_export_paths(export_path)
-
 
     def initialize_export_paths(self, export_path):
 
@@ -96,8 +95,9 @@ class SampleDataLoader:
             if dir_name == "FINALDATA":
                 full_path = os.path.join(os.getcwd(), dir_name)
             else:
-                # For all other directories, nest them within the 'export_path' or default directory
-                full_path = os.path.join(os.getcwd(), dir_name, default_export_dir)
+                # Other directories nested in 'export_path'/default directory
+                full_path = os.path.join(os.getcwd(), dir_name,
+                                         default_export_dir)
 
             os.makedirs(full_path, exist_ok=True)
             paths[dir_name] = full_path
@@ -106,9 +106,9 @@ class SampleDataLoader:
         for add_dir in add_dirs:
             os.makedirs(os.path.join(plotfile_path, add_dir), exist_ok=True)
 
-        # For 'data_export_path', use 'FINALDATA' directly without nesting further
-        self.data_export_path = os.path.join(paths["FINALDATA"], default_export_dir)
-
+        # For 'data_export_path', use 'FINALDATA' without nesting further
+        self.data_export_path = os.path.join(paths["FINALDATA"],
+                                             default_export_dir)
 
     def load_spectrum_directory(self, wn_high=5500, wn_low=1000):
 
@@ -149,12 +149,12 @@ class SampleDataLoader:
 
         return self.files, self.dfs_dict
 
-
     def load_chemistry_thickness(self):
 
         if (self.chemistry_thickness_path is None or
                 not os.path.exists(self.chemistry_thickness_path)):
-            raise ValueError("Chemistry thickness path is not provided or does not exist.")
+            raise ValueError("Chemistry thickness path not provided or "
+                             "does not exist.")
 
         chem_thickness = pd.read_csv(self.chemistry_thickness_path)
         chem_thickness.set_index("Sample", inplace=True)
@@ -181,7 +181,6 @@ class SampleDataLoader:
         self.thickness = thickness
 
         return self.chemistry, self.thickness
-
 
     def load_all_data(self, wn_high=5500, wn_low=1000):
 
@@ -233,8 +232,8 @@ class VectorLoader:
         H2Om_PC (np.ndarray): The matrix of H2O-modified principal components.
 
     Methods:
-        load_PC(file_name): Loads baseline principal components from an NPZ file.
-        load_wavenumber(file_name): Loads wavenumbers from an NPZ file
+        load_PC(file_name): Loads baseline principal components from NPZ.
+        load_wavenumber(file_name): Loads wavenumbers from NPZ.
 
     """
 
@@ -486,8 +485,8 @@ def NIR_process(data, wn_low, wn_high, peak):
 
     Returns:
         peak_fit (pd.DataFrame): A DataFrame of the absorbance data in
-        the region of interest, median filtered data, baseline
-        subtracted absorbance, and the subtracted peak.
+            the region of interest, median filtered data, baseline
+            subtracted absorbance, and the subtracted peak.
         krige_out (pd.DataFrame): A DataFrame of kriged data output.
         PH_krige (float): The peak height obtained after kriging.
         STN (float): The signal to noise ratio.
@@ -577,9 +576,9 @@ def MIR_process(data, wn_low, wn_high):
         wn_high (int): The higher bound wavenumber for MIR H2Ot, 3550.
 
     Returns:
-        data_output (pd.DataFrame): A DataFrame of absorbance data, 
-        median filtered data, baseline subtracted absorbance,
-        and the subtracted peak.
+        data_output (pd.DataFrame): A DataFrame of absorbance data,
+            median filtered data, baseline subtracted absorbance,
+            and the subtracted peak.
         krige_out (pd.DataFrame): A DataFrame of kriged data output.
         PH_krige (float): The peak height obtained after kriging.
 
@@ -707,7 +706,7 @@ def calculate_baselines(dfs_dict, export_path):
             files will be saved.
 
     Returns:
-        data_output (pd.DataFrame): A DataFrame of absorbance data, 
+        data_output (pd.DataFrame): A DataFrame of absorbance data,
             median filtered data, baseline subtracted absorbance,
             and the subtracted peak.
         failures (list): A list of file identifiers for which the analysis
@@ -764,7 +763,10 @@ def calculate_baselines(dfs_dict, export_path):
             # Three repeat baselines for the OH_{4500}
             OH_4500_peak_ranges = [(4250, 4675), (4225, 4650), (4275, 4700)]
             OH_4500_results = list(map(lambda peak_range: {
-                'peak_fit': (result := NIR_process(data, peak_range[0], peak_range[1], 'OH'))[0],
+                'peak_fit': (result := NIR_process(data,
+                                                   peak_range[0],
+                                                   peak_range[1],
+                                                   'OH'))[0],
                 'peak_krige': result[1],
                 'PH_krige': result[2],
                 'STN': result[3]
@@ -773,7 +775,10 @@ def calculate_baselines(dfs_dict, export_path):
             # Three repeat baselines for the H2Om_{5200}
             H2Om_5200_peak_ranges = [(4875, 5400), (4850, 5375), (4900, 5425)]
             H2Om_5200_results = list(map(lambda peak_range: {
-                'peak_fit': (result := NIR_process(data, peak_range[0], peak_range[1], 'H2Om'))[0],
+                'peak_fit': (result := NIR_process(data,
+                                                   peak_range[0],
+                                                   peak_range[1],
+                                                   'H2Om'))[0],
                 'peak_krige': result[1],
                 'PH_krige': result[2],
                 'STN': result[3]
@@ -820,7 +825,9 @@ def calculate_baselines(dfs_dict, export_path):
             # Three repeat baselines for the H2Ot_{3550}
             H2Ot_3550_peak_ranges = [(1900, 4400), (2100, 4200), (2300, 4000)]
             H2Ot_3550_results = list(map(lambda peak_range: {
-                'peak_fit': (result := MIR_process(data, peak_range[0], peak_range[1]))[0],
+                'peak_fit': (result := MIR_process(data,
+                                                   peak_range[0],
+                                                   peak_range[1]))[0],
                 'plot_output': result[1],
                 'PH': result[2],
             }, H2Ot_3550_peak_ranges))
@@ -991,7 +998,7 @@ def calculate_baselines(dfs_dict, export_path):
                 ax4 = plt.subplot2grid((2, 3), (0, 2), rowspan=2, fig=fig)
 
                 # Create subplot of H2Om_{5200}, OH_{4500} baselines/peak fits
-                plot_H2Om_OH(data, files, als_bls, ax_top=ax1, ax_bottom=ax2)
+                plot_H2Om_OH(data, files, als_bls, ax_top=ax1, ax_bot=ax2)
                 # Create subplot of H2Ot_{3550} baselines/peak fits
                 plot_H2Ot_3550(data, files, als_bls, ax=ax3)
                 # Create subplot of CO_3^{2-} baselines/peak fits
@@ -1423,11 +1430,11 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
             Default is 1 bar.
 
     Returns:
-        concentrations_df (pd.DataFrame): DataFrame containing calculated volatile
-            concentrations and their uncertainties for each sample, including
-            columns for mean and standard deviation of H2O and CO2 species
-            concentrations. ALso contains density ('Density' column) and
-            extinction coefficient ('epsilon' column) for each sample,
+        concentrations_df (pd.DataFrame): DataFrame containing calculated
+            volatile concentrations and their uncertainties for each sample,
+            including columns for mean and standard deviation of H2O and CO2
+            species concentrations. ALso contains density ('Density' column)
+            and extinction coefficient ('epsilon' column) for each sample,
             providing insight into the properties of the glass under analysis.
 
     Note:
@@ -1845,9 +1852,11 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
         )
 
     # Create final spreadsheet
-    concentrations_df = pd.concat([concentrations_sat, stnerror, 
-                                   density_df, density_sat_df, epsilon],
-                                   axis=1)
+    concentrations_df = pd.concat(
+        [concentrations_sat, stnerror,
+         density_df, density_sat_df, epsilon],
+        axis=1
+    )
 
     # Output different values depending on saturation.
     for m in concentrations.index:
@@ -1867,7 +1876,8 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
     mean_vol["CO2_MEAN"] = (concentrations["CO2_1515_BP"] +
                             concentrations["CO2_1430_BP"]) / 2
     mean_vol["CO2_STD"] = (
-        (concentrations["CO2_1515_STD"] ** 2) + (concentrations["CO2_1430_STD"] ** 2)
+        (concentrations["CO2_1515_STD"] ** 2) +
+        (concentrations["CO2_1430_STD"] ** 2)
     ) ** (1 / 2) / 2
 
     concentrations_df["H2Ot_MEAN"] = mean_vol["H2Ot_MEAN"]
@@ -1881,7 +1891,7 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
 # %% Plotting Functions
 
 
-def plot_H2Om_OH(data, files, als_bls, ax_top=None, ax_bottom=None):
+def plot_H2Om_OH(data, files, als_bls, ax_top=None, ax_bot=None):
 
     """
     Visualizes NIR spectrum data along with baseline-subtracted and kriged
@@ -1905,7 +1915,7 @@ def plot_H2Om_OH(data, files, als_bls, ax_top=None, ax_bottom=None):
         ax_top (matplotlib.axes.Axes, optional): The top subplot axis
             for plotting the NIR spectrum and peak fits. If not provided,
             a new figure with subplots will be created.
-        ax_bottom (matplotlib.axes.Axes, optional): The bottom subplot
+        ax_bot (matplotlib.axes.Axes, optional): The bottom subplot
             axis for plotting baseline-subtracted peaks and kriged peak
             fits. If not provided, it will be created along with `ax_top`
             in a new figure.
@@ -1919,14 +1929,14 @@ def plot_H2Om_OH(data, files, als_bls, ax_top=None, ax_bottom=None):
         The function is designed to work within a larger analytical framework,
         where spectral preprocessing and peak fitting have been previously
         conducted. It expects specific data structures from these analyses as
-        input. The function modifies the provided `ax_top` and `ax_bottom`
+        input. The function modifies the provided `ax_top` and `ax_bot`
         axes in place if they are provided; otherwise, it creates a new
         figure and axes for plotting.
 
     """
 
-    if ax_top is None or ax_bottom is None:
-        fig, (ax_top, ax_bottom) = plt.subplots(2, 1, figsize=(8, 8))
+    if ax_top is None or ax_bot is None:
+        fig, (ax_top, ax_bot) = plt.subplots(2, 1, figsize=(8, 8))
         ax_top.set_title(files)
 
     H2Om_5200_results = als_bls["H2Om_5200_results"]
@@ -1945,31 +1955,59 @@ def plot_H2Om_OH(data, files, als_bls, ax_top=None, ax_bottom=None):
     STN_5200_M = np.mean([result["STN"] for result in H2Om_5200_results])
 
     warnings.filterwarnings("ignore", module="matplotlib\\..*")
-    warnings.filterwarnings("ignore", category = UserWarning)
-    
-    ax_top.plot(data.index, data["Absorbance"], "k", linewidth=1.5, label="NIR Spectrum")
+    warnings.filterwarnings("ignore", category=UserWarning)
+
+    ax_top.plot(data.index, data["Absorbance"], "k",
+                linewidth=1.5, label="NIR Spectrum")
 
     for result in H2Om_5200_results:
-        ax_top.plot(result["peak_fit"].index, result["peak_fit"]["Absorbance_Filt"], "tab:blue",
-                    label=r"$\mathregular{H_2O_{m, 5200}}$ Median Filtered" if 
-                    result is H2Om_5200_results[0] else "_")
+        ax_top.plot(result["peak_fit"].index,
+                    result["peak_fit"]["Absorbance_Filt"],
+                    "tab:blue",
+                    label=(r"$\mathregular{H_2O_{m, 5200}}$ Median Filtered" if
+                           result is H2Om_5200_results[0] else "_"))
     for result in OH_4500_results:
-        ax_top.plot(result["peak_fit"].index, result["peak_fit"]["Absorbance_Filt"], "tab:orange",
-                    label=r"$\mathregular{OH^{-}_{4500}}$ Median Filtered" if
-                    result is OH_4500_results[0] else "_")
+        ax_top.plot(result["peak_fit"].index,
+                    result["peak_fit"]["Absorbance_Filt"],
+                    "tab:orange",
+                    label=(r"$\mathregular{OH^{-}_{4500}}$ Median Filtered" if
+                           result is OH_4500_results[0] else "_"))
     for result in H2Om_5200_results:
-        ax_top.plot(result["peak_fit"].index, result["peak_fit"]["Baseline_NIR"], "lightsteelblue",
+        ax_top.plot(result["peak_fit"].index,
+                    result["peak_fit"]["Baseline_NIR"],
+                    "lightsteelblue",
                     label=r"$\mathregular{H_2O_{m, 5200}}$ Baseline" if
                     result is H2Om_5200_results[0] else "_")
     for result in OH_4500_results:
-        ax_top.plot(result["peak_fit"].index, result["peak_fit"]["Baseline_NIR"], "bisque",
+        ax_top.plot(result["peak_fit"].index,
+                    result["peak_fit"]["Baseline_NIR"],
+                    "bisque",
                     label=r"$\mathregular{OH^{-}_{4500}}$ Baseline" if
                     result is OH_4500_results[0] else "_")
 
     handles_top, labels_top = ax_top.get_legend_handles_labels()
-    filtered_handles_top = [h for h, l in zip(handles_top, labels_top) if not l.startswith('_')]
-    filtered_labels_top = [l for l in labels_top if not l.startswith('_')]
+    filtered_handles_top = [h_t for h_t, l_t in
+                            zip(handles_top, labels_top)
+                            if not l_t.startswith('_')]
+    filtered_labels_top = [l_t for l_t in labels_top if not
+                           l_t.startswith('_')]
     ax_top.legend(filtered_handles_top, filtered_labels_top, prop={"size": 10})
+    ax_top.annotate(
+        r"$\mathregular{H_2O_{m, 5200}}$ Peak Height: "
+        + f"{PH_5200_krige_M:.4f} "
+        + r"± "
+        + f"{PH_5200_krige_STD:.4f}, S2N={STN_5200_M:.2f}",
+        (0.025, 0.9),
+        xycoords="axes fraction",
+    )
+    ax_top.annotate(
+        r"$\mathregular{OH^{-}_{4500}}$ Peak Height: "
+        + f"{PH_4500_krige_M:.4f} "
+        + r"± "
+        + f"{PH_4500_krige_STD:.4f}, S2N={STN_4500_M:.2f}",
+        (0.025, 0.8),
+        xycoords="axes fraction",
+    )
 
     plotmin = np.round(np.min(data.loc[4250:5400]["Absorbance"]), decimals=1)
     plotmax = np.round(np.max(data.loc[4250:5400]["Absorbance"]), decimals=1)
@@ -1980,43 +2018,53 @@ def plot_H2Om_OH(data, files, als_bls, ax_top=None, ax_bottom=None):
     ax_top.invert_xaxis()
 
     warnings.filterwarnings("ignore", module="matplotlib\\..*")
-    warnings.filterwarnings("ignore", category = UserWarning)
-
-
+    warnings.filterwarnings("ignore", category=UserWarning)
     for result in H2Om_5200_results:
-        baseline_subtracted = result["peak_fit"]["Peak_Subtract"] - np.min(result["peak_krige"]["Absorbance"])
-        ax_bottom.plot(result["peak_fit"].index, baseline_subtracted, "k",
-                    label=r"$\mathregular{H_2O_{m, 5200}}$ Baseline Subtracted" if result is H2Om_5200_results[0] else "_")
+        baseline_subtracted = (result["peak_fit"]["Peak_Subtract"] -
+                               np.min(result["peak_krige"]["Absorbance"]))
+        ax_bot.plot(result["peak_fit"].index, baseline_subtracted, "k",
+                    label=(r"$\mathregular{H_2O_{m,5200}}$ Baseline Subtracted"
+                           if result is H2Om_5200_results[0] else "_"))
 
     for result in OH_4500_results:
-        baseline_subtracted = result["peak_fit"]["Peak_Subtract"] - np.min(result["peak_krige"]["Absorbance"])
-        ax_bottom.plot(result["peak_fit"].index, baseline_subtracted, "k",
-                    label=r"$\mathregular{OH^{-}_{4500}}$ Baseline Subtracted" if result is OH_4500_results[0] else "_")
+        baseline_subtracted = (result["peak_fit"]["Peak_Subtract"] -
+                               np.min(result["peak_krige"]["Absorbance"]))
+        ax_bot.plot(result["peak_fit"].index, baseline_subtracted, "k",
+                    label=(r"$\mathregular{OH^{-}_{4500}}$ Baseline Subtracted"
+                           if result is OH_4500_results[0] else "_"))
 
     for result in H2Om_5200_results:
-        kriged_peak = result["peak_krige"]["Absorbance"] - np.min(result["peak_krige"]["Absorbance"])
-        ax_bottom.plot(result["peak_krige"].index, kriged_peak, "tab:blue",
-                    label=r"$\mathregular{H_2O_{m, 5200}}$ Kriged Peak" if result is H2Om_5200_results[0] else "_")
+        kriged_peak = (result["peak_krige"]["Absorbance"] -
+                       np.min(result["peak_krige"]["Absorbance"]))
+        ax_bot.plot(result["peak_krige"].index, kriged_peak, "tab:blue",
+                    label=(r"$\mathregular{H_2O_{m,5200}}$ Kriged Peak"
+                           if result is H2Om_5200_results[0] else "_"))
 
     for result in OH_4500_results:
-        kriged_peak = result["peak_krige"]["Absorbance"] - np.min(result["peak_krige"]["Absorbance"])
-        ax_bottom.plot(result["peak_krige"].index, kriged_peak, "tab:orange",
-                    label=r"$\mathregular{OH^{-}_{4500}}$ Kriged Peak" if result is OH_4500_results[0] else "_")
+        kriged_peak = (result["peak_krige"]["Absorbance"] -
+                       np.min(result["peak_krige"]["Absorbance"]))
+        ax_bot.plot(result["peak_krige"].index, kriged_peak, "tab:orange",
+                    label=(r"$\mathregular{OH^{-}_{4500}}$ Kriged Peak"
+                           if result is OH_4500_results[0] else "_"))
 
     # Handling legend entries to avoid duplicates
-    handles_bottom, labels_bottom = ax_bottom.get_legend_handles_labels()
-    filtered_handles_bottom = [h for h, l in zip(handles_bottom, labels_bottom) if not l.startswith('_')]
-    filtered_labels_bottom = [l for l in labels_bottom if not l.startswith('_')]
-    ax_bottom.legend(filtered_handles_bottom, filtered_labels_bottom, prop={"size": 10})
+    handles_bottom, labels_bottom = ax_bot.get_legend_handles_labels()
+    filtered_handles_bottom = [h_b for h_b, l_b in
+                               zip(handles_bottom, labels_bottom)
+                               if not l_b.startswith('_')]
+    filtered_labels_bottom = [l_b for l_b in labels_bottom if not
+                              l_b.startswith('_')]
+    ax_bot.legend(filtered_handles_bottom, filtered_labels_bottom,
+                  prop={"size": 10})
 
-    ax_bottom.set_xlim([4200, 5400])
+    ax_bot.set_xlim([4200, 5400])
     plotmax = np.round(
         np.max(OH_4500_results[0]["peak_fit"]["Peak_Subtract"]), decimals=1
     )
-    ax_bottom.set_ylim([0, plotmax + 0.05])
-    ax_bottom.tick_params(axis="x", direction="in", length=5, pad=6.5)
-    ax_bottom.tick_params(axis="y", direction="in", length=5, pad=6.5)
-    ax_bottom.invert_xaxis()
+    ax_bot.set_ylim([0, plotmax + 0.05])
+    ax_bot.tick_params(axis="x", direction="in", length=5, pad=6.5)
+    ax_bot.tick_params(axis="y", direction="in", length=5, pad=6.5)
+    ax_bot.invert_xaxis()
 
 
 def plot_H2Ot_3550(data, files, als_bls, ax=None):
@@ -2044,8 +2092,8 @@ def plot_H2Ot_3550(data, files, als_bls, ax=None):
 
     Returns:
         None: This function does not return any value. It generates a plot
-        visualizing the MIR spectral data, baseline fit, and filtered
-        peak fit for the H2Ot peak at 3550 cm^-1.
+            visualizing the MIR spectral data, baseline fit, and filtered
+            peak fit for the H2Ot peak at 3550 cm^-1.
 
     Note:
         The function is designed to work as part of a larger spectroscopic
@@ -2400,7 +2448,7 @@ def plot_trace(posterior, title, zchain=None, pnames=None, thinning=50,
 
     Returns:
         axes (1D list of matplotlib.axes.Axes): List of axes containing
-        the marginal posterior distributions.
+            the marginal posterior distributions.
 
     """
 
@@ -2506,7 +2554,7 @@ def plot_modelfit(data, uncert, indparams, model, title, nbins=75,
 
     Returns:
         ax (matplotlib.axes.Axes): Axes instance containing the marginal
-        posterior distributions.
+            posterior distributions.
 
     """
 
