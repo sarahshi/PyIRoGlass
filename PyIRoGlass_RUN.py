@@ -20,24 +20,21 @@ import seaborn as sns
 %matplotlib inline
 %config InlineBackend.figure_format = 'retina'
 
-
 # %% 
 
 # Get working paths 
-path_beg = os.getcwd() + '/'
 path_input = os.getcwd() + '/Inputs/'
-path_spec_input = os.getcwd() + '/Inputs/TransmissionSpectra/'
+path_spec_input = path_input + 'TransmissionSpectra/'
 output_dir = ["FIGURES", "PLOTFILES", "NPZTXTFILES", "LOGFILES", "FINALDATA"] 
 
 # Change paths to direct to folder with SampleSpectra -- last bit should be whatever your folder with spectra is called. 
-PATHS = [path_spec_input + string for string in ['Fuego/', 'Standards/', 'Fuego1974RH/']]
+PATHS = [path_spec_input + string for string in ['testing/', 'Fuego/', 'Standards/', 'Fuego1974RH/']]
 
 # Put ChemThick file in Inputs. Direct to what your ChemThick file is called. 
-CHEMTHICK_PATH = [path_input + string for string in ['FuegoChemThick.csv', 'StandardChemThick.csv', 'FuegoRHChemThick.csv']]
+CHEMTHICK_PATHS = [path_input + string for string in ['FuegoChemThick.csv', 'StandardChemThick.csv', 'FuegoRHChemThick.csv']]
 
 # Change last value in list to be what you want your output directory to be called. 
-OUTPUT_PATHS = ['FUEGO', 'STD', 'FRH']
-
+OUTPUT_PATHS = ['testing', 'FUEGO', 'STD', 'FRH']
 
 # %% 
 
@@ -65,57 +62,34 @@ REF_FUEGO = pig.Thickness_Process(REF_DFS_DICT, n = n_gl, wn_high = 2850, wn_low
 # %%
 
 fuegono = 0 
-# PATH_F = PATHS[fuegono]
-# FILES_F = sorted(glob.glob(PATH_F + "*"))
+floader = pig.SampleDataLoader(PATHS[fuegono], CHEMTHICK_PATHS[fuegono], OUTPUT_PATHS[fuegono])
+ffiles, fdfs_dict, fchem, fthick, fout, fdataout = floader.load_all_data()
 
-MICOMP_F, THICKNESS_F = pig.Load_ChemistryThickness(CHEMTHICK_PATH[fuegono])
+fdf_output, ffailures = pig.calculate_baselines(fdfs_dict, OUTPUT_PATHS[fuegono])
+fdf_output.to_csv(fdataout + '_DF.csv')
+# fdf_output = pd.read_csv(fout + '_DF.csv', index_col = 0)
 
-# DFS_FILES, DFS_DICT = pig.Load_SampleCSV(FILES_F, wn_high = 5500, wn_low = 1000)
-# DF_OUTPUT_F, FAILURES_F = pig.Run_All_Spectra(DFS_DICT, OUTPUT_PATHS[fuegono])
-
-# DF_OUTPUT_F.to_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATHS[fuegono] + '_DF.csv')
-
-DF_OUTPUT_F = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATHS[fuegono] + '_DF.csv', index_col = 0)
-
-T_ROOM = 25 # C
-P_ROOM = 1 # Bar
-
-N = 500000
-DENSITY_EPSILON_F, MEGA_SPREADSHEET_F = pig.Concentration_Output(DF_OUTPUT_F, N, THICKNESS_F, MICOMP_F, T_ROOM, P_ROOM)
-MEGA_SPREADSHEET_F.to_csv(output_dir[-1] + '/' + OUTPUT_PATHS[fuegono] + '_H2OCO2_brounce.csv')
-DENSITY_EPSILON_F.to_csv(output_dir[-1] + '/' + OUTPUT_PATHS[fuegono] + '_DensityEpsilon_brounce.csv')
-MEGA_SPREADSHEET_F
+fdf_conc = pig.calculate_concentrations(fdf_output, fchem, fthick)
+fdf_conc.to_csv(fout + '_H2OCO2.csv')
 
 # %%
 # %% 
 
 stdno = 1
+sloader = pig.SampleDataLoader(PATHS[stdno], CHEMTHICK_PATHS[stdno], OUTPUT_PATHS[stdno])
+sfiles, sdfs_dict, schem, sthick, sout, sdataout = sloader.load_all_data()
 
-# PATH_S = PATHS[stdno]
-# FILES_S = sorted(glob.glob(PATH_S + "*"))
+sdf_output, sfailures = pig.calculate_baselines(sdfs_dict, OUTPUT_PATHS[stdno])
+sdf_output.to_csv(sdataout + '_DF.csv')
+# sdf_output = pd.read_csv(sout + '_DF.csv', index_col = 0)
 
-MICOMP_S, THICKNESS_S = pig.Load_ChemistryThickness(CHEMTHICK_PATH[stdno])
-
-# DFS_FILES_S, DFS_DICT_S = pig.Load_SampleCSV(FILES_S, wn_high = 5500, wn_low = 1000)
-# DF_OUTPUT_S, FAILURES_S = pig.Run_All_Spectra(DFS_DICT_S, OUTPUT_PATHS[stdno])
-# DF_OUTPUT_S.to_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATHS[stdno] + '_DF.csv')
-
-DF_OUTPUT_S = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATHS[stdno] + '_DF.csv', index_col = 0)
-
-T_ROOM = 25 # C
-P_ROOM = 1 # Bar
-
-N = 500000
-DENSITY_EPSILON_S, MEGA_SPREADSHEET_S = pig.Concentration_Output(DF_OUTPUT_S, N, THICKNESS_S, MICOMP_S, T_ROOM, P_ROOM)
-MEGA_SPREADSHEET_S.to_csv(output_dir[-1] + '/' + OUTPUT_PATHS[stdno] + '_H2OCO2_brounce.csv')
-DENSITY_EPSILON_S.to_csv(output_dir[-1] + '/' + OUTPUT_PATHS[stdno] + '_DensityEpsilon_brounce.csv')
-MEGA_SPREADSHEET_S
+sdf_conc = pig.calculate_concentrations(sdf_output, schem, sthick)
+sdf_conc.to_csv(sout + '_H2OCO2.csv')
 
 # %%
 
 stdno = 1
-
-MEGA_SPREADSHEET = pd.read_csv(output_dir[-1] + '/' + OUTPUT_PATHS[stdno] + '_H2OCO2_brounce.csv', index_col = 0) 
+MEGA_SPREADSHEET = pd.read_csv(sout + '_H2OCO2_brounce.csv', index_col = 0) 
 
 def STD_DF_MOD(MEGA_SPREADSHEET):
     STD_VAL = pd.DataFrame(index = MEGA_SPREADSHEET.index, columns = ['H2O_EXP', 'H2O_EXP_STD', 'CO2_EXP', 'CO2_EXP_STD'])
@@ -258,7 +232,6 @@ def STD_DF_MOD(MEGA_SPREADSHEET):
             CO2_EXP = np.nan
             CO2_EXP_STD = np.nan
 
-
         STD_VAL.loc[j] = pd.Series({'H2O_EXP':H2O_EXP,'H2O_EXP_STD':H2O_EXP_STD,'CO2_EXP':CO2_EXP,'CO2_EXP_STD':CO2_EXP_STD})
 
     MEGA_SPREADSHEET_STD = pd.concat([MEGA_SPREADSHEET, STD_VAL], axis = 1)
@@ -267,34 +240,23 @@ def STD_DF_MOD(MEGA_SPREADSHEET):
 
 MEGA_SPREADSHEET_STD = STD_DF_MOD(MEGA_SPREADSHEET)
 
-MEGA_SPREADSHEET_STD.to_csv(output_dir[-1] + '/' + OUTPUT_PATHS[stdno] + '_H2OCO2_FwSTD_brounce.csv')
+MEGA_SPREADSHEET_STD.to_csv(sout + '_H2OCO2_FwSTD_brounce.csv')
 
 MEGA_SPREADSHEET_STD
 
 
 # %%
 
-fuegorhno = 2 
+frhno = 2 
+frhloader = pig.SampleDataLoader(PATHS[frhno], CHEMTHICK_PATHS[frhno], OUTPUT_PATHS[frhno])
+frhfiles, frhdfs_dict, frhchem, frhthick, frhout, frhdataout = frhloader.load_all_data()
 
-# PATH_R = PATHS[fuegorhno]
-# FILES_R = sorted(glob.glob(PATH_R + "*"))
+frhdf_output, frhfailures = pig.calculate_baselines(frhdfs_dict, OUTPUT_PATHS[frhno])
+frhdf_output.to_csv(sdataout + '_DF.csv')
+# frhdf_output = pd.read_csv(frhout + '_DF.csv', index_col = 0)
 
-MICOMP_R, THICKNESS_R = pig.Load_ChemistryThickness(CHEMTHICK_PATH[fuegorhno])
-
-# DFS_FILES_R, DFS_DICT_R = pig.Load_SampleCSV(FILES_R, wn_high = 5500, wn_low = 1000)
-# DF_OUTPUT_R, FAILURES_R = pig.Run_All_Spectra(DFS_DICT_R, OUTPUT_PATHS[fuegorhno])
-# DF_OUTPUT_R.to_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATHS[fuegorhno] + '_DF.csv')
-
-DF_OUTPUT_R = pd.read_csv(path_beg + output_dir[-1] + '/' + OUTPUT_PATHS[fuegorhno] + '_DF.csv', index_col = 0)
-
-T_ROOM = 25 # C
-P_ROOM = 1 # Bar
-
-N = 500000
-DENSITY_EPSILON_R, MEGA_SPREADSHEET_R = pig.Concentration_Output(DF_OUTPUT_R, N, THICKNESS_R, MICOMP_R, T_ROOM, P_ROOM)
-MEGA_SPREADSHEET_R.to_csv(output_dir[-1] + '/' + OUTPUT_PATHS[fuegorhno] + '_H2OCO2_brounce.csv')
-DENSITY_EPSILON_R.to_csv(output_dir[-1] + '/' + OUTPUT_PATHS[fuegorhno] + '_DensityEpsilon_brounce.csv')
-MEGA_SPREADSHEET_R
+frhdf_conc = pig.calculate_concentrations(frhdf_output, frhchem, frhthick)
+frhdf_conc.to_csv(frhout + '_H2OCO2.csv')
 
 
 # %% 

@@ -1946,81 +1946,31 @@ def plot_H2Om_OH(data, files, als_bls, ax_top=None, ax_bottom=None):
 
     warnings.filterwarnings("ignore", module="matplotlib\\..*")
     warnings.filterwarnings("ignore", category = UserWarning)
+    
+    ax_top.plot(data.index, data["Absorbance"], "k", linewidth=1.5, label="NIR Spectrum")
 
-    ax_top.plot(data.index, data["Absorbance"], "k", linewidth=1.5)
-    ax_top.plot(
-        H2Om_5200_results[0]["peak_fit"].index,
-        H2Om_5200_results[0]["peak_fit"]["Absorbance_Filt"],
-        H2Om_5200_results[1]["peak_fit"].index,
-        H2Om_5200_results[1]["peak_fit"]["Absorbance_Filt"],
-        H2Om_5200_results[2]["peak_fit"].index,
-        H2Om_5200_results[2]["peak_fit"]["Absorbance_Filt"],
-    )
-    ax_top.plot(
-        OH_4500_results[0]["peak_fit"].index,
-        OH_4500_results[0]["peak_fit"]["Absorbance_Filt"],
-        OH_4500_results[1]["peak_fit"].index,
-        OH_4500_results[1]["peak_fit"]["Absorbance_Filt"],
-        OH_4500_results[2]["peak_fit"].index,
-        OH_4500_results[2]["peak_fit"]["Absorbance_Filt"],
-    )
-    ax_top.plot(
-        H2Om_5200_results[0]["peak_fit"].index,
-        H2Om_5200_results[0]["peak_fit"]["Baseline_NIR"],
-        "lightsteelblue",
-        H2Om_5200_results[1]["peak_fit"].index,
-        H2Om_5200_results[1]["peak_fit"]["Baseline_NIR"],
-        "lightsteelblue",
-        H2Om_5200_results[2]["peak_fit"].index,
-        H2Om_5200_results[2]["peak_fit"]["Baseline_NIR"],
-        "lightsteelblue",
-    )
-    ax_top.plot(
-        OH_4500_results[0]["peak_fit"].index,
-        OH_4500_results[0]["peak_fit"]["Baseline_NIR"],
-        "silver",
-        OH_4500_results[1]["peak_fit"].index,
-        OH_4500_results[1]["peak_fit"]["Baseline_NIR"],
-        "silver",
-        OH_4500_results[2]["peak_fit"].index,
-        OH_4500_results[2]["peak_fit"]["Baseline_NIR"],
-        "silver",
-    )
-    ax_top.annotate(
-        r"$\mathregular{H_2O_{m, 5200}}$ Peak Height: "
-        + f"{PH_5200_krige_M:.4f} "
-        + r"± "
-        + f"{PH_5200_krige_STD:.4f}, S2N={STN_5200_M:.2f}",
-        (0.025, 0.9),
-        xycoords="axes fraction",
-    )
-    ax_top.annotate(
-        r"$\mathregular{OH^{-}_{4500}}$ Peak Height: "
-        + f"{PH_4500_krige_M:.4f} "
-        + r"± "
-        + f"{PH_4500_krige_STD:.4f}, S2N={STN_4500_M:.2f}",
-        (0.025, 0.8),
-        xycoords="axes fraction",
-    )
-    ax_top.set_ylabel("Absorbance")
-    ax_top.legend(
-        [
-            "NIR Spectrum",
-            "_",
-            "_",
-            r"$\mathregular{H_2O_{m, 5200}}$ Median Filtered",
-            "_",
-            "_",
-            r"$\mathregular{OH^{-}_{4500}}$ Median Filtered",
-            "_",
-            "_",
-            r"$\mathregular{H_2O_{m, 5200}}$ Baseline",
-            "_",
-            "_",
-            r"$\mathregular{OH^{-}_{4500}}$ Baseline",
-        ],
-        prop={"size": 10},
-    )
+    for result in H2Om_5200_results:
+        ax_top.plot(result["peak_fit"].index, result["peak_fit"]["Absorbance_Filt"], "tab:blue",
+                    label=r"$\mathregular{H_2O_{m, 5200}}$ Median Filtered" if 
+                    result is H2Om_5200_results[0] else "_")
+    for result in OH_4500_results:
+        ax_top.plot(result["peak_fit"].index, result["peak_fit"]["Absorbance_Filt"], "tab:orange",
+                    label=r"$\mathregular{OH^{-}_{4500}}$ Median Filtered" if
+                    result is OH_4500_results[0] else "_")
+    for result in H2Om_5200_results:
+        ax_top.plot(result["peak_fit"].index, result["peak_fit"]["Baseline_NIR"], "lightsteelblue",
+                    label=r"$\mathregular{H_2O_{m, 5200}}$ Baseline" if
+                    result is H2Om_5200_results[0] else "_")
+    for result in OH_4500_results:
+        ax_top.plot(result["peak_fit"].index, result["peak_fit"]["Baseline_NIR"], "bisque",
+                    label=r"$\mathregular{OH^{-}_{4500}}$ Baseline" if
+                    result is OH_4500_results[0] else "_")
+
+    handles_top, labels_top = ax_top.get_legend_handles_labels()
+    filtered_handles_top = [h for h, l in zip(handles_top, labels_top) if not l.startswith('_')]
+    filtered_labels_top = [l for l in labels_top if not l.startswith('_')]
+    ax_top.legend(filtered_handles_top, filtered_labels_top, prop={"size": 10})
+
     plotmin = np.round(np.min(data.loc[4250:5400]["Absorbance"]), decimals=1)
     plotmax = np.round(np.max(data.loc[4250:5400]["Absorbance"]), decimals=1)
     ax_top.set_xlim([4200, 5400])
@@ -2031,122 +1981,34 @@ def plot_H2Om_OH(data, files, als_bls, ax_top=None, ax_bottom=None):
 
     warnings.filterwarnings("ignore", module="matplotlib\\..*")
     warnings.filterwarnings("ignore", category = UserWarning)
-    ax_bottom.plot(
-        H2Om_5200_results[0]["peak_fit"].index,
-        (
-            H2Om_5200_results[0]["peak_fit"]["Peak_Subtract"]
-            - np.min(H2Om_5200_results[0]["peak_krige"]["Absorbance"])
-        ),
-        "k",
-        label=r"$\mathregular{H_2O_{m, 5200}}$ Baseline Subtracted",
-    )
-    ax_bottom.plot(
-        H2Om_5200_results[1]["peak_fit"].index,
-        (
-            H2Om_5200_results[1]["peak_fit"]["Peak_Subtract"]
-            - np.min(H2Om_5200_results[1]["peak_krige"]["Absorbance"])
-        ),
-        "k",
-    )
-    ax_bottom.plot(
-        H2Om_5200_results[2]["peak_fit"].index,
-        (
-            H2Om_5200_results[2]["peak_fit"]["Peak_Subtract"]
-            - np.min(H2Om_5200_results[1]["peak_krige"]["Absorbance"])
-        ),
-        "k",
-    )
 
-    ax_bottom.plot(
-        OH_4500_results[0]["peak_fit"].index,
-        (
-            OH_4500_results[0]["peak_fit"]["Peak_Subtract"]
-            - np.min(OH_4500_results[0]["peak_krige"]["Absorbance"])
-        ),
-        "k",
-        label=r"$\mathregular{OH^{-}_{4500}}$ Baseline Subtracted",
-    )
-    ax_bottom.plot(
-        OH_4500_results[1]["peak_fit"].index,
-        (
-            OH_4500_results[1]["peak_fit"]["Peak_Subtract"]
-            - np.min(OH_4500_results[1]["peak_krige"]["Absorbance"])
-        ),
-        "k",
-    )
-    ax_bottom.plot(
-        OH_4500_results[2]["peak_fit"].index,
-        (
-            OH_4500_results[2]["peak_fit"]["Peak_Subtract"]
-            - np.min(OH_4500_results[2]["peak_krige"]["Absorbance"])
-        ),
-        "k",
-    )
 
-    ax_bottom.plot(
-        H2Om_5200_results[0]["peak_krige"].index,
-        (
-            H2Om_5200_results[0]["peak_krige"]["Absorbance"]
-            - np.min(H2Om_5200_results[0]["peak_krige"]["Absorbance"])
-        ),
-        label=r"$\mathregular{H_2O_{m, 5200}}$ Kriged Peak",
-    )
-    ax_bottom.plot(
-        H2Om_5200_results[1]["peak_krige"].index,
-        (
-            H2Om_5200_results[1]["peak_krige"]["Absorbance"]
-            - np.min(H2Om_5200_results[1]["peak_krige"]["Absorbance"])
-        ),
-    )
-    ax_bottom.plot(
-        H2Om_5200_results[2]["peak_krige"].index,
-        (
-            H2Om_5200_results[2]["peak_krige"]["Absorbance"]
-            - np.min(H2Om_5200_results[2]["peak_krige"]["Absorbance"])
-        ),
-    )
+    for result in H2Om_5200_results:
+        baseline_subtracted = result["peak_fit"]["Peak_Subtract"] - np.min(result["peak_krige"]["Absorbance"])
+        ax_bottom.plot(result["peak_fit"].index, baseline_subtracted, "k",
+                    label=r"$\mathregular{H_2O_{m, 5200}}$ Baseline Subtracted" if result is H2Om_5200_results[0] else "_")
 
-    ax_bottom.plot(
-        OH_4500_results[0]["peak_krige"].index,
-        (
-            OH_4500_results[0]["peak_krige"]["Absorbance"]
-            - np.min(OH_4500_results[0]["peak_krige"]["Absorbance"])
-        ),
-        label=r"$\mathregular{OH^{-}_{4500}}$ Kriged Peak",
-    )
-    ax_bottom.plot(
-        OH_4500_results[1]["peak_krige"].index,
-        (
-            OH_4500_results[1]["peak_krige"]["Absorbance"]
-            - np.min(OH_4500_results[1]["peak_krige"]["Absorbance"])
-        ),
-    )
-    ax_bottom.plot(
-        OH_4500_results[2]["peak_krige"].index,
-        (
-            OH_4500_results[2]["peak_krige"]["Absorbance"]
-            - np.min(OH_4500_results[2]["peak_krige"]["Absorbance"])
-        ),
-    )
-    ax_bottom.set_xlabel(r"Wavenumber $(\mathregular{cm^{-1}})$")
-    ax_bottom.set_ylabel("Absorbance")
-    ax_bottom.legend(
-        [
-            r"$\mathregular{H_2O_{m, 5200}}$ Baseline Subtracted",
-            "_",
-            "_",
-            r"$\mathregular{OH^{-}_{4500}}$ Baseline Subtracted",
-            "_",
-            "_",
-            "_",
-            "_",
-            r"$\mathregular{H_2O_{m, 5200}}$ Kriged",
-            "_",
-            "_",
-            r"$\mathregular{OH^{-}_{4500}}$ Kriged",
-        ],
-        prop={"size": 10},
-    )
+    for result in OH_4500_results:
+        baseline_subtracted = result["peak_fit"]["Peak_Subtract"] - np.min(result["peak_krige"]["Absorbance"])
+        ax_bottom.plot(result["peak_fit"].index, baseline_subtracted, "k",
+                    label=r"$\mathregular{OH^{-}_{4500}}$ Baseline Subtracted" if result is OH_4500_results[0] else "_")
+
+    for result in H2Om_5200_results:
+        kriged_peak = result["peak_krige"]["Absorbance"] - np.min(result["peak_krige"]["Absorbance"])
+        ax_bottom.plot(result["peak_krige"].index, kriged_peak, "tab:blue",
+                    label=r"$\mathregular{H_2O_{m, 5200}}$ Kriged Peak" if result is H2Om_5200_results[0] else "_")
+
+    for result in OH_4500_results:
+        kriged_peak = result["peak_krige"]["Absorbance"] - np.min(result["peak_krige"]["Absorbance"])
+        ax_bottom.plot(result["peak_krige"].index, kriged_peak, "tab:orange",
+                    label=r"$\mathregular{OH^{-}_{4500}}$ Kriged Peak" if result is OH_4500_results[0] else "_")
+
+    # Handling legend entries to avoid duplicates
+    handles_bottom, labels_bottom = ax_bottom.get_legend_handles_labels()
+    filtered_handles_bottom = [h for h, l in zip(handles_bottom, labels_bottom) if not l.startswith('_')]
+    filtered_labels_bottom = [l for l in labels_bottom if not l.startswith('_')]
+    ax_bottom.legend(filtered_handles_bottom, filtered_labels_bottom, prop={"size": 10})
+
     ax_bottom.set_xlim([4200, 5400])
     plotmax = np.round(
         np.max(OH_4500_results[0]["peak_fit"]["Peak_Subtract"]), decimals=1

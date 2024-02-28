@@ -2,6 +2,10 @@
 Change Log
 ==========
 
+Version 0.4.2
+=============
+Streamline exports from calculate_concentrations function, merge sheets. Working through reviewer comments from Volcanica!
+
 
 Version 0.4.1
 =============
