@@ -186,20 +186,20 @@ class test_plot_pyiroglass(unittest.TestCase):
     def test_plot_H2Om_OH(self, mock_subplots):
         mock_fig = MagicMock()
         mock_ax_top = MagicMock()
-        mock_ax_bottom = MagicMock()
-        mock_subplots.return_value = (mock_fig, (mock_ax_top, mock_ax_bottom))
+        mock_ax_bot = MagicMock()
+        mock_subplots.return_value = (mock_fig, (mock_ax_top, mock_ax_bot))
         mock_ax_top.get_legend_handles_labels.return_value = ([], [])
-        mock_ax_bottom.get_legend_handles_labels.return_value = ([], [])
+        mock_ax_bot.get_legend_handles_labels.return_value = ([], [])
 
         pig.plot_H2Om_OH(
             self.df,
             self.file,
             self.als_bls,
             ax_top=mock_ax_top,
-            ax_bottom=mock_ax_bottom,
+            ax_bot=mock_ax_bot,
         )
         self.assertTrue(mock_ax_top.plot.called)
-        self.assertTrue(mock_ax_bottom.plot.called)
+        self.assertTrue(mock_ax_bot.plot.called)
 
         plt.close("all")
 
@@ -209,7 +209,7 @@ class test_plot_pyiroglass(unittest.TestCase):
 
         before_plot_figures = len(plt.get_fignums())
 
-        pig.plot_H2Om_OH(self.df, self.file, self.als_bls, ax_top=None, ax_bottom=None)
+        pig.plot_H2Om_OH(self.df, self.file, self.als_bls, ax_top=None, ax_bot=None)
 
         after_plot_figures = len(plt.get_fignums())
 
