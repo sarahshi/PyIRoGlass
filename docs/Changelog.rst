@@ -6,6 +6,7 @@ Version 0.5.2
 =============
 Account for variability in export_path naming practice. Remove remove_baseline argument from thickness functions.
 
+
 Version 0.5.1
 =============
 Updating molar absorptivity inversions to add Shi et al., 2024 values for H2Ot, 3550 and carbonate. Update data export paths to be more sensible within the calculate_baselines and calculate_concentrations functions. Add to the inversion.py functionality for calculating statistics. 
