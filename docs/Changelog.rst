@@ -4,8 +4,7 @@ Change Log
 
 Version 0.5.2
 =============
-Account for variability in export_path naming practice. 
-
+Account for variability in export_path naming practice. Remove remove_baseline argument from thickness functions.
 
 Version 0.5.1
 =============

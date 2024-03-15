@@ -62,7 +62,6 @@ class test_thickness(unittest.TestCase):
                               plotting=True,
                               savgol_filter_width=savgol_filter_width_ol,
                               smoothing_wn_width=smoothing_wn_width_ol,
-                              remove_baseline=True,
                               peak_heigh_min_delta=peak_heigh_min_delta_ol,
                               peak_search_width=peak_search_width_ol)
         expected_peak_loc = 2138.76
@@ -81,7 +80,6 @@ class test_thickness(unittest.TestCase):
                 result,
                 self.wn_high_ol,
                 self.wn_low_ol,
-                remove_baseline=False,
                 plotting=False,
                 phaseol=True)
 
@@ -90,7 +88,6 @@ class test_thickness(unittest.TestCase):
                 1.546,
                 self.wn_high_gl,
                 self.wn_low_gl,
-                remove_baseline=False,
                 plotting=False,
                 phaseol=False)
 
