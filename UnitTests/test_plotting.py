@@ -249,7 +249,9 @@ class test_plot_pyiroglass(unittest.TestCase):
         mock_ax = MagicMock()
         mock_subplots.return_value = (mock_fig, mock_ax)
 
-        pig.plot_carbonate(self.df, self.file, self.mcmc_npz, export_path=None, ax=mock_ax)
+        pig.plot_carbonate(
+            self.df, self.file, self.mcmc_npz, export_path=None, ax=mock_ax
+        )
         self.assertTrue(mock_ax.plot.called)
         plt.close("all")
 
