@@ -57,8 +57,7 @@ class SampleDataLoader:
 
     def __init__(self,
                  spectrum_path=None,
-                 chemistry_thickness_path=None,
-                 export_path=None):
+                 chemistry_thickness_path=None):
 
         """
         Initializes a SampleDataLoader object with optional default paths for
@@ -67,48 +66,6 @@ class SampleDataLoader:
 
         self.spectrum_path = spectrum_path
         self.chemistry_thickness_path = chemistry_thickness_path
-        self.export_path = export_path
-        self.initialize_export_paths(export_path)
-
-    def initialize_export_paths(self, export_path):
-
-        """
-        Initializes the export paths for various data outputs, such as figures,
-        plot files, and final data. This method creates the necessary
-        directories if they do not exist. If an export path is provided, it is
-        used as the base directory for all exports. Otherwise, a default
-        directory named 'export_data' within the current working directory
-        is used.
-        """
-
-        output_dirs = [
-            "FIGURES", "PLOTFILES", "NPZTXTFILES", "LOGFILES",
-            "PKLFILES", "BLPEAKFILES", "FINALDATA"
-        ]
-        add_dirs = ["TRACE", "HISTOGRAM", "PAIRWISE", "MODELFIT"]
-
-        # Default directory for data export if export_path is not provided
-        default_export_dir = "Samples" if export_path is None else export_path
-
-        paths = {}
-        for dir_name in output_dirs:
-            if dir_name == "FINALDATA":
-                full_path = os.path.join(os.getcwd(), dir_name)
-            else:
-                # Other directories nested in 'export_path'/default directory
-                full_path = os.path.join(os.getcwd(), dir_name,
-                                         default_export_dir)
-
-            os.makedirs(full_path, exist_ok=True)
-            paths[dir_name] = full_path
-
-        plotfile_path = paths["PLOTFILES"]
-        for add_dir in add_dirs:
-            os.makedirs(os.path.join(plotfile_path, add_dir), exist_ok=True)
-
-        # For 'data_export_path', use 'FINALDATA' without nesting further
-        self.data_export_path = os.path.join(paths["FINALDATA"],
-                                             default_export_dir)
 
     def load_spectrum_directory(self, wn_high=5500, wn_low=1000):
 
@@ -144,10 +101,10 @@ class SampleDataLoader:
             dfs.append(spectrum)
             files.append(file)
 
-        self.files = files
+        # self.files = files
         self.dfs_dict = dict(zip(files, dfs))
 
-        return self.files, self.dfs_dict
+        return self.dfs_dict
 
     def load_chemistry_thickness(self):
 
@@ -190,22 +147,19 @@ class SampleDataLoader:
         if self.chemistry_thickness_path is None:
             raise ValueError("Chemistry thickness path is not provided.")
 
-        files, dfs_dict = self.load_spectrum_directory(wn_high=wn_high,
-                                                       wn_low=wn_low)
+        dfs_dict = self.load_spectrum_directory(wn_high=wn_high,
+                                                wn_low=wn_low)
         chemistry, thickness = self.load_chemistry_thickness()
 
-        self.files = files
+        # self.files = files
         self.dfs_dict = dfs_dict
         self.chemistry = chemistry
         self.thickness = thickness
 
         return (
-            self.files,
             self.dfs_dict,
             self.chemistry,
             self.thickness,
-            self.export_path,
-            self.data_export_path,
         )
 
 
@@ -485,8 +439,8 @@ def NIR_process(data, wn_low, wn_high, peak):
 
     Returns:
         peak_fit (pd.DataFrame): A DataFrame of the absorbance data in
-            the region of interest, median filtered data, baseline
-            subtracted absorbance, and the subtracted peak.
+        the region of interest, median filtered data, baseline
+        subtracted absorbance, and the subtracted peak.
         krige_out (pd.DataFrame): A DataFrame of kriged data output.
         PH_krige (float): The peak height obtained after kriging.
         STN (float): The signal to noise ratio.
@@ -576,9 +530,9 @@ def MIR_process(data, wn_low, wn_high):
         wn_high (int): The higher bound wavenumber for MIR H2Ot, 3550.
 
     Returns:
-        data_output (pd.DataFrame): A DataFrame of absorbance data,
-            median filtered data, baseline subtracted absorbance,
-            and the subtracted peak.
+        data_output (pd.DataFrame): A DataFrame of absorbance data, 
+        median filtered data, baseline subtracted absorbance,
+        and the subtracted peak.
         krige_out (pd.DataFrame): A DataFrame of kriged data output.
         PH_krige (float): The peak height obtained after kriging.
 
@@ -688,7 +642,7 @@ def calculate_baselines(dfs_dict, export_path):
     The calculate_baselines function processes a collection of spectral data
     to fit baselines to all H2O and CO2 related peaks in basaltic-andesitic
     spectra. The function inputs the dictionary of DataFrames that were
-    created by the SampleDataLoad class and determines best-fit (and
+    created by the SampleDataLoader class and determines best-fit (and
     standard deviations) baselines, peak heights, peak locations, peak
     widths, and principal component vectors used to fit the spectra. These
     values are exported in a csv file and figures are created for each
@@ -713,8 +667,6 @@ def calculate_baselines(dfs_dict, export_path):
             failed, possibly due to data issues or processing errors.
 
     """
-
-    path_beg = os.getcwd() + "/"
 
     # Load files with PC vectors for the baseline and H2Om, 1635 peak.
     vector_loader = VectorLoader()
@@ -884,6 +836,7 @@ def calculate_baselines(dfs_dict, export_path):
             if export_path is not None:
                 warnings.filterwarnings("ignore", category=DeprecationWarning)
                 # Create output directories for resulting files
+                default_export_dir = "Samples" if export_path is None else export_path
                 output_dirs = [
                     "FIGURES",
                     "PLOTFILES",
@@ -891,11 +844,31 @@ def calculate_baselines(dfs_dict, export_path):
                     "LOGFILES",
                     "BLPEAKFILES",
                     "PKLFILES",
+                    "FINALDATA",
                 ]
+                add_dirs = [
+                    "TRACE",
+                    "HISTOGRAM",
+                    "PAIRWISE",
+                    "MODELFIT",
+                ]
+
                 paths = {}
                 for dir_name in output_dirs:
-                    full_path = os.path.join(path_beg, dir_name, export_path)
+                    if dir_name == "FINALDATA":
+                        full_path = os.path.join(os.getcwd(), dir_name)
+                    else:
+                        # Other directories in 'export_path'
+                        full_path = os.path.join(os.getcwd(), dir_name,
+                                                default_export_dir)
+
+                    os.makedirs(full_path, exist_ok=True)
                     paths[dir_name] = full_path
+
+                plotfile_path = paths["PLOTFILES"]
+                for add_dir in add_dirs:
+                    os.makedirs(os.path.join(plotfile_path, add_dir), 
+                                exist_ok=True)
 
                 # Create additional directories under 'PLOTFILES'
                 plotfile_path = paths["PLOTFILES"]
@@ -906,6 +879,8 @@ def calculate_baselines(dfs_dict, export_path):
                 sfpath = os.path.join(paths["NPZTXTFILES"], "")
                 lpath = os.path.join(paths["LOGFILES"], "")
                 pklpath = os.path.join(paths["PKLFILES"], "")
+                full_path = os.path.join(paths["FINALDATA"], "")
+                file_name = f"{export_path}_DF.csv"
 
                 als_bls = {
                     "OH_4500_results": OH_4500_results,
@@ -979,6 +954,10 @@ def calculate_baselines(dfs_dict, export_path):
                 plt.close("all")
 
             else:
+                full_path = os.path.join(os.getcwd(), "FINALDATA")
+                os.makedirs(full_path, exist_ok=True)
+                file_name = "DF.csv"
+
                 mc3_output = MCMC(
                     data=spec_mc3,
                     uncert=uncert,
@@ -1002,7 +981,7 @@ def calculate_baselines(dfs_dict, export_path):
                 # Create subplot of H2Ot_{3550} baselines/peak fits
                 plot_H2Ot_3550(data, files, als_bls, ax=ax3)
                 # Create subplot of CO_3^{2-} baselines/peak fits
-                plot_carbonate(data, files, mc3_output, ax=ax4)
+                plot_carbonate(data, files, mc3_output, export_path, ax=ax4)
                 plt.tight_layout()
                 plt.savefig(fpath + files + ".pdf")
                 plt.close("all")
@@ -1059,6 +1038,9 @@ def calculate_baselines(dfs_dict, export_path):
 
     Volatile_PH = pd.concat([H2O_3550_PH, DF_Output, NEAR_IR_PH, PC_Output],
                             axis=1)
+
+    full_file_path = os.path.join(full_path, file_name)
+    Volatile_PH.to_csv(full_file_path)
 
     return Volatile_PH, failures
 
@@ -1322,16 +1304,16 @@ def calculate_epsilon(composition, T, P):
 
     # Set up extinction coefficient inversion best-fit parameters and
     # covariance matrices
-    mest_3550 = np.array([15.725557, 71.368691])
-    mest_1635 = np.array([-50.397564, 124.250534])
-    mest_CO2 = np.array([426.66290034, -334.45444392])
-    covm_est_3550 = np.diag([38.4640, 77.8597])
-    covm_est_1635 = np.diag([20.8503, 39.3875])
-    covm_est_CO2 = np.diag([93.85345732, 359.94988573])
-    mest_4500 = np.array([-1.632730, 3.532522])
-    mest_5200 = np.array([-2.291420, 4.675528])
-    covm_est_4500 = np.diag([0.0329, 0.0708])
-    covm_est_5200 = np.diag([0.0129, 0.0276])
+    mest_5200 = np.array([-2.29142025, 4.67552848])
+    covm_est_5200 = np.diag([0.01285319, 0.02764414])
+    mest_4500 = np.array([-1.63273006, 3.53252218])
+    covm_est_4500 = np.diag([0.03292054, 0.07082581])
+    mest_3550 = np.array([15.88456476, 71.22955961])
+    covm_est_3550 = np.diag([38.06765317, 77.40636723])
+    mest_1635 = np.array([-50.3975642, 124.2505339])
+    covm_est_1635 = np.diag([20.85034888, 39.38749563])
+    mest_CO2 = np.array([417.4903541 , -318.59874422])
+    covm_est_CO2 = np.diag([84.92345481, 339.80111416])
 
     # Set up matrices for calculating uncertainties on extinction coefficients
     G_SiAl = np.ones((2, 1))
@@ -1383,7 +1365,7 @@ def calculate_epsilon(composition, T, P):
         epsilon.loc[i] = pd.Series(
             {
                 "Tau": SiAl_tot[i],
-                "Na/Na+Ca": Na_NaCa[i],
+                "Eta": Na_NaCa[i],
                 "epsilon_H2Ot_3550": epsilon_H2Ot_3550,
                 "sigma_epsilon_H2Ot_3550": CT68_3550,
                 "epsilon_H2Om_1635": epsilon_H2Om_1635,
@@ -1401,7 +1383,7 @@ def calculate_epsilon(composition, T, P):
 
 
 def calculate_concentrations(Volatile_PH, composition, thickness,
-                             N=500000, T=25, P=1):
+                             export_path, N=500000, T=25, P=1):
 
     """
     The calculate_concentrations function calculates the concentrations
@@ -1443,6 +1425,22 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
         all specified peaks. Errors in input data or missing values may affect
         the accuracy of the results.
     """
+
+    if export_path is not None:
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
+        output_dirs = ["FINALDATA"]
+
+        for dir_name in output_dirs:
+            full_path = os.path.join(os.getcwd(), dir_name)
+            os.makedirs(full_path, exist_ok=True)
+
+        file_name = f"{export_path}_H2OCO2.csv"
+    else: 
+        full_path = os.path.join(os.getcwd(), "FINALDATA")
+        os.makedirs(full_path, exist_ok=True)
+        file_name = "H2OCO2.csv"
+
+    full_file_path = os.path.join(full_path, file_name)
 
     # Define a dictionary of molar masses for each oxide
     molar_mass = {
@@ -1885,6 +1883,8 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
     concentrations_df["CO2_MEAN"] = mean_vol["CO2_MEAN"]
     concentrations_df["CO2_STD"] = mean_vol["CO2_STD"]
 
+    concentrations_df.to_csv(full_file_path)
+
     return concentrations_df
 
 
@@ -2180,7 +2180,7 @@ def plot_H2Ot_3550(data, files, als_bls, ax=None):
     ax.invert_xaxis()
 
 
-def derive_carbonate(data, files, mc3_output, export_path=None):
+def derive_carbonate(data, files, mc3_output, export_path):
 
     """
     Derives and saves carbonate region baseline and peak fits from FTIR
@@ -2319,7 +2319,7 @@ def derive_carbonate(data, files, mc3_output, export_path=None):
     return bestfits, baselines
 
 
-def plot_carbonate(data, files, mc3_output, ax=None):
+def plot_carbonate(data, files, mc3_output, export_path, ax=None):
 
     """
     Plots the FTIR spectrum along with baseline fits, and model fits for
@@ -2359,7 +2359,7 @@ def plot_carbonate(data, files, mc3_output, ax=None):
         fig, ax = plt.subplots(figsize=(8, 8))
         ax.set_title(files)
 
-    bestfits, baselines = derive_carbonate(data, files, mc3_output)
+    bestfits, baselines = derive_carbonate(data, files, mc3_output, export_path)
     ax.plot(baselines.index, baselines.to_numpy(), "dimgray", linewidth=0.25)
     ax.plot(
         bestfits.index,

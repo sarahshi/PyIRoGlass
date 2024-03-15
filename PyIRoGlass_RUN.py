@@ -24,72 +24,56 @@ import seaborn as sns
 
 # Get working paths 
 path_input = os.getcwd() + '/Inputs/'
-path_spec_input = path_input + 'TransmissionSpectra/'
-output_dir = ["FIGURES", "PLOTFILES", "NPZTXTFILES", "LOGFILES", "FINALDATA"] 
 
 # Change paths to direct to folder with SampleSpectra -- last bit should be whatever your folder with spectra is called. 
-PATHS = [path_spec_input + string for string in ['testing/', 'Fuego/', 'Standards/', 'Fuego1974RH/']]
+PATHS = [path_input + 'TransmissionSpectra/' + string for string in ['Fuego/', 'Standards/', 'Fuego1974RH/']]
 
 # Put ChemThick file in Inputs. Direct to what your ChemThick file is called. 
 CHEMTHICK_PATHS = [path_input + string for string in ['FuegoChemThick.csv', 'StandardChemThick.csv', 'FuegoRHChemThick.csv']]
 
 # Change last value in list to be what you want your output directory to be called. 
-OUTPUT_PATHS = ['testing', 'FUEGO', 'STD', 'FRH']
+OUTPUT_PATHS = ['FUEGO', 'STD', 'FRH']
 
+# %%
 # %% 
 
-REF_PATH = path_input + 'ReflectanceSpectra/FuegoOl/'
-REF_FILES = sorted(glob.glob(REF_PATH + "*"))
-
-REF_DFS_FILES, REF_DFS_DICT = pig.Load_SampleCSV(REF_FILES, wn_high = 2700, wn_low = 2100)
+ref_ol_loader = pig.SampleDataLoader(spectrum_path=path_input+'ReflectanceSpectra/FuegoOl/')
+ref_ol_dfs_dict = ref_ol_loader.load_spectrum_directory(wn_high=2700, wn_low=2100)
 
 # Use DHZ parameterization of olivine reflectance index. 
-n_ol = pig.Reflectance_Index(0.72)
+n_ol = pig.reflectance_index(0.72)
+ref_fuego = pig.calculate_mean_thickness(ref_ol_dfs_dict, n=n_ol, wn_high=2700, wn_low=2100, remove_baseline=True, plotting=False, phaseol=True)
 
-REF_FUEGO = pig.Thickness_Process(REF_DFS_DICT, n = n_ol, wn_high = 2700, wn_low = 2100, remove_baseline = True, plotting = False, phaseol = True)
-
-REF_PATH = path_input + '/ReflectanceSpectra/rf_ND70/'
-REF_FILES = sorted(glob.glob(REF_PATH + "*"))
-
-REF_DFS_FILES, REF_DFS_DICT = pig.Load_SampleCSV(REF_FILES, wn_high = 2850, wn_low = 1700)
+ref_gl_loader = pig.SampleDataLoader(spectrum_path=path_input+'ReflectanceSpectra/rf_ND70/')
+ref_gl_dfs_dict = ref_gl_loader.load_spectrum_directory(wn_high=2850, wn_low=1700)
 
 # n=1.546 in the range of 2000-2700 cm^-1 following Nichols and Wysoczanski, 2007 for basaltic glass
 n_gl = 1.546
-
-REF_FUEGO = pig.Thickness_Process(REF_DFS_DICT, n = n_gl, wn_high = 2850, wn_low = 1700, remove_baseline = True, plotting = False, phaseol = False)
+ref_nd70 = pig.calculate_mean_thickness(ref_gl_dfs_dict, n=n_gl, wn_high=2850, wn_low=1700, remove_baseline=True, plotting=False, phaseol=False)
 
 # %% 
 # %%
 
-fuegono = 0 
-floader = pig.SampleDataLoader(PATHS[fuegono], CHEMTHICK_PATHS[fuegono], OUTPUT_PATHS[fuegono])
-ffiles, fdfs_dict, fchem, fthick, fout, fdataout = floader.load_all_data()
+fuegono = 0
+floader = pig.SampleDataLoader(PATHS[fuegono], CHEMTHICK_PATHS[fuegono])
+fdfs_dict, fchem, fthick = floader.load_all_data()
 
 fdf_output, ffailures = pig.calculate_baselines(fdfs_dict, OUTPUT_PATHS[fuegono])
-fdf_output.to_csv(fdataout + '_DF.csv')
-# fdf_output = pd.read_csv(fout + '_DF.csv', index_col = 0)
-
-fdf_conc = pig.calculate_concentrations(fdf_output, fchem, fthick)
-fdf_conc.to_csv(fout + '_H2OCO2.csv')
+fdf_conc = pig.calculate_concentrations(fdf_output, fchem, fthick, OUTPUT_PATHS[fuegono])
 
 # %%
 # %% 
 
 stdno = 1
-sloader = pig.SampleDataLoader(PATHS[stdno], CHEMTHICK_PATHS[stdno], OUTPUT_PATHS[stdno])
-sfiles, sdfs_dict, schem, sthick, sout, sdataout = sloader.load_all_data()
+sloader = pig.SampleDataLoader(PATHS[stdno], CHEMTHICK_PATHS[stdno])
+sdfs_dict, schem, sthick = sloader.load_all_data()
 
 sdf_output, sfailures = pig.calculate_baselines(sdfs_dict, OUTPUT_PATHS[stdno])
-sdf_output.to_csv(sdataout + '_DF.csv')
-# sdf_output = pd.read_csv(sout + '_DF.csv', index_col = 0)
-
-sdf_conc = pig.calculate_concentrations(sdf_output, schem, sthick)
-sdf_conc.to_csv(sout + '_H2OCO2.csv')
+sdf_conc = pig.calculate_concentrations(sdf_output, schem, sthick, OUTPUT_PATHS[stdno])
 
 # %%
 
-stdno = 1
-MEGA_SPREADSHEET = pd.read_csv(sout + '_H2OCO2_brounce.csv', index_col = 0) 
+MEGA_SPREADSHEET = pd.read_csv('FINALDATA/STD_H2OCO2.csv', index_col = 0) 
 
 def STD_DF_MOD(MEGA_SPREADSHEET):
     STD_VAL = pd.DataFrame(index = MEGA_SPREADSHEET.index, columns = ['H2O_EXP', 'H2O_EXP_STD', 'CO2_EXP', 'CO2_EXP_STD'])
@@ -194,18 +178,18 @@ def STD_DF_MOD(MEGA_SPREADSHEET):
         elif 'BF73' in j: 
             H2O_EXP = 0.715
             H2O_EXP_STD = 0.0715
-            CO2_EXP = 2995 # 2170 
-            CO2_EXP_STD = 190 # 68 
+            CO2_EXP = 2995
+            CO2_EXP_STD = 190
         elif 'BF76' in j: 
             H2O_EXP = 0.669
             H2O_EXP_STD = 0.0669
-            CO2_EXP = 2336 # 2052 
-            CO2_EXP_STD = 127 # 68 
+            CO2_EXP = 2336
+            CO2_EXP_STD = 127
         elif 'BF77' in j: 
             H2O_EXP = 0.696
             H2O_EXP_STD = 0.0696
-            CO2_EXP = 1030 # 708
-            CO2_EXP_STD = 27 # 29 
+            CO2_EXP = 1030
+            CO2_EXP_STD = 27
         elif 'FAB1' in j: 
             H2O_EXP = np.nan
             H2O_EXP_STD = np.nan
@@ -214,8 +198,8 @@ def STD_DF_MOD(MEGA_SPREADSHEET):
         elif 'NS1' in j: 
             H2O_EXP = 0.37
             H2O_EXP_STD = 0.037
-            CO2_EXP = 3154 # 4433
-            CO2_EXP_STD = 3154*0.05 # 222
+            CO2_EXP = 3154 
+            CO2_EXP_STD = 3154*0.05
         elif 'M35' in j: 
             H2O_EXP = 4.20
             H2O_EXP_STD = 0.420
@@ -226,6 +210,36 @@ def STD_DF_MOD(MEGA_SPREADSHEET):
             H2O_EXP_STD = 0.279
             CO2_EXP = 3172
             CO2_EXP_STD = 317.2
+        elif 'INSOL' in j: 
+            H2O_EXP = 0.20
+            H2O_EXP_STD = 0.01
+            CO2_EXP = 8025.5
+            CO2_EXP_STD = 995
+        elif 'ND70_02' in j: 
+            H2O_EXP = 2.53
+            H2O_EXP_STD = 0.24
+            CO2_EXP = 1837
+            CO2_EXP_STD = 35
+        elif 'ND70_03' in j: 
+            H2O_EXP = 3.13
+            H2O_EXP_STD = 0.30
+            CO2_EXP = 2689
+            CO2_EXP_STD = 54
+        elif 'ND70_04' in j: 
+            H2O_EXP = 3.68
+            H2O_EXP_STD = 0.35
+            CO2_EXP = 4122
+            CO2_EXP_STD = 65
+        elif 'ND70_05' in j: 
+            H2O_EXP = 5.34
+            H2O_EXP_STD = 0.51
+            CO2_EXP = 12682 
+            CO2_EXP_STD = 105
+        elif 'ND70_06' in j: 
+            H2O_EXP = 6.26
+            H2O_EXP_STD = 0.59
+            CO2_EXP = 16847
+            CO2_EXP_STD = 120
         else: 
             H2O_EXP = np.nan
             H2O_EXP_STD = np.nan
@@ -240,23 +254,19 @@ def STD_DF_MOD(MEGA_SPREADSHEET):
 
 MEGA_SPREADSHEET_STD = STD_DF_MOD(MEGA_SPREADSHEET)
 
-MEGA_SPREADSHEET_STD.to_csv(sout + '_H2OCO2_FwSTD_brounce.csv')
+MEGA_SPREADSHEET_STD.to_csv('FINALDATA/STD_H2OCO2_FwSTD.csv')
 
 MEGA_SPREADSHEET_STD
 
-
+# %%
 # %%
 
 frhno = 2 
-frhloader = pig.SampleDataLoader(PATHS[frhno], CHEMTHICK_PATHS[frhno], OUTPUT_PATHS[frhno])
-frhfiles, frhdfs_dict, frhchem, frhthick, frhout, frhdataout = frhloader.load_all_data()
+frhloader = pig.SampleDataLoader(PATHS[frhno], CHEMTHICK_PATHS[frhno])
+frhdfs_dict, frhchem, frhthick = frhloader.load_all_data()
 
 frhdf_output, frhfailures = pig.calculate_baselines(frhdfs_dict, OUTPUT_PATHS[frhno])
-frhdf_output.to_csv(sdataout + '_DF.csv')
-# frhdf_output = pd.read_csv(frhout + '_DF.csv', index_col = 0)
-
-frhdf_conc = pig.calculate_concentrations(frhdf_output, frhchem, frhthick)
-frhdf_conc.to_csv(frhout + '_H2OCO2.csv')
+frhdf_conc = pig.calculate_concentrations(frhdf_output, frhchem, frhthick, OUTPUT_PATHS[frhno])
 
 
-# %% 
+# %%

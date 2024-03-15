@@ -38,8 +38,8 @@ class test_loading_csv(unittest.TestCase):
             '../Inputs/TransmissionSpectra/Fuego/')
 
         loader = pig.SampleDataLoader(spectrum_path=dir_path)
-        files, dfs_dict = loader.load_spectrum_directory()
-        self.assertEqual(len(files), 97)  # Adjust based on your test data
+        dfs_dict = loader.load_spectrum_directory()
+        self.assertEqual(len(dfs_dict), 97)  # Adjust based on your test data
 
     def test_load_chemthick(self):
 
@@ -69,10 +69,9 @@ class test_loading_csv(unittest.TestCase):
             '../Inputs/ChemThick_Template.csv')
         loader = pig.SampleDataLoader(spectrum_path=dir_path, 
                                       chemistry_thickness_path=file_path)
-        (files, data, chemistry, thickness, 
-         export_path, data_export_path) = loader.load_all_data()
+        (dfs_dict, chemistry, thickness) = loader.load_all_data()
 
-        self.assertEqual(len(files), 97)  # Adjust based on your test data
+        self.assertEqual(len(dfs_dict), 97)  # Adjust based on your test data
         self.assertEqual(chemistry.shape, (9, 11))
         self.assertEqual(thickness.shape, (9, 2))
 

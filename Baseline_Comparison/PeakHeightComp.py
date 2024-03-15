@@ -29,60 +29,35 @@ plt.rcParams["ytick.labelsize"] = 20 # Sets size of numbers on tick marks
 plt.rcParams["axes.titlesize"] = 22
 plt.rcParams["axes.labelsize"] = 22 # Axes labels
 
-# %% 
-
-# Get working paths 
-path_beg = os.getcwd() + '/'
-path_input = os.getcwd() + '/Inputs/'
-path_spec_input = os.getcwd() + '/Inputs/TransmissionSpectra/'
-output_dir = ["FIGURES", "PLOTFILES", "NPZTXTFILES", "LOGFILES", "FINALDATA"] 
-
-# Change paths to direct to folder with SampleSpectra -- last bit should be whatever your folder with spectra is called. 
-PATHS = [path_spec_input + string for string in ['Fuego/', 'Standards/', 'Fuego1974RH/']]
-
-# Put ChemThick file in Inputs. Direct to what your ChemThick file is called. 
-CHEMTHICK_PATH = [path_input + string for string in ['FuegoChemThick.csv', 'StandardChemThick.csv', 'FuegoRHChemThick.csv']]
-
-# Change last value in list to be what you want your output directory to be called. 
-OUTPUT_PATHS = ['FUEGO', 'STD', 'FRH']
-
 
 # %% 
 
-stdno = 1
 
-MEGA_SPREADSHEET = pd.read_csv('../FINALDATA/' + OUTPUT_PATHS[stdno] + '_DF.csv', index_col = 0) 
+MEGA_SPREADSHEET = pd.read_csv('../FINALDATA/STD_DF.csv', index_col = 0) 
 MEGA_SPREADSHEET['Sample ID'] = MEGA_SPREADSHEET.index
 
-DE = pd.read_csv('../FINALDATA/' + OUTPUT_PATHS[stdno] + '_DensityEpsilon.csv', index_col = 0) 
-DE['Sample ID'] = DE.index
-
-CONC = pd.read_csv('../FINALDATA/' + OUTPUT_PATHS[stdno] + '_H2OCO2.csv', index_col = 0) 
+CONC = pd.read_csv('../FINALDATA/STD_H2OCO2.csv', index_col = 0) 
 CONC['Sample ID'] = MEGA_SPREADSHEET.index
 
 HJ = pd.read_csv('PyIRoGlass-LHJ_091623.csv', index_col=0)
-HJ_peaks = HJ[['Sample ID', 'Repeats', 'Sub_Repeats', 'PH_1430', 'PH_1515', 'Thickness']]
+HJ_peaks = HJ[['Repeats', 'PH_1430', 'PH_1515', 'Thickness']]
 
 CONC_conc = CONC[['CO2_MEAN', 'CO2_STD']]
 
 merge = MEGA_SPREADSHEET.merge(HJ_peaks, on='Sample ID')
 merge = merge.merge(CONC, on='Sample ID')
-merge = merge.merge(DE, on='Sample ID')
 merge = merge.set_index('Sample ID')
 merge.to_csv('PHComparison.csv')
-merge
 
-# %% 
 
 standards = pd.read_csv('PyIRoGlass_Standards.csv', index_col=0)
 
-merge1 = MEGA_SPREADSHEET.merge(standards, on='Sample ID')
-merge1 = merge1.merge(CONC, on='Sample ID')
-merge1 = merge1.set_index('Sample ID')
-merge1.to_csv('Comparison_Standards.csv')
-merge1
+merge_std = MEGA_SPREADSHEET.merge(standards, on='Sample ID')
+merge_std = merge_std.merge(CONC, on='Sample ID')
+merge_std = merge_std.set_index('Sample ID')
+merge_std.to_csv('Comparison_Standards.csv')
 
-# %%
+# %% 
 
 badspec = np.array(['CI_IPGP_B6_1_50x50_256s_sp1', 'CI_IPGP_B6_2_50x50_256s_sp1', 'CI_IPGP_B6_1_50x50_256s_sp2', 'CI_IPGP_NBO_2_2_1_100x100_256s_sp1', 
                     'CI_Ref_13_1_100x100_256s_sp1', 'CI_Ref_13_1_100x100_256s_sp2', 'CI_Ref_13_1_100x100_256s_sp3', 'CI_Ref_13_1_100x100_256s_sp4', 
@@ -113,6 +88,7 @@ badspec = np.array(['CI_IPGP_B6_1_50x50_256s_sp1', 'CI_IPGP_B6_2_50x50_256s_sp1'
 merge = merge[~merge.index.isin(badspec)]
 merge = merge[~merge.index.str.contains('map', case=False, na=False)]
 merge
+
 
 # %% 
 # %% 
@@ -155,6 +131,42 @@ def relative_root_mean_squared_error(true, pred):
     return rrmse_loss
 
 
+def Error_Prop(mean_std, mean_mean, std_mean): 
+    
+    sigma_analysis = mean_std/mean_mean
+    sigma_repeat = std_mean/mean_mean
+    sigma_prop = np.where(sigma_repeat.isna(), sigma_analysis,
+        np.sqrt(sigma_analysis**2 + sigma_repeat**2))
+    uncert_prop = mean_mean * sigma_prop
+
+    return uncert_prop
+
+
+def NBO_T(MI_Composition): 
+
+
+    # Define a dictionary of molar masses for each oxide
+    molar_mass = {'SiO2': 60.08, 'TiO2': 79.866, 'Al2O3': 101.96, 'Fe2O3': 159.69, 'FeO': 71.844, 'MnO': 70.9374, 
+                'MgO': 40.3044, 'CaO': 56.0774, 'Na2O': 61.9789, 'K2O': 94.2, 'P2O5': 141.9445}
+
+    # Create an empty dataframe to store the mole fraction of each oxide in the MI composition
+    mol = pd.DataFrame()
+    # Calculate the mole fraction of each oxide by dividing its mole fraction by its molar mass
+    for oxide in MI_Composition:
+        mol[oxide] = MI_Composition[oxide]/molar_mass[oxide]
+
+    # Calculate the total mole fraction for the MI composition
+    mol_tot = pd.DataFrame()
+    mol_tot = mol.sum(axis = 1)
+
+    t = mol['SiO2'] + 2*mol['Al2O3'] + 2*mol['Fe2O3']
+    o = mol.sum(axis=1) + mol['SiO2'] + mol['TiO2'] + 2*mol['Al2O3'] + 2*mol['Fe2O3'] + 4*mol['P2O5']
+
+    nbo_t = ((2*o)-(4*t))/t
+
+    return nbo_t
+
+
 %matplotlib inline
 %config InlineBackend.figure_format = 'retina'
 rc('font',**{'family':'Avenir', 'size': 20})
@@ -195,19 +207,14 @@ mean_1515 = np.mean(merge['Py_Devol_1515'])
 std_1515 = np.std(merge['Py_Devol_1515'])
 
 merge_no_nd70 = merge[~merge.index.astype(str).str.contains('ND70')]
-merge_int_no_nd70 = merge_no_nd70[abs(merge_no_nd70['Py_Devol_1430'] - mean_1430) < 2 * std_1430]
-merge_filt_no_nd70 = merge_int_no_nd70[abs(merge_int_no_nd70['Py_Devol_1515'] - mean_1515) < 2 * std_1515]
+merge_int_no_nd70 = merge_no_nd70[abs(merge_no_nd70['Py_Devol_1430'] - mean_1430) < 1.5 * std_1430]
+merge_filt_no_nd70 = merge_int_no_nd70[abs(merge_int_no_nd70['Py_Devol_1515'] - mean_1515) < 1.55 * std_1515]
 merge_nd70 = merge[merge.index.astype(str).str.contains('ND70')]
 
 merge_filt = pd.concat([merge_filt_no_nd70, merge_nd70])
 
-merge_filt.to_csv('PHComparison_lim.csv')
-merge_filt
-
-merge_nd70.to_csv('PHComparison_ND70.csv')
-
-DE_filt = DE[DE.index.isin(merge_filt.index)].drop(columns=['Sample ID', 'Density'])
-DE_filt['Repeats'] = merge_filt['Repeats']
+# merge_filt.to_csv('PHComparison_lim.csv')
+# merge_nd70.to_csv('PHComparison_ND70.csv')
 
 
 slope0, intercept0, r_value0, p_value0, std_err0 = scipy.stats.linregress(merge_filt.PH_1515_norm, merge_filt.PH_1515_BP_norm)
@@ -237,7 +244,7 @@ ax[0].tick_params(axis="x", direction='in', length=5, pad = 6.5, labelbottom = F
 ax[0].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 
 ax[0].annotate("$\mathregular{R^{2}}$="+str(np.round(r_value0**2, 3)), xy=(0.03, 0.7975), xycoords="axes fraction", fontsize=16)
-ax[0].annotate("RMSE="+str(np.round(rmse0, 3))+"; RRMSE="+str(np.round(relative_root_mean_squared_error(merge_filt.PH_1515_norm, merge_filt.PH_1515_BP_norm)*100, 2))+'%', xy=(0.03, 0.84), xycoords="axes fraction", fontsize=16)
+ax[0].annotate("RMSE="+str(np.round(rmse0, 3))+"; RRMSE="+str(np.round(relative_root_mean_squared_error(merge_filt.PH_1515_norm, merge_filt.PH_1515_BP_norm)*100, 3))+'%', xy=(0.03, 0.84), xycoords="axes fraction", fontsize=16)
 ax[0].annotate("CCC="+str(np.round(ccc0, 3)), xy=(0.03, 0.88), xycoords="axes fraction", fontsize=16)
 ax[0].annotate("m="+str(np.round(slope0, 3)), xy=(0.03, 0.76), xycoords="axes fraction", fontsize=16)
 ax[0].annotate("b="+str(np.round(intercept0, 3)), xy=(0.03, 0.72), xycoords="axes fraction", fontsize=16)
@@ -259,7 +266,7 @@ ax[1].legend(loc='lower right', labelspacing = 0.2, handletextpad = 0.25, handle
 
 ax[1].annotate("$\mathregular{R^{2}}$="+str(np.round(r_value1**2, 3)), xy=(0.03, 0.7975), xycoords="axes fraction", fontsize=16)
 ax[1].annotate("CCC="+str(np.round(ccc1, 3)), xy=(0.03, 0.88), xycoords="axes fraction", fontsize=16)
-ax[1].annotate("RMSE="+str(np.round(rmse1, 3))+"; RRMSE="+str(np.round(relative_root_mean_squared_error(merge_filt.PH_1430_norm, merge_filt.PH_1430_BP_norm)*100, 2))+'%', xy=(0.03, 0.84), xycoords="axes fraction", fontsize=16)
+ax[1].annotate("RMSE="+str(np.round(rmse1, 3))+"; RRMSE="+str(np.round(relative_root_mean_squared_error(merge_filt.PH_1430_norm, merge_filt.PH_1430_BP_norm)*100, 3))+'%', xy=(0.03, 0.84), xycoords="axes fraction", fontsize=16)
 ax[1].annotate("m="+str(np.round(slope1, 3)), xy=(0.03, 0.76), xycoords="axes fraction", fontsize=16)
 ax[1].annotate("b="+str(np.round(intercept1, 3)), xy=(0.03, 0.72), xycoords="axes fraction", fontsize=16)
 
@@ -271,14 +278,14 @@ sc1 = ax[3].scatter(merge_filt.PH_1430_norm, (merge_filt['Py_Devol_1430']), s = 
                     zorder = 20)
 ax[2].axhline(np.mean(merge_filt['Py_Devol_1515']), color='k', linestyle='--', dashes = (10, 10), linewidth=0.75,)
 ax[2].annotate(r'C. $\mathregular{CO_{3, 1515}^{2-}}, n=$'+str(len(merge_filt)), xy=(0.03, 0.92), xycoords='axes fraction', ha='left', va ='bottom', size = 20)
-ax[2].text(1.85, 0.945, r'$\overline{\frac{P}{D}}$='+str(round(np.mean(merge_filt['Py_Devol_1515']), 4)), ha='left', va ='bottom', size = 20)
+ax[2].text(1.9, 0.945, r'$\overline{\frac{P}{D}}$='+str(round(np.mean(merge_filt['Py_Devol_1515']), 3)), ha='left', va ='bottom', size = 20)
 
 ax[2].fill_between(line, np.mean(merge_filt['Py_Devol_1515'])-np.std(merge_filt['Py_Devol_1515']), np.mean(merge_filt['Py_Devol_1515'])+np.std(merge_filt['Py_Devol_1515']), color = 'k', alpha=0.10, edgecolor = None,
     zorder = -5, label='68% Confidence Interval')
 
 ax[3].axhline(np.mean(merge_filt['Py_Devol_1430']), color='k', linestyle='--', dashes = (10, 10), linewidth=0.75, label='Mean')
 ax[3].annotate(r'D. $\mathregular{CO_{3, 1430}^{2-}}, n=$'+str(len(merge_filt)), xy=(0.03, 0.92), xycoords='axes fraction', ha='left', va ='bottom', size = 20)
-ax[3].text(1.85, 0.965, r'$\overline{\frac{P}{D}}$='+str(round(np.mean(merge_filt['Py_Devol_1430']), 4)), ha='left', va ='bottom', size = 20)
+ax[3].text(1.9, 0.965, r'$\overline{\frac{P}{D}}$='+str(round(np.mean(merge_filt['Py_Devol_1430']), 3)), ha='left', va ='bottom', size = 20)
 
 ax[3].fill_between(line, np.mean(merge_filt['Py_Devol_1430'])-np.std(merge_filt['Py_Devol_1430']), np.mean(merge_filt['Py_Devol_1430'])+np.std(merge_filt['Py_Devol_1430']), color = 'k', alpha=0.10, edgecolor = None,
     zorder = -5, label='68% Confidence Interval')
@@ -312,282 +319,52 @@ ax[3].set_yticklabels(tick_labels_y)
 ax[3].tick_params(axis="x", direction='in', length=5, pad=6.5)
 ax[3].tick_params(axis="y", direction='in', length=5, pad=6.5)
 plt.tight_layout()
-# plt.savefig('PHCombined1.pdf', bbox_inches='tight', pad_inches = 0.025)
-
-# %% 
-
-
-# %% 
-from scipy.optimize import curve_fit
-
-def func(x, a):
-    return a * x
-
-abs_df = pd.read_csv('PHComparison_ND70_ERDA_NRA.csv', index_col=0)
-
-co2_nra = abs_df['NRA_CO2']/10000 
-co2_nra_std = abs_df['NRA_CO2_STD']/10000 
-
-co2_y_1430 = 44.01*abs_df['PH_1430_BP']/(abs_df['Density_Sat']*(abs_df['Thickness']/1e6))
-co2_y_1515 = 44.01*abs_df['PH_1515_BP']/(abs_df['Density_Sat']*(abs_df['Thickness']/1e6))
-
-sigma_co2_y_1430 = co2_y_1430 * np.sqrt( (abs_df['PH_1430_STD']/abs_df['PH_1430_BP'])**2 + (0.025**2) + (3/abs_df['Thickness'])**2 )
-sigma_co2_y_1515 = co2_y_1515 * np.sqrt( (abs_df['PH_1515_STD']/abs_df['PH_1515_BP'])**2 + (0.025**2) + (3/abs_df['Thickness'])**2 )
-
-
-
-# %% 
-
-def inversion(comp, epsilon, sigma_comp, sigma_epsilon):
-
-    N = len(comp)
-    G = np.array([comp]).T
-    mls = np.linalg.solve(np.dot(G.T, G), np.dot(G.T, epsilon))
-
-    # Regular least squares for starting value. 
-    covls = np.linalg.inv(np.dot(G.T, G))
-
-    # A priori solution is least squares solution. 
-    xbar = np.concatenate([epsilon, mls])
-
-    # Trial solution based on least squares 
-    xg = xbar
-
-    # Gradient vector, needs to change for multiple parameters. 
-    Fg = np.zeros((N, N+1))
-
-    # Covariance, large for model parameters 
-    covx = np.zeros((N+1, N+1))
-    covx[:N, :N] = np.diag(sigma_epsilon**2)
-    scale = 1
-    covx[N, N] = scale * covls[0, 0]
-
-    Nit = 100
-    epsilon_pre_all = np.zeros((N, Nit))
-    mest_all = np.zeros((1, Nit))
-    epsilon_linear_all = np.zeros((N, Nit))
-
-    for i in range(Nit): 
-        f = -xg[:N] + (xg[N]*comp)
-        Ef = np.dot(f.T, f)
-
-        if (i == 0) or (i % 10 == 0):
-            print(f'Error in implicit equation at iteration {i} = {Ef}')
-
-        Fg[:N, :N] = -np.eye(N)
-        Fg[:N, N] = comp
-
-        epsi = 0
-        left = Fg.T
-        right = np.dot(Fg, covx).dot(Fg.T) + (epsi*np.eye(N))
-        solve = np.linalg.solve(right.T, left.T).T
-        MO = np.dot(covx, solve)
-        xg2 = xbar + np.dot(MO, (np.dot(Fg, (xg-xbar))-f))
-        xg = xg2
-
-        mest = xg[N]
-        epsilon_pre = xg[:N]
-        epsilon_linear = mest*comp
-        epsilon_pre_all[:, i] = epsilon_pre
-        mest_all[:, i] = mest
-        epsilon_linear_all[:, i] = epsilon_linear
-
-    MO2 = np.dot(MO, Fg)
-    covx_est = np.dot(MO2, covx).dot(MO2.T)
-
-    covepsilon_est_f = covx_est[:N, :N]
-    vepsilon = np.diag(covepsilon_est_f)
-    E_calib = 2*np.sqrt(np.mean(vepsilon))
-
-    vc = covx_est[N, N]
-    epsilon_pre = xg[:N]
-    comp_pre = xg[N:]
-
-    mest_f = xg[N]
-    epsilon_linear = mest_f*comp
-    epsilon_ls = mls[0]*comp
-
-    print('mls ' + str(mls))
-    print('95% CI ' + str(2*np.sqrt(np.diag(covls))))
-    print('mest ' + str(mest_f))
-    print('95% CI final ' + str(2*np.sqrt(vc)))
-
-    return mls, mest_f, covls, vc, covepsilon_est_f, comp_pre, epsilon_pre, epsilon_linear
-
-
-mls_1430, mest_f_1430, covls_1430, covm_est_f_1430, covepsilon_est_f_1430, volatile_pre_1430, epsilon_pre_1430, epsilon_linear_1430 = inversion(co2_nra, co2_y_1430, co2_nra_std, sigma_co2_y_1430)
-
-# %%
-
-co2_popt_1430, co2_pcov_1430 = curve_fit(func, co2_nra, co2_y_1430)
-plt.figure(figsize=(8, 8))
-plt.scatter(co2_nra, co2_y_1430, marker='o', s=100, ec='k', lw=0.5, zorder=20)
-plt.errorbar(co2_nra, co2_y_1430, xerr = co2_nra_std, yerr = sigma_co2_y_1430, ls = 'none', lw = 0.5, c = 'k', zorder=10) 
-plt.plot(co2_nra, func(co2_nra, co2_popt_1430),"r--")
-plt.title('$Ɛ_{CO_{2, 1430}}$ = ' + str(round(co2_popt_1430[0], 3)) + ' L/mol$\cdot$cm')
-plt.xlabel('CO$_2$ (wt.%)')
-plt.ylabel('44.01*PH_1430*Density*Thickness')
-plt.show()
-
-co2_popt_1515, co2_pcov_1515 = curve_fit(func, co2_nra, co2_y_1515)
-plt.figure(figsize=(8, 8))
-plt.scatter(co2_nra, co2_y_1515, marker='o', s=100, ec='k', lw=0.5)
-plt.plot(co2_nra, func(co2_nra, co2_popt_1515),"r--")
-plt.title('$Ɛ_{CO_{2, 1515}}$ = ' + str(round(co2_popt_1515[0], 3)) + ' L/mol$\cdot$cm')
-plt.xlabel('CO$_2$ (wt.%)')
-plt.ylabel('44.01*PH_1515*Density*Thickness')
-plt.show()
-
-# %% 
-
-co2_y_1430_area = 44.01*((abs_df['PH_1430_BP'])*(np.sqrt(2*np.pi*(abs_df['STD_1430_BP']/2)**2))) / (abs_df['Density_Sat']*(abs_df['Thickness']/1e6))
-co2_y_1515_area = 44.01*((abs_df['PH_1515_BP'])*(np.sqrt(2*np.pi*(abs_df['STD_1515_BP']/2)**2))) / (abs_df['Density_Sat']*(abs_df['Thickness']/1e6))
-
-co2_popt_1430_area, co2_pcov_1430_area = curve_fit(func, co2_nra, co2_y_1430_area)
-plt.figure(figsize=(8, 8))
-plt.scatter(co2_nra, co2_y_1430_area, marker='o', s=100, ec='k', lw=0.5)
-plt.plot(co2_nra, func(co2_nra, co2_popt_1430_area),"r--")
-plt.title('$Ɛ_{CO_{2, 1430}}$ = ' + str(round(co2_popt_1430_area[0], 3)) + ' L/mol$\cdot$cm$^2$')
-plt.xlabel('CO$_2$ (wt.%)')
-plt.ylabel('44.01*Area_1430*Density*Thickness')
-
-co2_popt_1515_area, co2_pcov_1515_area = curve_fit(func, co2_nra, co2_y_1515_area)
-plt.figure(figsize=(8, 8))
-plt.scatter(co2_nra, co2_y_1515_area, marker='o', s=100, ec='k', lw=0.5)
-plt.plot(co2_nra, func(co2_nra, co2_popt_1515_area),"r--")
-plt.title('$Ɛ_{CO_{2, 1515}}$ = ' + str(round(co2_popt_1515_area[0], 3)) + ' L/mol$\cdot$cm$^2$')
-plt.xlabel('CO$_2$ (wt.%)')
-plt.ylabel('44.01*Area_1515*Density*Thickness')
-
-# %% 
-
-abs_df_lim = abs_df[abs_df['H2OT_3550_SAT?'] == '-']
-h2o_y = 18.01528*abs_df_lim['PH_3550_M']/(abs_df_lim['Density_Sat']*(abs_df_lim['Thickness']/1e6))
-h2o_nra = abs_df_lim['ERDA_H2O'] 
-
-h2o_popt, h2o_pcov = curve_fit(func, h2o_nra, h2o_y)
-plt.figure(figsize=(8, 8))
-plt.scatter(h2o_nra, h2o_y, marker='o', s=100, ec='k', lw=0.5)
-plt.plot(h2o_nra, func(h2o_nra, h2o_popt),"r--")
-plt.title('$Ɛ_{H_2O,_{3550}}$ = ' + str(round(h2o_popt[0], 3)) + ' L/mol$\cdot$cm')
-plt.xlabel('H$_2$O (wt.%)')
-plt.ylabel('18.01*PH_3550*Density*Thickness')
-plt.show()
+plt.savefig('PHCombined_new1.pdf', bbox_inches='tight', pad_inches = 0.025)
 
 # %% 
 # %% 
-
-def Error_Prop(mean_std, mean_mean, std_mean): 
-    
-    sigma_analysis = mean_std/mean_mean
-    sigma_repeat = std_mean/mean_mean
-    sigma_prop = np.where(sigma_repeat.isna(), sigma_analysis,
-        np.sqrt(sigma_analysis**2 + sigma_repeat**2))
-    uncert_prop = mean_mean * sigma_prop
-
-    return uncert_prop
 
 col_means = ['PH_1515_norm', 'PH_1515_BP_norm', 'PH_1515_STD_norm', 'PH_1430_norm', 'PH_1430_BP_norm', 'PH_1430_STD_norm', 
-             'Py_Devol_1430', 'Py_Devol_1515', 'H2OT_MEAN', 'H2OT_STD', 'CO2_MEAN', 'CO2_STD']
+             'Py_Devol_1430', 'Py_Devol_1515', 'H2Ot_MEAN', 'H2Ot_STD', 'CO2_MEAN', 'CO2_STD']
 counts = merge_filt.groupby('Repeats')['PH_1515_norm'].count()
 
 std = merge_filt.groupby('Repeats')[col_means].std()
 # std.to_csv('std.csv')
 
 means = merge_filt.groupby('Repeats')[col_means].mean()
+means['Counts'] = counts
 means['PH_1515_STD_net'] = Error_Prop(means['PH_1515_STD_norm'], means['PH_1515_BP_norm'], std['PH_1515_BP_norm'])
 means['PH_1430_STD_net'] = Error_Prop(means['PH_1430_STD_norm'], means['PH_1430_BP_norm'], std['PH_1430_BP_norm'])
-means['H2OT_STD_net'] = Error_Prop(means['H2OT_STD'], means['H2OT_MEAN'], std['H2OT_MEAN'])
+means['H2Ot_STD_net'] = Error_Prop(means['H2Ot_STD'], means['H2Ot_MEAN'], std['H2Ot_MEAN'])
 means['CO2_STD_net']  = Error_Prop(means['CO2_STD'], means['CO2_MEAN'], std['CO2_MEAN'])
-means['Counts'] = counts
-# means.to_csv('nd70_statistics.csv')
+means.to_csv('CI_statistics.csv')
 
 # %% 
 
 
-col_means_lim = ['H2OT_MEAN', 'H2OT_STD', 'CO2_MEAN', 'CO2_STD']
-counts1 = merge1.groupby('Repeats')['H2OT_MEAN'].count()
+col_means_lim = ['H2Ot_MEAN', 'H2Ot_STD', 'CO2_MEAN', 'CO2_STD']
+counts_std = merge_std.groupby('Repeats')['H2Ot_MEAN'].count()
 
-std1 = merge1.groupby('Repeats')[col_means_lim].std()
+std1 = merge_std.groupby('Repeats')[col_means_lim].std()
 # std.to_csv('std.csv')
 
-means1 = merge1.groupby('Repeats')[col_means_lim].mean()
-means1['H2OT_STD_net'] = Error_Prop(means1['H2OT_STD'], means1['H2OT_MEAN'], std1['H2OT_MEAN'])
-means1['CO2_STD_net']  = Error_Prop(means1['CO2_STD'], means1['CO2_MEAN'], std1['CO2_MEAN'])
-means1['Counts'] = counts1
-# means1.to_csv('standard_statistics.csv')
-means1
+means_std = merge_std.groupby('Repeats')[col_means_lim].mean()
+means_std['H2Ot_STD_net'] = Error_Prop(means_std['H2Ot_STD'], means_std['H2Ot_MEAN'], std1['H2Ot_MEAN'])
+means_std['CO2_STD_net']  = Error_Prop(means_std['CO2_STD'], means_std['CO2_MEAN'], std1['CO2_MEAN'])
+means_std['Counts'] = counts_std
+# means_std.to_csv('standard_statistics.csv')
+means_std
+
 
 # %% 
-
-de_means = DE_filt.groupby('Repeats').mean()
-de_std = DE_filt.groupby('Repeats').std()
-
-
-columns = ['Density', 'sigma_Density', 'Tau', 'sigma_Tau', 'Eta', 'sigma_Eta', 
-           'epsilon_H2OT_3550', 'sigma_epsilon_H2OT_3550', 
-           'epsilon_H2Om_1635', 'sigma_epsilon_H2Om_1635', 
-           'epsilon_CO2', 'sigma_epsilon_CO2',
-           'epsilon_H2Om_5200', 'sigma_epsilon_H2Om_5200', 
-           'epsilon_OH_4500', 'sigma_epsilon_OH_4500'
-           ]
-
-df = pd.DataFrame(columns=columns)
-df['Density'] = de_means.Density_Sat
-df['Tau'] = de_means.Tau
-df['Eta'] = de_means.Eta
-df['epsilon_H2OT_3550'] = de_means.epsilon_H2OT_3550
-df['epsilon_H2Om_1635'] = de_means.epsilon_H2Om_1635
-df['epsilon_CO2'] = de_means.epsilon_CO2
-df['epsilon_H2Om_5200'] = de_means.epsilon_H2Om_5200
-df['epsilon_OH_4500'] = de_means.epsilon_OH_4500
-
-df['sigma_Density'] = Error_Prop(0, de_means['Density_Sat'], de_std['Density_Sat'])
-df['sigma_Tau'] = Error_Prop(0, de_means['Tau'], de_std['Tau'])
-df['sigma_Eta'] = Error_Prop(0, de_means['Eta'], de_std['Eta'])
-df['sigma_epsilon_H2OT_3550'] = Error_Prop(de_means['sigma_epsilon_H2OT_3550'], de_means['epsilon_H2OT_3550'], de_std['epsilon_H2OT_3550'])
-df['sigma_epsilon_H2Om_1635'] = Error_Prop(de_means['sigma_epsilon_H2Om_1635'], de_means['epsilon_H2Om_1635'], de_std['epsilon_H2Om_1635'])
-df['sigma_epsilon_CO2'] = Error_Prop(de_means['sigma_epsilon_CO2'], de_means['epsilon_CO2'], de_std['epsilon_CO2'])
-df['sigma_epsilon_H2Om_5200'] = Error_Prop(de_means['sigma_epsilon_H2Om_5200'], de_means['epsilon_H2Om_5200'], de_std['epsilon_H2Om_5200'])
-df['sigma_epsilon_OH_4500'] = Error_Prop(de_means['sigma_epsilon_OH_4500'], de_means['epsilon_OH_4500'], de_std['epsilon_OH_4500'])
-
-# df.to_csv('nd70_propagatesigma.csv')
-
 # %% 
 
-def NBO_T(MI_Composition): 
-
-
-    # Define a dictionary of molar masses for each oxide
-    molar_mass = {'SiO2': 60.08, 'TiO2': 79.866, 'Al2O3': 101.96, 'Fe2O3': 159.69, 'FeO': 71.844, 'MnO': 70.9374, 
-                'MgO': 40.3044, 'CaO': 56.0774, 'Na2O': 61.9789, 'K2O': 94.2, 'P2O5': 141.9445}
-
-    # Create an empty dataframe to store the mole fraction of each oxide in the MI composition
-    mol = pd.DataFrame()
-    # Calculate the mole fraction of each oxide by dividing its mole fraction by its molar mass
-    for oxide in MI_Composition:
-        mol[oxide] = MI_Composition[oxide]/molar_mass[oxide]
-
-    # Calculate the total mole fraction for the MI composition
-    mol_tot = pd.DataFrame()
-    mol_tot = mol.sum(axis = 1)
-
-    t = mol['SiO2'] + 2*mol['Al2O3'] + 2*mol['Fe2O3']
-    o = mol.sum(axis=1) + mol['SiO2'] + mol['TiO2'] + 2*mol['Al2O3'] + 2*mol['Fe2O3'] + 4*mol['P2O5']
-
-    nbo_t = ((2*o)-(4*t))/t
-
-    return nbo_t
-
-# %% 
-
-fuegono = 0 
-stdno = 1
-fuegorhno = 2 
-
-MICOMP0, THICKNESS0 = pig.Load_ChemistryThickness('../Inputs/FuegoChemThick.csv')
-MICOMP1, THICKNESS1 = pig.Load_ChemistryThickness('../Inputs/StandardChemThick.csv')
-MICOMP2, THICKNESS2 = pig.Load_ChemistryThickness('../Inputs/FuegoRHChemThick.csv')
+sdl1 = pig.SampleDataLoader(chemistry_thickness_path='../Inputs/FuegoChemThick.csv')
+MICOMP0, THICKNESS0 = sdl1.load_chemistry_thickness()
+sdl2 = pig.SampleDataLoader(chemistry_thickness_path='../Inputs/StandardChemThick.csv')
+MICOMP1, THICKNESS1 = sdl2.load_chemistry_thickness()
+sdl3 = pig.SampleDataLoader(chemistry_thickness_path='../Inputs/FuegoRHChemThick.csv')
+MICOMP2, THICKNESS2 = sdl3.load_chemistry_thickness()
 
 MICOMP = pd.concat([MICOMP0, MICOMP1, MICOMP2])
 THICKNESS = pd.concat([THICKNESS0, THICKNESS1, THICKNESS2])
@@ -600,46 +377,28 @@ THICKNESS_only = THICKNESS_lim.Thickness
 
 MICOMP_merge = MICOMP[MICOMP.Fe2O3 != 0]
 
-MEGA_SPREADSHEET0 = pd.read_csv('../' + output_dir[-1] + '/' + OUTPUT_PATHS[fuegono] + '_DF.csv') #, index_col=0)
-MEGA_SPREADSHEET1 = pd.read_csv('../' +output_dir[-1] + '/' + OUTPUT_PATHS[stdno] + '_DF.csv') #, index_col=0)
-MEGA_SPREADSHEET2 = pd.read_csv('../' +output_dir[-1] + '/' + OUTPUT_PATHS[fuegorhno] + '_DF.csv') #, index_col=0)
-H2OCO20 = pd.read_csv('../' +output_dir[-1] + '/' + OUTPUT_PATHS[fuegono] + '_H2OCO2.csv') #, index_col=0)
-H2OCO21 = pd.read_csv('../' +output_dir[-1] + '/' + OUTPUT_PATHS[stdno] + '_H2OCO2.csv') #, index_col=0)
-H2OCO22 = pd.read_csv('../' +output_dir[-1] + '/' + OUTPUT_PATHS[fuegorhno] + '_H2OCO2.csv') #, index_col=0)
-DENSEPS0 = pd.read_csv('../' +output_dir[-1] + '/' + OUTPUT_PATHS[fuegono] + '_DensityEpsilon.csv') #, index_col=0)
-DENSEPS1 = pd.read_csv('../' +output_dir[-1] + '/' + OUTPUT_PATHS[stdno] + '_DensityEpsilon.csv') #, index_col=0)
-DENSEPS2 = pd.read_csv('../' +output_dir[-1] + '/' + OUTPUT_PATHS[fuegorhno] + '_DensityEpsilon.csv') #, index_col=0)
+MEGA_SPREADSHEET0 = pd.read_csv('../FINALDATA/FUEGO_DF.csv', index_col=0).rename_axis('Sample')
+MEGA_SPREADSHEET1 = pd.read_csv('../FINALDATA/STD_DF.csv', index_col=0).rename_axis('Sample')
+MEGA_SPREADSHEET2 = pd.read_csv('../FINALDATA/FRH_DF.csv', index_col=0).rename_axis('Sample')
+H2OCO20 = pd.read_csv('../FINALDATA/FUEGO_H2OCO2.csv', index_col=0).rename_axis('Sample')
+H2OCO21 = pd.read_csv('../FINALDATA/STD_H2OCO2.csv', index_col=0).rename_axis('Sample')
+H2OCO22 = pd.read_csv('../FINALDATA/FRH_H2OCO2.csv', index_col=0).rename_axis('Sample')
 
 MEGA_SPREADSHEET = pd.concat([MEGA_SPREADSHEET0, MEGA_SPREADSHEET1, MEGA_SPREADSHEET2])
-MEGA_SPREADSHEET = MEGA_SPREADSHEET.rename(columns={'Unnamed: 0': 'Sample'})
-MEGA_SPREADSHEET = MEGA_SPREADSHEET.set_index('Sample')
 MEGA_SPREADSHEET_lim = MEGA_SPREADSHEET[MICOMP.Fe2O3 != 0]
 
-DENSEPS = pd.concat([DENSEPS0, DENSEPS1, DENSEPS2])
-DENSEPS = DENSEPS.rename(columns={'Unnamed: 0': 'Sample'})
-DENSEPS = DENSEPS.set_index('Sample')
-DENSEPS1 = DENSEPS[MICOMP.Fe2O3 != 0]
-
 H2OCO2 = pd.concat([H2OCO20, H2OCO21, H2OCO22])
-H2OCO2 = H2OCO2.rename(columns={'Unnamed: 0': 'Sample'})
-H2OCO2 = H2OCO2.set_index('Sample')
-H2OCO2_1 = H2OCO2[MICOMP.Fe2O3 != 0]
-
-THICKNESS_lim = THICKNESS_only.values[~np.isnan(DENSEPS1.Density)]
-DENSEPS_lim = DENSEPS1[~np.isnan(DENSEPS1.Density)]
+H2OCO2_lim = H2OCO2[MICOMP.Fe2O3 != 0]
 
 MEGA_SPREADSHEET_lim = MEGA_SPREADSHEET_lim[['AVG_BL_BP', 'PC1_BP', 'PC2_BP', 'PC3_BP', 'PC4_BP', 'm_BP', 'b_BP', 'PH_1635_BP', 'PH_1635_PC1_BP', 'PH_1635_PC2_BP']]
-MEGA_SPREADSHEET_norm = MEGA_SPREADSHEET_lim.divide(THICKNESS_lim, axis=0) * 100
+MEGA_SPREADSHEET_norm = MEGA_SPREADSHEET_lim.divide(THICKNESS_lim['Thickness'], axis=0) * 100
 plots = MEGA_SPREADSHEET_norm.join([nbo_t_lim])
 
-plots = plots.join([MICOMP_merge])
-plots = plots.join([DENSEPS_lim[['Density_Sat', 'Tau', 'Eta']]])
-plots = plots.join([H2OCO2_1['H2OT_MEAN']])
+plots = plots.merge(MICOMP_merge, left_index=True, right_index=True, how='left')
+plots = plots.merge(H2OCO2_lim[['H2Ot_MEAN', 'Density_Sat', 'Tau', 'Eta']], left_index=True, right_index=True, how='left')
 plots = plots.rename(columns={0: 'NBO_T'})
 plots = plots[abs(plots.NBO_T - np.mean(plots.NBO_T)) < 2 * np.std(plots.NBO_T)]
 plots = plots[abs(plots.SiO2 - np.mean(plots.SiO2)) < 2 * np.std(plots.SiO2)]
-# plots = plots[abs(plots.Al2O3 - np.mean(plots.Al2O3)) < 2 * np.std(plots.Al2O3)]
-# plots = plots[abs(plots.MnO - np.mean(plots.MnO)) < 2 * np.std(plots.MnO)]
 
 plots_lim = plots[abs(plots.AVG_BL_BP - np.mean(plots.AVG_BL_BP)) < 2 * np.std(plots.AVG_BL_BP)]
 plots_lim = plots_lim[abs(plots_lim.PC1_BP - np.mean(plots_lim.PC1_BP)) < 2 * np.std(plots_lim.PC1_BP)]
@@ -648,13 +407,8 @@ plots_lim = plots_lim[abs(plots_lim.PC3_BP - np.mean(plots_lim.PC3_BP)) < 2 * np
 plots_lim = plots_lim[abs(plots_lim.PC4_BP - np.mean(plots_lim.PC4_BP)) < 2 * np.std(plots_lim.PC4_BP)]
 
 plots_lim = plots_lim[['AVG_BL_BP', 'PC1_BP', 'PC2_BP', 'PC3_BP', 'PC4_BP', 'SiO2', 'TiO2', 'Al2O3', 'Fe2O3', 
-                       'FeO', 'MgO', 'CaO', 'Na2O', 'K2O', 'P2O5', 'H2OT_MEAN', 'NBO_T', 'Tau', 'Eta', 'Density_Sat']] # 'MnO',, 'm_BP', 'b_BP' 'PH_1635_PC1_BP', 'PH_1635_PC2_BP', 
-plots_lim = plots_lim[~plots_lim.index.isin(badspec)]
-# plots_lim = plots_lim[~plots_lim.index.str.contains('map_actual_focusedProperly', case=False, na=False)]
-# plots_lim = plots_lim[~plots_lim.index.str.contains('INSOL', case=False, na=False)]
-# plots_lim = plots_lim[~plots_lim.index.str.contains('ND70', case=False, na=False)]
-# plots_lim = plots_lim[~plots_lim.index.str.contains('CI_', case=False, na=False)]
-plots_f = plots_lim.rename(columns={'H2OT_MEAN': 'H2O'})
+                       'FeO', 'MgO', 'CaO', 'Na2O', 'K2O', 'P2O5', 'H2Ot_MEAN', 'NBO_T', 'Tau', 'Eta', 'Density_Sat']] 
+plots_f = plots_lim.rename(columns={'H2Ot_MEAN': 'H2O'})
 
 corr = plots_lim.corr()
 # corr.to_csv('correlation.csv')
@@ -690,19 +444,18 @@ mol_frac = pd.DataFrame()
 for oxide in MI_Composition:
     mol_frac[oxide] = mol[oxide]/mol_tot
 
-plots_molfrac = plots_lim[['AVG_BL_BP', 'PC1_BP', 'PC2_BP', 'PC3_BP', 'PC4_BP', 'NBO_T', 'Density_Sat', 'Tau', 'Eta']] # 'm_BP', 'b_BP', 'PH_1635_BP', 'PH_1635_PC1_BP', 'PH_1635_PC2_BP',
+plots_molfrac = plots_lim[['AVG_BL_BP', 'PC1_BP', 'PC2_BP', 'PC3_BP', 'PC4_BP', 'NBO_T', 'Density_Sat', 'Tau', 'Eta']]
 
 plots_molfrac = plots_molfrac.join([mol_frac])
 plots_molfrac['Na_K'] = plots_molfrac.Na2O + plots_molfrac.K2O
 plots_molfrac['FeT'] = plots_molfrac.FeO + plots_molfrac.Fe2O3/1.11134
 plots_molfrac = plots_molfrac[['AVG_BL_BP', 'PC1_BP', 'PC2_BP', 'PC3_BP', 'PC4_BP', 'SiO2', 'TiO2', 
-                               'Al2O3', 'Fe2O3', 'FeO', 'MgO', 'CaO', 'Na2O', 'K2O', 'P2O5', 'H2O', 'NBO_T', 'Tau', 'Eta', 'Density_Sat']] # 'm_BP', 'b_BP', 'PH_1635_BP', 'PH_1635_PC1_BP', 'PH_1635_PC2_BP', 'MnO','FeT', 
+                               'Al2O3', 'Fe2O3', 'FeO', 'MgO', 'CaO', 'Na2O', 'K2O', 'P2O5', 'H2O', 'NBO_T', 'Tau', 'Eta', 'Density_Sat']]
 
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
 chem_param = ['SiO2', 'TiO2', 'Al2O3', 'Fe2O3', 'FeO', 'MgO', 'CaO', 'Na2O', 'K2O', 'P2O5']
-# molfrac_chem = plots_molfrac[['SiO2', 'TiO2', 'Al2O3', 'Fe2O3', 'FeO', 'MnO', 'MgO', 'CaO', 'Na2O', 'K2O', 'P2O5']]
 molfrac_chem = plots_molfrac[chem_param]
 
 scaler = StandardScaler()

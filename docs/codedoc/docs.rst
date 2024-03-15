@@ -94,7 +94,7 @@ Functions for molar absorptivity inversions
 
 .. autofunction:: PyIRoGlass.calculate_calibration_error
 
-.. autofunction:: PyIRoGlass.calculate_epsilon_inversion
+.. autofunction:: PyIRoGlass.calculate_y_inversion
 
 .. autofunction:: PyIRoGlass.calculate_SEE
 

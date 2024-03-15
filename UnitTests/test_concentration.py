@@ -10,12 +10,12 @@ class test_conc_outputs_h2ot(unittest.TestCase):
         self.molar_mass = 18.01528
         self.absorbance = 1.523342931
         self.sigma_absorbance = 0.003308868
-        self.density = 2702.703546
+        self.density = 2702.81550010862
         self.sigma_density = self.density * 0.025
         self.thickness = 39
         self.sigma_thickness = 3
-        self.epsilon = 64.4628687805379
-        self.sigma_epsilon = 7.401239521
+        self.epsilon = 64.5268644303552
+        self.sigma_epsilon = 7.37609147230662
         self.N = 500000
         self.MI_Composition = {
             'SiO2': 47.95,
@@ -41,7 +41,7 @@ class test_conc_outputs_h2ot(unittest.TestCase):
             self.density,
             self.thickness,
             self.epsilon)
-        expected = 4.03892743514451
+        expected = 4.03475462729302
         self.assertAlmostEqual(
             result,
             expected,
@@ -62,7 +62,7 @@ class test_conc_outputs_h2ot(unittest.TestCase):
             self.sigma_thickness,
             self.epsilon,
             self.sigma_epsilon)
-        expected = 0.432638234770662
+        expected = 0.431636377873926
         self.assertAlmostEqual(
             result,
             expected,
@@ -78,12 +78,12 @@ class test_conc_outputs_co2(unittest.TestCase):
         self.molar_mass = 44.01
         self.absorbance = 0.053059942737517
         self.sigma_absorbance = 0.00376445440661992
-        self.density = 2702.703546
+        self.density = 2702.81550010862
         self.sigma_density = self.density * 0.025
         self.thickness = 39
         self.sigma_thickness = 3
-        self.epsilon = 296.377038501122
-        self.sigma_epsilon = 17.091250588327
+        self.epsilon = 293.381038986771
+        self.sigma_epsilon = 16.307943404879
         self.N = 500000
         self.MI_Composition = {
             'SiO2': 47.95,
@@ -109,7 +109,7 @@ class test_conc_outputs_co2(unittest.TestCase):
             self.density,
             self.thickness,
             self.epsilon) * 10000
-        expected = 747.498925861367
+        expected = 755.101090599377
         self.assertAlmostEqual(
             result,
             expected,
@@ -130,7 +130,7 @@ class test_conc_outputs_co2(unittest.TestCase):
             self.sigma_thickness,
             self.epsilon,
             self.sigma_epsilon) * 10000
-        expected = 85.8212335730925
+        expected = 86.3485059939307
         self.assertAlmostEqual(
             result,
             expected,
@@ -189,9 +189,9 @@ class test_conc_outputs(unittest.TestCase):
     def test_concentration(self):  # OL53
 
         concentrations = pig.calculate_concentrations(
-            self.PH, self.MI_Composition, self.thickness)
-        expected_H2O = 4.03892743514451
-        expected_CO2 = 727.658175499597
+            self.PH, self.MI_Composition, self.thickness, None)
+        expected_H2O = 4.03475462729302
+        expected_CO2 = 735.058557154539
         self.assertAlmostEqual(
             float(
                 concentrations['H2Ot_MEAN'].iloc[0]),
@@ -258,9 +258,9 @@ class test_conc_outputs_saturated(unittest.TestCase):  # OL49
     def test_concentration(self):
 
         concentrations = pig.calculate_concentrations(
-            self.PH, self.MI_Composition, self.thickness)
-        expected_H2O = 2.54389275724829
-        expected_CO2 = 748.715067109224
+            self.PH, self.MI_Composition, self.thickness, None)
+        expected_H2O = 2.54383576945602
+        expected_CO2 = 752.347159392848
         self.assertAlmostEqual(
             float(
                 concentrations['H2Ot_MEAN'].iloc[0]),

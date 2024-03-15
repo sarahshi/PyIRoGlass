@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+Version 0.5.1
+=============
+Updating molar absorptivity inversions to add Shi et al., 2024 values for H$_2$O$_{t, 3550}$ and carbonate. Update data export paths to be more sensible within the calculate_baselines and calculate_concentrations functions. Add to the inversion.py functionality for calculating statistics. 
+
+
 Version 0.4.2
 =============
 Streamline exports from calculate_concentrations function, merge sheets. Working through reviewer comments from Volcanica!

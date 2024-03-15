@@ -72,14 +72,14 @@ class test_inversion(unittest.TestCase):
 
         m = np.array([0, 1])
         comp = 1
-        eps = pig.calculate_epsilon_inversion(m, comp)
+        eps = pig.calculate_y_inversion(m, comp)
         expected_eps = 1
         self.assertAlmostEqual(
             eps,
             expected_eps,
             self.decimalPlace,
             msg="epsilon test and expected values from the "
-            "calculate_epsilon_inversion function do not agree")
+            "calculate_y_inversion function do not agree")
 
     def test_residuals(self):
 
@@ -120,7 +120,7 @@ class test_inversion(unittest.TestCase):
         mest_f, covm_est_f, covepsilon_est_f = pig.inversion(
             self.tau, self.epsilon_1635,
             self.sigma_tau, self.sigma_epsilon_1635)
-        E_calib, _, _, RMSE_inv = pig.inversion_fit_errors(
+        E_calib, _, _, RMSE_inv, RRMSE_inv, CCC_inv = pig.inversion_fit_errors(
             self.tau, self.epsilon_1635, mest_f, covm_est_f, covepsilon_est_f)
         E_calib = float(E_calib)
         RMSE_inv = float(RMSE_inv)

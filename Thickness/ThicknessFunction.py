@@ -31,7 +31,6 @@ plt.rcParams["axes.labelsize"] = 22 # Axes labels
 
 # %% 
 
-
 def Load_SampleCSV(paths, wn_high, wn_low): 
 
     """The Load_SampleCSV function takes the inputs of the path to a directory with all sample CSVs, wavenumber high, wavenumber low values. The function outputs a dictionary of each sample's associated wavenumbers and absorbances."""
