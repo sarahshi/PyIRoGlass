@@ -47,7 +47,7 @@ class SampleDataLoader:
             range, ensuring that the wavenumbers are in ascending order and
             skipping headers if present.
         load_chemistry_thickness(chemistry_thickness_path): Loads glass
-            chemistry and thickness data from a CSV file, setting the 'Sample'
+            chemistry and thickness data from a CSV file, setting the "Sample"
             column as the index.
         load_all_data(paths, chemistry_thickness_path, wn_high, wn_low):
             Loads both spectral data from CSV files and chemistry thickness
@@ -398,7 +398,7 @@ class WhittakerSmoother(object):
         k = len(d)
         s = float(smoothness_param)
 
-        # Here be dragons: essentially we're faking a big banded matrix D,
+        # Here be dragons: essentially we are faking a big banded matrix D,
         # doing s * D.T.dot(D) with it, then taking the upper triangular bands.
         diag_sums = np.vstack([
             np.pad(s * np.cumsum(d[-i:] * d[:i]), ((k - i, 0),), "constant")
@@ -530,7 +530,7 @@ def MIR_process(data, wn_low, wn_high):
         wn_high (int): The higher bound wavenumber for MIR H2Ot, 3550.
 
     Returns:
-        data_output (pd.DataFrame): A DataFrame of absorbance data, 
+        data_output (pd.DataFrame): A DataFrame of absorbance data,
         median filtered data, baseline subtracted absorbance,
         and the subtracted peak.
         krige_out (pd.DataFrame): A DataFrame of kriged data output.
@@ -608,29 +608,29 @@ def MCMC(data, uncert, indparams, log, savefile):
     priorup = np.array([0.00, 0.00, 0.00, 0.00, 0.00, 0.0, 5.00, 0.0, 0.0,
                         5.00, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 
-    pnames = ['B_mean', 'B_PC1', 'B_PC2', 'B_PC3', 'B_PC4',
-              'G1430_peak', 'G1430_std', 'G1430_amp',
-              'G1515_peak', 'G1515_std', 'G1515_amp',
-              'H1635_mean', 'H1635_PC1', 'H1635_PC2', 'm', 'b']
+    pnames = ["B_mean", "B_PC1", "B_PC2", "B_PC3", "B_PC4",
+              "G1430_peak", "G1430_std", "G1430_amp",
+              "G1515_peak", "G1515_std", "G1515_amp",
+              "H1635_mean", "H1635_PC1", "H1635_PC2", "m", "b"]
 
-    texnames = ['$\\overline{B}$', '$\\overline{B}_{PC1}$',
-                '$\\overline{B}_{PC2}$', '$\\overline{B}_{PC3}$',
-                '$\\overline{B}_{PC4}$',
-                '$\\mu_{1430}$', '$\\sigma_{1430}$', '$a_{1430}$',
-                '$\\mu_{1515}$', '$\\sigma_{1515}$', '$a_{1515}$',
-                '$\\overline{H_{1635}}$',
-                '$\\overline{H_{1635}}_{PC1}$',
-                '$\\overline{H_{1635}}_{PC2}$', '$m$', '$b$']
+    texnames = ["$\\overline{B}$", "$\\overline{B}_{PC1}$",
+                "$\\overline{B}_{PC2}$", "$\\overline{B}_{PC3}$",
+                "$\\overline{B}_{PC4}$",
+                "$\\mu_{1430}$", "$\\sigma_{1430}$", "$a_{1430}$",
+                "$\\mu_{1515}$", "$\\sigma_{1515}$", "$a_{1515}$",
+                "$\\overline{H_{1635}}$",
+                "$\\overline{H_{1635}}_{PC1}$",
+                "$\\overline{H_{1635}}_{PC2}$", "$m$", "$b$"]
 
     mc3_output = mc3.sample(data=data, uncert=uncert, func=func, params=params,
                             indparams=indparams, pmin=pmin, pmax=pmax,
                             pstep=pstep, prior=prior, priorlow=priorlow,
                             priorup=priorup, pnames=pnames, texnames=texnames,
-                            sampler='snooker', rms=False, nsamples=1e6,
+                            sampler="snooker", rms=False, nsamples=1e6,
                             nchains=9, ncpu=4, burnin=2e4, thinning=5,
-                            leastsq='trf', chisqscale=False, grtest=True,
+                            leastsq="trf", chisqscale=False, grtest=True,
                             grbreak=1.01, grnmin=0.5, hsize=10,
-                            kickoff='normal', wlike=False, plots=False,
+                            kickoff="normal", wlike=False, plots=False,
                             log=log, savefile=savefile)
 
     return mc3_output
@@ -678,29 +678,29 @@ def calculate_baselines(dfs_dict, export_path):
 
     # Create DataFrames to store peak height data:
     # P_ = peak_, _BP = best parameter, #_STD = _stdev
-    H2O_3550_PH = pd.DataFrame(columns=['PH_3550_M', 'PH_3550_STD',
-                                        'H2Ot_3550_MAX',
-                                        'BL_H2Ot_3550_MAX',
-                                        'H2Ot_3550_SAT'])
-    DF_Output = pd.DataFrame(columns=['PH_1635_BP', 'PH_1635_STD',
-                                      'PH_1515_BP', 'PH_1515_STD',
-                                      'P_1515_BP', 'P_1515_STD',
-                                      'STD_1515_BP', 'STD_1515_STD',
-                                      'PH_1430_BP', 'PH_1430_STD',
-                                      'P_1430_BP', 'P_1430_STD',
-                                      'STD_1430_BP', 'STD_1430_STD'])
-    PC_Output = pd.DataFrame(columns=['AVG_BL_BP', 'AVG_BL_STD',
-                                      'PC1_BP', 'PC1_STD',
-                                      'PC2_BP', 'PC2_STD',
-                                      'PC3_BP', 'PC3_STD',
-                                      'PC4_BP', 'PC4_STD',
-                                      'm_BP', 'm_STD', 'b_BP', 'b_STD',
-                                      'PH_1635_PC1_BP', 'PH_1635_PC1_STD',
-                                      'PH_1635_PC2_BP', 'PH_1635_PC2_STD'])
-    NEAR_IR_PH = pd.DataFrame(columns=['PH_5200_M', 'PH_5200_STD',
-                                       'PH_4500_M', 'PH_4500_STD',
-                                       'STN_P5200', 'ERR_5200',
-                                       'STN_P4500', 'ERR_4500'])
+    H2O_3550_PH = pd.DataFrame(columns=["PH_3550_M", "PH_3550_STD",
+                                        "H2Ot_3550_MAX",
+                                        "BL_H2Ot_3550_MAX",
+                                        "H2Ot_3550_SAT"])
+    DF_Output = pd.DataFrame(columns=["PH_1635_BP", "PH_1635_STD",
+                                      "PH_1515_BP", "PH_1515_STD",
+                                      "P_1515_BP", "P_1515_STD",
+                                      "STD_1515_BP", "STD_1515_STD",
+                                      "PH_1430_BP", "PH_1430_STD",
+                                      "P_1430_BP", "P_1430_STD",
+                                      "STD_1430_BP", "STD_1430_STD"])
+    PC_Output = pd.DataFrame(columns=["AVG_BL_BP", "AVG_BL_STD",
+                                      "PC1_BP", "PC1_STD",
+                                      "PC2_BP", "PC2_STD",
+                                      "PC3_BP", "PC3_STD",
+                                      "PC4_BP", "PC4_STD",
+                                      "m_BP", "m_STD", "b_BP", "b_STD",
+                                      "PH_1635_PC1_BP", "PH_1635_PC1_STD",
+                                      "PH_1635_PC2_BP", "PH_1635_PC2_STD"])
+    NEAR_IR_PH = pd.DataFrame(columns=["PH_5200_M", "PH_5200_STD",
+                                       "PH_4500_M", "PH_4500_STD",
+                                       "STN_P5200", "ERR_5200",
+                                       "STN_P4500", "ERR_4500"])
 
     # Initialize lists for failures and errors
     failures = []
@@ -715,25 +715,25 @@ def calculate_baselines(dfs_dict, export_path):
             # Three repeat baselines for the OH_{4500}
             OH_4500_peak_ranges = [(4250, 4675), (4225, 4650), (4275, 4700)]
             OH_4500_results = list(map(lambda peak_range: {
-                'peak_fit': (result := NIR_process(data,
+                "peak_fit": (result := NIR_process(data,
                                                    peak_range[0],
                                                    peak_range[1],
-                                                   'OH'))[0],
-                'peak_krige': result[1],
-                'PH_krige': result[2],
-                'STN': result[3]
+                                                   "OH"))[0],
+                "peak_krige": result[1],
+                "PH_krige": result[2],
+                "STN": result[3]
             }, OH_4500_peak_ranges))
 
             # Three repeat baselines for the H2Om_{5200}
             H2Om_5200_peak_ranges = [(4875, 5400), (4850, 5375), (4900, 5425)]
             H2Om_5200_results = list(map(lambda peak_range: {
-                'peak_fit': (result := NIR_process(data,
+                "peak_fit": (result := NIR_process(data,
                                                    peak_range[0],
                                                    peak_range[1],
-                                                   'H2Om'))[0],
-                'peak_krige': result[1],
-                'PH_krige': result[2],
-                'STN': result[3]
+                                                   "H2Om"))[0],
+                "peak_krige": result[1],
+                "PH_krige": result[2],
+                "STN": result[3]
             }, H2Om_5200_peak_ranges))
 
             # Kriged peak heights
@@ -777,11 +777,11 @@ def calculate_baselines(dfs_dict, export_path):
             # Three repeat baselines for the H2Ot_{3550}
             H2Ot_3550_peak_ranges = [(1900, 4400), (2100, 4200), (2300, 4000)]
             H2Ot_3550_results = list(map(lambda peak_range: {
-                'peak_fit': (result := MIR_process(data,
+                "peak_fit": (result := MIR_process(data,
                                                    peak_range[0],
                                                    peak_range[1]))[0],
-                'plot_output': result[1],
-                'PH': result[2],
+                "plot_output": result[1],
+                "PH": result[2],
             }, H2Ot_3550_peak_ranges))
 
             PH_3550 = [result["PH"] for result in H2Ot_3550_results]
@@ -822,7 +822,7 @@ def calculate_baselines(dfs_dict, export_path):
                                         spec.index[-1],
                                         df_length)
                 interp_abs = interpolate.interp1d(
-                    spec.index, spec['Absorbance'])(interp_wn)
+                    spec.index, spec["Absorbance"])(interp_wn)
                 spec = spec.reindex(index=interp_wn)
                 spec["Absorbance"] = interp_abs
                 spec_mc3 = spec["Absorbance"].to_numpy()
@@ -835,8 +835,24 @@ def calculate_baselines(dfs_dict, export_path):
             # Run PyIRoGlass mc3!!!
             if export_path is not None:
                 warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+                if isinstance(export_path, list):
+                    if len(export_path) == 1:
+                        export_path = export_path[0]
+                        export_path = export_path.strip(" /").rstrip('/')
+                    else:
+                        return ("Warning: Please provide a single directory path "
+                                "as a string or a list containing one item.")
+                elif isinstance(export_path, str):
+                    export_path = export_path.strip(" /").rstrip('/')
+                else:
+                    return ("Warning: The provided 'export_path' should be a "
+                            "string or a list containing one item.")
+
                 # Create output directories for resulting files
-                default_export_dir = "Samples" if export_path is None else export_path
+                default_export_dir = (
+                    "Samples" if export_path is None else export_path
+                )
                 output_dirs = [
                     "FIGURES",
                     "PLOTFILES",
@@ -858,19 +874,19 @@ def calculate_baselines(dfs_dict, export_path):
                     if dir_name == "FINALDATA":
                         full_path = os.path.join(os.getcwd(), dir_name)
                     else:
-                        # Other directories in 'export_path'
+                        # Other directories in "export_path"
                         full_path = os.path.join(os.getcwd(), dir_name,
-                                                default_export_dir)
+                                                 default_export_dir)
 
                     os.makedirs(full_path, exist_ok=True)
                     paths[dir_name] = full_path
 
                 plotfile_path = paths["PLOTFILES"]
                 for add_dir in add_dirs:
-                    os.makedirs(os.path.join(plotfile_path, add_dir), 
+                    os.makedirs(os.path.join(plotfile_path, add_dir),
                                 exist_ok=True)
 
-                # Create additional directories under 'PLOTFILES'
+                # Create additional directories under "PLOTFILES"
                 plotfile_path = paths["PLOTFILES"]
 
                 # Construct file paths
@@ -1073,7 +1089,7 @@ def beer_lambert(molar_mass, absorbance, density, thickness, epsilon):
 
     """
 
-    concentration = pd.Series(dtype='float')
+    concentration = pd.Series(dtype="float")
     concentration = ((1e6 * molar_mass * absorbance) /
                      (density * thickness * epsilon))
 
@@ -1162,8 +1178,8 @@ def calculate_density(composition, T, P, model="LS"):
             percentages for the glass composition.
         T (float): temperature at which the density is calculated (in Celsius)
         P (float): pressure at which the density is calculated (in bars)
-        model (str): Choice of density model. 'LS' for Lesher and Spera (2015),
-            'IT' for Iacovino and Till (2019). Default is 'LS'.
+        model (str): Choice of density model. "LS" for Lesher and Spera (2015),
+            "IT" for Iacovino and Till (2019). Default is "LS".
 
     Returns:
         mol (pd.DataFrame): DataFrame containing the oxide mole fraction for
@@ -1298,7 +1314,7 @@ def calculate_epsilon(composition, T, P):
 
     # Calculate extinction coefficient
     cation_tot = (mol.sum(axis=1) +
-                  mol['Al2O3'] + mol['Na2O'] + mol['K2O'] + mol['P2O5'])
+                  mol["Al2O3"] + mol["Na2O"] + mol["K2O"] + mol["P2O5"])
     Na_NaCa = (2 * mol["Na2O"]) / ((2 * mol["Na2O"]) + mol["CaO"])
     SiAl_tot = (mol["SiO2"] + (2 * mol["Al2O3"])) / cation_tot
 
@@ -1312,7 +1328,7 @@ def calculate_epsilon(composition, T, P):
     covm_est_3550 = np.diag([38.06765317, 77.40636723])
     mest_1635 = np.array([-50.3975642, 124.2505339])
     covm_est_1635 = np.diag([20.85034888, 39.38749563])
-    mest_CO2 = np.array([417.4903541 , -318.59874422])
+    mest_CO2 = np.array([417.4903541, -318.59874422])
     covm_est_CO2 = np.diag([84.92345481, 339.80111416])
 
     # Set up matrices for calculating uncertainties on extinction coefficients
@@ -1402,7 +1418,7 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
             different sample.
         composition (dictionary): Dictionary with keys as oxide names and
             values as their weight percentages in the glass composition.
-        thickness (pd.DataFrame): DataFrame with 'Thickness' column
+        thickness (pd.DataFrame): DataFrame with "Thickness" column
             indicating wafer thickness in micrometers (µm) for each sample.
         N (int): Number of Monte Carlo simulations to perform for uncertainty
             estimation. Default is 500,000.
@@ -1415,8 +1431,8 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
         concentrations_df (pd.DataFrame): DataFrame containing calculated
             volatile concentrations and their uncertainties for each sample,
             including columns for mean and standard deviation of H2O and CO2
-            species concentrations. ALso contains density ('Density' column)
-            and extinction coefficient ('epsilon' column) for each sample,
+            species concentrations. ALso contains density ("Density" column)
+            and extinction coefficient ("epsilon" column) for each sample,
             providing insight into the properties of the glass under analysis.
 
     Note:
@@ -1427,7 +1443,22 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
     """
 
     if export_path is not None:
+
         warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+        if isinstance(export_path, list):
+            if len(export_path) == 1:
+                export_path = export_path[0]
+                export_path = export_path.strip(" /").rstrip('/')
+            else:
+                return ("Warning: Please provide a single directory path "
+                        "as a string or a list containing one item.")
+        elif isinstance(export_path, str):
+            export_path = export_path.strip(" /").rstrip('/')
+        else:
+            return ("Warning: The provided 'export_path' should be a "
+                    "string or a list containing one item.")
+
         output_dirs = ["FINALDATA"]
 
         for dir_name in output_dirs:
@@ -1435,7 +1466,7 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
             os.makedirs(full_path, exist_ok=True)
 
         file_name = f"{export_path}_H2OCO2.csv"
-    else: 
+    else:
         full_path = os.path.join(os.getcwd(), "FINALDATA")
         os.makedirs(full_path, exist_ok=True)
         file_name = "H2OCO2.csv"
@@ -1904,12 +1935,12 @@ def plot_H2Om_OH(data, files, als_bls, ax_top=None, ax_bot=None):
 
     Parameters:
         data (pd.DataFrame): DataFrame containing spectral data with
-            'Absorbance' values indexed by wavenumber.
+            "Absorbance" values indexed by wavenumber.
         files (str): The identifier for the current sample set being
             processed, used for titling the plot.
         als_bls (dict): A dictionary containing results from baseline
             fitting and peak analysis. Expected keys include
-            'H2Om_5200_results' and 'OH_4500_results', each storing a
+            "H2Om_5200_results" and "OH_4500_results", each storing a
             list of result dictionaries from the ALS (Asymmetric Least
             Squares) processing for respective peaks.
         ax_top (matplotlib.axes.Axes, optional): The top subplot axis
@@ -1988,9 +2019,9 @@ def plot_H2Om_OH(data, files, als_bls, ax_top=None, ax_bot=None):
     handles_top, labels_top = ax_top.get_legend_handles_labels()
     filtered_handles_top = [h_t for h_t, l_t in
                             zip(handles_top, labels_top)
-                            if not l_t.startswith('_')]
+                            if not l_t.startswith("_")]
     filtered_labels_top = [l_t for l_t in labels_top if not
-                           l_t.startswith('_')]
+                           l_t.startswith("_")]
     ax_top.legend(filtered_handles_top, filtered_labels_top, prop={"size": 10})
     ax_top.annotate(
         r"$\mathregular{H_2O_{m, 5200}}$ Peak Height: "
@@ -2051,9 +2082,9 @@ def plot_H2Om_OH(data, files, als_bls, ax_top=None, ax_bot=None):
     handles_bottom, labels_bottom = ax_bot.get_legend_handles_labels()
     filtered_handles_bottom = [h_b for h_b, l_b in
                                zip(handles_bottom, labels_bottom)
-                               if not l_b.startswith('_')]
+                               if not l_b.startswith("_")]
     filtered_labels_bottom = [l_b for l_b in labels_bottom if not
-                              l_b.startswith('_')]
+                              l_b.startswith("_")]
     ax_bot.legend(filtered_handles_bottom, filtered_labels_bottom,
                   prop={"size": 10})
 
@@ -2078,12 +2109,12 @@ def plot_H2Ot_3550(data, files, als_bls, ax=None):
 
     Parameters:
         data (pd.DataFrame): DataFrame containing spectral data with
-            'Absorbance' values indexed by wavenumber. Expected to cover
+            "Absorbance" values indexed by wavenumber. Expected to cover
             the MIR range relevant for the H2Ot peak analysis.
         files (str): Identifier for the current sample set being processed,
             used for titling the plot.
         als_bls (dict): Dictionary containing results from baseline fitting
-            and peak analysis. Expected to have a key 'H2Ot_3550_results'
+            and peak analysis. Expected to have a key "H2Ot_3550_results"
             which stores a list of dictionaries with results from the
             processing for the H2Ot peak.
         ax (matplotlib.axes.Axes, optional): Matplotlib axis object where
@@ -2099,7 +2130,7 @@ def plot_H2Ot_3550(data, files, als_bls, ax=None):
         The function is designed to work as part of a larger spectroscopic
         analysis workflow, where spectral data preprocessing, baseline fitting,
         and peak analysis have been previously conducted. It expects specific
-        data structures from these analyses as input. If 'ax' is not provided,
+        data structures from these analyses as input. If "ax" is not provided,
         the function creates a new figure and axis for plotting, which might
         not be ideal for integrating this plot into multi-panel figures or
         more complex visual layouts.
@@ -2194,13 +2225,13 @@ def derive_carbonate(data, files, mc3_output, export_path):
 
     Parameters:
         data (pd.DataFrame): DataFrame containing FTIR spectral data with
-            'Absorbance' values indexed by wavenumber.
+            "Absorbance" values indexed by wavenumber.
         file (str): Spectrum sample name.
         mc3_output (dict): Dictionary containing results from PyIRoGlass
             fitting, including best fit parameters, posterior distributions,
             and other model outputs relevant for calculating peak fits.
         savefile (bool): If True, the function will save the best fits and
-            baselines data to CSV files named according to the 'file'
+            baselines data to CSV files named according to the "file"
             parameter. If False, no files will be saved.
 
     Returns:
@@ -2230,7 +2261,7 @@ def derive_carbonate(data, files, mc3_output, export_path):
                                 spec.index[-1],
                                 df_length)
         interp_abs = interpolate.interp1d(
-            spec.index, spec['Absorbance'])(interp_wn)
+            spec.index, spec["Absorbance"])(interp_wn)
         spec = spec.reindex(index=interp_wn)
         spec["Absorbance"] = interp_abs
         spec_mc3 = spec["Absorbance"].to_numpy()
@@ -2329,7 +2360,7 @@ def plot_carbonate(data, files, mc3_output, export_path, ax=None):
 
     Parameters:
         data (pd.DataFrame): DataFrame containing FTIR spectral data with
-            'Absorbance' values indexed by wavenumber. Expected to cover
+            "Absorbance" values indexed by wavenumber. Expected to cover
             the range relevant for carbonate and water peak analysis.
         files (str): Identifier for the current sample set being processed,
             used for titling the plot.
@@ -2348,7 +2379,7 @@ def plot_carbonate(data, files, mc3_output, export_path, ax=None):
         The function is designed to work as part of a larger spectroscopic
         analysis workflow, where spectral data preprocessing, baseline fitting,
         and peak modeling have been previously conducted. It expects specific
-        data structures from these analyses as input. If 'ax' is not provided,
+        data structures from these analyses as input. If "ax" is not provided,
         the function creates a new figure and axis for plotting, which might
         not be ideal for integrating this plot into multi-panel figures or
         more complex visual layouts.
@@ -2359,7 +2390,10 @@ def plot_carbonate(data, files, mc3_output, export_path, ax=None):
         fig, ax = plt.subplots(figsize=(8, 8))
         ax.set_title(files)
 
-    bestfits, baselines = derive_carbonate(data, files, mc3_output, export_path)
+    bestfits, baselines = derive_carbonate(data,
+                                           files,
+                                           mc3_output,
+                                           export_path)
     ax.plot(baselines.index, baselines.to_numpy(), "dimgray", linewidth=0.25)
     ax.plot(
         bestfits.index,

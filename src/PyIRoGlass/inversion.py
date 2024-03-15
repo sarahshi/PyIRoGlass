@@ -1,6 +1,6 @@
 # %%
 
-__author__ = 'Sarah Shi'
+__author__ = "Sarah Shi"
 
 import numpy as np
 import pandas as pd
@@ -60,8 +60,7 @@ def inversion(x, y, sigma_x, sigma_y, intercept_zero=False):
         mls[0] = 0.0
 
     # Compute covariance matrix for regular least squares solution
-    covls = np.linalg.inv(np.linalg.multi_dot([G.T,
-                                               np.diag(sigma_y**-2), G]))
+    covls = np.linalg.inv(np.linalg.multi_dot([G.T, np.diag(sigma_y**-2), G]))
 
     # Combine all parameters into a single vector for use in optimization
     xbar = np.concatenate([y, x, mls])
@@ -70,22 +69,22 @@ def inversion(x, y, sigma_x, sigma_y, intercept_zero=False):
     xg = xbar
 
     # Initialize gradient vector
-    Fg = np.zeros([N, M*N+M])
+    Fg = np.zeros([N, M * N + M])
 
     # Initialize covariance matrix
-    covx = np.zeros([M*N+M, M*N+M])
+    covx = np.zeros([M * N + M, M * N + M])
 
     # Set covariance matrix for measurement uncertainties
-    covx[0*N:1*N, 0*N:1*N] = np.diag(sigma_y**2)
-    covx[1*N:2*N, 1*N:2*N] = np.diag(sigma_x**2)
+    covx[0 * N : 1 * N, 0 * N : 1 * N] = np.diag(sigma_y**2)
+    covx[1 * N : 2 * N, 1 * N : 2 * N] = np.diag(sigma_x**2)
 
     # Set large covariance matrix for model parameters
     scale = 1
     if intercept_zero:
-        covx[M*N+0, M*N+0] = 1e-3 * scale * covls[0, 0]
+        covx[M * N + 0, M * N + 0] = 1e-3 * scale * covls[0, 0]
     else:
-        covx[M*N+0, M*N+0] = scale * covls[0, 0]
-    covx[M*N+1, M*N+1] = scale * covls[1, 1]
+        covx[M * N + 0, M * N + 0] = scale * covls[0, 0]
+    covx[M * N + 1, M * N + 1] = scale * covls[1, 1]
 
     # Set number of iterations for optimization
     Nit = 100
@@ -98,36 +97,40 @@ def inversion(x, y, sigma_x, sigma_y, intercept_zero=False):
     # Perform optimization
     for i in range(0, Nit):
         # Calculate residual vector and its squared norm
-        f = -xg[0:N] + (xg[M*N+1]*xg[1*N:2*N]) + (xg[M*N+0]*np.ones(N))
+        f = (
+            -xg[0:N]
+            + (xg[M * N + 1] * xg[1 * N : 2 * N])
+            + (xg[M * N + 0] * np.ones(N))
+        )
         Ef = np.dot(f.T, f)
 
         # Print error at first iteration and every 10th iteration
-        if (i == 0):
-            print('Initial error in implicit equation = ' + str(Ef))
-        elif (i % 10 == 0):
-            print('Final error in implicit equation = ', Ef)
+        if i == 0:
+            print("Initial error in implicit equation = " + str(Ef))
+        elif i % 10 == 0:
+            print("Final error in implicit equation = ", Ef)
 
         # Compute gradient vector
         Fg[0:N, 0:N] = -np.eye(N, N)
-        Fg[0:N, N:2*N] = xg[M*N+1] * np.eye(N, N)
-        Fg[0:N, M*N+0] = np.ones([N])
-        Fg[0:N, M*N+1] = xg[1*N:2*N]
+        Fg[0:N, N : 2 * N] = xg[M * N + 1] * np.eye(N, N)
+        Fg[0:N, M * N + 0] = np.ones([N])
+        Fg[0:N, M * N + 1] = xg[1 * N : 2 * N]
 
         # Set regularization parameter
         epsi = 0
 
         # Solve linear system
         left = Fg.T
-        right = np.linalg.multi_dot([Fg, covx, Fg.T]) + (epsi*np.eye(N, N))
+        right = np.linalg.multi_dot([Fg, covx, Fg.T]) + (epsi * np.eye(N, N))
         solve = np.linalg.solve(right.conj().T, left.conj().T).conj().T
         MO = np.dot(covx, solve)
-        xg2 = xbar + np.dot(MO, (np.dot(Fg, (xg-xbar))-f))
+        xg2 = xbar + np.dot(MO, (np.dot(Fg, (xg - xbar)) - f))
         xg = xg2
 
         # Store some variables for later use
-        mest = xg[M*N+0:M*N+M]
+        mest = xg[M * N + 0 : M * N + M]
         y_pre = xg[0:N]
-        y_linear = mest[0] + mest[1]*x
+        y_linear = mest[0] + mest[1] * x
         y_pre_all[0:N, i] = y_pre[0:N]
         mest_all[0:N, i] = mest
         y_linear_all[0:N, i] = y_linear[0:N]
@@ -138,7 +141,7 @@ def inversion(x, y, sigma_x, sigma_y, intercept_zero=False):
     covy_est_f = covx_est[0:N, 0:N]
     covm_est_f = covx_est[-2:, -2:]
 
-    mest_f = xg[M*N:M*N+M]
+    mest_f = xg[M * N : M * N + M]
 
     # Return relevant variables
     return mest_f, covm_est_f, covy_est_f
@@ -175,8 +178,7 @@ def least_squares(x, y, sigma_y):
     mls = np.linalg.solve(np.dot(G.T, G), np.dot(G.T, y))
 
     # Compute covariance matrix for regular least squares solution
-    covls = np.linalg.inv(np.linalg.multi_dot([G.T,
-                                               np.diag(sigma_y**-2), G]))
+    covls = np.linalg.inv(np.linalg.multi_dot([G.T, np.diag(sigma_y**-2), G]))
 
     return mls, covls
 
@@ -226,7 +228,7 @@ def calculate_SEE(residuals):
         A float representing the standard error of estimate.
     """
 
-    return np.sqrt(np.sum(residuals ** 2)) / (len(residuals) - 2)
+    return np.sqrt(np.sum(residuals**2)) / (len(residuals) - 2)
 
 
 def calculate_R2(true_y, pred_y):
@@ -261,7 +263,7 @@ def calculate_RMSE(residuals):
         A float representing the root mean squared error.
     """
 
-    return np.sqrt(np.mean(residuals ** 2))
+    return np.sqrt(np.mean(residuals**2))
 
 
 def calculate_RRMSE(true_y, pred_y):
@@ -276,18 +278,18 @@ def calculate_RRMSE(true_y, pred_y):
 
     Returns:
         A float representing the relative root mean squared error.
-    
+
     """
 
     num = np.sum(np.square(true_y - pred_y))
     den = np.sum(np.square(pred_y))
-    squared_error = num/den
-    rrmse_loss=np.sqrt(squared_error)
+    squared_error = num / den
+    rrmse_loss = np.sqrt(squared_error)
 
     return rrmse_loss
 
 
-def calculate_CCC(true_y, pred_y): 
+def calculate_CCC(true_y, pred_y):
 
     """
     Calculate the Concordance Correlation Coefficient (CCC) between
@@ -303,15 +305,12 @@ def calculate_CCC(true_y, pred_y):
     """
 
     # Remove NaNs
-    df = pd.DataFrame({
-        'true_y': true_y,
-        'pred_y': pred_y
-    })
+    df = pd.DataFrame({"true_y": true_y, "pred_y": pred_y})
     df = df.dropna()
-    true_y = df['true_y']
-    pred_y = df['pred_y']
+    true_y = df["true_y"]
+    pred_y = df["pred_y"]
     # Pearson product-moment correlation coefficients
-    cor = np.corrcoef(true_y, pred_y)[0][1] 
+    cor = np.corrcoef(true_y, pred_y)[0][1]
     # Mean
     mean_true = np.mean(true_y)
     mean_pred = np.mean(pred_y)
@@ -323,7 +322,7 @@ def calculate_CCC(true_y, pred_y):
     sd_pred = np.std(pred_y)
     # Calculate CCC
     numerator = 2 * cor * sd_true * sd_pred
-    denominator = var_true + var_pred + (mean_true - mean_pred)**2
+    denominator = var_true + var_pred + (mean_true - mean_pred) ** 2
 
     return numerator / denominator
 
@@ -402,18 +401,20 @@ def inversion_fit_errors_plotting(x, y, mest_f):
     x_m = np.mean(x)
 
     y_hat = y_inv
-    ssresid = np.sum((y-y_hat)**2)
-    ssxx = sum((x - x_m)**2)
+    ssresid = np.sum((y - y_hat) ** 2)
+    ssxx = sum((x - x_m) ** 2)
 
-    ttest = stats.t.ppf(((1-0.68)/2), n-2)
-    se = np.sqrt(ssresid / (n-2))
+    ttest = stats.t.ppf(((1 - 0.68) / 2), n - 2)
+    se = np.sqrt(ssresid / (n - 2))
 
-    conf_upper = line_y + (ttest*se*np.sqrt(1/n+(line_x-x_m)**2/ssxx))
-    conf_lower = line_y - (ttest*se*np.sqrt(1/n+(line_x-x_m)**2/ssxx))
+    conf_upper = line_y + (ttest * se *
+                           np.sqrt(1 / n + (line_x - x_m) ** 2 / ssxx))
+    conf_lower = line_y - (ttest * se *
+                           np.sqrt(1 / n + (line_x - x_m) ** 2 / ssxx))
 
-    pred_upper = line_y + (ttest*se*np.sqrt(1 + 1/n+(line_x-x_m)**2/ssxx))
-    pred_lower = line_y - (ttest*se*np.sqrt(1 + 1/n+(line_x-x_m)**2/ssxx))
+    pred_upper = line_y + (ttest * se *
+                           np.sqrt(1 + 1 / n + (line_x - x_m) ** 2 / ssxx))
+    pred_lower = line_y - (ttest * se *
+                           np.sqrt(1 + 1 / n + (line_x - x_m) ** 2 / ssxx))
 
     return line_x, line_y, conf_lower, conf_upper, pred_lower, pred_upper
-
-# %%

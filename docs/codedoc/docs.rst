@@ -102,5 +102,10 @@ Functions for molar absorptivity inversions
 
 .. autofunction:: PyIRoGlass.calculate_RMSE
 
+.. autofunction:: PyIRoGlass.calculate_RRMSE
+
+.. autofunction:: PyIRoGlass.calculate_CCC
+
 .. autofunction:: PyIRoGlass.inversion_fit_errors
 
+.. autofunction:: PyIRoGlass.inversion_fit_errors_plotting

@@ -1,6 +1,6 @@
 # %%
 
-__author__ = 'Sarah Shi'
+__author__ = "Sarah Shi"
 
 import numpy as np
 import pandas as pd
@@ -9,6 +9,7 @@ import scipy.signal as signal
 from matplotlib import pyplot as plt
 
 # %% Reflectance FTIR - Interference Fringe Processing for Thicknesses
+
 
 def datacheck_peakdetect(x_axis, y_axis):
 
@@ -121,31 +122,31 @@ def peakdetect(y_axis, x_axis=None, lookahead=200, delta=0):
             mnpos = x
 
         # Look for max
-        if y < mx-delta and mx != np.Inf:
+        if y < mx - delta and mx != np.Inf:
             # Maxima peak candidate found
             # Look ahead in signal to ensure that this is a peak and not jitter
-            if y_axis[index:index+lookahead].max() < mx:
+            if y_axis[index : index + lookahead].max() < mx:
                 max_peaks.append([mxpos, mx])
                 dump.append(True)
                 # Set algorithm to only find minima now
                 mx = np.Inf
                 mn = np.Inf
-                if index+lookahead >= length:
+                if index + lookahead >= length:
                     # End is within lookahead no more peaks can be found
                     break
                 continue
 
         # Look for min
-        if y > mn+delta and mn != -np.Inf:
+        if y > mn + delta and mn != -np.Inf:
             # Minima peak candidate found
             # Look ahead in signal to ensure that this is a peak and not jitter
-            if y_axis[index:index+lookahead].min() > mn:
+            if y_axis[index : index + lookahead].min() > mn:
                 min_peaks.append([mnpos, mn])
                 dump.append(False)
                 # Set algorithm to only find maxima now
                 mn = -np.Inf
                 mx = -np.Inf
-                if index+lookahead >= length:
+                if index + lookahead >= length:
                     break
 
     # Remove the false hit on the first value of the y_axis
@@ -161,11 +162,17 @@ def peakdetect(y_axis, x_axis=None, lookahead=200, delta=0):
     return [max_peaks, min_peaks]
 
 
-
-def peakID(ref_spec, wn_high, wn_low, peak_heigh_min_delta, peak_search_width,
-           savgol_filter_width, smoothing_wn_width=None, remove_baseline=True,
-           plotting=False, filename=None):
-
+def peakID(
+    ref_spec,
+    wn_high,
+    wn_low,
+    peak_heigh_min_delta,
+    peak_search_width,
+    savgol_filter_width,
+    smoothing_wn_width=None,
+    plotting=False,
+    filename=None,
+):
     """
     Identifies peaks based on the peakdetect package which
     identifies local maxima and minima in noisy signals.
@@ -178,8 +185,6 @@ def peakID(ref_spec, wn_high, wn_low, peak_heigh_min_delta, peak_search_width,
         wn_low (int): The lower wavenumber limit for the analysis.
         smoothing_wn_width (int): The window size for the Savitzky-Golay
             smoothing filter. Default is None.
-        remove_baseline (bool): Whether to remove the baseline from the
-            spectrum. Default is False.
         peak_heigh_min_delta (float): Minimum difference between a peak and
             its neighboring points for it to be considered a peak.
             Default is 0.008.
@@ -196,25 +201,26 @@ def peakID(ref_spec, wn_high, wn_low, peak_heigh_min_delta, peak_search_width,
     """
 
     spec = ref_spec.loc[wn_low:wn_high].copy()  # df indexed by wavenumber
-    spec_filt = pd.DataFrame(columns=['Wavenumber', 'Absorbance'])
+    spec_filt = pd.DataFrame(columns=["Wavenumber", "Absorbance"])
     baseline = 0
 
     spec_filter = signal.medfilt(spec.Absorbance, 3)
-
-    if remove_baseline is True:
-        baseline = signal.savgol_filter(spec_filter, savgol_filter_width, 3)
-        spec_filter = spec_filter - baseline
+    baseline = signal.savgol_filter(spec_filter, savgol_filter_width, 3)
+    spec_filter = spec_filter - baseline
 
     if smoothing_wn_width is not None:
         spec_filter = signal.savgol_filter(spec_filter, smoothing_wn_width, 3)
 
-    spec_filt['Absorbance'] = spec_filter
+    spec_filt["Absorbance"] = spec_filter
     spec_filt.index = spec.index
-    spec['Subtracted'] = spec['Absorbance'] - baseline
+    spec["Subtracted"] = spec["Absorbance"] - baseline
 
-    pandt = peakdetect(spec_filt.Absorbance, spec_filt.index,
-                       lookahead=peak_search_width,
-                       delta=peak_heigh_min_delta)
+    pandt = peakdetect(
+        spec_filt.Absorbance,
+        spec_filt.index,
+        lookahead=peak_search_width,
+        delta=peak_heigh_min_delta,
+    )
     peaks = np.array(pandt[0])
     troughs = np.array(pandt[1])
 
@@ -222,13 +228,13 @@ def peakID(ref_spec, wn_high, wn_low, peak_heigh_min_delta, peak_search_width,
         pass
     else:
         fig, ax = plt.subplots(1, 1, figsize=(8, 6))
-        ax.plot(spec.index, spec['Subtracted'], linewidth=1)
+        ax.plot(spec.index, spec["Subtracted"], linewidth=1)
         ax.plot(spec_filt.index, spec_filt.Absorbance)
-        ax.plot(peaks[:, 0], peaks[:, 1], 'ro')
-        ax.plot(troughs[:, 0], troughs[:, 1], 'ko')
+        ax.plot(peaks[:, 0], peaks[:, 1], "ro")
+        ax.plot(troughs[:, 0], troughs[:, 1], "ko")
         ax.set_title(filename)
-        ax.set_xlabel('Wavenumber')
-        ax.set_ylabel('Absorbance')
+        ax.set_xlabel("Wavenumber")
+        ax.set_ylabel("Absorbance")
         ax.invert_xaxis()
 
     return peaks, troughs
@@ -249,11 +255,12 @@ def calculate_thickness(n, positions):
         np.ndarray: Array of thicknesses of glass wafers.
     """
 
-    return 1/(2 * n * np.abs(np.diff(positions)))
+    return 1 / (2 * n * np.abs(np.diff(positions)))
 
 
-def calculate_mean_thickness(dfs_dict, n, wn_high, wn_low,
-                             remove_baseline=True, plotting=False, phaseol=True):
+def calculate_mean_thickness(
+    dfs_dict, n, wn_high, wn_low, plotting=False, phaseol=True
+):
 
     """
     Calculates thickness of glass wafers based on the refractive index of
@@ -268,18 +275,16 @@ def calculate_mean_thickness(dfs_dict, n, wn_high, wn_low,
         n (float): refractive index of the glass
         wn_high (float): the high wavenumber cutoff for the analysis
         wn_low (float): the low wavenumber cutoff for the analysis
-        remove_baseline (bool): whether or not to remove the baseline
-            from the data
         plotting (bool): whether or not to plot the data and detected
             peaks and troughs
 
     Returns:
         ThickDF (pd.DataFrame): a dataframe containing the thickness
-        calculations for each file. 
+        calculations for each file.
 
     Notes:
         smoothing_wn_width (float): Width of the Savitzky-Golay smoothing
-        window, if not used, set to None. 
+        window, if not used, set to None.
         peak_heigh_min_delta (float): Minimum height difference between a
         peak and its surrounding points.
         peak_search_width (float): Distance (in wavenumbers) to look on
@@ -288,16 +293,16 @@ def calculate_mean_thickness(dfs_dict, n, wn_high, wn_low,
 
     ThickDF = pd.DataFrame(
         columns=[
-            'Thickness_M',
-            'Thickness_STD',
-            'Peak_Thicknesses',
-            'Peak_Thickness_M',
-            'Peak_Thickness_STD',
-            'Trough_Thicknesses',
-            'Trough_Thickness_M',
-            'Trough_Thickness_STD'
-            ]
-            )
+            "Thickness_M",
+            "Thickness_STD",
+            "Peak_Thicknesses",
+            "Peak_Thickness_M",
+            "Peak_Thickness_STD",
+            "Trough_Thicknesses",
+            "Trough_Thickness_M",
+            "Trough_Thickness_STD",
+        ]
+    )
 
     failures = []
 
@@ -316,75 +321,100 @@ def calculate_mean_thickness(dfs_dict, n, wn_high, wn_low,
 
     for filename, data in dfs_dict.items():
         try:
-            peaks, troughs = peakID(data, wn_high, wn_low, filename=filename,
-                                    plotting=plotting,
-                                    savgol_filter_width=savgol_filter_width,
-                                    smoothing_wn_width=smoothing_wn_width,
-                                    remove_baseline=True,
-                                    peak_heigh_min_delta=peak_heigh_min_delta,
-                                    peak_search_width=peak_search_width)
+            peaks, troughs = peakID(
+                data,
+                wn_high,
+                wn_low,
+                filename=filename,
+                plotting=plotting,
+                savgol_filter_width=savgol_filter_width,
+                smoothing_wn_width=smoothing_wn_width,
+                peak_heigh_min_delta=peak_heigh_min_delta,
+                peak_search_width=peak_search_width,
+            )
             peaks_loc = peaks[:, 0].round(2)
             troughs_loc = troughs[:, 0].round(2)
             peaks_diff = np.diff(peaks[:, 0]).round(2)
             troughs_diff = np.diff(troughs[:, 0]).round(2)
 
-            peaks_loc_filt = np.array([x for x in peaks_loc if
-                                       abs(x - np.mean(peaks_loc))
-                                       < 2 * np.std(peaks_loc)])
-            troughs_loc_filt = np.array([x for x in troughs_loc if
-                                         abs(x - np.mean(troughs_loc))
-                                         < 2 * np.std(troughs_loc)])
-            peaks_diff_filt = np.array([x for x in peaks_diff if
-                                        abs(x - np.mean(peaks_diff))
-                                        < 2 * np.std(peaks_diff)])
-            troughs_diff_filt = np.array([x for x in troughs_diff if
-                                          abs(x - np.mean(troughs_diff))
-                                          < 2 * np.std(troughs_diff)])
+            peaks_loc_filt = np.array(
+                [
+                    x
+                    for x in peaks_loc
+                    if (abs(x - np.mean(peaks_loc)) <
+                        2 * np.std(peaks_loc))
+                ]
+            )
+            troughs_loc_filt = np.array(
+                [
+                    x
+                    for x in troughs_loc
+                    if (abs(x - np.mean(troughs_loc)) <
+                        2 * np.std(troughs_loc))
+                ]
+            )
+            peaks_diff_filt = np.array(
+                [
+                    x
+                    for x in peaks_diff
+                    if (abs(x - np.mean(peaks_diff)) <
+                        2 * np.std(peaks_diff))
+                ]
+            )
+            troughs_diff_filt = np.array(
+                [
+                    x
+                    for x in troughs_diff
+                    if (abs(x - np.mean(troughs_diff)) <
+                        2 * np.std(troughs_diff))
+                ]
+            )
 
             t_peaks = (calculate_thickness(n, peaks[:, 0]) * 1e4).round(2)
-            t_peaks_filt = np.array([x for x in t_peaks if
-                                     abs(x - np.mean(t_peaks))
-                                     < np.std(t_peaks)])
+            t_peaks_filt = np.array(
+                [x for x in t_peaks if (abs(x - np.mean(t_peaks)) <
+                                        np.std(t_peaks))]
+            )
             mean_t_peaks_filt = np.mean(t_peaks_filt).round(2)
             std_t_peaks_filt = np.std(t_peaks_filt).round(2)
 
             t_troughs = (calculate_thickness(n, troughs[:, 0]) * 1e4).round(2)
-            t_troughs_filt = [x for x in t_troughs if
-                              abs(x - np.mean(t_troughs))
-                              < np.std(t_troughs)]
+            t_troughs_filt = np.array(
+                [x for x in t_troughs if (abs(x - np.mean(t_troughs)) <
+                                          np.std(t_troughs))]
+            )
             mean_t_troughs_filt = np.mean(t_troughs_filt).round(2)
             std_t_troughs_filt = np.std(t_troughs_filt).round(2)
 
-            mean_t = np.mean(
-                np.concatenate([t_peaks_filt, t_troughs_filt])
-                ).round(2)
-            std_t = np.std(
-                np.concatenate([t_peaks_filt, t_troughs_filt])
-                ).round(2)
+            mean_t = np.mean(np.concatenate([t_peaks_filt,
+                                             t_troughs_filt])).round(2)
+            std_t = np.std(np.concatenate([t_peaks_filt,
+                                           t_troughs_filt])).round(2)
 
-            ThickDF.loc[f"{filename}"] = pd.Series({
-                'Thickness_M': mean_t,
-                'Thickness_STD': std_t,
-                'Peak_Thicknesses': t_peaks_filt,
-                'Peak_Thickness_M': mean_t_peaks_filt,
-                'Peak_Thickness_STD': std_t_peaks_filt,
-                'Peak_Loc': peaks_loc_filt,
-                'Peak_Diff': peaks_diff_filt,
-                'Trough_Thicknesses': t_troughs_filt,
-                'Trough_Thickness_M': mean_t_troughs_filt,
-                'Trough_Thickness_STD': std_t_troughs_filt,
-                'Trough_Loc': troughs_loc_filt,
-                'Trough_Diff': troughs_diff_filt
-                })
+            ThickDF.loc[f"{filename}"] = pd.Series(
+                {
+                    "Thickness_M": mean_t,
+                    "Thickness_STD": std_t,
+                    "Peak_Thicknesses": t_peaks_filt,
+                    "Peak_Thickness_M": mean_t_peaks_filt,
+                    "Peak_Thickness_STD": std_t_peaks_filt,
+                    "Peak_Loc": peaks_loc_filt,
+                    "Peak_Diff": peaks_diff_filt,
+                    "Trough_Thicknesses": t_troughs_filt,
+                    "Trough_Thickness_M": mean_t_troughs_filt,
+                    "Trough_Thickness_STD": std_t_troughs_filt,
+                    "Trough_Loc": troughs_loc_filt,
+                    "Trough_Diff": troughs_diff_filt,
+                }
+            )
 
         except Exception as e:
             print(f"Error: {e}")
             print(e)
             failures.append(filename)
-            ThickDF.loc[filename] = pd.Series({
-                'V1': np.nan, 'V2': np.nan,
-                'Thickness': np.nan
-                })
+            ThickDF.loc[filename] = pd.Series(
+                {"V1": np.nan, "V2": np.nan, "Thickness": np.nan}
+            )
 
     return ThickDF
 
@@ -403,9 +433,11 @@ def reflectance_index(XFo):
         n (float): The calculated reflectance index.
     """
 
-    n_alpha = 1.827 - 0.192*XFo
-    n_beta = 1.869 - 0.218*XFo
-    n_gamma = 1.879 - 0.209*XFo
-    n = (n_alpha+n_beta+n_gamma) / 3
+    n_alpha = 1.827 - 0.192 * XFo
+    n_beta = 1.869 - 0.218 * XFo
+    n_gamma = 1.879 - 0.209 * XFo
+    n = (n_alpha + n_beta + n_gamma) / 3
 
     return n
+
+# %%
