@@ -24,7 +24,6 @@ plt.rcParams["ytick.labelsize"] = 20 # Sets size of numbers on tick marks
 plt.rcParams["axes.titlesize"] = 22
 plt.rcParams["axes.labelsize"] = 22 # Axes labels
 
-
 # %% 
 
 wn_low = 1250

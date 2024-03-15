@@ -23,7 +23,7 @@ class test_inversion(unittest.TestCase):
             self.sigma_tau, self.sigma_epsilon_1635)
         mls, _ = pig.least_squares(
             self.tau, self.epsilon_1635,
-            self.sigma_tau, self.sigma_epsilon_1635)
+            self.sigma_epsilon_1635)
         m0 = float(mest_f[0])
         m1 = float(mest_f[1])
         expected_m0 = -50.3975642
@@ -120,8 +120,8 @@ class test_inversion(unittest.TestCase):
         mest_f, covm_est_f, covepsilon_est_f = pig.inversion(
             self.tau, self.epsilon_1635,
             self.sigma_tau, self.sigma_epsilon_1635)
-        E_calib, _, _, RMSE_inv, RRMSE_inv, CCC_inv = pig.inversion_fit_errors(
-            self.tau, self.epsilon_1635, mest_f, covm_est_f, covepsilon_est_f)
+        E_calib, _, _, RMSE_inv, _, _ = pig.inversion_fit_errors(
+            self.tau, self.epsilon_1635, mest_f, covepsilon_est_f)
         E_calib = float(E_calib)
         RMSE_inv = float(RMSE_inv)
         expected_E_calib = 3.1321319317425775

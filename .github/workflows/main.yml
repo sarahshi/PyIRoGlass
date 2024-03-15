@@ -9,7 +9,6 @@ on:
   release:
     types: [ created ]
 
-
 jobs:
   test:
     runs-on: ubuntu-latest
