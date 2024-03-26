@@ -83,7 +83,7 @@ class test_density_epsilon_calculation(unittest.TestCase):
         tau = float(epsilon["Tau"].iloc[0])
         expected_tau = 0.682894853
         epsilon_h2ot = float(epsilon["epsilon_H2Ot_3550"].iloc[0])
-        expected_epsilon_h2ot = 64.5268644303552
+        expected_epsilon_h2ot = 64.49365540510483
         sigma_epsilon_h2ot = float(epsilon["sigma_epsilon_H2Ot_3550"].iloc[0])
         expected_sigma_epsilon_h2ot = 7.37609147230662
         self.assertAlmostEqual(

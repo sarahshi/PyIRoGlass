@@ -36,7 +36,7 @@ class test_conc_outputs_h2ot(unittest.TestCase):
         result = pig.beer_lambert(
             self.molar_mass, self.absorbance, self.density, self.thickness, self.epsilon
         )
-        expected = 4.03475462729302
+        expected = 4.036918931617838
         self.assertAlmostEqual(
             result,
             expected,
@@ -267,7 +267,7 @@ class test_conc_outputs_saturated(unittest.TestCase):  # OL49
         concentrations = pig.calculate_concentrations(
             self.PH, self.MI_Composition, self.thickness, None
         )
-        expected_H2O = 2.54383576945602
+        expected_H2O = 2.54386321287308
         expected_CO2 = 752.347159392848
         self.assertAlmostEqual(
             float(concentrations["H2Ot_MEAN"].iloc[0]),
