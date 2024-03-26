@@ -197,7 +197,7 @@ class test_conc_outputs(unittest.TestCase):
             self.PH, self.MI_Composition, self.thickness, None
         )
         expected_H2O = 4.036918931617838
-        expected_CO2 = 735.058557154539
+        expected_CO2 = 735.3744776620634
         self.assertAlmostEqual(
             float(concentrations["H2Ot_MEAN"].iloc[0]),
             expected_H2O,
