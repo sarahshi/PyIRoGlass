@@ -1,7 +1,7 @@
 
 #!/usr/bin/env python
-from setuptools import setup, find_packages
 from os import path
+from setuptools import setup, find_packages
 
 this_directory = path.abspath(path.dirname(__file__))
 

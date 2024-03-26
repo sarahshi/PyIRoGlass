@@ -30,3 +30,5 @@ Make sure that you keep up with the latest version of PyIRoGlass. To upgrade to 
 ```
 pip install PyIRoGlass --upgrade
 ```
+
+## Using Published FTIR Spectra

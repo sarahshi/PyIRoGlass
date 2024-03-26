@@ -1,6 +1,3 @@
-import unittest
-from unittest.mock import patch, MagicMock
-
 import os
 import pickle
 import warnings
@@ -8,6 +5,8 @@ import numpy as np
 import pandas as pd
 import PyIRoGlass as pig
 
+import unittest
+from unittest.mock import patch, MagicMock
 from matplotlib import pyplot as plt
 
 

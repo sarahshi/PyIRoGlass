@@ -101,7 +101,6 @@ class SampleDataLoader:
             dfs.append(spectrum)
             files.append(file)
 
-        # self.files = files
         self.dfs_dict = dict(zip(files, dfs))
 
         return self.dfs_dict
@@ -151,7 +150,6 @@ class SampleDataLoader:
                                                 wn_low=wn_low)
         chemistry, thickness = self.load_chemistry_thickness()
 
-        # self.files = files
         self.dfs_dict = dfs_dict
         self.chemistry = chemistry
         self.thickness = thickness
@@ -675,6 +673,8 @@ def calculate_baselines(dfs_dict, export_path):
     H2Om1635_PCmatrix = vector_loader.H2Om_PC
     Nvectors = 5
     indparams = [wavenumber, PCmatrix, H2Om1635_PCmatrix, Nvectors]
+
+    full_path = os.path.join(os.getcwd(), "FINALDATA")
 
     # Create DataFrames to store peak height data:
     # P_ = peak_, _BP = best parameter, #_STD = _stdev
@@ -1324,12 +1324,12 @@ def calculate_epsilon(composition, T, P):
     covm_est_5200 = np.diag([0.01285319, 0.02764414])
     mest_4500 = np.array([-1.63273006, 3.53252218])
     covm_est_4500 = np.diag([0.03292054, 0.07082581])
-    mest_3550 = np.array([15.88456476, 71.22955961])
-    covm_est_3550 = np.diag([38.06765317, 77.40636723])
+    mest_3550 = np.array([15.73722543, 71.39668681])
+    covm_est_3550 = np.diag([38.05316054, 77.3885357])
     mest_1635 = np.array([-50.3975642, 124.2505339])
     covm_est_1635 = np.diag([20.85034888, 39.38749563])
-    mest_CO2 = np.array([417.4903541, -318.59874422])
-    covm_est_CO2 = np.diag([84.92345481, 339.80111416])
+    mest_CO2 = np.array([417.17390625, -318.09377591])
+    covm_est_CO2 = np.diag([84.84230954, 339.64346778])
 
     # Set up matrices for calculating uncertainties on extinction coefficients
     G_SiAl = np.ones((2, 1))

@@ -2,6 +2,11 @@
 Change Log
 ==========
 
+Version 0.6.1
+=============
+Update composition-dependent epsilon inversions to add Shi et al., 2024 values for H2Ot, 3550 and carbonate, slight correction. Correct data export paths in calculate_baselines and calculate_concentrations. Update PC vector creation 
+
+
 Version 0.5.2
 =============
 Account for variability in export_path naming practice. Remove remove_baseline argument from thickness functions.

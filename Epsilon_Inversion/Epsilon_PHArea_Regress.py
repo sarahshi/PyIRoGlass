@@ -26,6 +26,13 @@ plt.rcParams["ytick.labelsize"] = 20 # Sets size of numbers on tick marks
 plt.rcParams["axes.titlesize"] = 22
 plt.rcParams["axes.labelsize"] = 22 # Axes labels
 
+plt.rcParams['xtick.direction'] = 'in'
+plt.rcParams['ytick.direction'] = 'in'
+plt.rcParams['xtick.major.size'] = 5
+plt.rcParams['ytick.major.size'] = 5
+plt.rcParams['xtick.major.pad'] = 6.5
+plt.rcParams['ytick.major.pad'] = 6.5
+
 # method treats d, z, m1 and m2 as unknowns. model f(i) = 0 = m1 + m2*z(i) - d(i);
 # unknowns:  m1, m2 and the predicted (z,d)'s
 
@@ -48,7 +55,7 @@ cols = ['ERDA_H2O',
         'Density_Sat',
         'Thickness',
         'Sigma_Thickness',
-        'Sub_Repeats',
+        'Repeats',
         'Tau',
         'Eta'
         ]
@@ -78,11 +85,16 @@ cols_lim = ['ERDA_H2O',
         ]
 
 df_orig = pd.read_csv('PHComparison_ERDA_NRA.csv', index_col=0)
-df = df_orig[cols].groupby('Sub_Repeats').mean()
+df = df_orig[cols].groupby('Repeats').mean()
+df_counts_1 = df_orig.groupby('Repeats').count().iloc[:, 0].rename('count')
+df = df.join(df_counts_1)
+
 
 df_h2o = df_orig[(df_orig.index != 'ND70_04_02_06032022_150x150_sp1') &
                  (df_orig.index != 'ND70_04_02_06032022_150x150_sp2') &
-                 (df_orig.index != 'ND70_04_02_06032022_150x150_sp3')
+                 (df_orig.index != 'ND70_04_02_06032022_150x150_sp3') & 
+                 (df_orig.index != 'ND70_03_01_06032022_150x150_sp2') & 
+                 (df_orig.index != 'ND70_03_01_06032022_150x150_sp3') 
                  ]
 sloader = pig.SampleDataLoader(spectrum_path='../Inputs/TransmissionSpectra/Standards/')
 sdfs_dict = sloader.load_spectrum_directory()
@@ -91,6 +103,8 @@ nd70_dict = {key: value for key, value in sdfs_dict.items() if 'ND70' in key}
 nd70_df_lim = df_h2o[(df_h2o.index != 'ND70_04_02_06032022_150x150_sp1') &
                      (df_h2o.index != 'ND70_04_02_06032022_150x150_sp2') &
                      (df_h2o.index != 'ND70_04_02_06032022_150x150_sp3') &
+                     (df_h2o.index != 'ND70_03_01_06032022_150x150_sp2') &
+                     (df_h2o.index != 'ND70_03_01_06032022_150x150_sp3') &
                      (~df_h2o.index.str.contains("Glass_")) & 
                      (~df_h2o.index.str.contains("_org_")) & 
                      (~df_h2o.index.str.contains("_degassed_"))]
@@ -115,7 +129,10 @@ for files, data in nd70_dict_lim.items():
     df_h2o.loc[files, 'Area_3550_M'] = np.mean([asimps0, asimps1, asimps2])
     df_h2o.loc[files, 'Area_3550_STD'] = np.std([asimps0, asimps1, asimps2])
 
-df_h2o = df_h2o[cols_lim].groupby('Repeats').mean()
+df_means = df_h2o[cols_lim].groupby('Repeats').mean()
+df_counts_2 = df_h2o.groupby('Repeats').count().iloc[:, 0].rename('count')
+df_h2o = df_means.join(df_counts_2)
+
 h2o_erda = df_h2o['ERDA_SIMS_H2O'] 
 h2o_erda_std = df_h2o['ERDA_SIMS_H2O_STD'] 
 h2o_range = np.linspace(0, 7, 5)
@@ -173,9 +190,9 @@ sz = 125
 fig, ax = plt.subplots(1, 2, figsize = (14, 7))
 ax = ax.flatten()
 h2o_inv = pig.calculate_y_inversion(mest_h2o, h2o_range)
-h2o_label = '$\mathregular{Ɛ_{H_{2}O_{3550}}}$ = ' + f'{round(mest_h2o[1],3)}(±{round(np.sqrt(np.diag(covm_est_h2o))[1],3)})' + ' L/mol$\mathregular{\cdot}$cm'
+h2o_label = '$\mathregular{Ɛ_{H_{2}O_{3550}}}$=' + f'{round(mest_h2o[1],3)}(±{round(np.sqrt(np.diag(covm_est_h2o))[1],3)})' + ' L/mol$\mathregular{\cdot}$cm'
 ax[0].plot(h2o_range, h2o_inv, 'k', lw=1, label=h2o_label)
-ax[0].scatter(h2o_erda, h2o_y, s = sz, c = '#0C7BDC', ec = '#171008', lw= 0.5, zorder = 20, label='ND70-Series')
+ax[0].scatter(h2o_erda, h2o_y, s = sz, c = '#0C7BDC', ec = '#171008', lw= 0.5, zorder = 20, label='ND70-Series, n=6')
 ax[0].errorbar(h2o_erda, h2o_y, xerr=h2o_erda_std, yerr=sigma_h2o_y, fmt='none', lw= 0.5, c = 'k', zorder = 10)
 ax[0].fill_between(line_x_h2o, conf_low_h2o, conf_up_h2o, color = 'k', alpha=0.20, edgecolor=None,
                    zorder=-5, label='68% Confidence Interval')
@@ -187,16 +204,16 @@ ax[0].annotate("CCC="+str(np.round(ccc_h2o, 3)), xy=(0.975, 0.075), xycoords="ax
 ax[0].annotate("RRMSE="+str(np.round(rrmse_h2o*100, 3))+'%', xy=(0.975, 0.025), xycoords="axes fraction", ha='right', fontsize=14)
 ax[0].legend(loc=(0.02, 0.75), labelspacing=0.2, handletextpad=0.5, handlelength=0.75, prop={'size': 14}, frameon=False)
 ax[0].set_xlabel('$\mathregular{H_{2}O}$, ERDA/SIMS (wt.%)')
-ax[0].set_ylabel('18.02$\mathregular{\cdot a_{H2O_{t, 3550}} \cdot}$Density$\mathregular{\cdot}$Thickness')
+ax[0].set_ylabel('18.02$\mathregular{\cdot A_{H_2O_{t, 3550}} \cdot}$Density$\mathregular{\cdot}$Thickness')
 ax[0].set_xlim([0, 7])
 ax[0].set_ylim([0, 400])
 ax[0].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[0].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 
 co2_inv = pig.calculate_y_inversion(mest_co2, co2_range)
-co2_1430_label = '$\mathregular{Ɛ_{CO_{2, 1515/1430}}}$ = ' + f'{round(mest_co2[1],3)}(±{round(np.sqrt(np.diag(covm_est_co2))[1],3)})' + ' L/mol$\mathregular{\cdot}$cm'
+co2_1430_label = '$\mathregular{Ɛ_{CO_{3, 1515/1430}^{2-}}}$=' + f'{round(mest_co2[1],3)}(±{round(np.sqrt(np.diag(covm_est_co2))[1],3)})' + ' L/mol$\mathregular{\cdot}$cm'
 ax[1].plot(co2_range, co2_inv, 'k', lw=1, label=co2_1430_label)
-ax[1].scatter(co2_nra_x, co2_y, s = sz, c='#E42211', marker = 's', ec = '#171008', lw= 0.5, zorder = 20, label='ND70-Series')
+ax[1].scatter(co2_nra_x, co2_y, s = sz, c='#E42211', marker = 's', ec = '#171008', lw= 0.5, zorder = 20, label='ND70-Series, n=14')
 ax[1].errorbar(co2_nra_x, co2_y, xerr=co2_nra_std_x, yerr=sigma_co2_y, fmt='none', lw= 0.5, c = 'k', zorder = 10)
 ax[1].fill_between(line_x_co2, conf_low_co2, conf_up_co2, color = 'k', alpha=0.20, edgecolor=None,
                    zorder=-5, label='68% Confidence Interval')
@@ -208,7 +225,7 @@ ax[1].annotate("CCC="+str(np.round(ccc_co2, 3)), xy=(0.975, 0.075), xycoords="ax
 ax[1].annotate("RRMSE="+str(np.round(rrmse_co2*100, 3))+'%', xy=(0.975, 0.025), xycoords="axes fraction", ha='right', fontsize=14)
 ax[1].legend(loc=(0.02, 0.75), labelspacing=0.2, handletextpad=0.5, handlelength=0.75, prop={'size': 14}, frameon=False)
 ax[1].set_xlabel('$\mathregular{CO_{2}}$, NRA (wt.%)')
-ax[1].set_ylabel('44.01$\mathregular{\cdot a_{CO_3^{2-}} \cdot}$Density$\mathregular{\cdot}$Thickness')
+ax[1].set_ylabel('44.01$\mathregular{\cdot A_{CO_3^{2-}} \cdot}$Density$\mathregular{\cdot}$Thickness')
 ax[1].set_xlim([0, 2])
 ax[1].set_ylim([0, 600])
 ax[1].tick_params(axis="x", direction='in', length=5, pad = 6.5)
@@ -246,9 +263,9 @@ sz = 125
 fig, ax = plt.subplots(1, 2, figsize = (14, 7))
 ax = ax.flatten()
 h2o_inv_area = pig.calculate_y_inversion(mest_h2o_area, h2o_range)
-h2o_label = '$\mathregular{Ɛ_{i, H_{2}O_{3550}}}$ = ' + f'{round(mest_h2o_area[1])}(±{round(np.sqrt(np.diag(covm_est_h2o_area))[1])})' + ' L/mol$\mathregular{\cdot cm^{2}}$'
+h2o_label = '$\mathregular{Ɛ_{i, H_{2}O_{3550}}}$=' + f'{round(mest_h2o_area[1])}(±{round(np.sqrt(np.diag(covm_est_h2o_area))[1])})' + ' L/mol$\mathregular{\cdot cm^{2}}$'
 ax[0].plot(h2o_range, h2o_inv_area, 'k', lw=1, label=h2o_label)
-ax[0].scatter(h2o_erda, h2o_3550_area, s = sz, c = '#0C7BDC', ec = '#171008', lw= 0.5, zorder = 20, label='ND70-Series')
+ax[0].scatter(h2o_erda, h2o_3550_area, s = sz, c = '#0C7BDC', ec = '#171008', lw= 0.5, zorder = 20, label='ND70-Series, n=6')
 ax[0].errorbar(h2o_erda, h2o_3550_area, xerr=h2o_erda_std, yerr=sigma_h2o_3550_area, fmt='none', lw= 0.5, c = 'k', zorder = 10)
 
 ax[0].fill_between(line_x_h2o_area, conf_low_h2o_area, conf_up_h2o_area, color = 'k', alpha=0.20, edgecolor=None,
@@ -261,16 +278,16 @@ ax[0].annotate("CCC="+str(np.round(ccc_h2o_area, 3)), xy=(0.975, 0.075), xycoord
 ax[0].annotate("RRMSE="+str(np.round(rrmse_h2o_area*100, 3))+'%', xy=(0.975, 0.025), xycoords="axes fraction", ha='right', fontsize=14)
 ax[0].legend(loc=(0.02, 0.75), labelspacing=0.2, handletextpad=0.5, handlelength=0.75, prop={'size': 14}, frameon=False)
 ax[0].set_xlabel('$\mathregular{H_{2}O}$, ERDA/SIMS (wt.%)')
-ax[0].set_ylabel('18.02$\mathregular{\cdot a_{i, H2O_{t, 3550}} \cdot}$Density$\mathregular{\cdot}$Thickness')
+ax[0].set_ylabel('18.02$\mathregular{\cdot A_{i, H_2O_{t, 3550}} \cdot}$Density$\mathregular{\cdot}$Thickness')
 ax[0].set_xlim([0, 7])
 ax[0].set_ylim([0, 200000])
 ax[0].tick_params(axis="x", direction='in', length=5, pad = 6.5)
 ax[0].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 
 co2_inv_area = pig.calculate_y_inversion(mest_co2_area, co2_range)
-co2_1430_label = '$\mathregular{Ɛ_{i, CO_{2, 1515/1430}}}$ = ' + f'{round(mest_co2_area[1])}(±{round(np.sqrt(np.diag(covm_est_co2_area))[1])})' + ' L/mol$\mathregular{\cdot cm^{2}}$'
+co2_1430_label = '$\mathregular{Ɛ_{i, CO_{3, 1515/1430}^{2-}}}$=' + f'{round(mest_co2_area[1])}(±{round(np.sqrt(np.diag(covm_est_co2_area))[1])})' + ' L/mol$\mathregular{\cdot cm^{2}}$'
 ax[1].plot(co2_range, co2_inv_area, 'k', lw=1, label=co2_1430_label)
-ax[1].scatter(co2_nra_x, co2_y_area, s = sz, c='#E42211', marker = 's', ec = '#171008', lw= 0.5, zorder = 20, label='ND70-Series')
+ax[1].scatter(co2_nra_x, co2_y_area, s = sz, c='#E42211', marker = 's', ec = '#171008', lw= 0.5, zorder = 20, label='ND70-Series, n=14')
 ax[1].errorbar(co2_nra_x, co2_y_area, xerr=co2_nra_std_x, yerr=sigma_co2_y_area, fmt='none', lw= 0.5, c = 'k', zorder = 10)
 ax[1].fill_between(line_x_co2_area, conf_low_co2_area, conf_up_co2_area, color = 'k', alpha=0.20, edgecolor=None,
                    zorder=-5, label='68% Confidence Interval')
@@ -282,7 +299,7 @@ ax[1].annotate("CCC="+str(np.round(ccc_co2_area, 3)), xy=(0.975, 0.075), xycoord
 ax[1].annotate("RRMSE="+str(np.round(rrmse_co2_area*100, 3))+'%', xy=(0.975, 0.025), xycoords="axes fraction", ha='right', fontsize=14)
 ax[1].legend(loc=(0.02, 0.75), labelspacing=0.2, handletextpad=0.5, handlelength=0.75, prop={'size': 14}, frameon=False)
 ax[1].set_xlabel('$\mathregular{CO_{2}}$, NRA (wt.%)')
-ax[1].set_ylabel('44.01$\mathregular{\cdot a_{i, CO_3^{2-}} \cdot}$Density$\mathregular{\cdot}$Thickness')
+ax[1].set_ylabel('44.01$\mathregular{\cdot A_{i, CO_3^{2-}} \cdot}$Density$\mathregular{\cdot}$Thickness')
 ax[1].set_xlim([0, 2])
 ax[1].set_ylim([0, 50000])
 ax[1].tick_params(axis="x", direction='in', length=5, pad = 6.5)

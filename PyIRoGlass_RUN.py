@@ -42,14 +42,14 @@ ref_ol_dfs_dict = ref_ol_loader.load_spectrum_directory(wn_high=2700, wn_low=210
 
 # Use DHZ parameterization of olivine reflectance index. 
 n_ol = pig.reflectance_index(0.72)
-ref_fuego = pig.calculate_mean_thickness(ref_ol_dfs_dict, n=n_ol, wn_high=2700, wn_low=2100, remove_baseline=True, plotting=False, phaseol=True)
+ref_fuego = pig.calculate_mean_thickness(ref_ol_dfs_dict, n=n_ol, wn_high=2700, wn_low=2100, plotting=False, phaseol=True)
 
 ref_gl_loader = pig.SampleDataLoader(spectrum_path=path_input+'ReflectanceSpectra/rf_ND70/')
 ref_gl_dfs_dict = ref_gl_loader.load_spectrum_directory(wn_high=2850, wn_low=1700)
 
 # n=1.546 in the range of 2000-2700 cm^-1 following Nichols and Wysoczanski, 2007 for basaltic glass
 n_gl = 1.546
-ref_nd70 = pig.calculate_mean_thickness(ref_gl_dfs_dict, n=n_gl, wn_high=2850, wn_low=1700, remove_baseline=True, plotting=False, phaseol=False)
+ref_nd70 = pig.calculate_mean_thickness(ref_gl_dfs_dict, n=n_gl, wn_high=2850, wn_low=1700, plotting=False, phaseol=False)
 
 # %% 
 # %%
@@ -58,7 +58,8 @@ fuegono = 0
 floader = pig.SampleDataLoader(PATHS[fuegono], CHEMTHICK_PATHS[fuegono])
 fdfs_dict, fchem, fthick = floader.load_all_data()
 
-fdf_output, ffailures = pig.calculate_baselines(fdfs_dict, OUTPUT_PATHS[fuegono])
+# fdf_output, ffailures = pig.calculate_baselines(fdfs_dict, OUTPUT_PATHS[fuegono])
+fdf_output = pd.read_csv('FINALDATA/FUEGO_DF.csv', index_col=0)
 fdf_conc = pig.calculate_concentrations(fdf_output, fchem, fthick, OUTPUT_PATHS[fuegono])
 
 # %%
@@ -68,7 +69,8 @@ stdno = 1
 sloader = pig.SampleDataLoader(PATHS[stdno], CHEMTHICK_PATHS[stdno])
 sdfs_dict, schem, sthick = sloader.load_all_data()
 
-sdf_output, sfailures = pig.calculate_baselines(sdfs_dict, OUTPUT_PATHS[stdno])
+# sdf_output, sfailures = pig.calculate_baselines(sdfs_dict, OUTPUT_PATHS[stdno])
+sdf_output = pd.read_csv('FINALDATA/STD_DF.csv', index_col=0)
 sdf_conc = pig.calculate_concentrations(sdf_output, schem, sthick, OUTPUT_PATHS[stdno])
 
 # %%
@@ -206,15 +208,15 @@ def STD_DF_MOD(MEGA_SPREADSHEET):
             CO2_EXP = 1019
             CO2_EXP_STD = 101.9
         elif 'M43' in j: 
-            H2O_EXP = 2.79
-            H2O_EXP_STD = 0.279
+            H2O_EXP = 2.62
+            H2O_EXP_STD = 0.26
             CO2_EXP = 3172
             CO2_EXP_STD = 317.2
         elif 'INSOL' in j: 
-            H2O_EXP = 0.20
+            H2O_EXP = 0.15
             H2O_EXP_STD = 0.01
-            CO2_EXP = 8025.5
-            CO2_EXP_STD = 995
+            CO2_EXP = 8207
+            CO2_EXP_STD = 377
         elif 'ND70_02' in j: 
             H2O_EXP = 2.53
             H2O_EXP_STD = 0.24
@@ -265,7 +267,8 @@ frhno = 2
 frhloader = pig.SampleDataLoader(PATHS[frhno], CHEMTHICK_PATHS[frhno])
 frhdfs_dict, frhchem, frhthick = frhloader.load_all_data()
 
-frhdf_output, frhfailures = pig.calculate_baselines(frhdfs_dict, OUTPUT_PATHS[frhno])
+# frhdf_output, frhfailures = pig.calculate_baselines(frhdfs_dict, OUTPUT_PATHS[frhno])
+frhdf_output = pd.read_csv('FINALDATA/FRH_DF.csv', index_col=0)
 frhdf_conc = pig.calculate_concentrations(frhdf_output, frhchem, frhthick, OUTPUT_PATHS[frhno])
 
 

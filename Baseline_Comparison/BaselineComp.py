@@ -33,9 +33,7 @@ plt.rcParams["axes.labelsize"] = 22 # Axes labels
 
 # %% 
 
-
 path_par = os.path.dirname(os.getcwd()) + '/'
-
 
 Wavenumber = pig.Load_Wavenumber('BaselineAvgPC.npz')
 PCmatrix = pig.Load_PC('BaselineAvgPC.npz')
@@ -94,7 +92,6 @@ for hj_file_path, data in DICT_filt.items():
     ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
     ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
     plt.savefig('png/'+common_part+'_BLcomp.png', bbox_inches='tight', pad_inches = 0.025)
-
 
 # badspec = np.array(['CI_IPGP_B6_1_50x50_256s_sp1', 'CI_IPGP_B6_2_50x50_256s_sp1', 'CI_IPGP_B6_1_50x50_256s_sp2', 'CI_IPGP_NBO_2_2_1_100x100_256s_sp1', 
 #                     'CI_Ref_13_1_100x100_256s_sp1', 'CI_Ref_13_1_100x100_256s_sp2', 'CI_Ref_13_1_100x100_256s_sp3', 'CI_Ref_13_1_100x100_256s_sp4', 
