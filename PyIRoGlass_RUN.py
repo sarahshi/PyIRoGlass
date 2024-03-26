@@ -4,10 +4,8 @@
 # Import packages
 import os
 import sys
-import glob
 import numpy as np
 import pandas as pd
-import mc3
 
 sys.path.append('src/')
 import PyIRoGlass as pig
@@ -15,7 +13,6 @@ import PyIRoGlass as pig
 import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib import rc, cm
-import seaborn as sns
 
 %matplotlib inline
 %config InlineBackend.figure_format = 'retina'
