@@ -12,6 +12,8 @@ __pycache__
 /Baseline_Comparison/ND70Spec/
 /Baseline_Comparison/ND70_Merge.pdf
 /Baseline_Comparison/Comparison_Standards.csv
+/Baseline_Comparison/BLChem.pdf
+/Baseline_Comparison/BLChem_lim.pdf
 /docs/examples/transmission_ftir/LOGFILES/RESULTS/AC4_OL49_021920_30x30_H2O_a.log
 /docs/examples/transmission_ftir/LOGFILES/RESULTS/AC4_OL53_101220_256s_30x30_a.log
 /docs/examples/transmission_ftir/LOGFILES/RESULTS/STD_D1010_012821_256s_100x100_a.log
@@ -35,7 +37,7 @@ __pycache__
 /docs/examples/transmission_ftir/LOGFILES/RESULTS/AC4_OL53_101220_256s_30x30_a.log
 /docs/examples/transmission_ftir/LOGFILES/RESULTS/STD_D1010_012821_256s_100x100_a.log
 /Epsilon_Inversion/OldEpsilonRegressions/
-/Inputs/TransmissionSpectra/Devolatilized
+/Inputs/TransmissionSpectra/BadSpectra/
 /Thickness/FuegoOlMicrometer.csv
 /Thickness/FuegoOlThickness.csv
 /Thickness/ND70_Micrometer.csv

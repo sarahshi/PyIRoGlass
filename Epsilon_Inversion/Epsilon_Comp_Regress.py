@@ -361,6 +361,6 @@ ax[4].tick_params(axis="y", direction='in', length=5, pad = 6.5)
 
 fig.delaxes(ax[5])
 plt.tight_layout()
-plt.savefig('AllEpsilonRegress_SHI1.pdf', bbox_inches='tight', pad_inches=0.025)
+# plt.savefig('AllEpsilonRegress_SHI.pdf', bbox_inches='tight', pad_inches=0.025)
 
 # %%

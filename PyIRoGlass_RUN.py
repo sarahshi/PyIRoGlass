@@ -20,13 +20,15 @@ from matplotlib import rc, cm
 # %% 
 
 # Get working paths 
-path_input = os.getcwd() + '/Inputs/'
+path_input = os.path.join(os.getcwd(), 'Inputs')
 
 # Change paths to direct to folder with SampleSpectra -- last bit should be whatever your folder with spectra is called. 
-PATHS = [path_input + 'TransmissionSpectra/' + string for string in ['Fuego/', 'Standards/', 'Fuego1974RH/']]
+PATHS = [os.path.join(path_input, 'TransmissionSpectra', directory) 
+         for directory in ['Fuego', 'Standards', 'Fuego1974RH']]
 
 # Put ChemThick file in Inputs. Direct to what your ChemThick file is called. 
-CHEMTHICK_PATHS = [path_input + string for string in ['FuegoChemThick.csv', 'StandardChemThick.csv', 'FuegoRHChemThick.csv']]
+CHEMTHICK_PATHS = [os.path.join(path_input, filename) 
+                   for filename in ['FuegoChemThick.csv', 'StandardChemThick.csv', 'FuegoRHChemThick.csv']]
 
 # Change last value in list to be what you want your output directory to be called. 
 OUTPUT_PATHS = ['FUEGO', 'STD', 'FRH']
@@ -34,19 +36,21 @@ OUTPUT_PATHS = ['FUEGO', 'STD', 'FRH']
 # %%
 # %% 
 
-ref_ol_loader = pig.SampleDataLoader(spectrum_path=path_input+'ReflectanceSpectra/FuegoOl/')
+ref_ol_loader = pig.SampleDataLoader(spectrum_path=os.path.join(path_input, 'ReflectanceSpectra/FuegoOl'))
 ref_ol_dfs_dict = ref_ol_loader.load_spectrum_directory(wn_high=2700, wn_low=2100)
 
 # Use DHZ parameterization of olivine reflectance index. 
 n_ol = pig.reflectance_index(0.72)
 ref_fuego = pig.calculate_mean_thickness(ref_ol_dfs_dict, n=n_ol, wn_high=2700, wn_low=2100, plotting=False, phaseol=True)
+display(ref_fuego)
 
-ref_gl_loader = pig.SampleDataLoader(spectrum_path=path_input+'ReflectanceSpectra/rf_ND70/')
+ref_gl_loader = pig.SampleDataLoader(spectrum_path=os.path.join(path_input, 'ReflectanceSpectra/rf_ND70'))
 ref_gl_dfs_dict = ref_gl_loader.load_spectrum_directory(wn_high=2850, wn_low=1700)
 
 # n=1.546 in the range of 2000-2700 cm^-1 following Nichols and Wysoczanski, 2007 for basaltic glass
 n_gl = 1.546
 ref_nd70 = pig.calculate_mean_thickness(ref_gl_dfs_dict, n=n_gl, wn_high=2850, wn_low=1700, plotting=False, phaseol=False)
+display(ref_nd70)
 
 # %% 
 # %%

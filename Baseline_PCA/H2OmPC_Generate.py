@@ -63,7 +63,7 @@ def basic_scale_data(spectrum):
 
     Returns:
         spectrum_scale (numeric 2D array): The data after scaling to the range
-            of -0.5 to 0.5 and recentring by the mean spectrum.
+            of -0.5 to 0.5 and recentering by the mean spectrum.
         mean_baseline (numeric array): The mean baseline spectrum across all
             observations after scaling.
     """
