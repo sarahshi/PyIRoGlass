@@ -28,13 +28,13 @@ plt.rcParams["axes.labelsize"] = 22 # Axes labels
 # %% PCA Component Plotting
 
 BaselinePCA = pd.read_csv('./InputData/Baseline_Avg+PCA.csv')
-H2OPCA = pd.read_csv('./InputData/Water_Peak_1635_All.csv')
-H2OPCA_Plot = pd.read_csv('./InputData/Water_Peak_1635_Plotting.csv')
+H2OPCA = pd.read_csv('./InputData/H2Om1635_PC.csv')
+H2OPCA_Plot = pd.read_csv('./InputData/H2Om1635_PC_Plotting.csv')
 
-spec=pd.read_csv('./InputData/AC4_OL49_021920_30x30_H2O_a.csv')
+spec = pd.read_csv('./InputData/AC4_OL49_021920_30x30_H2O_a.csv')
 spec1 = pd.read_csv('./InputData/AC4_OL53_101220_256s_30x30_a.csv')
 
-x=pd.read_csv('./InputData/x.csv') 
+x = pd.read_csv('./InputData/x.csv') 
 
 data_H2O5200_1 = pd.read_csv('./InputData/data_H2O5200_1.csv')
 data_H2O5200_2 = pd.read_csv('./InputData/data_H2O5200_2.csv')
@@ -222,7 +222,27 @@ fig.supylabel('Absorbance', x=0.03)
 plt.tight_layout()
 # plt.savefig('AllPeaks.pdf', bbox_inches='tight', pad_inches = 0.025)
 
+# %% 
 
+co2_1515 = (CO2P1515_BP['Absorbance'] - Baseline_Solve_BP['Absorbance']) / 10
+co2_1430 = (CO2P1430_BP['Absorbance'] - Baseline_Solve_BP['Absorbance']) / 10
+
+fig, ax = plt.subplots(1, 1, figsize=(15, 15))
+ax.plot(spec.Wavenumber, spec.Absorbance, c='k', lw=2, label='FTIR Spectrum')
+ax.plot(x.Wavenumber, Baseline_Array_Plot[1, :], c='#5E5E5E', lw=1.5, label='PyIRoGlass Sampled Baselines')
+for i in range(0, 100, 5):
+    ax.plot(x.Wavenumber, Baseline_Array_Plot[i, :], c='#5E5E5E', lw=1.5)
+# ax.plot(x.Wavenumber, CO2P1515_BP['Absorbance'], c='#E42211', lw=2, label='$\mathregular{CO_{3, 1515}^{2-}}$')
+# ax.plot(x.Wavenumber, CO2P1430_BP['Absorbance'], c='#009E73', lw=2, label='$\mathregular{CO_{3, 1430}^{2-}}$')
+ax.plot(x.Wavenumber, co2_1515 + Baseline_Solve_BP['Absorbance'], c='#E42211', lw=2, label='$\mathregular{CO_{3, 1515}^{2-}}$')
+ax.plot(x.Wavenumber, co2_1430 + Baseline_Solve_BP['Absorbance'], c='#009E73', lw=2, label='$\mathregular{CO_{3, 1515}^{2-}}$')
+ax.plot(x.Wavenumber, carbonate['Absorbance'], c='#9A5ABD', lw=2, label='PyIRoGlass Best-Fit Spectrum')
+ax.plot(x.Wavenumber, Baseline_Solve_BP['Absorbance'], linestyle='--', dashes = (2, 2), c='k', lw=2, label='PyIRoGlass Best-Fit Baseline')
+ax.set_xlim([1250, 2000])
+ax.set_ylim([0.4, 1.6])
+ax.invert_xaxis()
+
+# %% 
 # %% 
 
 fig, ax=plt.subplots(2, 2, figsize=(13, 13))

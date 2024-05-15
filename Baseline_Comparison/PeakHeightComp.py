@@ -110,11 +110,11 @@ rmse1 = pig.calculate_RMSE(merge_filt.PH_1430_norm-merge_filt.PH_1430_BP_norm)
 
 fig, ax = plt.subplots(2, 2, figsize=(13, 13))
 ax=ax.flatten()
-ax[0].plot(line, line, 'k', lw = 1, zorder = 0, label='1-1 Line')
+ax[0].plot(line, line, 'k', lw=1, zorder=0, label='1-1 Line')
 ax[0].fill_between(line, 0.9*line, 1.1*line, color='gray', edgecolor=None, alpha=0.25, label='10% Uncertainty')
-ax[0].scatter(merge_filt.PH_1515_norm, merge_filt.PH_1515_BP_norm, s = sz, c = '#0C7BDC', ec = '#171008', lw = 0.5, zorder = 20,)
-ax[0].errorbar(merge_filt.PH_1515_norm, merge_filt.PH_1515_BP_norm, yerr=merge_filt.PH_1515_STD/merge_filt.Thickness*200, xerr=merge_filt['PH_1515']/merge_filt.Thickness*50*0.05, fmt='none', lw = 0.5, c = 'k', zorder = 10)
-ax[0].annotate(r'A. $\mathregular{CO_{3, 1515}^{2-}}, n=$'+str(len(merge_filt)), xy=(0.03, 0.92), xycoords='axes fraction', ha='left', va ='bottom', size = 20)
+ax[0].scatter(merge_filt.PH_1515_norm, merge_filt.PH_1515_BP_norm, s=sz, c='#0C7BDC', ec='#171008', lw=0.5, zorder=20,)
+ax[0].errorbar(merge_filt.PH_1515_norm, merge_filt.PH_1515_BP_norm, yerr=merge_filt.PH_1515_STD/merge_filt.Thickness*200, xerr=merge_filt['PH_1515']/merge_filt.Thickness*50*0.05, fmt='none', lw=0.5, c='k', zorder=10)
+ax[0].annotate(r'A. $\mathregular{CO_{3, 1515}^{2-}}, n=$'+str(len(merge_filt)), xy=(0.03, 0.92), xycoords='axes fraction', ha='left', va='bottom', size=20)
 ax[0].set_xlim([0, 2.5])
 ax[0].set_ylim([0, 2.5])
 ax[0].set_xticks(ticks)
@@ -129,11 +129,11 @@ ax[0].annotate("CCC="+str(np.round(ccc0, 3)), xy=(0.03, 0.88), xycoords="axes fr
 ax[0].annotate("m="+str(np.round(slope0, 3)), xy=(0.03, 0.76), xycoords="axes fraction", fontsize=16)
 ax[0].annotate("b="+str(np.round(intercept0, 3)), xy=(0.03, 0.72), xycoords="axes fraction", fontsize=16)
 
-ax[1].plot(line, line, 'k', lw = 1, zorder = 0, label='1-1 Line')
+ax[1].plot(line, line, 'k', lw=1, zorder=0, label='1-1 Line')
 ax[1].fill_between(line, 0.9*line, 1.1*line, color='gray', edgecolor=None, alpha=0.25, label='10% Uncertainty')
-ax[1].scatter(merge_filt.PH_1430_norm, merge_filt.PH_1430_BP_norm, s = sz, c = '#0C7BDC', ec = '#171008', lw = 0.5, zorder = 20)
-ax[1].errorbar(merge_filt.PH_1430_norm, merge_filt.PH_1430_BP_norm, yerr=merge_filt.PH_1430_STD/merge_filt.Thickness*200, xerr=merge_filt['PH_1430']/merge_filt.Thickness*50*0.05, fmt='none', lw = 0.5, c = 'k', zorder = 10)
-ax[1].annotate(r'B. $\mathregular{CO_{3, 1430}^{2-}}, n=$'+str(len(merge_filt)), xy=(0.03, 0.92), xycoords='axes fraction', ha='left', va ='bottom', size = 20)
+ax[1].scatter(merge_filt.PH_1430_norm, merge_filt.PH_1430_BP_norm, s=sz, c='#0C7BDC', ec='#171008', lw=0.5, zorder=20)
+ax[1].errorbar(merge_filt.PH_1430_norm, merge_filt.PH_1430_BP_norm, yerr=merge_filt.PH_1430_STD/merge_filt.Thickness*200, xerr=merge_filt['PH_1430']/merge_filt.Thickness*50*0.05, fmt='none', lw=0.5, c='k', zorder=10)
+ax[1].annotate(r'B. $\mathregular{CO_{3, 1430}^{2-}}, n=$'+str(len(merge_filt)), xy=(0.03, 0.92), xycoords='axes fraction', ha='left', va='bottom', size=20)
 ax[1].set_xlim([0, 2.5])
 ax[1].set_ylim([0, 2.5])
 ax[1].set_xticks(ticks)  # Set x ticks
@@ -151,17 +151,17 @@ ax[1].annotate("b="+str(np.round(intercept1, 3)), xy=(0.03, 0.72), xycoords="axe
 ticks_y = np.arange(0.85, 1.05, 0.05)
 tick_labels_y = [f"{t:.2f}" for t in ticks_y]
 
-sc2 = ax[2].scatter(merge_filt.PH_1515_norm, (merge_filt['Py_Devol_1515']), s = sz, 
-                    c = '#0C7BDC', ec = '#171008', lw = 0.5, 
-                    zorder = 20)
-sc1 = ax[3].scatter(merge_filt.PH_1430_norm, (merge_filt['Py_Devol_1430']), s = sz, 
-                    c = '#0C7BDC', ec = '#171008', lw = 0.5, 
-                    zorder = 20)
+sc2 = ax[2].scatter(merge_filt.PH_1515_norm, (merge_filt['Py_Devol_1515']), s=sz, 
+                    c='#0C7BDC', ec='#171008', lw=0.5, 
+                    zorder=20)
+sc1 = ax[3].scatter(merge_filt.PH_1430_norm, (merge_filt['Py_Devol_1430']), s=sz, 
+                    c='#0C7BDC', ec='#171008', lw=0.5, 
+                    zorder=20)
 ax[2].axhline(np.mean(merge_filt['Py_Devol_1515']), color='k', linestyle='--', dashes = (10, 10), linewidth=0.75,)
-ax[2].annotate(r'C. $\mathregular{CO_{3, 1515}^{2-}}, n=$'+str(len(merge_filt)), xy=(0.03, 0.92), xycoords='axes fraction', ha='left', va ='bottom', size = 20)
-ax[2].text(1.9, 0.945, r'$\overline{\frac{P}{D}}$='+str(round(np.mean(merge_filt['Py_Devol_1515']), 3)), ha='left', va ='bottom', size = 20)
+ax[2].annotate(r'C. $\mathregular{CO_{3, 1515}^{2-}}, n=$'+str(len(merge_filt)), xy=(0.03, 0.92), xycoords='axes fraction', ha='left', va='bottom', size=20)
+ax[2].text(1.9, 0.945, r'$\overline{\frac{P}{D}}$='+str(round(np.mean(merge_filt['Py_Devol_1515']), 3)), ha='left', va='bottom', size=20)
 ax[2].fill_between(line, np.mean(merge_filt['Py_Devol_1515'])-np.std(merge_filt['Py_Devol_1515']), np.mean(merge_filt['Py_Devol_1515'])+np.std(merge_filt['Py_Devol_1515']), color = 'k', alpha=0.10, edgecolor = None,
-    zorder = -5, label='68% Confidence Interval')
+    zorder=-5, label='68% Confidence Interval')
 ax[2].set_xlabel('Measured Devolatilized Spectrum Peak Heights')
 ax[2].set_ylabel('PyIRoGlass/Measured Devolatilized Spectrum Peak Height')
 ax[2].set_xlim([0, 2.5])
@@ -174,10 +174,10 @@ ax[2].tick_params(axis="x", direction='in', length=5, pad=6.5)
 ax[2].tick_params(axis="y", direction='in', length=5, pad=6.5)
 
 ax[3].axhline(np.mean(merge_filt['Py_Devol_1430']), color='k', linestyle='--', dashes = (10, 10), linewidth=0.75, label='Mean')
-ax[3].annotate(r'D. $\mathregular{CO_{3, 1430}^{2-}}, n=$'+str(len(merge_filt)), xy=(0.03, 0.92), xycoords='axes fraction', ha='left', va ='bottom', size = 20)
-ax[3].text(1.9, 0.965, r'$\overline{\frac{P}{D}}$='+str(round(np.mean(merge_filt['Py_Devol_1430']), 3)), ha='left', va ='bottom', size = 20)
+ax[3].annotate(r'D. $\mathregular{CO_{3, 1430}^{2-}}, n=$'+str(len(merge_filt)), xy=(0.03, 0.92), xycoords='axes fraction', ha='left', va='bottom', size=20)
+ax[3].text(1.9, 0.965, r'$\overline{\frac{P}{D}}$='+str(round(np.mean(merge_filt['Py_Devol_1430']), 3)), ha='left', va='bottom', size=20)
 ax[3].fill_between(line, np.mean(merge_filt['Py_Devol_1430'])-np.std(merge_filt['Py_Devol_1430']), np.mean(merge_filt['Py_Devol_1430'])+np.std(merge_filt['Py_Devol_1430']), color = 'k', alpha=0.10, edgecolor = None,
-    zorder = -5, label='68% Confidence Interval')
+    zorder=-5, label='68% Confidence Interval')
 ax[3].legend(loc='lower right', labelspacing = 0.2, handletextpad = 0.25, handlelength = 1.00, prop={'size': 16}, frameon=False)
 ax[3].set_xlim([0, 2.5])
 ax[3].set_xticks(ticks)
@@ -295,17 +295,17 @@ for oxide in MI_Composition:
 mol_tot = pd.DataFrame()
 mol_tot = mol.sum(axis = 1)
 
-mol_frac = pd.DataFrame()
+mol_frac=pd.DataFrame()
 for oxide in MI_Composition:
     mol_frac[oxide] = mol[oxide]/mol_tot
 
-plots_molfrac = plots_lim[['AVG_BL_BP', 'PC1_BP', 'PC2_BP', 'PC3_BP', 'PC4_BP', 'NBO_T', 'Density_Sat', 'Tau', 'Eta']]
-plots_molfrac = plots_molfrac.join([mol_frac])
+plots_molfrac=plots_lim[['AVG_BL_BP', 'PC1_BP', 'PC2_BP', 'PC3_BP', 'PC4_BP', 'NBO_T', 'Density_Sat', 'Tau', 'Eta']]
+plots_molfrac=plots_molfrac.join([mol_frac])
 plots_molfrac['Na_K'] = plots_molfrac.Na2O + plots_molfrac.K2O
 plots_molfrac['FeT'] = plots_molfrac.FeO + plots_molfrac.Fe2O3/1.11134
-plots_molfrac = plots_molfrac[['AVG_BL_BP', 'PC1_BP', 'PC2_BP', 'PC3_BP', 'PC4_BP', 'SiO2', 'TiO2', 
+plots_molfrac=plots_molfrac[['AVG_BL_BP', 'PC1_BP', 'PC2_BP', 'PC3_BP', 'PC4_BP', 'SiO2', 'TiO2', 
                                'Al2O3', 'Fe2O3', 'FeO', 'MgO', 'CaO', 'Na2O', 'K2O', 'P2O5', 'H2O', 'NBO_T', 'Tau', 'Eta', 'Density_Sat']]
-corr_frac = plots_molfrac.corr()
+corr_frac=plots_molfrac.corr()
 
 # %% Figure adapted in illustrator for Figure 13. 
 

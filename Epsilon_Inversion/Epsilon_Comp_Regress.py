@@ -97,12 +97,12 @@ fig, ax = plt.subplots(1, 1, figsize = (8, 8))
 ax.plot(tau_arr_5200, epsilon_5200_arr, 'k', lw=2, zorder=0, label=legend_5200)
 mand, = ax.plot(tau_arr_5200, epsilon_5200_mandeville, 'k-.', lw=2, zorder=0, label='Mandeville et al., 2002')
 mand.set_dashes([1.5, 1, 3, 1])
-ax.fill_between(tau_arr_5200, conf_lower_5200, conf_upper_5200, color = 'k', alpha=0.20, edgecolor=None,
+ax.fill_between(tau_arr_5200, conf_lower_5200, conf_upper_5200, color='k', alpha=0.20, edgecolor=None,
     zorder=-5, label='68% Confidence Interval')
 ax.plot(tau_arr_5200, pred_upper_5200, 'k--', lw=0.5, zorder=0, dashes=(16, 10))
 ax.plot(tau_arr_5200, pred_lower_5200, 'k--', lw=0.5, zorder=0, dashes=(16, 10), label='68% Prediction Interval')
 ax.errorbar(tau_5200, epsilon_5200, yerr=sigma_epsilon_5200, xerr=sigma_tau_5200, ls='none', elinewidth=0.5, ecolor='k')
-ax.scatter(tau_5200, epsilon_5200, s=sz, c='#0C7BDC', edgecolors='black', linewidth = 0.5, zorder=15)
+ax.scatter(tau_5200, epsilon_5200, s=sz, c='#0C7BDC', edgecolors='black', linewidth=0.5, zorder=15)
 ax.set_xlim([ 0.5, 1.0])
 ax.set_ylim([-0.5, 3.5])
 xlabel_5200 = '$\\tau$='+'(Si+Al)/Total Cations'
@@ -111,8 +111,8 @@ ax.set_xlabel(xlabel_5200)
 ax.set_ylabel('$\mathregular{ƐH_2O_{m, 5200}}$')
 
 ax.legend(loc='upper left', labelspacing=0.2, handletextpad=0.5, handlelength=1.0, prop={'size': 14}, frameon=False)
-ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
-ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
+ax.tick_params(axis="x", direction='in', length=5, pad=6.5)
+ax.tick_params(axis="y", direction='in', length=5, pad=6.5)
 plt.tight_layout()
 # plt.savefig('Epsilon5200Regress.pdf')
 
@@ -128,21 +128,21 @@ fig, ax = plt.subplots(1, 1, figsize = (8, 8))
 ax.plot(tau_arr_4500, epsilon_4500_arr, 'k', lw=2, zorder=0, label=legend_4500)
 mand, = ax.plot(tau_arr_4500, epsilon_4500_mandeville, 'k-.', lw=2, zorder=0, label='Mandeville et al., 2002')
 mand.set_dashes([1.5, 1, 3, 1])
-ax.fill_between(tau_arr_4500, conf_lower_4500, conf_upper_4500, color = 'k', alpha=0.20, edgecolor=None,
+ax.fill_between(tau_arr_4500, conf_lower_4500, conf_upper_4500, color='k', alpha=0.20, edgecolor=None,
     zorder=-5, label='68% Confidence Interval')
 ax.plot(tau_arr_4500, pred_upper_4500, 'k--', lw=0.5, zorder=0, dashes=(16, 10))
 ax.plot(tau_arr_4500, pred_lower_4500, 'k--', lw=0.5, zorder=0, dashes=(16, 10), label='68% Prediction Interval')
-# ax.fill_between(tau_arr_4500[fuego_idx], conf_lower_4500[fuego_idx], conf_upper_4500[fuego_idx], color = 'r', alpha=0.30, edgecolor=None, zorder=-5, label='Fuego Interval')
+# ax.fill_between(tau_arr_4500[fuego_idx], conf_lower_4500[fuego_idx], conf_upper_4500[fuego_idx], color='r', alpha=0.30, edgecolor=None, zorder=-5, label='Fuego Interval')
 ax.errorbar(tau_4500, epsilon_4500, yerr=sigma_epsilon_4500, xerr=sigma_tau_4500, ls='none', elinewidth=0.5, ecolor='k')
-ax.scatter(tau_4500, epsilon_4500, s=sz, c='#0C7BDC', edgecolors='black', linewidth = 0.5, zorder=15)
+ax.scatter(tau_4500, epsilon_4500, s=sz, c='#0C7BDC', edgecolors='black', linewidth=0.5, zorder=15)
 ax.set_xlim([ 0.5, 1.0])
 ax.set_ylim([-0.5, 3.5])
 xlabel_4500 = '$\\tau$=' + '(Si+Al)/Total Cations'
 ax.set_xlabel(xlabel_4500) 
 ax.set_ylabel('$\mathregular{ƐOH^{-}_{4500}}$')
 ax.legend(loc='upper left', labelspacing=0.2, handletextpad=0.5, handlelength=1.0, prop={'size': 14}, frameon=False)
-ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
-ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
+ax.tick_params(axis="x", direction='in', length=5, pad=6.5)
+ax.tick_params(axis="y", direction='in', length=5, pad=6.5)
 plt.tight_layout()
 # plt.savefig('Epsilon4500Regress.pdf')
 
@@ -156,19 +156,19 @@ sz = 150
 fig, ax = plt.subplots(1, 1, figsize = (8, 8))
 ax.plot(tau_arr_3550, epsilon_3550_arr, 'k', lw=2, zorder=0, label=legend_3550)
 mand.set_dashes([1.5, 1, 3, 1])
-ax.fill_between(tau_arr_3550, conf_lower_3550, conf_upper_3550, color = 'k', alpha=0.20, edgecolor=None, zorder=-5, label='68% Confidence Interval')
+ax.fill_between(tau_arr_3550, conf_lower_3550, conf_upper_3550, color='k', alpha=0.20, edgecolor=None, zorder=-5, label='68% Confidence Interval')
 ax.plot(tau_arr_3550, pred_upper_3550, 'k--', lw=0.5, zorder=0, dashes=(16, 10))
 ax.plot(tau_arr_3550, pred_lower_3550, 'k--', lw=0.5, zorder=0, dashes=(16, 10), label='68% Prediction Interval')
 ax.errorbar(tau_3550, epsilon_3550, yerr=sigma_epsilon_3550, xerr=sigma_tau_3550, ls='none', elinewidth=0.5, ecolor='k')
-ax.scatter(tau_3550, epsilon_3550, s=sz, c='#0C7BDC', edgecolors='black', linewidth = 0.5, zorder=15)
+ax.scatter(tau_3550, epsilon_3550, s=sz, c='#0C7BDC', edgecolors='black', linewidth=0.5, zorder=15)
 ax.set_xlim([0.4, 1.0])
 ax.set_ylim([20, 110])
 xlabel_3550 = '$\\tau$=' + '(Si+Al)/Total Cations'
 ax.set_xlabel(xlabel_3550) 
 ax.set_ylabel('$\mathregular{ƐH_2O_{t, 3550}}$')
 ax.legend(loc='upper left', labelspacing=0.2, handletextpad=0.5, handlelength=1.0, prop={'size': 14}, frameon=False)
-ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
-ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
+ax.tick_params(axis="x", direction='in', length=5, pad=6.5)
+ax.tick_params(axis="y", direction='in', length=5, pad=6.5)
 plt.tight_layout()
 # plt.savefig('Epsilon3550Regress.pdf')
 
@@ -183,11 +183,11 @@ fig, ax = plt.subplots(1, 1, figsize = (8, 8))
 ax.plot(tau_arr_1635, epsilon_1635_arr, 'k', lw=2, zorder=0, label=legend_1635)
 mand, = ax.plot(tau_arr_1635, epsilon_1635_mandeville, 'k-.', lw=2, zorder=0, label='Mandeville et al., 2002')
 mand.set_dashes([1.5, 1, 3, 1])
-ax.fill_between(tau_arr_1635, conf_lower_1635, conf_upper_1635, color = 'k', alpha=0.20, edgecolor=None, zorder=-5, label='68% Confidence Interval')
+ax.fill_between(tau_arr_1635, conf_lower_1635, conf_upper_1635, color='k', alpha=0.20, edgecolor=None, zorder=-5, label='68% Confidence Interval')
 ax.plot(tau_arr_1635, pred_upper_1635, 'k--', lw=0.5, zorder=0, dashes=(16, 10))
 ax.plot(tau_arr_1635, pred_lower_1635, 'k--', lw=0.5, zorder=0, dashes=(16, 10), label='68% Prediction Interval')
 ax.errorbar(tau_1635, epsilon_1635, yerr=sigma_epsilon_1635, xerr=sigma_tau_1635, ls='none', elinewidth=0.5, ecolor='k')
-ax.scatter(tau_1635, epsilon_1635, s=sz, c='#0C7BDC', edgecolors='black', linewidth = 0.5, zorder=15)
+ax.scatter(tau_1635, epsilon_1635, s=sz, c='#0C7BDC', edgecolors='black', linewidth=0.5, zorder=15)
 ax.set_xlim([0.5, 1.0])
 ax.set_ylim([0, 90])
 xlabel_1635 = '$\\tau$=' + '(Si+Al)/Total Cations'
@@ -195,8 +195,8 @@ ax.set_xlabel(xlabel_1635)
 ax.set_ylabel('$\mathregular{ƐH_2O_{m, 1635}}$')
 
 ax.legend(loc='upper left', labelspacing=0.2, handletextpad=0.5, handlelength=1.0, prop={'size': 14}, frameon=False)
-ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
-ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
+ax.tick_params(axis="x", direction='in', length=5, pad=6.5)
+ax.tick_params(axis="y", direction='in', length=5, pad=6.5)
 plt.tight_layout()
 # plt.savefig('Epsilon1635Regress.pdf')
 
@@ -214,10 +214,10 @@ sz = 150
 fig, ax = plt.subplots(1, 1, figsize = (8, 8))
 
 ax.errorbar(low_df['Eta'], low_df['Epsilon_Carbonate'], yerr=low_df['Epsilon_Carbonate']*0.1, xerr=low_df['Eta']*0.025, ls='none', elinewidth=0.5, ecolor='k')
-ax.scatter(low_df['Eta'], low_df['Epsilon_Carbonate'], s=sz, c='#0C7BDC', edgecolors='black', linewidth = 0.5, zorder=15, label='$\mathregular{CO_{3, 1430}^{2-}}$, n='+str(len(low_df)))
-ax.scatter(brounce['Eta'], brounce['Epsilon_Carbonate'], s=sz, c='#0C7BDC', edgecolors='black', linewidth = 2, zorder=15, label='Brounce et al., 2021')
+ax.scatter(low_df['Eta'], low_df['Epsilon_Carbonate'], s=sz, c='#0C7BDC', edgecolors='black', linewidth=0.5, zorder=15, label='$\mathregular{CO_{3, 1430}^{2-}}$, n='+str(len(low_df)))
+ax.scatter(brounce['Eta'], brounce['Epsilon_Carbonate'], s=sz, c='#0C7BDC', edgecolors='black', linewidth=2, zorder=15, label='Brounce et al., 2021')
 ax.errorbar(high_df['Eta'], high_df['Epsilon_Carbonate'], yerr=high_df['Epsilon_Carbonate']*0.10, xerr=high_df['Eta']*0.025, ls='none', elinewidth=0.5, ecolor='k')
-ax.scatter(high_df['Eta'], high_df['Epsilon_Carbonate'], s=sz, c='#E42211', marker = 's', edgecolors='black', linewidth = 0.5, zorder=15, label='$\mathregular{CO_{3, 1515}^{2-}}$, n='+str(len(high_df)))
+ax.scatter(high_df['Eta'], high_df['Epsilon_Carbonate'], s=sz, c='#E42211', marker = 's', edgecolors='black', linewidth=0.5, zorder=15, label='$\mathregular{CO_{3, 1515}^{2-}}$, n='+str(len(high_df)))
 
 dixonpan, = ax.plot(eta_arr, epsilon_carbonate_dixonpan, 'k-.', lw=1.5, zorder=0, label='Dixon and Pan, 1995')
 dixonpan.set_dashes([1.5, 1, 3, 1])
@@ -225,7 +225,7 @@ legend_carbonate = '$\mathregular{ƐCO_3^{2-}}$= ' + f'{round(mest_carbonate[0],
 ax.plot(eta_arr, epsilon_carbonate_arr, 'k', lw=2, zorder=0, label=legend_carbonate)
 ax.plot(eta_arr, epsilon_carbonate_old, 'green', lw=2, zorder=0)
 
-ax.fill_between(eta_arr, conf_lower_carbonate, conf_upper_carbonate, color = 'k', alpha=0.20, edgecolor=None, zorder=-5, label='68% Confidence Interval')
+ax.fill_between(eta_arr, conf_lower_carbonate, conf_upper_carbonate, color='k', alpha=0.20, edgecolor=None, zorder=-5, label='68% Confidence Interval')
 ax.plot(eta_arr, pred_upper_carbonate, 'k--', lw=0.5, zorder=0, dashes=(16, 10))
 ax.plot(eta_arr, pred_lower_carbonate, 'k--', lw=0.5, zorder=0, dashes=(16, 10), label='68% Prediction Interval')
 ax.set_xlim([0.1, 0.9])
@@ -234,8 +234,8 @@ ax.set_xlabel('$\mathregular{\\eta=Na/(Na+Ca)}$')
 ax.set_ylabel('$\mathregular{ƐCO_3^{2-}}$')
 
 ax.legend(loc='lower left', labelspacing=0.2, handletextpad=0.5, handlelength=1.0, prop={'size': 14}, frameon=False)
-ax.tick_params(axis="x", direction='in', length=5, pad = 6.5)
-ax.tick_params(axis="y", direction='in', length=5, pad = 6.5)
+ax.tick_params(axis="x", direction='in', length=5, pad=6.5)
+ax.tick_params(axis="y", direction='in', length=5, pad=6.5)
 plt.tight_layout()
 # plt.savefig('EpsilonCarbonateRegress.pdf')
 
@@ -252,11 +252,11 @@ legend_5200 = '$\mathregular{ƐH_2O_{m, 5200}}$=' + f'{round(mest_5200[0],3)}(±
 ax[0].plot(tau_arr_5200, epsilon_5200_arr, 'k', lw=2, zorder=0, label=legend_5200)
 mand, = ax[0].plot(tau_arr_5200, epsilon_5200_mandeville, 'k-.', lw=2, zorder=0, label='Mandeville et al., 2002')
 mand.set_dashes([1.5, 1, 3, 1])
-ax[0].fill_between(tau_arr_5200, conf_lower_5200, conf_upper_5200, color = 'k', alpha=0.20, edgecolor=None, zorder=-5, label='68% Confidence Interval')
+ax[0].fill_between(tau_arr_5200, conf_lower_5200, conf_upper_5200, color='k', alpha=0.20, edgecolor=None, zorder=-5, label='68% Confidence Interval')
 ax[0].plot(tau_arr_5200, pred_upper_5200, 'k--', lw=0.5, zorder=0, dashes=(16, 10))
 ax[0].plot(tau_arr_5200, pred_lower_5200, 'k--', lw=0.5, zorder=0, dashes=(16, 10), label='68% Prediction Interval')
 ax[0].errorbar(tau_5200, epsilon_5200, yerr=sigma_epsilon_5200, xerr=sigma_tau_5200, ls='none', elinewidth=0.5, ecolor='k')
-ax[0].scatter(tau_5200, epsilon_5200, s=sz, c='#0C7BDC', edgecolors='black', linewidth = 0.5, zorder=15)
+ax[0].scatter(tau_5200, epsilon_5200, s=sz, c='#0C7BDC', edgecolors='black', linewidth=0.5, zorder=15)
 ax[0].set_xlim([ 0.5, 1.0])
 ax[0].set_ylim([-0.5, 3.5])
 ax[0].annotate("A.", xy=(0.032, 0.935), xycoords="axes fraction", fontsize=20, weight='bold')
@@ -264,8 +264,8 @@ xlabel_5200 = '$\\tau$='+'(Si+Al)/Total Cations'
 ax[0].set_xlabel(xlabel_5200)
 ax[0].set_ylabel('$\mathregular{ƐH_2O_{m, 5200}}$')
 ax[0].legend(loc=(0.02, 0.69), labelspacing=0.2, handletextpad=0.5, handlelength=1.0, prop={'size': 14}, frameon=False)
-ax[0].tick_params(axis="x", direction='in', length=5, pad = 6.5)
-ax[0].tick_params(axis="y", direction='in', length=5, pad = 6.5)
+ax[0].tick_params(axis="x", direction='in', length=5, pad=6.5)
+ax[0].tick_params(axis="y", direction='in', length=5, pad=6.5)
 
 epsilon_4500_mandeville = -2.026+4.054*tau_arr_4500
 fuego_idx = np.where((tau_arr_4500 > 0.653) & (tau_arr_4500 < 0.715))
@@ -273,12 +273,12 @@ legend_4500 = '$\mathregular{ƐOH^{-}_{4500}}$=' + f'{round(mest_4500[0],3)}(±{
 ax[1].plot(tau_arr_4500, epsilon_4500_arr, 'k', lw=2, zorder=0, label=legend_4500)
 mand, = ax[1].plot(tau_arr_4500, epsilon_4500_mandeville, 'k-.', lw=2, zorder=0, label='Mandeville et al., 2002')
 mand.set_dashes([1.5, 1, 3, 1])
-ax[1].fill_between(tau_arr_4500, conf_lower_4500, conf_upper_4500, color = 'k', alpha=0.20, edgecolor=None,
+ax[1].fill_between(tau_arr_4500, conf_lower_4500, conf_upper_4500, color='k', alpha=0.20, edgecolor=None,
     zorder=-5, label='68% Confidence Interval')
 ax[1].plot(tau_arr_4500, pred_upper_4500, 'k--', lw=0.5, zorder=0, dashes=(16, 10))
 ax[1].plot(tau_arr_4500, pred_lower_4500, 'k--', lw=0.5, zorder=0, dashes=(16, 10), label='68% Prediction Interval')
 ax[1].errorbar(tau_4500, epsilon_4500, yerr=sigma_epsilon_4500, xerr=sigma_tau_4500, ls='none', elinewidth=0.5, ecolor='k')
-ax[1].scatter(tau_4500, epsilon_4500, s=sz, c='#0C7BDC', edgecolors='black', linewidth = 0.5, zorder=15)
+ax[1].scatter(tau_4500, epsilon_4500, s=sz, c='#0C7BDC', edgecolors='black', linewidth=0.5, zorder=15)
 ax[1].set_xlim([ 0.5, 1.0])
 ax[1].set_ylim([-0.5, 3.5])
 ax[1].annotate("B.", xy=(0.032, 0.935), xycoords="axes fraction", fontsize=20, weight='bold')
@@ -286,20 +286,20 @@ xlabel_4500 = '$\\tau$=' + '(Si+Al)/Total Cations'
 ax[1].set_xlabel(xlabel_4500) 
 ax[1].set_ylabel('$\mathregular{ƐOH^{-}_{4500}}$')
 ax[1].legend(loc=(0.02, 0.69), labelspacing=0.2, handletextpad=0.5, handlelength=1.0, prop={'size': 14}, frameon=False)
-ax[1].tick_params(axis="x", direction='in', length=5, pad = 6.5)
-ax[1].tick_params(axis="y", direction='in', length=5, pad = 6.5)
+ax[1].tick_params(axis="x", direction='in', length=5, pad=6.5)
+ax[1].tick_params(axis="y", direction='in', length=5, pad=6.5)
 
 
 fuego_idx = np.where((tau_arr_3550 > 0.653) & (tau_arr_3550 < 0.715))
 legend_3550 = '$\mathregular{ƐH_2O_{t, 3550}}$=' + f'{round(mest_3550[0],3)}(±{round(np.sqrt(np.diag(covm_est_3550))[0],3)})+{round(mest_3550[1],3)}(±{round(np.sqrt(np.diag(covm_est_3550))[1],3)})'+ '·' + '$\\tau$'+ f', n={len(tau_3550)}'
 ax[2].plot(tau_arr_3550, epsilon_3550_arr, 'k', lw=2, zorder=0, label=legend_3550)
 mand.set_dashes([1.5, 1, 3, 1])
-ax[2].fill_between(tau_arr_3550, conf_lower_3550, conf_upper_3550, color = 'k', alpha=0.20, edgecolor=None,
+ax[2].fill_between(tau_arr_3550, conf_lower_3550, conf_upper_3550, color='k', alpha=0.20, edgecolor=None,
     zorder=-5, label='68% Confidence Interval')
 ax[2].plot(tau_arr_3550, pred_upper_3550, 'k--', lw=0.5, zorder=0, dashes=(16, 10))
 ax[2].plot(tau_arr_3550, pred_lower_3550, 'k--', lw=0.5, zorder=0, dashes=(16, 10), label='68% Prediction Interval')
 ax[2].errorbar(tau_3550, epsilon_3550, yerr=sigma_epsilon_3550, xerr=sigma_tau_3550, ls='none', elinewidth=0.5, ecolor='k')
-ax[2].scatter(tau_3550, epsilon_3550, s=sz, c='#0C7BDC', edgecolors='black', linewidth = 0.5, zorder=15)
+ax[2].scatter(tau_3550, epsilon_3550, s=sz, c='#0C7BDC', edgecolors='black', linewidth=0.5, zorder=15)
 ax[2].set_xlim([0.4, 1.0])
 ax[2].set_ylim([20, 120])
 ax[2].annotate("C.", xy=(0.032, 0.935), xycoords="axes fraction", fontsize=20, weight='bold')
@@ -307,8 +307,8 @@ xlabel_3550 = '$\\tau$=' + '(Si+Al)/Total Cations'
 ax[2].set_xlabel(xlabel_3550) 
 ax[2].set_ylabel('$\mathregular{ƐH_2O_{t, 3550}}$')
 ax[2].legend(loc=(0.02, 0.74), labelspacing=0.2, handletextpad=0.5, handlelength=1.0, prop={'size': 14}, frameon=False)
-ax[2].tick_params(axis="x", direction='in', length=5, pad = 6.5)
-ax[2].tick_params(axis="y", direction='in', length=5, pad = 6.5)
+ax[2].tick_params(axis="x", direction='in', length=5, pad=6.5)
+ax[2].tick_params(axis="y", direction='in', length=5, pad=6.5)
 
 
 epsilon_1635_mandeville = -57.813+131.94*tau_arr_1635
@@ -317,12 +317,12 @@ legend_1635 = '$\mathregular{ƐH_2O_{m, 1635}}$=' + f'{round(mest_1635[0],3)}(±
 ax[3].plot(tau_arr_1635, epsilon_1635_arr, 'k', lw=2, zorder=0, label=legend_1635)
 mand, = ax[3].plot(tau_arr_1635, epsilon_1635_mandeville, 'k-.', lw=2, zorder=0, label='Mandeville et al., 2002')
 mand.set_dashes([1.5, 1, 3, 1])
-ax[3].fill_between(tau_arr_1635, conf_lower_1635, conf_upper_1635, color = 'k', alpha=0.20, edgecolor=None,
+ax[3].fill_between(tau_arr_1635, conf_lower_1635, conf_upper_1635, color='k', alpha=0.20, edgecolor=None,
     zorder=-5, label='68% Confidence Interval')
 ax[3].plot(tau_arr_1635, pred_upper_1635, 'k--', lw=0.5, zorder=0, dashes=(16, 10))
 ax[3].plot(tau_arr_1635, pred_lower_1635, 'k--', lw=0.5, zorder=0, dashes=(16, 10), label='68% Prediction Interval')
 ax[3].errorbar(tau_1635, epsilon_1635, yerr=sigma_epsilon_1635, xerr=sigma_tau_1635, ls='none', elinewidth=0.5, ecolor='k')
-ax[3].scatter(tau_1635, epsilon_1635, s=sz, c='#0C7BDC', edgecolors='black', linewidth = 0.5, zorder=15)
+ax[3].scatter(tau_1635, epsilon_1635, s=sz, c='#0C7BDC', edgecolors='black', linewidth=0.5, zorder=15)
 ax[3].set_xlim([0.5, 1.0])
 ax[3].set_ylim([0, 90])
 ax[3].annotate("D.", xy=(0.032, 0.935), xycoords="axes fraction", fontsize=20, weight='bold')
@@ -330,8 +330,8 @@ xlabel_1635 = '$\\tau$=' + '(Si+Al)/Total Cations'
 ax[3].set_xlabel(xlabel_1635) 
 ax[3].set_ylabel('$\mathregular{ƐH_2O_{m, 1635}}$')
 ax[3].legend(loc=(0.02, 0.69), labelspacing=0.2, handletextpad=0.5, handlelength=1.0, prop={'size': 14}, frameon=False)
-ax[3].tick_params(axis="x", direction='in', length=5, pad = 6.5)
-ax[3].tick_params(axis="y", direction='in', length=5, pad = 6.5)
+ax[3].tick_params(axis="x", direction='in', length=5, pad=6.5)
+ax[3].tick_params(axis="y", direction='in', length=5, pad=6.5)
 
 epsilon_carbonate_dixonpan = 451-342*eta_arr
 fuego_idx = np.where((eta_arr > 0.389) & (eta_arr < 0.554))
@@ -339,14 +339,14 @@ df_carbonate = pd.read_excel('./EpsilonRegression.xlsx', sheet_name='CarbonateRe
 low_df = df_carbonate[df_carbonate.Epsilon_Location == 'Low']
 high_df = df_carbonate[df_carbonate.Epsilon_Location == 'High']
 ax[4].errorbar(low_df['Eta'], low_df['Epsilon_Carbonate'], yerr=low_df['Epsilon_Carbonate']*0.1, xerr=low_df['Eta']*0.025, ls='none', elinewidth=0.5, ecolor='k')
-ax[4].scatter(low_df['Eta'], low_df['Epsilon_Carbonate'], s=sz, c='#0C7BDC', edgecolors='black', linewidth = 0.5, zorder=15, label='$\mathregular{CO_{3, 1430}^{2-}}$, n='+str(len(low_df)))
+ax[4].scatter(low_df['Eta'], low_df['Epsilon_Carbonate'], s=sz, c='#0C7BDC', edgecolors='black', linewidth=0.5, zorder=15, label='$\mathregular{CO_{3, 1430}^{2-}}$, n='+str(len(low_df)))
 ax[4].errorbar(high_df['Eta'], high_df['Epsilon_Carbonate'], yerr=high_df['Epsilon_Carbonate']*0.10, xerr=high_df['Eta']*0.025, ls='none', elinewidth=0.5, ecolor='k')
-ax[4].scatter(high_df['Eta'], high_df['Epsilon_Carbonate'], s=sz, c='#E42211', marker = 's', edgecolors='black', linewidth = 0.5, zorder=15, label='$\mathregular{CO_{3, 1515}^{2-}}$, n='+str(len(high_df)))
+ax[4].scatter(high_df['Eta'], high_df['Epsilon_Carbonate'], s=sz, c='#E42211', marker = 's', edgecolors='black', linewidth=0.5, zorder=15, label='$\mathregular{CO_{3, 1515}^{2-}}$, n='+str(len(high_df)))
 dixonpan, = ax[4].plot(eta_arr, epsilon_carbonate_dixonpan, 'k-.', lw=1.5, zorder=0, label='Dixon and Pan, 1995')
 dixonpan.set_dashes([1.5, 1, 3, 1])
 legend_carbonate = '$\mathregular{ƐCO_3^{2-}}$=' + f'{round(mest_carbonate[0],3)}(±{round(np.sqrt(np.diag(covm_est_carbonate))[0],3)})-{round(mest_carbonate[1],3)*-1}(±{round(np.sqrt(np.diag(covm_est_carbonate))[1],3)})' + '·' + f'$\\eta$'
 ax[4].plot(eta_arr, epsilon_carbonate_arr, 'k', lw=2, zorder=0, label=legend_carbonate)
-ax[4].fill_between(eta_arr, conf_lower_carbonate, conf_upper_carbonate, color = 'k', alpha=0.20, edgecolor=None,
+ax[4].fill_between(eta_arr, conf_lower_carbonate, conf_upper_carbonate, color='k', alpha=0.20, edgecolor=None,
     zorder=-5, label='68% Confidence Interval')
 ax[4].plot(eta_arr, pred_upper_carbonate, 'k--', lw=0.5, zorder=0, dashes=(16, 10))
 ax[4].plot(eta_arr, pred_lower_carbonate, 'k--', lw=0.5, zorder=0, dashes=(16, 10), label='68% Prediction Interval')
@@ -356,8 +356,8 @@ ax[4].annotate("E.", xy=(0.032, 0.935), xycoords="axes fraction", fontsize=20, w
 ax[4].set_xlabel('$\mathregular{\\eta=Na/(Na+Ca)}$') 
 ax[4].set_ylabel('$\mathregular{ƐCO_3^{2-}}$')
 ax[4].legend(loc='lower left', labelspacing=0.2, handletextpad=0.5, handlelength=1.0, prop={'size': 14}, frameon=False)
-ax[4].tick_params(axis="x", direction='in', length=5, pad = 6.5)
-ax[4].tick_params(axis="y", direction='in', length=5, pad = 6.5)
+ax[4].tick_params(axis="x", direction='in', length=5, pad=6.5)
+ax[4].tick_params(axis="y", direction='in', length=5, pad=6.5)
 
 fig.delaxes(ax[5])
 plt.tight_layout()
