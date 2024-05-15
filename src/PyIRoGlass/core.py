@@ -459,7 +459,7 @@ def NIR_process(data, wn_low, wn_high, peak):
         data_output["Absorbance_Filt"],
         asymmetry_param=0.001,
         smoothness_param=1e9,
-        max_iters=10,
+        max_iters=20,
         conv_thresh=1e-5,
     )
     data_output["Peak_Subtract"] = (
@@ -546,7 +546,7 @@ def MIR_process(data, wn_low, wn_high):
     data_output["Absorbance"] = data_H2Ot_3550["Absorbance"]
     data_output["Baseline_MIR"] = als_baseline(
         data_H2Ot_3550["Absorbance"],
-        asymmetry_param=0.0010,
+        asymmetry_param=0.001,
         smoothness_param=1e11,
         max_iters=20,
         conv_thresh=1e-7,
@@ -2326,13 +2326,15 @@ def derive_carbonate(data, files, mc3_output, export_path):
         "CO2_1515": CO2P1515_SOLVE,
         "CO2_1430": CO2P1430_SOLVE,
     }
-    bestfits = pd.DataFrame(best_fits_data, index=wavenumber)
+    bestfits = pd.DataFrame(best_fits_data)
+    bestfits.set_index('Wavenumber', inplace=True)
 
     baselines = pd.DataFrame(
         Baseline_Array.T,
         index=wavenumber,
         columns=[f"Baseline_{i}" for i in range(Baseline_Array.shape[0])],
     )
+    baselines.index.name = 'Wavenumber'
 
     if export_path is not None:
         path_beg = os.getcwd() + "/"
