@@ -115,23 +115,41 @@ class SampleDataLoader:
         chem_thickness = pd.read_csv(self.chemistry_thickness_path)
         chem_thickness.set_index("Sample", inplace=True)
 
+        oxides = [
+            "SiO2",
+            "TiO2",
+            "Al2O3",
+            "Fe2O3",
+            "FeO",
+            "MnO",
+            "MgO",
+            "CaO",
+            "Na2O",
+            "K2O",
+            "P2O5",
+        ]
+
+        thicknesses = [
+            "Thickness",
+            "Sigma_Thickness"
+        ]
+
+        missing_columns = [col for col in oxides+thicknesses if col 
+                           not in chem_thickness.columns]
+        if missing_columns:
+            warnings.warn(f"Missing required columns: {missing_columns}. "
+                          f"Column created and filled with NaN. "
+                          f"Please correct the values.",
+                          UserWarning,
+                          stacklevel=2)
+            for col in missing_columns:
+                chem_thickness[col] = np.nan
+
         chemistry = chem_thickness.loc[
             :,
-            [
-                "SiO2",
-                "TiO2",
-                "Al2O3",
-                "Fe2O3",
-                "FeO",
-                "MnO",
-                "MgO",
-                "CaO",
-                "Na2O",
-                "K2O",
-                "P2O5",
-            ],
+            oxides,
         ].fillna(0)
-        thickness = chem_thickness.loc[:, ["Thickness", "Sigma_Thickness"]]
+        thickness = chem_thickness.loc[:, thicknesses]
 
         self.chemistry = chemistry
         self.thickness = thickness
@@ -1281,8 +1299,8 @@ def calculate_epsilon(composition, T, P):
     or glass composition dataset.
 
     Parameters:
-        composition (dictionary): Dictionary containing the weight percentages
-            of each oxide in the glass composition
+        composition (pd.DataFrame): Dataframe containing oxide weight
+            percentages for the glass composition.
         T (int): temperature at which the density is calculated (in Celsius)
         P (int): pressure at which the density is calculated (in bars)
 
@@ -1416,8 +1434,8 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
             of total H2O (3550 cm^-1), molecular H2O (1635 cm^-1), and
             carbonate peaks (1515 and 1430 cm^-1). Each row represents a
             different sample.
-        composition (dictionary): Dictionary with keys as oxide names and
-            values as their weight percentages in the glass composition.
+        composition (pd.DataFrame): Dataframe containing oxide weight
+            percentages for the glass composition.
         thickness (pd.DataFrame): DataFrame with "Thickness" column
             indicating wafer thickness in micrometers (µm) for each sample.
         N (int): Number of Monte Carlo simulations to perform for uncertainty
@@ -1441,6 +1459,17 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
         all specified peaks. Errors in input data or missing values may affect
         the accuracy of the results.
     """
+
+    # Check if sample names match between Volatile_PH and composition
+    Volatile_PH_samples = set(Volatile_PH.index)
+    composition_samples = set(composition.index)
+    mismatched_samples = Volatile_PH_samples.symmetric_difference(composition_samples)
+
+    if mismatched_samples:
+        raise ValueError(
+            f"Sample names in Volatile_PH and composition do not match. "
+            f"Mismatched samples: {mismatched_samples}"
+        )
 
     if export_path is not None:
 

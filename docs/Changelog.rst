@@ -2,6 +2,12 @@
 Change Log
 ==========
 
+
+Version 0.6.2
+=============
+Return ValueError for mismatched samples in peak height and composition DataFrames, UserWarning for missing data columns in composition DataFrame.
+
+
 Version 0.6.1
 =============
 Update composition-dependent epsilon inversions to add Shi et al., 2024 values for H2Ot, 3550 and carbonate, slight correction. Correct data export paths in calculate_baselines and calculate_concentrations. Update PC vector creation.
