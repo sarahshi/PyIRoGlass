@@ -309,6 +309,7 @@ ax[2].set_ylabel('$\mathregular{ƐH_2O_{t, 3550}}$')
 ax[2].legend(loc=(0.02, 0.74), labelspacing=0.2, handletextpad=0.5, handlelength=1.0, prop={'size': 14}, frameon=False)
 ax[2].tick_params(axis="x", direction='in', length=5, pad=6.5)
 ax[2].tick_params(axis="y", direction='in', length=5, pad=6.5)
+ax[2].scatter(tau_3550[epsilon_3550==63.027], epsilon_3550[epsilon_3550==63.027], s=sz, c='#0C7BDC', edgecolors='black', linewidth=2, zorder=15)
 
 
 epsilon_1635_mandeville = -57.813+131.94*tau_arr_1635
@@ -337,11 +338,18 @@ epsilon_carbonate_dixonpan = 451-342*eta_arr
 fuego_idx = np.where((eta_arr > 0.389) & (eta_arr < 0.554))
 df_carbonate = pd.read_excel('./EpsilonRegression.xlsx', sheet_name='CarbonateRegress')
 low_df = df_carbonate[df_carbonate.Epsilon_Location == 'Low']
+shi_low = low_df[low_df.Compilation=='Shi']
 high_df = df_carbonate[df_carbonate.Epsilon_Location == 'High']
+shi_high = low_df[low_df.Compilation=='Shi']
+
 ax[4].errorbar(low_df['Eta'], low_df['Epsilon_Carbonate'], yerr=low_df['Epsilon_Carbonate']*0.1, xerr=low_df['Eta']*0.025, ls='none', elinewidth=0.5, ecolor='k')
 ax[4].scatter(low_df['Eta'], low_df['Epsilon_Carbonate'], s=sz, c='#0C7BDC', edgecolors='black', linewidth=0.5, zorder=15, label='$\mathregular{CO_{3, 1430}^{2-}}$, n='+str(len(low_df)))
 ax[4].errorbar(high_df['Eta'], high_df['Epsilon_Carbonate'], yerr=high_df['Epsilon_Carbonate']*0.10, xerr=high_df['Eta']*0.025, ls='none', elinewidth=0.5, ecolor='k')
 ax[4].scatter(high_df['Eta'], high_df['Epsilon_Carbonate'], s=sz, c='#E42211', marker = 's', edgecolors='black', linewidth=0.5, zorder=15, label='$\mathregular{CO_{3, 1515}^{2-}}$, n='+str(len(high_df)))
+
+ax[4].scatter(shi_high['Eta'], shi_high['Epsilon_Carbonate'], s=sz, c='#E42211', marker = 's', edgecolors='black', linewidth=2, zorder=15)
+ax[4].scatter(shi_low['Eta'], shi_low['Epsilon_Carbonate'], s=sz, c='#0C7BDC', edgecolors='black', linewidth=2, zorder=15)#
+
 dixonpan, = ax[4].plot(eta_arr, epsilon_carbonate_dixonpan, 'k-.', lw=1.5, zorder=0, label='Dixon and Pan, 1995')
 dixonpan.set_dashes([1.5, 1, 3, 1])
 legend_carbonate = '$\mathregular{ƐCO_3^{2-}}$=' + f'{round(mest_carbonate[0],3)}(±{round(np.sqrt(np.diag(covm_est_carbonate))[0],3)})-{round(mest_carbonate[1],3)*-1}(±{round(np.sqrt(np.diag(covm_est_carbonate))[1],3)})' + '·' + f'$\\eta$'
@@ -361,6 +369,6 @@ ax[4].tick_params(axis="y", direction='in', length=5, pad=6.5)
 
 fig.delaxes(ax[5])
 plt.tight_layout()
-# plt.savefig('AllEpsilonRegress_SHI.pdf', bbox_inches='tight', pad_inches=0.025)
+plt.savefig('AllEpsilonRegress_SHI1.pdf', bbox_inches='tight', pad_inches=0.025)
 
 # %%
