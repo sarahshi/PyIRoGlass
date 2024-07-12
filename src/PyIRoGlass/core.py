@@ -97,6 +97,13 @@ class SampleDataLoader:
                 df = df.iloc[::-1]
             df.set_index("Wavenumber", inplace=True)
             spectrum = df.loc[wn_low:wn_high]
+            if wn_low == 1000 and wn_high == 5500:
+                if not (spectrum.index.min() <= wn_low and 
+                        spectrum.index.max() >= wn_high):
+                    warnings.warn(f"{file} data do not span the required "
+                                  f"wavenumbers of 1000-5500 cm^-1.",
+                                  UserWarning,
+                                  stacklevel=2)
             dfs.append(spectrum)
             files.append(file)
 
@@ -692,6 +699,7 @@ def calculate_baselines(dfs_dict, export_path):
     indparams = [wavenumber, PCmatrix, H2Om1635_PCmatrix, Nvectors]
 
     full_path = os.path.join(os.getcwd(), "FINALDATA")
+    file_name = "DF.csv" if export_path is None else f"{export_path}_DF.csv"
 
     # Create DataFrames to store peak height data:
     # P_ = peak_, _BP = best parameter, #_STD = _stdev
@@ -1354,6 +1362,15 @@ def calculate_epsilon(composition, T, P):
     covz_error_SiAl = np.zeros((2, 2))
     covz_error_NaCa = np.zeros((2, 2))
 
+    # Define calibration ranges
+    tau_ranges = {
+        "epsilon_H2Om_5200": (0.6, 0.8641748075261225),
+        "epsilon_OH_4500": (0.6, 0.8641748075261225),
+        "epsilon_H2Ot_3550": (0.5078379123837519, 0.9023427189457927),
+        "epsilon_H2Om_1635": (0.627337511542476, 0.86)
+    }
+    eta_range = (0.23157895182099122, 0.8406489374848108)
+
     # Loop through and calculate for all MI or glass compositions.
     for i in composition.index:
         # Calculate extinction coefficients with best-fit parameters
@@ -1411,6 +1428,40 @@ def calculate_epsilon(composition, T, P):
                 "sigma_epsilon_OH_4500": CT68_4500,
             }
         )
+
+        # Check whether Tau and Eta are in calibration ranges, warn if not
+        # Same ranges for epsilon_H2Om_5200 and epsilon_OH_4500, simplify
+        if not (tau_ranges["epsilon_H2Om_5200"][0] 
+                <= SiAl_tot[i] <= tau_ranges["epsilon_H2Om_5200"][1]):
+            warnings.warn(f"Tau ({round(SiAl_tot[i], 4)}) for {i} "
+                        f"is outside the calibration range for "
+                        f"epsilon_H2Om_5200 and epsilon_OH_4500. "
+                        f"Use caution.", 
+                        UserWarning,
+                        stacklevel=2)
+
+        if not (tau_ranges["epsilon_H2Ot_3550"][0] 
+                <= SiAl_tot[i] <= tau_ranges["epsilon_H2Ot_3550"][1]):
+            warnings.warn(f"Tau ({round(SiAl_tot[i], 4)}) for {i} "
+                        f"is outside the calibration range for "
+                        f"epsilon_H2Ot_3550. Use caution.",
+                        UserWarning,
+                        stacklevel=2)
+
+        if not (tau_ranges["epsilon_H2Om_1635"][0] 
+                <= SiAl_tot[i] <= tau_ranges["epsilon_H2Om_1635"][1]):
+            warnings.warn(f"Tau ({round(SiAl_tot[i], 4)}) for {i} "
+                        f"is outside the calibration range for "
+                        f"epsilon_H2Om_1635. Use caution.",
+                        UserWarning,
+                        stacklevel=2)
+
+        if not (eta_range[0] <= Na_NaCa[i] <= eta_range[1]):
+            warnings.warn(f"Eta ({round(Na_NaCa[i], 4)}) for {i} "
+                        f"is outside the calibration range for "
+                        f"epsilon_CO2. Use caution.",
+                        UserWarning,
+                        stacklevel=2)
 
     return epsilon
 
