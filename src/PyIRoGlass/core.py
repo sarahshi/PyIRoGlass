@@ -1483,7 +1483,8 @@ def calculate_epsilon(composition, T, P):
 
 
 def calculate_concentrations(Volatile_PH, composition, thickness,
-                             export_path, N=500000, T=25, P=1):
+                             export_path, N=500000, T=25, P=1,
+                             model="LS"):
 
     """
     The calculate_concentrations function calculates the concentrations
@@ -1510,6 +1511,8 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
             Default is 25°C.
         P (int): Pressure in bars at which the density is calculated.
             Default is 1 bar.
+        model (str): Choice of density model. "LS" for Lesher and Spera (2015),
+            "IT" for Iacovino and Till (2019). Default is "LS".
 
     Returns:
         concentrations_df (pd.DataFrame): DataFrame containing calculated
@@ -1606,7 +1609,7 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
 
     # Initialize density calculation with 0 wt.% H2O.
     composition["H2O"] = 0
-    _, density = calculate_density(composition, T, P)
+    _, density = calculate_density(composition, T, P, model)
     epsilon = calculate_epsilon(composition, T, P)
 
     # Doing density-H2O iterations:
@@ -1619,7 +1622,7 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
             epsilon["epsilon_H2Ot_3550"],
         )
         composition["H2O"] = H2Ot_3550_I
-        _, density = calculate_density(composition, T, P)
+        _, density = calculate_density(composition, T, P, model)
 
     # Doing density-H2O iterations:
     for kk in Volatile_PH.index:
@@ -1806,7 +1809,8 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
                     epsilon["epsilon_OH_4500"][ll],
                 )
                 sat_composition.loc[ll, "H2O"] = H2Om_1635_BP + OH_4500_M
-                mol_sat, density_sat = calculate_density(sat_composition, T, P)
+                mol_sat, density_sat = calculate_density(sat_composition,
+                                                         T, P, model)
             density_sat = density_sat[ll]
 
             H2Ot_3550_M = beer_lambert(
