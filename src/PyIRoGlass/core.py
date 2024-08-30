@@ -659,14 +659,14 @@ def MCMC(data, uncert, indparams, log, savefile):
     return mc3_output
 
 
-def create_output_dirs(base_path, export_dir):
+def create_output_dirs(base_path, export_path):
 
     """
     Create output directories for storing resulting files.
     
     Parameters:
         base_path (str): The base path for directories.
-        export_dir (str): The directory for exported files.
+        export_path (str): The directory for exported files.
         
     Returns:
         dict: A dictionary with directory names as keys and paths as values.
@@ -712,7 +712,7 @@ def create_output_dirs(base_path, export_dir):
         if dir_name == "FINALDATA":
             full_path = os.path.join(base_path, dir_name)
         else:
-            full_path = os.path.join(base_path, dir_name, export_dir)
+            full_path = os.path.join(base_path, dir_name, export_path)
         os.makedirs(full_path, exist_ok=True)
         paths[dir_name] = full_path
 
