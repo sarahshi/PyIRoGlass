@@ -659,6 +659,70 @@ def MCMC(data, uncert, indparams, log, savefile):
     return mc3_output
 
 
+def create_output_dirs(base_path, export_dir):
+
+    """
+    Create output directories for storing resulting files.
+    
+    Parameters:
+        base_path (str): The base path for directories.
+        export_dir (str): The directory for exported files.
+        
+    Returns:
+        dict: A dictionary with directory names as keys and paths as values.
+    """
+
+    if isinstance(export_path, list):
+        if len(export_path) == 1:
+            export_path = export_path[0]
+            export_path = export_path.strip(" /").rstrip('/')
+        else:
+            warnings.warn(f"Please provide a single directory path as a "
+                          f"string or a list containing one item.",
+                          UserWarning,
+                          stacklevel=2)
+            return {}
+    elif isinstance(export_path, str):
+        export_path = export_path.strip(" /").rstrip('/')
+    else:
+        warnings.warn(f"The provided 'export_path' should be a string or a "
+                      f"list containing one item.",
+                      UserWarning,
+                      stacklevel=2)
+        return {}
+    
+    output_dirs = [
+        "FIGURES",
+        "PLOTFILES",
+        "NPZTXTFILES",
+        "LOGFILES",
+        "BLPEAKFILES",
+        "PKLFILES",
+        "FINALDATA",
+    ]
+    add_dirs = [
+        "TRACE",
+        "HISTOGRAM",
+        "PAIRWISE",
+        "MODELFIT",
+    ]
+
+    paths = {}
+    for dir_name in output_dirs:
+        if dir_name == "FINALDATA":
+            full_path = os.path.join(base_path, dir_name)
+        else:
+            full_path = os.path.join(base_path, dir_name, export_dir)
+        os.makedirs(full_path, exist_ok=True)
+        paths[dir_name] = full_path
+
+    plotfile_path = paths["PLOTFILES"]
+    for add_dir in add_dirs:
+        os.makedirs(os.path.join(plotfile_path, add_dir), exist_ok=True)
+
+    return paths
+
+
 def calculate_baselines(dfs_dict, export_path):
 
     """
@@ -699,8 +763,13 @@ def calculate_baselines(dfs_dict, export_path):
     Nvectors = 5
     indparams = [wavenumber, PCmatrix, H2Om1635_PCmatrix, Nvectors]
 
-    full_path = os.path.join(os.getcwd(), "FINALDATA")
-    file_name = "DF.csv" if export_path is None else f"{export_path}_DF.csv"
+    if export_path is not None:
+        paths = create_output_dirs(os.getcwd(), export_path)
+        full_path = paths["FINALDATA"]
+        file_name = f"{export_path}_DF.csv"
+    else:
+        full_path = os.join(os.getcwd(), "FINALDATA")
+        file_name = "DF.csv"
 
     # Create DataFrames to store peak height data:
     # P_ = peak_, _BP = best parameter, #_STD = _stdev
@@ -738,6 +807,13 @@ def calculate_baselines(dfs_dict, export_path):
     # OH_{4500}, H2Ot_{3550}) and PyIRoGlass mc3 (H2Om_{1635}, CO3^{2-})
     for files, data in dfs_dict.items():
         try:
+            # Ensure the data spans the required wavenumbers
+            if data.index.min() > 1000 or data.index.max() < 5500:
+                warnings.warn(f"{files} data do not span the required "
+                                f"wavenumbers of 1000-5500 cm^-1.",
+                                UserWarning,
+                                stacklevel=2)
+                    
             # Three repeat baselines for the OH_{4500}
             OH_4500_peak_ranges = [(4250, 4675), (4225, 4650), (4275, 4700)]
             OH_4500_results = list(map(lambda peak_range: {
@@ -813,8 +889,8 @@ def calculate_baselines(dfs_dict, export_path):
             PH_3550 = [result["PH"] for result in H2Ot_3550_results]
             PH_3550_M, PH_3550_STD = np.mean(PH_3550), np.std(PH_3550)
 
-            # Determine maximum absorbances for H2Ot_{3550} and H2Om_{1635}
-            # to check for saturation
+            # Determine maximum absorbances for H2Ot_{3550} to check for 
+            # saturation
             data_H2Ot_3550_1 = H2Ot_3550_results[0]["peak_fit"]
             MAX_3550_ABS = data_H2Ot_3550_1[data_H2Ot_3550_1.index > 3550][
                 "Absorbance"
@@ -862,75 +938,14 @@ def calculate_baselines(dfs_dict, export_path):
             if export_path is not None:
                 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-                if isinstance(export_path, list):
-                    if len(export_path) == 1:
-                        export_path = export_path[0]
-                        export_path = export_path.strip(" /").rstrip('/')
-                    else:
-                        return ("Warning: Please provide a single directory path "
-                                "as a string or a list containing one item.")
-                elif isinstance(export_path, str):
-                    export_path = export_path.strip(" /").rstrip('/')
-                else:
-                    return ("Warning: The provided 'export_path' should be a "
-                            "string or a list containing one item.")
-
-                # Create output directories for resulting files
-                default_export_dir = (
-                    "Samples" if export_path is None else export_path
-                )
-                output_dirs = [
-                    "FIGURES",
-                    "PLOTFILES",
-                    "NPZTXTFILES",
-                    "LOGFILES",
-                    "BLPEAKFILES",
-                    "PKLFILES",
-                    "FINALDATA",
-                ]
-                add_dirs = [
-                    "TRACE",
-                    "HISTOGRAM",
-                    "PAIRWISE",
-                    "MODELFIT",
-                ]
-
-                paths = {}
-                for dir_name in output_dirs:
-                    if dir_name == "FINALDATA":
-                        full_path = os.path.join(os.getcwd(), dir_name)
-                    else:
-                        # Other directories in "export_path"
-                        full_path = os.path.join(os.getcwd(), dir_name,
-                                                 default_export_dir)
-
-                    os.makedirs(full_path, exist_ok=True)
-                    paths[dir_name] = full_path
-
-                plotfile_path = paths["PLOTFILES"]
-                for add_dir in add_dirs:
-                    os.makedirs(os.path.join(plotfile_path, add_dir),
-                                exist_ok=True)
-
-                # Create additional directories under "PLOTFILES"
-                plotfile_path = paths["PLOTFILES"]
-
-                # Construct file paths
-                fpath = os.path.join(paths["FIGURES"], "")
-                ppath = os.path.join(plotfile_path, "")
-                sfpath = os.path.join(paths["NPZTXTFILES"], "")
-                lpath = os.path.join(paths["LOGFILES"], "")
-                pklpath = os.path.join(paths["PKLFILES"], "")
-                full_path = os.path.join(paths["FINALDATA"], "")
-                file_name = f"{export_path}_DF.csv"
-
                 als_bls = {
                     "OH_4500_results": OH_4500_results,
                     "H2Om_5200_results": H2Om_5200_results,
                     "H2Ot_3550_results": H2Ot_3550_results,
                 }
 
-                with open(pklpath + files + ".pkl", "wb") as handle:
+                with open(os.path.join(paths["PKLFILES"], 
+                                       f"{files}.pkl"), "wb") as handle:
                     pickle.dump(als_bls, handle,
                                 protocol=pickle.HIGHEST_PROTOCOL)
 
@@ -938,8 +953,8 @@ def calculate_baselines(dfs_dict, export_path):
                     data=spec_mc3,
                     uncert=uncert,
                     indparams=indparams,
-                    log=lpath + files + ".log",
-                    savefile=sfpath + files + ".npz",
+                    log=os.path.join(paths["LOGFILES"], f"{files}.log"),
+                    savefile=os.path.join(paths["NPZTXTFILES"], f"{files}.npz"),
                 )
 
                 texnames = [
@@ -966,13 +981,16 @@ def calculate_baselines(dfs_dict, export_path):
 
                 post.plot()
                 plt.suptitle(files)
-                plt.savefig(ppath + "PAIRWISE/" + files + "_pairwise.pdf")
+                plt.savefig(os.path.join(paths["PLOTFILES"], "PAIRWISE", 
+                                         f"{files}_pairwise.pdf"),
+                                         bbox_inches="tight")
                 plt.close("all")
 
                 post.plot_histogram(nx=4, ny=4)
                 plt.suptitle(files, y=1.015)
-                plt.savefig(ppath + "HISTOGRAM/" + files + "_histogram.pdf",
-                            bbox_inches="tight")
+                plt.savefig(os.path.join(paths["PLOTFILES"], "HISTOGRAM", 
+                                         f"{files}_histogram.pdf"),
+                                         bbox_inches="tight")
                 plt.close("all")
 
                 plot_trace(
@@ -981,8 +999,8 @@ def calculate_baselines(dfs_dict, export_path):
                     zchain=mc3_output["zchain"],
                     burnin=mc3_output["burnin"],
                     pnames=texnames,
-                    savefile=(ppath + "TRACE/" + files + "_trace.pdf"),
-                )
+                    savefile=os.path.join(paths["PLOTFILES"], "TRACE", 
+                                          f"{files}_trace.pdf"),)
                 plt.close("all")
 
                 plot_modelfit(
@@ -991,15 +1009,11 @@ def calculate_baselines(dfs_dict, export_path):
                     indparams[0],
                     mc3_output["best_model"],
                     title=files,
-                    savefile=(ppath + "MODELFIT/" + files + "_modelfit.pdf"),
-                )
+                    savefile=os.path.join(paths["PLOTFILES"], "MODELFIT", 
+                                          f"{files}_modelfit.pdf"),)
                 plt.close("all")
 
             else:
-                full_path = os.path.join(os.getcwd(), "FINALDATA")
-                os.makedirs(full_path, exist_ok=True)
-                file_name = "DF.csv"
-
                 mc3_output = MCMC(
                     data=spec_mc3,
                     uncert=uncert,
@@ -1025,7 +1039,7 @@ def calculate_baselines(dfs_dict, export_path):
                 # Create subplot of CO_3^{2-} baselines/peak fits
                 plot_carbonate(data, files, mc3_output, export_path, ax=ax4)
                 plt.tight_layout()
-                plt.savefig(fpath + files + ".pdf")
+                plt.savefig(os.path.join(paths["FIGURES"], f"{files}.pdf"),)
                 plt.close("all")
 
         except Exception as e:
@@ -1511,6 +1525,17 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
         the accuracy of the results.
     """
 
+    # Use the create_output_dirs function to get output directories
+    if export_path is not None:
+        paths = create_output_dirs(os.getcwd(), export_path)
+        full_path = paths["FINALDATA"]
+        file_name = f"{export_path}_H2OCO2.csv"
+    else:
+        full_path = os.join(os.getcwd(), "FINALDATA")
+        file_name = "H2OCO2.csv"
+    full_file_path = os.path.join(full_path, file_name)
+
+
     # Check if sample names match between Volatile_PH and composition
     Volatile_PH_samples = set(Volatile_PH.index)
     composition_samples = set(composition.index)
@@ -1521,37 +1546,6 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
             f"Sample names in Volatile_PH and composition do not match. "
             f"Mismatched samples: {mismatched_samples}"
         )
-
-    if export_path is not None:
-
-        warnings.filterwarnings("ignore", category=DeprecationWarning)
-
-        if isinstance(export_path, list):
-            if len(export_path) == 1:
-                export_path = export_path[0]
-                export_path = export_path.strip(" /").rstrip('/')
-            else:
-                return ("Warning: Please provide a single directory path "
-                        "as a string or a list containing one item.")
-        elif isinstance(export_path, str):
-            export_path = export_path.strip(" /").rstrip('/')
-        else:
-            return ("Warning: The provided 'export_path' should be a "
-                    "string or a list containing one item.")
-
-        output_dirs = ["FINALDATA"]
-
-        for dir_name in output_dirs:
-            full_path = os.path.join(os.getcwd(), dir_name)
-            os.makedirs(full_path, exist_ok=True)
-
-        file_name = f"{export_path}_H2OCO2.csv"
-    else:
-        full_path = os.path.join(os.getcwd(), "FINALDATA")
-        os.makedirs(full_path, exist_ok=True)
-        file_name = "H2OCO2.csv"
-
-    full_file_path = os.path.join(full_path, file_name)
 
     # Define a dictionary of molar masses for each oxide
     molar_mass = {
@@ -2417,17 +2411,10 @@ def derive_carbonate(data, files, mc3_output, export_path):
     baselines.index.name = 'Wavenumber'
 
     if export_path is not None:
-        path_beg = os.getcwd() + "/"
-        output_dirs = ["BLPEAKFILES"]
-        paths = {}
-        for dir_name in output_dirs:
-            full_path = os.path.join(path_beg, dir_name, export_path)
-            paths[dir_name] = full_path
-
-        # Construct file paths
-        bppath = os.path.join(paths["BLPEAKFILES"], "")
-        bestfits.to_csv(bppath + files + "_bestfits.csv")
-        baselines.to_csv(bppath + files + "_baselines.csv")
+        bppath = os.path.join(os.getcwd(), "BLPEAKFILES", export_path)
+        os.makedirs(bppath, exist_ok=True)
+        bestfits.to_csv(os.path.join(bppath, f"{files}_bestfits.csv"))
+        baselines.to_csv(os.path.join(bppath, f"{files}_baselines.csv"))
 
     return bestfits, baselines
 

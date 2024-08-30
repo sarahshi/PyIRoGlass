@@ -30,7 +30,7 @@ Updating molar absorptivity inversions to add Shi et al., 2024 values for H2Ot, 
 
 Version 0.4.2
 =============
-Streamline exports from calculate_concentrations function, merge sheets. Working through reviewer comments from Volcanica!
+Streamline exports from calculate_concentrations function, merge sheets. Working through reviewer comments from Volcanica! Thanks to Daniel Lee for identifying a to_csv bug during test usage.
 
 
 Version 0.4.1
