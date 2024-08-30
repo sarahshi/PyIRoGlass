@@ -770,6 +770,7 @@ def calculate_baselines(dfs_dict, export_path):
     else:
         full_path = os.path.join(os.getcwd(), "FINALDATA")
         file_name = "DF.csv"
+    os.makedirs(full_path, exist_ok=True)
 
     # Create DataFrames to store peak height data:
     # P_ = peak_, _BP = best parameter, #_STD = _stdev
@@ -1533,6 +1534,7 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
     else:
         full_path = os.path.join(os.getcwd(), "FINALDATA")
         file_name = "H2OCO2.csv"
+    os.makedirs(full_path, exist_ok=True)
     full_file_path = os.path.join(full_path, file_name)
 
 
