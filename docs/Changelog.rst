@@ -3,9 +3,14 @@ Change Log
 ==========
 
 
+Version 0.6.4
+=============
+Update output directory generation, correct density model implementation. Updated ReadtheDocs to account for these new functions and warnings. Rename `composition` parameters as `chemistry` for consistency.
+
+
 Version 0.6.3
 =============
-Return UserWarning for compositions outside of the calibration ranges for the epsilon absorption coefficients in function calculate_concentrations and calculate_epsilon, UserWarning for when data do not span the full wavenumber range of 1000-5500 cm^-1 whilst using class SampleDataLoader. Thanks to Dr. Shuo Ding and Emilia Pelegano-Titmuss for identifying common errors during test usage, which contributed to these improvements.
+Return UserWarning for compositions outside of the calibration ranges for the epsilon (molar absorptivities) in function calculate_concentrations and calculate_epsilon, UserWarning for when data do not span the full wavenumber range of 1000-5500 cm^-1 whilst using class SampleDataLoader. Thanks to Dr. Shuo Ding and Emilia Pelegano-Titmuss for identifying common errors during test usage, which contributed to these improvements.
 
 
 Version 0.6.2

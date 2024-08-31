@@ -747,7 +747,7 @@ def calculate_baselines(dfs_dict, export_path):
             files will be saved.
 
     Returns:
-        data_output (pd.DataFrame): A DataFrame of absorbance data,
+        Volatile_PH (pd.DataFrame): A DataFrame of absorbance data,
             median filtered data, baseline subtracted absorbance,
             and the subtracted peak.
         failures (list): A list of file identifiers for which the analysis
@@ -1203,10 +1203,10 @@ def beer_lambert_error(N, molar_mass,
     return concentration_std
 
 
-def calculate_density(composition, T, P, model="LS"):
+def calculate_density(chemistry, T, P, model="LS"):
 
     """
-    The calculate_density function inputs the MI composition file and outputs
+    The calculate_density function inputs the MI chemistry file and outputs
     the glass density at the temperature and pressure of analysis. The mole
     fraction is calculated. The total molar volume xivibari is determined from
     sum of the mole fractions of each oxide * partial molar volume at room
@@ -1215,8 +1215,8 @@ def calculate_density(composition, T, P, model="LS"):
     finally determined by dividing gram formula weight by total molar volume.
 
     Parameters:
-        composition (pd.DataFrame): Dataframe containing oxide weight
-            percentages for the glass composition.
+        chemistry (pd.DataFrame): Dataframe containing oxide weight
+            percentages for the glass chemistry.
         T (float): temperature at which the density is calculated (in Celsius)
         P (float): pressure at which the density is calculated (in bars)
         model (str): Choice of density model. "LS" for Lesher and Spera (2015),
@@ -1224,7 +1224,7 @@ def calculate_density(composition, T, P, model="LS"):
 
     Returns:
         mol (pd.DataFrame): DataFrame containing the oxide mole fraction for
-            the glass composition
+            the glass chemistry
         density (float): glass density at room temperature and pressure
             (in kg/m^3)
 
@@ -1281,13 +1281,13 @@ def calculate_density(composition, T, P, model="LS"):
             "H2O": (22.9 + 9.5 * (T_K - 1273) / 1000 - 3.20 * P / 1000),
         }
 
-    # Create an DataFrame to store oxide moles for composition
+    # Create an DataFrame to store oxide moles for chemistry
     mol = pd.DataFrame()
     # Calculate oxide moles by dividing weight percentage by molar mass
-    for oxide in composition:
-        mol[oxide] = composition[oxide] / molar_mass[oxide]
+    for oxide in chemistry:
+        mol[oxide] = chemistry[oxide] / molar_mass[oxide]
 
-    # Calculate the total moles for the MI composition
+    # Calculate the total moles for the MI chemistry
     mol_tot = mol.sum(axis=1)
 
     # Create empty DataFrames to store the partial molar volume, gram formula
@@ -1296,7 +1296,7 @@ def calculate_density(composition, T, P, model="LS"):
     xivbari = pd.DataFrame()
     gfw = pd.DataFrame()
 
-    for oxide in composition:
+    for oxide in chemistry:
         # If the oxide is included in the partial molar volume dictionary,
         # calculate its partial molar volume and gram formula weight
         if oxide in par_molar_vol:
@@ -1314,22 +1314,22 @@ def calculate_density(composition, T, P, model="LS"):
     return mol, density
 
 
-def calculate_epsilon(composition, T, P):
+def calculate_epsilon(chemistry, T, P):
 
     """
     The calculate_epsilon function computes the extinction coefficients
     and their uncertainties for various molecular species in a given MI
-    or glass composition dataset.
+    or glass chemistry dataset.
 
     Parameters:
-        composition (pd.DataFrame): Dataframe containing oxide weight
-            percentages for the glass composition.
+        chemistry (pd.DataFrame): Dataframe containing oxide weight
+            percentages for the glass chemistry.
         T (int): temperature at which the density is calculated (in Celsius)
         P (int): pressure at which the density is calculated (in bars)
 
     Returns:
         mol (pd.DataFrame): Dataframe of the mole fraction of each oxide in
-            the glass composition
+            the glass chemistry
         density (pd.DataFrame): Dataframe of glass density at room temperature
             and pressure (in kg/m^3)
     """
@@ -1351,7 +1351,7 @@ def calculate_epsilon(composition, T, P):
         ]
     )
 
-    mol, _ = calculate_density(composition, T, P)
+    mol, _ = calculate_density(chemistry, T, P)
 
     # Calculate extinction coefficient
     cation_tot = (mol.sum(axis=1) +
@@ -1387,8 +1387,8 @@ def calculate_epsilon(composition, T, P):
     }
     eta_range = (0.23157895182099122, 0.8406489374848108)
 
-    # Loop through and calculate for all MI or glass compositions.
-    for i in composition.index:
+    # Loop through and calculate for all MI or glass chemistrys.
+    for i in chemistry.index:
         # Calculate extinction coefficients with best-fit parameters
         epsilon_H2Ot_3550 = mest_3550[0] + (mest_3550[1] * SiAl_tot[i])
         epsilon_H2Om_1635 = mest_1635[0] + (mest_1635[1] * SiAl_tot[i])
@@ -1482,7 +1482,7 @@ def calculate_epsilon(composition, T, P):
     return epsilon
 
 
-def calculate_concentrations(Volatile_PH, composition, thickness,
+def calculate_concentrations(Volatile_PH, chemistry, thickness,
                              export_path, N=500000, T=25, P=1,
                              model="LS"):
 
@@ -1491,7 +1491,7 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
     and uncertainties of volatile components (H2O peak (3550 cm^-1),
     molecular H2O peak (1635 cm^-1), and carbonate peaks (1515 and
     1430 cm^-1) in a glass sample based on peak height data, sample
-    composition, and wafer thickness. This function uses the Beer-Lambert
+    chemistry, and wafer thickness. This function uses the Beer-Lambert
     law for absorbance to estimate concentrations and applies Monte Carlo
     simulations to quantify uncertainties. It iteratively adjusts for the
     effect of water content on glass density to improve accuracy.
@@ -1501,8 +1501,8 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
             of total H2O (3550 cm^-1), molecular H2O (1635 cm^-1), and
             carbonate peaks (1515 and 1430 cm^-1). Each row represents a
             different sample.
-        composition (pd.DataFrame): Dataframe containing oxide weight
-            percentages for the glass composition.
+        chemistry (pd.DataFrame): Dataframe containing oxide weight
+            percentages for the glass chemistry.
         thickness (pd.DataFrame): DataFrame with "Thickness" column
             indicating wafer thickness in micrometers (µm) for each sample.
         N (int): Number of Monte Carlo simulations to perform for uncertainty
@@ -1523,7 +1523,7 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
             providing insight into the properties of the glass under analysis.
 
     Note:
-        The function assumes that the input composition includes all relevant
+        The function assumes that the input chemistry includes all relevant
         oxides and that the Volatile_PH DataFrame contains peak height data for
         all specified peaks. Errors in input data or missing values may affect
         the accuracy of the results.
@@ -1541,14 +1541,14 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
     full_file_path = os.path.join(full_path, file_name)
 
 
-    # Check if sample names match between Volatile_PH and composition
+    # Check if sample names match between Volatile_PH and chemistry
     Volatile_PH_samples = set(Volatile_PH.index)
-    composition_samples = set(composition.index)
-    mismatched_samples = Volatile_PH_samples.symmetric_difference(composition_samples)
+    chemistry_samples = set(chemistry.index)
+    mismatched_samples = Volatile_PH_samples.symmetric_difference(chemistry_samples)
 
     if mismatched_samples:
         raise ValueError(
-            f"Sample names in Volatile_PH and composition do not match. "
+            f"Sample names in Volatile_PH and chemistry do not match. "
             f"Mismatched samples: {mismatched_samples}"
         )
 
@@ -1608,9 +1608,9 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
     )
 
     # Initialize density calculation with 0 wt.% H2O.
-    composition["H2O"] = 0
-    _, density = calculate_density(composition, T, P, model)
-    epsilon = calculate_epsilon(composition, T, P)
+    chemistry["H2O"] = 0
+    _, density = calculate_density(chemistry, T, P, model)
+    epsilon = calculate_epsilon(chemistry, T, P)
 
     # Doing density-H2O iterations:
     for jj in range(10):
@@ -1621,8 +1621,8 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
             thickness["Thickness"],
             epsilon["epsilon_H2Ot_3550"],
         )
-        composition["H2O"] = H2Ot_3550_I
-        _, density = calculate_density(composition, T, P, model)
+        chemistry["H2O"] = H2Ot_3550_I
+        _, density = calculate_density(chemistry, T, P, model)
 
     # Doing density-H2O iterations:
     for kk in Volatile_PH.index:
@@ -1792,7 +1792,7 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
             density_sat = density_df["Density"][ll]
 
         elif Volatile_PH["H2Ot_3550_SAT"][ll] == "*":
-            sat_composition = composition.copy()
+            sat_chemistry = chemistry.copy()
             for m in range(20):
                 H2Om_1635_BP = beer_lambert(
                     molar_mass["H2O"],
@@ -1808,8 +1808,8 @@ def calculate_concentrations(Volatile_PH, composition, thickness,
                     thickness["Thickness"][ll],
                     epsilon["epsilon_OH_4500"][ll],
                 )
-                sat_composition.loc[ll, "H2O"] = H2Om_1635_BP + OH_4500_M
-                mol_sat, density_sat = calculate_density(sat_composition,
+                sat_chemistry.loc[ll, "H2O"] = H2Om_1635_BP + OH_4500_M
+                mol_sat, density_sat = calculate_density(sat_chemistry,
                                                          T, P, model)
             density_sat = density_sat[ll]
 

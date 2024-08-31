@@ -32,6 +32,8 @@ Building-blocks functions for fitting baselines and peaks
 
 .. autofunction:: PyIRoGlass.MCMC
 
+.. autofunction:: PyIRoGlass.create_output_dirs
+
 .. autofunction:: PyIRoGlass.calculate_baselines
 
 
@@ -64,9 +66,9 @@ Functions for plotting MCMC results
 
 .. autofunction:: PyIRoGlass.plot_carbonate
 
-.. autofunction:: PyIRoGlass.plot_modelfit
-
 .. autofunction:: PyIRoGlass.plot_trace
+
+.. autofunction:: PyIRoGlass.plot_modelfit
 
 
 Functions for determining thickness from reflectance FTIR spectra

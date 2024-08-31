@@ -19,7 +19,7 @@ import sphinx_rtd_theme
 # -- Project information -----------------------------------------------------
 
 project = 'PyIRoGlass'
-copyright = '2023, Sarah Shi'
+copyright = '2024, Sarah Shi'
 author = 'Sarah Shi'
 
 # The short X.Y version
