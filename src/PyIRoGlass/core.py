@@ -103,8 +103,8 @@ class SampleDataLoader:
                     warnings.warn(f"{file} data do not span the required "
                                   f"wavenumbers of 1000-5500 cm^-1. "
                                   f"Available range: "
-                                  f"{df["Wavenumber"].min():.2f}-"
-                                  f"{df["Wavenumber"].max():.2f} cm^-1.",
+                                  f"{df['Wavenumber'].min():.2f}-"
+                                  f"{df['Wavenumber'].max():.2f} cm^-1.",
                                   UserWarning,
                                   stacklevel=2)
 
@@ -2419,14 +2419,14 @@ def derive_carbonate(data, files, mc3_output, export_path):
         "CO2_1430": CO2P1430_SOLVE,
     }
     bestfits = pd.DataFrame(best_fits_data)
-    bestfits.set_index('Wavenumber', inplace=True)
+    bestfits.set_index("Wavenumber", inplace=True)
 
     baselines = pd.DataFrame(
         Baseline_Array.T,
         index=wavenumber,
         columns=[f"Baseline_{i}" for i in range(Baseline_Array.shape[0])],
     )
-    baselines.index.name = 'Wavenumber'
+    baselines.index.name = "Wavenumber"
 
     if export_path is not None:
         bppath = os.path.join(os.getcwd(), "BLPEAKFILES", export_path)
