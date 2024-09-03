@@ -38,9 +38,19 @@ The following columns are required for this `ChemThick.CSV` file:
 *  :math:`\text{Thickness}`
 *  :math:`\text{Sigma_Thickness}`
 
-For example, here a screenshot of a `.CSV` spreadsheet containing the glass composition and thickness data. You can use the `ChemThickTemplate.CSV` from the GitHub repository to create your own. You should fill every cell, else ``PyIRoGlass`` will assume that oxide was not analyzed or detected. For oxides that were not analyzed or not detected, enter 0 into the cell. 
+For example, here is an example of a `.CSV` table containing the glass composition and thickness data. You can use the `ChemThickTemplate.CSV` from the GitHub repository to create your own. You should fill every cell, else ``PyIRoGlass`` will assume that oxide was not analyzed or detected. For oxides that were not analyzed or not detected, enter 0 into the cell. 
 
-.. image:: _static/chemthick.png
++--------------------------+-------+-------+--------+--------+-------+-------+-------+-------+-------+------+-------+-------+----------+--------------+
+| Sample                   | SiO2  | TiO2  | Al2O3  | Fe2O3  | FeO   | MnO   | MgO   | CaO   | Na2O  | K2O  | P2O5  | Thickness | Sigma_Thickness |
++==========================+=======+=======+========+========+=======+=======+=======+=======+=======+======+=======+=======+==========+==============+
+| AC4_EUH33_030920_256s_20x20_a | 53.02 | 0.96  | 18.28  | 2.16   | 7.89  | 0.23  | 3.48  | 7.18  | 4.48  | 1.15 | 0.28  | 49.60    | 3.00          |
++--------------------------+-------+-------+--------+--------+-------+-------+-------+-------+-------+------+-------+-------+----------+--------------+
+| AC4_EUH102_030920_256s_15x20_a | 50.26 | 0.92  | 17.60  | 2.17   | 7.92  | 0.21  | 4.31  | 9.30  | 3.57  | 0.69 | 0.16  | 45.63    | 3.00          |
++--------------------------+-------+-------+--------+--------+-------+-------+-------+-------+-------+------+-------+-------+----------+--------------+
+| AC4_OL3_101220_256s_30x30_a   | 51.87 | 1.01  | 18.20  | 2.16   | 7.89  | 0.23  | 3.52  | 6.94  | 4.73  | 1.14 | 0.16  | 49.33    | 3.00          |
++--------------------------+-------+-------+--------+--------+-------+-------+-------+-------+-------+------+-------+-------+----------+--------------+
+| AC4_OL21_012821_256s_20x20_a  | 50.36 | 1.25  | 17.51  | 2.08   | 7.59  | 0.18  | 3.78  | 8.23  | 4.01  | 0.85 | 0.20  | 31.67    | 3.00          |
++--------------------------+-------+-------+--------+--------+-------+-------+-------+-------+-------+------+-------+-------+----------+--------------+
 
 For the liquid composition, ``PyIRoGlass`` allows users to specify how they partition :math:`\text{Fe}` between ferrous and ferric iron, because glass density changes due to the proportion of :math:`\text{Fe}^{3+}`. Both the :cite:t:`LesherandSpera2015` and :cite:t:`IacovinoandTill2019` density models are available for use. To avoid ambiguity, the `ChemThick.CSV` handles this by providing two columns for :math:`\text{FeO}` and :math:`\text{Fe}_2\text{O}_3`. If the speciation is unknown, input all :math:`\text{Fe}` as :math:`\text{FeO}` and leave the :math:`\text{Fe}_2\text{O}_3` cells empty. This will not constitute the largest uncertainty, as the molar absorptivities and thicknesses impact concentrations more significantly. 
 
