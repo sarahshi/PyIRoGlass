@@ -2,9 +2,9 @@
 Introduction and Citation
 =========================
 
-Welcome to ``PyIRoGlass``: An Open-Source, Bayesian MCMC Algorithm for Fitting Baselines to FTIR Spectra of Basaltic-Andesitic Glasses. ``PyIRoGlass`` is an open-source Python3 tool for determining $\mathrm{H_2O}$ and $\mathrm{CO_2}$ species concentrations in the transmission FTIR spectra of basaltic to andesitic glasses. 
+Welcome to ``PyIRoGlass``: An Open-Source, Bayesian MCMC Algorithm for Fitting Baselines to FTIR Spectra of Basaltic-Andesitic Glasses. ``PyIRoGlass`` is an open-source `Python` tool for determining :math:`H_{2}O` and :math:`CO_{2}` species concentrations in the transmission FTIR spectra of basaltic to andesitic glasses. 
 
-``PyIRoGlass`` has been reviewed and published at Volcanica. Please refer to the manuscript for a more detailed description of the development and validation of the method. If you use this package in your work, please cite: 
+``PyIRoGlass`` has been reviewed and published at Volcanica :cite:p:`Shietal2024`. Please refer to the manuscript for a more detailed description of the development and validation of the method. If you use this package in your work, please cite: 
 
 .. code-block:: console
 

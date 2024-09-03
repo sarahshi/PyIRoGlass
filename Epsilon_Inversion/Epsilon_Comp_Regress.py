@@ -203,7 +203,7 @@ plt.tight_layout()
 # %% Carbonate
 
 epsilon_carbonate_dixonpan = 451-342*eta_arr
-epsilon_carbonate_old = 440.696-355.205*eta_arr
+# epsilon_carbonate_old = 440.696-355.205*eta_arr
 fuego_idx = np.where((eta_arr > 0.389) & (eta_arr < 0.554))
 df_carbonate = pd.read_excel('./EpsilonRegression.xlsx', sheet_name='CarbonateRegress')
 low_df = df_carbonate[df_carbonate.Epsilon_Location == 'Low']
@@ -215,7 +215,7 @@ fig, ax = plt.subplots(1, 1, figsize = (8, 8))
 
 ax.errorbar(low_df['Eta'], low_df['Epsilon_Carbonate'], yerr=low_df['Epsilon_Carbonate']*0.1, xerr=low_df['Eta']*0.025, ls='none', elinewidth=0.5, ecolor='k')
 ax.scatter(low_df['Eta'], low_df['Epsilon_Carbonate'], s=sz, c='#0C7BDC', edgecolors='black', linewidth=0.5, zorder=15, label='$\mathregular{CO_{3, 1430}^{2-}}$, n='+str(len(low_df)))
-ax.scatter(brounce['Eta'], brounce['Epsilon_Carbonate'], s=sz, c='#0C7BDC', edgecolors='black', linewidth=2, zorder=15, label='Brounce et al., 2021')
+# ax.scatter(brounce['Eta'], brounce['Epsilon_Carbonate'], s=sz, c='#0C7BDC', edgecolors='black', linewidth=2, zorder=15, label='Brounce et al., 2021')
 ax.errorbar(high_df['Eta'], high_df['Epsilon_Carbonate'], yerr=high_df['Epsilon_Carbonate']*0.10, xerr=high_df['Eta']*0.025, ls='none', elinewidth=0.5, ecolor='k')
 ax.scatter(high_df['Eta'], high_df['Epsilon_Carbonate'], s=sz, c='#E42211', marker = 's', edgecolors='black', linewidth=0.5, zorder=15, label='$\mathregular{CO_{3, 1515}^{2-}}$, n='+str(len(high_df)))
 
@@ -223,7 +223,7 @@ dixonpan, = ax.plot(eta_arr, epsilon_carbonate_dixonpan, 'k-.', lw=1.5, zorder=0
 dixonpan.set_dashes([1.5, 1, 3, 1])
 legend_carbonate = '$\mathregular{ƐCO_3^{2-}}$= ' + f'{round(mest_carbonate[0],3)}(±{round(np.sqrt(np.diag(covm_est_carbonate))[0],3)}) - {round(mest_carbonate[1],3)*-1}(±{round(np.sqrt(np.diag(covm_est_carbonate))[1],3)})' + '·' + f'$\\eta$, n={len(eta)}'
 ax.plot(eta_arr, epsilon_carbonate_arr, 'k', lw=2, zorder=0, label=legend_carbonate)
-ax.plot(eta_arr, epsilon_carbonate_old, 'green', lw=2, zorder=0)
+# ax.plot(eta_arr, epsilon_carbonate_old, 'green', lw=2, zorder=0)
 
 ax.fill_between(eta_arr, conf_lower_carbonate, conf_upper_carbonate, color='k', alpha=0.20, edgecolor=None, zorder=-5, label='68% Confidence Interval')
 ax.plot(eta_arr, pred_upper_carbonate, 'k--', lw=0.5, zorder=0, dashes=(16, 10))
