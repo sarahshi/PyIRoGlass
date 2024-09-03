@@ -24,17 +24,17 @@ Users can batch process their FTIR data by creating directories containing all s
 The following columns are required for this `ChemThick.CSV` file:
 
 *  Sample
-*  :math:`SiO_{2}`
-*  :math:`TiO_{2}`
-*  :math:`Al_{2}O_{3}`
-*  :math:`Fe_{2}O_{3}`
-*  :math:`FeO_{t}`
-*  :math:`MnO`
-*  :math:`MgO`
-*  :math:`CaO`
-*  :math:`Na_{2}O`
-*  :math:`K_{2}O`
-*  :math:`P_{2}O_{5}`
+*  :math:`\text{SiO}_{2}`
+*  :math:`\text{TiO}_{2}`
+*  :math:`\text{Al}_{2}\text{O}_{3}`
+*  :math:`\text{Fe}_{2}\text{O}_{3}`
+*  :math:`\text{FeO}_{t}`
+*  :math:`\text{MnO}`
+*  :math:`\text{MgO}`
+*  :math:`\text{CaO}`
+*  :math:`\text{Na}_{2}\text{O}`
+*  :math:`\text{K}_{2}\text{O}`
+*  :math:`\text{P}_{2}\text{O}_{5}`
 *  Thickness
 *  Sigma_Thickness
 
@@ -43,7 +43,7 @@ For example, here a screenshot of a `.CSV` spreadsheet containing the glass comp
 .. image:: _static/chemthick.png
 
 
-For the liquid composition, ``PyIRoGlass`` allows users to specify how they partition :math:`Fe` between ferrous and ferric iron, because glass density changes due to the proportion of :math:`Fe^{3+}`. To avoid ambiguity, the `ChemThick.CSV` handles this by providing two columns for :math:`FeO` and :math:`Fe_{2}O_{3}`. If the speciation is unknown, input all :math:`Fe` as :math:`FeO` and leave the :math:`Fe_{2}O_{3}` cells empty. This will not constitute the largest uncertainty, as the molar absorptivities and thicknesses impact concentrations more significantly. 
+For the liquid composition, ``PyIRoGlass`` allows users to specify how they partition :math:`\text{Fe}` between ferrous and ferric iron, because glass density changes due to the proportion of :math:`\text{Fe^{3+}}`. To avoid ambiguity, the `ChemThick.CSV` handles this by providing two columns for :math:`\text{FeO}` and :math:`\text{Fe_{2}O_{3}}`. If the speciation is unknown, input all :math:`\text{Fe}` as :math:`\text{FeO}` and leave the :math:`\text{Fe_{2}O_{3}}` cells empty. This will not constitute the largest uncertainty, as the molar absorptivities and thicknesses impact concentrations more significantly. 
 
 =================
 Importing Package

@@ -20,7 +20,7 @@ Return ``ValueError`` for mismatched samples in peak height and composition Data
 
 Version 0.6.1
 =============
-Update composition-dependent epsilon inversions to add :cite:t:`Shietal2024` values for :math:`H_{2}O_{t, 3550}` and :math:`CO_{3}^{2-}`, slight correction. Correct data export paths in :func:`pig.calculate_baselines` and :func:`pig.calculate_concentrations`. Update PC vector creation.
+Update composition-dependent epsilon inversions to add :cite:t:`Shietal2024` values for :math:`\text{H_{2}O_{t, 3550}}` and :math:`\text{CO_{3}^{2-}}`, slight correction. Correct data export paths in :func:`pig.calculate_baselines` and :func:`pig.calculate_concentrations`. Update PC vector creation.
 
 
 Version 0.5.2
@@ -30,7 +30,7 @@ Account for variability in ``export_path`` naming practice. Remove ``remove_base
 
 Version 0.5.1
 =============
-Updating molar absorptivity inversions to add :cite:t:`Shietal2024` values for :math:`H_{2}O_{t, 3550}` and :math:`CO_{3}^{2-}`. Update data export paths to be more sensible within the functions :func:`pig.calculate_baselines` and :func:`pig.calculate_concentrations`. Add to the inversion.py functionality for calculating statistics. 
+Updating molar absorptivity inversions to add :cite:t:`Shietal2024` values for :math:`\text{H_{2}O_{t, 3550}}` and :math:`\text{CO_{3}^{2-}}`. Update data export paths to be more sensible within the functions :func:`pig.calculate_baselines` and :func:`pig.calculate_concentrations`. Add to the inversion.py functionality for calculating statistics. 
 
 
 Version 0.4.2
@@ -45,7 +45,7 @@ Updating functions loading data to be in object-oriented structure. Streamlining
 
 Version 0.3.1
 =============
-Updating epsilon (molar absorptivity) inversion to add :cite:t:`Brounceetal2021` value for :math:`CO_{3}^{2-}`. Paper submitted to Volcanica!
+Updating epsilon (molar absorptivity) inversion to add :cite:t:`Brounceetal2021` value for :math:`\text{CO_{3}^{2-}}`. Paper submitted to Volcanica!
 
 
 Version 0.2.2
