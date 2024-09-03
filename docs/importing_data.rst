@@ -67,7 +67,7 @@ We use the ``os`` package in `Python` to facilitate navigation to various direct
     loader = pig.SampleDataLoader(spectrum_path=path)
     dfs_dict = loader.load_spectrum_directory()
 
-:class:`pig.SampleDataLoader` and :method:`load_spectrum_directory` returns ``dfs_dict``, a dictionary of the wavenumber and absorbance of each sample. 
+:class:`pig.SampleDataLoader` and :meth:`load_spectrum_directory` returns ``dfs_dict``, a dictionary of the wavenumber and absorbance of each sample. 
 
 To load the `.CSV` containing glass chemistry and thickness information, provide the path to the file. 
 
@@ -96,14 +96,14 @@ For olivine, specify the following wavenumber range based on :cite:t:`Nicholsand
 
 .. code-block:: python
 
-    ref_dfs_dict_ol = loader.load_spectrum_directory(REF_PATH, wn_high=2700, wn_low=2100)
+    ref_dfs_dict_ol = loader.load_spectrum_directory(ref_path, wn_high=2700, wn_low=2100)
     n_ol = pig.reflectance_index(XFo) 
 
 For glass, specify the following wavenumber range based on :cite:t:`NicholsandWysoczanski2007` and enter the relevant reflectance index :math:`n`. We use the reflectance index for basaltic glasses from :cite:t:`NicholsandWysoczanski2007` here. 
 
 .. code-block:: python
 
-    ref_dfs_dict_gl = loader.load_spectrum_directory(REF_PATH, wn_high=2850, wn_low=1700)
+    ref_dfs_dict_gl = loader.load_spectrum_directory(ref_path, wn_high=2850, wn_low=1700)
     n_gl = 1.546 
 
 
