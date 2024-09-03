@@ -5,7 +5,7 @@ Installation & Updating
 Installation
 ============
 
-First, obtain `Python3` (tested on versions≥3.8). If you haven't used `Python` before, we recomend installing it through `anaconda3 <https://www.anaconda.com/products/individual>`_.
+First, obtain `Python3 <https://www.python.org/>`_ (tested on versions≥3.8). If you haven't used `Python <https://www.python.org/>`_ before, we recomend installing it through `anaconda3 <https://www.anaconda.com/products/individual>`_.
 
 ``PyIRoGlass`` can be installed using pip in one line. If you are using a terminal, enter:
 
@@ -13,7 +13,7 @@ First, obtain `Python3` (tested on versions≥3.8). If you haven't used `Python`
 
    pip install PyIRoGlass
 
-If you are using Jupyter Notebooks (on Google Colab or Binder) or Jupyter Lab, you can also install it by entering the following code into a notebook cell (note the !):
+If you are using `Jupyter Notebooks <https://jupyter.org/>`_ (on `Google Colab <https://colab.research.google.com/>`_ or `Binder <https://mybinder.org/>`_) or `Jupyter Lab <https://jupyter.org/>`_, you can also install it by entering the following code into a notebook cell (note the !):
 
 .. code-block:: bash
 
@@ -25,7 +25,7 @@ You then need to import ``PyIRoGlass`` into the script you are running code in. 
 
    import PyIRoGlass as pig
 
-This means any time you want to call a function from ``PyIRoGlass``, you do pig.function_name.
+This means any time you want to call a function from ``PyIRoGlass``, you do :code:`pig.function_name`.
 
 
 Updating

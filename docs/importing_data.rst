@@ -2,7 +2,7 @@
 Importing Data
 ==============
 
-We walk through an implementation of ``PyIRoGlass`` here. We recommend following this tutorial as-is for those not familiar with navigating between directories in `Python`. Create this following file structure locally: 
+We walk through an implementation of ``PyIRoGlass`` here. We recommend following this tutorial as-is for those not familiar with navigating between directories in `Python <https://www.python.org/>`_. This file structure should be locally replicaated: 
 
 ::
 
@@ -19,7 +19,7 @@ We walk through an implementation of ``PyIRoGlass`` here. We recommend following
     └── PyIRoGlass_RUN.py
 
 
-Users can batch process their FTIR data by creating directories containing all spectra files, called `TransmissionSpectra/YourDirectoryName` here, in comma separated values (`.CSV`). Users should format their glass composition and thickness data as a spreadsheet of comma separated values (`.CSV`) file with each analysis having its own row and columns of sample name, oxide components in weight percentages, and thicknesses and uncertainties in thickness in micrometers. The spectrum file name **must** match the sample name input in the chemistry and thickness file. The order of columns does not matter, as the `Python` ``pandas`` package will identify the column heading regardless of its location. 
+Users can batch process their FTIR data by creating directories containing all spectra files, called `TransmissionSpectra/YourDirectoryName` here, in comma separated values (`.CSV`). Users should format their glass composition and thickness data as a spreadsheet of comma separated values (`.CSV`) file with each analysis having its own row and columns of sample name, oxide components in weight percentages, and thicknesses and uncertainties in thickness in micrometers. The spectrum file name **must** match the sample name input in the chemistry and thickness file. The order of columns does not matter, as the `Python <https://www.python.org/>`_ ``pandas`` package will identify the column heading regardless of its location. 
 
 The following columns are required for this `ChemThick.CSV` file:
 
@@ -38,7 +38,7 @@ The following columns are required for this `ChemThick.CSV` file:
 *  :math:`\text{Thickness}`
 *  :math:`\text{Sigma_Thickness}`
 
-For example, here is an example of a `.CSV` table containing the glass composition and thickness data (scroll across to see the entire table). You can use the `ChemThickTemplate.CSV` from the GitHub repository to create your own. You should fill every cell, else ``PyIRoGlass`` will assume that oxide was not analyzed or detected. For oxides that were not analyzed or not detected, enter 0 into the cell. 
+For example, here is an example of a `.CSV` table containing the glass composition and thickness data (scroll across to see the entire table). You can use the `ChemThickTemplate.CSV` from the `PyIRoGlass GitHub repository <https://github.com/sarahshi/PyIRoGlass>`_ to create your own. You should fill every cell, else ``PyIRoGlass`` will assume that oxide was not analyzed or detected. For oxides that were not analyzed or not detected, enter 0 into the cell. 
 
 +------------+-------+------+-------+-------+------+------+------+------+------+------+------+-----------+-----------------+
 | Sample     | SiO2  | TiO2 | Al2O3 | Fe2O3 | FeO  | MnO  | MgO  | CaO  | Na2O | K2O  | P2O5 | Thickness | Sigma_Thickness |
@@ -59,7 +59,7 @@ For the liquid composition, ``PyIRoGlass`` allows users to specify how they part
 Importing Package
 =================
 
-We import the package ``PyIRoGlass`` in `Python`. 
+We import the package ``PyIRoGlass`` in `Python <https://www.python.org/>`_. 
 
 .. code-block:: python
 
@@ -69,7 +69,7 @@ We import the package ``PyIRoGlass`` in `Python`.
 PyIRoGlass for Transmission FTIR Spectra
 ========================================
 
-We use the ``os`` package in `Python` to facilitate navigation to various directories and files. To load the transmission FTIR spectra, you must provide the path to the directory. Specify the wavenumbers of interest to fit all species peaks between 5500 and 1000 cm\ :sup:`-1`. 
+We use the ``os`` package in `Python <https://www.python.org/>`_ to facilitate navigation to various directories and files. To load the transmission FTIR spectra, you must provide the path to the directory. Specify the wavenumbers of interest to fit all species peaks between 5500 and 1000 cm\ :sup:`-1`. 
 
 .. code-block:: python
 

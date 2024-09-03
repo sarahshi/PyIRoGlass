@@ -5,7 +5,7 @@ Change Log
 
 Version 0.6.4
 =============
-Update output directory generation, correct density model implementation. Updated ReadtheDocs to account for these new functions and warnings. Rename ``composition`` parameters as ``chemistry`` for consistency.
+Update output directory generation, correct density model implementation. Updated `ReadtheDocs <https://pyiroglass.readthedocs.io/en/latest/>`_ to account for these new functions and warnings. Rename ``composition`` parameters as ``chemistry`` for consistency.
 
 
 Version 0.6.3
@@ -40,7 +40,7 @@ Streamline exports from function :func:`pig.calculate_concentrations`, merge she
 
 Version 0.4.1
 =============
-Updating functions loading data to be in object-oriented structure. Streamlining and separating out plotting functions from remaining code. Removing excess variables. Renaming for consistency with Python function guidance. Correcting for pep8. Working through reviewer comments!
+Updating functions loading data to be in object-oriented structure. Streamlining and separating out plotting functions from remaining code. Removing excess variables. Renaming for consistency with `Python <https://www.python.org/>`_ function guidance. Correcting for `pep8 <https://peps.python.org/pep-0008/>`_. Working through reviewer comments!
 
 
 Version 0.3.1
@@ -50,7 +50,7 @@ Updating epsilon (molar absorptivity) inversion to add :cite:t:`Brounceetal2021`
 
 Version 0.2.2
 =============
-Accidental deletion of GitHub commits, this restores all commits to v0.2.1. .git file size reduced. 
+Accidental deletion of `GitHub <https://github.com/sarahshi/PyIRoGlass>`_ commits, this restores all commits to v0.2.1. .git file size reduced. 
 
 
 Version 0.2.1
@@ -65,15 +65,15 @@ Update parameter estimation regions with the guidance of devolatilized spectra, 
 
 Version 0.1.0
 =============
-Update version on PyPi to be compatible with ``mc3`` v3.1.2.
+Update version on `PyPi <https://pypi.org/project/PyIRoGlass/>`_ to be compatible with ``mc3`` v3.1.2.
 
 
 Version 0.0.1
 =============
-Update version on PyPi to fix .npz read. 
+Update version on `PyPi <https://pypi.org/project/PyIRoGlass/>`_ to fix .npz read. 
 
 
 Version 0.0.0
 =============
-First version on PyPi. 
+First version on `PyPi <https://pypi.org/project/PyIRoGlass/>`_. 
 
