@@ -23,7 +23,7 @@ Users can batch process their FTIR data by creating directories containing all s
 
 The following columns are required for this `ChemThick.CSV` file:
 
-*  Sample
+*  :math:`\text{Sample}`
 *  :math:`\text{SiO}_{2}`
 *  :math:`\text{TiO}_{2}`
 *  :math:`\text{Al}_{2}\text{O}_{3}`
@@ -35,15 +35,14 @@ The following columns are required for this `ChemThick.CSV` file:
 *  :math:`\text{Na}_{2}\text{O}`
 *  :math:`\text{K}_{2}\text{O}`
 *  :math:`\text{P}_{2}\text{O}_{5}`
-*  Thickness
-*  Sigma_Thickness
+*  :math:`\text{Thickness}`
+*  :math:`\text{Sigma_Thickness}`
 
 For example, here a screenshot of a `.CSV` spreadsheet containing the glass composition and thickness data. You can use the `ChemThickTemplate.CSV` from the GitHub repository to create your own. You should fill every cell, else ``PyIRoGlass`` will assume that oxide was not analyzed or detected. For oxides that were not analyzed or not detected, enter 0 into the cell. 
 
 .. image:: _static/chemthick.png
 
-
-For the liquid composition, ``PyIRoGlass`` allows users to specify how they partition :math:`\text{Fe}` between ferrous and ferric iron, because glass density changes due to the proportion of :math:`\text{Fe^{3+}}`. To avoid ambiguity, the `ChemThick.CSV` handles this by providing two columns for :math:`\text{FeO}` and :math:`\text{Fe_{2}O_{3}}`. If the speciation is unknown, input all :math:`\text{Fe}` as :math:`\text{FeO}` and leave the :math:`\text{Fe_{2}O_{3}}` cells empty. This will not constitute the largest uncertainty, as the molar absorptivities and thicknesses impact concentrations more significantly. 
+For the liquid composition, ``PyIRoGlass`` allows users to specify how they partition :math:`\text{Fe}` between ferrous and ferric iron, because glass density changes due to the proportion of :math:`\text{Fe}^{3+}`. Both the :cite:t:`LesherandSpera2015` and :cite:t:`IacovinoandTill2019` density models are available for use. To avoid ambiguity, the `ChemThick.CSV` handles this by providing two columns for :math:`\text{FeO}` and :math:`\text{Fe}_2\text{O}_3`. If the speciation is unknown, input all :math:`\text{Fe}` as :math:`\text{FeO}` and leave the :math:`\text{Fe}_2\text{O}_3` cells empty. This will not constitute the largest uncertainty, as the molar absorptivities and thicknesses impact concentrations more significantly. 
 
 =================
 Importing Package

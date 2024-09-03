@@ -96,15 +96,20 @@ class SampleDataLoader:
 
             if df["Wavenumber"].iloc[0] > df["Wavenumber"].iloc[-1]:
                 df = df.iloc[::-1]
-            df.set_index("Wavenumber", inplace=True)
-            spectrum = df.loc[wn_low:wn_high]
+
             if wn_low == 1000 and wn_high == 5500:
-                if not (spectrum.index.min() <= wn_low and 
-                        spectrum.index.max() >= wn_high):
+                if not (df["Wavenumber"].min() <= wn_low and
+                        df["Wavenumber"].max() >= wn_high):
                     warnings.warn(f"{file} data do not span the required "
-                                  f"wavenumbers of 1000-5500 cm^-1.",
+                                  f"wavenumbers of 1000-5500 cm^-1. "
+                                  f"Available range: "
+                                  f"{df["Wavenumber"].min():.2f}-"
+                                  f"{df["Wavenumber"].max():.2f} cm^-1.",
                                   UserWarning,
                                   stacklevel=2)
+
+            df.set_index("Wavenumber", inplace=True)
+            spectrum = df.loc[wn_low:wn_high]
             dfs.append(spectrum)
             files.append(file)
 
@@ -804,14 +809,21 @@ def calculate_baselines(dfs_dict, export_path):
     error_4500 = []
     error_5200 = []
 
+    # Initialize tolerance for baseline range
+    tolerance = 5
+
     # Determine best-fit baselines for all peaks with ALS (H2Om_{5200},
     # OH_{4500}, H2Ot_{3550}) and PyIRoGlass mc3 (H2Om_{1635}, CO3^{2-})
     for files, data in dfs_dict.items():
         try:
             # Ensure the data spans the required wavenumbers
-            if data.index.min() > 1000 or data.index.max() < 5500:
+            if (data.index.min() > (1000 + tolerance) or 
+                data.index.max() < (5500 - tolerance)):
                 warnings.warn(f"{files} data do not span the required "
-                                f"wavenumbers of 1000-5500 cm^-1.",
+                                f"wavenumbers of 1000-5500 cm^-1, with "
+                                f"{tolerance} cm^-1 tolerance. "
+                                f"Available range: {data.index.min():.2f}"
+                                f"-{data.index.max():.2f} cm^-1.",
                                 UserWarning,
                                 stacklevel=2)
                     
