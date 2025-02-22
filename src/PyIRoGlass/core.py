@@ -678,14 +678,16 @@ def create_output_dirs(base_path, export_path):
     """
 
     if isinstance(export_path, list):
-        if len(export_path) == 1:
-            export_path = export_path[0]
-            export_path = export_path.strip(" /").rstrip('/')
+        if len(export_path) == 0:
+            warnings.warn("export_path list is empty; provide a valid path.", UserWarning)
+            return {}
+        elif len(export_path) == 1:
+            export_path = export_path[0].strip(" /").rstrip('/')
         else:
             warnings.warn(f"Please provide a single directory path as a "
-                          f"string or a list containing one item.",
-                          UserWarning,
-                          stacklevel=2)
+                        f"string or a list containing one item.",
+                        UserWarning,
+                        stacklevel=2)
             return {}
     elif isinstance(export_path, str):
         export_path = export_path.strip(" /").rstrip('/')

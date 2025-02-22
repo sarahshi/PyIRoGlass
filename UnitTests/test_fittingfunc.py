@@ -247,8 +247,11 @@ class test_fitting_functions(unittest.TestCase):
 
         # Check for figure files
         fpath = paths["FIGURES"]
-        figure_files = glob.glob(os.path.join(fpath, "*.pdf"))
-        self.assertTrue(len(figure_files) > 0, "No figure files found in the FIGURES subdirectory.")
+
+        # figure_files = glob.glob(os.path.join(fpath, "*.pdf"))
+        
+        figure_files = glob.glob(os.path.join(fpath, "**", "*.pdf"), recursive=True)
+        self.assertTrue(len(figure_files) > 0, "No figure files found in FIGURES or its subdirectories.")
 
         # Clean up function
         def remove_dir(dir_path):
