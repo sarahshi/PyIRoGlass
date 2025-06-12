@@ -1554,17 +1554,20 @@ def calculate_concentrations(Volatile_PH, chemistry, thickness,
     os.makedirs(full_path, exist_ok=True)
     full_file_path = os.path.join(full_path, file_name)
 
+    common = Volatile_PH.index.intersection(chemistry.index)
+    if common.empty:
+        raise ValueError("No sample names overlap between Volatile_PH and chemistry!")
 
-    # Check if sample names match between Volatile_PH and chemistry
-    Volatile_PH_samples = set(Volatile_PH.index)
-    chemistry_samples = set(chemistry.index)
-    mismatched_samples = Volatile_PH_samples.symmetric_difference(chemistry_samples)
+    # warn about what’s dropped
+    dropped_vol = set(Volatile_PH.index) - set(common)
+    dropped_chem = set(chemistry.index) - set(common)
+    if dropped_vol or dropped_chem:
+        print(f"Warning: Dropping {len(dropped_vol)} Volatile_PH samples and "
+              f"{len(dropped_chem)} chemistry samples names that do not match.")
 
-    if mismatched_samples:
-        raise ValueError(
-            f"Sample names in Volatile_PH and chemistry do not match. "
-            f"Mismatched samples: {mismatched_samples}"
-        )
+    # filter both DataFrames
+    Volatile_PH = Volatile_PH.loc[common]
+    chemistry = chemistry.loc[common]
 
     # Define a dictionary of molar masses for each oxide
     molar_mass = {

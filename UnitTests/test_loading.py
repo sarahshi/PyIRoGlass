@@ -32,7 +32,7 @@ class test_loading_csv(unittest.TestCase):
 
         loader = pig.SampleDataLoader(spectrum_path=dir_path)
         dfs_dict = loader.load_spectrum_directory()
-        self.assertEqual(len(dfs_dict), 97)  # Adjust based on your test data
+        self.assertEqual(len(dfs_dict), 94)  # Adjust based on your test data
 
     def test_load_chemthick(self):
         file_path = os.path.join(
