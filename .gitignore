@@ -36,8 +36,11 @@ __pycache__
 /docs/examples/transmission_ftir/LOGFILES/RESULTS/AC4_OL49_021920_30x30_H2O_a.log
 /docs/examples/transmission_ftir/LOGFILES/RESULTS/AC4_OL53_101220_256s_30x30_a.log
 /docs/examples/transmission_ftir/LOGFILES/RESULTS/STD_D1010_012821_256s_100x100_a.log
+/docs/_static/PyIRoGlass_logo.pdf
 /Epsilon_Inversion/OldEpsilonRegressions/
 /Inputs/TransmissionSpectra/BadSpectra/
+/Inputs/TransmissionSpectra/AMNH_MixedGlass/
+/Inputs/TransmissionSpectra/Test/
 /Thickness/FuegoOlMicrometer.csv
 /Thickness/FuegoOlThickness.csv
 /Thickness/ND70_Micrometer.csv
@@ -49,5 +52,5 @@ __pycache__
 /Volatiles_Speciation/AC4_OL49_pairwise.pdf
 /Volatiles_Speciation/AC4_OL49_trace.pdf
 /Volatiles_Speciation/AC4_OL49_histogram.pdf
-
 pyproject.toml
+
