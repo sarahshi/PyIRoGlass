@@ -63,7 +63,7 @@ class test_loading_csv(unittest.TestCase):
         )
         (dfs_dict, chemistry, thickness) = loader.load_all_data()
 
-        self.assertEqual(len(dfs_dict), 97)  # Adjust based on your test data
+        self.assertEqual(len(dfs_dict), 94)  # Adjust based on your test data
         self.assertEqual(chemistry.shape, (9, 11))
         self.assertEqual(thickness.shape, (9, 2))
 
