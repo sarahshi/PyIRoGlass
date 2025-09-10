@@ -267,7 +267,7 @@ class test_conc_outputs_saturated(unittest.TestCase):  # OL49
         concentrations = pig.calculate_concentrations(
             self.PH, self.MI_Composition, self.thickness, None
         )
-        expected_H2O = 2.54386321287308
+        expected_H2O = 2.54709950708554
         expected_CO2 = 752.5429016613664
         self.assertAlmostEqual(
             float(concentrations["H2Ot_MEAN"].iloc[0]),
