@@ -2767,3 +2767,4 @@ def plot_modelfit(data, uncert, indparams, model, title, nbins=75,
         plt.savefig(savefile, bbox_inches="tight")
 
     return ax, rax
+
