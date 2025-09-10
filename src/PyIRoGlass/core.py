@@ -1988,9 +1988,8 @@ def calculate_concentrations(Volatile_PH, chemistry, thickness,
             CO2_1430_BP_STD *= 10000
 
         density_sat_df.loc[ll] = pd.Series({"Density_Sat": density_sat})
-        # contains both saturated and unsaturated values
-        # despite being called concentrations_sat, pulls correct values
-        # from both calculation instances
+        # contains both saturated and unsaturated values despite being 
+        # called concentrations_sat, pulls correct values from both dfs
         concentrations_sat.loc[ll] = pd.Series(
             {
                 "H2Ot_3550_M": H2Ot_3550_M,
@@ -2027,14 +2026,14 @@ def calculate_concentrations(Volatile_PH, chemistry, thickness,
     # Output different values depending on saturation.
     for m in concentrations.index:
         if concentrations["H2Ot_3550_SAT"][m] == "*":
-            if not ignore_NIR: 
+            if not ignore_NIR: # option if using NIR data for saturated
                 H2O_mean = (concentrations_sat["H2Om_1635_BP"][m] +
                             concentrations_sat["OH_4500_M"][m])
                 H2O_std = (
                     (concentrations_sat["H2Om_1635_STD"][m] ** 2)
                     + (concentrations_sat["OH_4500_STD"][m] ** 2)
                 ) ** (1 / 2) / 2
-            else: 
+            else: # option if ignoring NIR data for saturated
                 H2O_mean = concentrations_sat["H2Ot_3550_M"][m]
                 H2O_std = concentrations_sat["H2Ot_3550_STD"][m]
 
