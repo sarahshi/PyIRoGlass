@@ -109,7 +109,7 @@ def peakdetect(y_axis, x_axis=None, lookahead=200, delta=0):
         raise ValueError("delta must be a positive number")
 
     # Maxima (mx) and minima (mn) candidates are temporarily stored
-    mn, mx = np.Inf, -np.Inf
+    mn, mx = np.inf, -np.inf
 
     # Only detect peak if there is 'lookahead' amount of points after it
     for index, (x, y) in enumerate(zip(x_axis[:-lookahead],
@@ -122,30 +122,30 @@ def peakdetect(y_axis, x_axis=None, lookahead=200, delta=0):
             mnpos = x
 
         # Look for max
-        if y < mx - delta and mx != np.Inf:
+        if y < mx - delta and mx != np.inf:
             # Maxima peak candidate found
             # Look ahead in signal to ensure that this is a peak and not jitter
             if y_axis[index : index + lookahead].max() < mx:
                 max_peaks.append([mxpos, mx])
                 dump.append(True)
                 # Set algorithm to only find minima now
-                mx = np.Inf
-                mn = np.Inf
+                mx = np.inf
+                mn = np.inf
                 if index + lookahead >= length:
                     # End is within lookahead no more peaks can be found
                     break
                 continue
 
         # Look for min
-        if y > mn + delta and mn != -np.Inf:
+        if y > mn + delta and mn != -np.inf:
             # Minima peak candidate found
             # Look ahead in signal to ensure that this is a peak and not jitter
             if y_axis[index : index + lookahead].min() > mn:
                 min_peaks.append([mnpos, mn])
                 dump.append(False)
                 # Set algorithm to only find maxima now
-                mn = -np.Inf
-                mx = -np.Inf
+                mn = -np.inf
+                mx = -np.inf
                 if index + lookahead >= length:
                     break
 

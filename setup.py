@@ -28,8 +28,8 @@ setup(
         "": ["*.pkl", "*.npz"],
     },
     install_requires=[
-            'numpy<2',
             'pandas',
+            'numpy',
             'matplotlib',
             'scikit-learn',
             'scipy',

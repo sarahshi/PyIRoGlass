@@ -730,7 +730,7 @@ def create_output_dirs(base_path, export_path):
     return paths
 
 
-def calculate_baselines(dfs_dict, export_path):
+def calculate_baselines(dfs_dict, export_path, ignore_NIR=False):
 
     """
     The calculate_baselines function processes a collection of spectral data
@@ -752,6 +752,7 @@ def calculate_baselines(dfs_dict, export_path):
         export_path (str, None): The directory path where the output files
             (CSVs, figures, logs, etc.) should be saved. If None, no
             files will be saved.
+        ignore_NIR (bool, optional): If True, skips the Near-IR peaks
 
     Returns:
         Volatile_PH (pd.DataFrame): A DataFrame of absorbance data,
@@ -759,7 +760,6 @@ def calculate_baselines(dfs_dict, export_path):
             and the subtracted peak.
         failures (list): A list of file identifiers for which the analysis
             failed, possibly due to data issues or processing errors.
-
     """
 
     # Load files with PC vectors for the baseline and H2Om, 1635 peak.
@@ -819,77 +819,98 @@ def calculate_baselines(dfs_dict, export_path):
     for files, data in dfs_dict.items():
         try:
             # Ensure the data spans the required wavenumbers
+            if not ignore_NIR: 
+                upper_wavenumber = 5500
+            else: 
+                upper_wavenumber = 4400
+
             if (data.index.min() > (1000 + tolerance) or 
-                data.index.max() < (5500 - tolerance)):
+                data.index.max() < (upper_wavenumber - tolerance)):
                 warnings.warn(f"{files} data do not span the required "
-                                f"wavenumbers of 1000-5500 cm^-1, with "
-                                f"{tolerance} cm^-1 tolerance. "
-                                f"Available range: {data.index.min():.2f}"
-                                f"-{data.index.max():.2f} cm^-1.",
-                                UserWarning,
-                                stacklevel=2)
+                              f"wavenumbers of 1000-{upper_wavenumber} cm^-1, with "
+                              f"{tolerance} cm^-1 tolerance. "
+                              f"Available range: {data.index.min():.2f}"
+                              f"-{data.index.max():.2f} cm^-1.",
+                              UserWarning,
+                              stacklevel=2)
                     
             # Three repeat baselines for the OH_{4500}
-            OH_4500_peak_ranges = [(4250, 4675), (4225, 4650), (4275, 4700)]
-            OH_4500_results = list(map(lambda peak_range: {
-                "peak_fit": (result := NIR_process(data,
-                                                   peak_range[0],
-                                                   peak_range[1],
-                                                   "OH"))[0],
-                "peak_krige": result[1],
-                "PH_krige": result[2],
-                "STN": result[3]
-            }, OH_4500_peak_ranges))
+            OH_4500_results = None
+            H2Om_5200_results = None
+            if not ignore_NIR: 
+                OH_4500_peak_ranges = [(4250, 4675), (4225, 4650), (4275, 4700)]
+                OH_4500_results = list(map(lambda peak_range: {
+                    "peak_fit": (result := NIR_process(data,
+                                                    peak_range[0],
+                                                    peak_range[1],
+                                                    "OH"))[0],
+                    "peak_krige": result[1],
+                    "PH_krige": result[2],
+                    "STN": result[3]
+                }, OH_4500_peak_ranges))
 
-            # Three repeat baselines for the H2Om_{5200}
-            H2Om_5200_peak_ranges = [(4875, 5400), (4850, 5375), (4900, 5425)]
-            H2Om_5200_results = list(map(lambda peak_range: {
-                "peak_fit": (result := NIR_process(data,
-                                                   peak_range[0],
-                                                   peak_range[1],
-                                                   "H2Om"))[0],
-                "peak_krige": result[1],
-                "PH_krige": result[2],
-                "STN": result[3]
-            }, H2Om_5200_peak_ranges))
+                # Three repeat baselines for the H2Om_{5200}
+                H2Om_5200_peak_ranges = [(4875, 5400), (4850, 5375), (4900, 5425)]
+                H2Om_5200_results = list(map(lambda peak_range: {
+                    "peak_fit": (result := NIR_process(data,
+                                                    peak_range[0],
+                                                    peak_range[1],
+                                                    "H2Om"))[0],
+                    "peak_krige": result[1],
+                    "PH_krige": result[2],
+                    "STN": result[3]
+                }, H2Om_5200_peak_ranges))
 
-            # Kriged peak heights
-            PH_4500_krige = [result["PH_krige"] for result in
-                             OH_4500_results]
-            PH_4500_krige_M, PH_4500_krige_STD = (
-                np.mean(PH_4500_krige),
-                np.std(PH_4500_krige),
-            )
-            PH_5200_krige = [result["PH_krige"] for result in
-                             H2Om_5200_results]
-            PH_5200_krige_M, PH_5200_krige_STD = (
-                np.mean(PH_5200_krige),
-                np.std(PH_5200_krige),
-            )
+                # Kriged peak heights
+                PH_4500_krige = [result["PH_krige"] for result in
+                                OH_4500_results]
+                PH_4500_krige_M, PH_4500_krige_STD = (
+                    np.mean(PH_4500_krige),
+                    np.std(PH_4500_krige),
+                )
+                PH_5200_krige = [result["PH_krige"] for result in
+                                H2Om_5200_results]
+                PH_5200_krige_M, PH_5200_krige_STD = (
+                    np.mean(PH_5200_krige),
+                    np.std(PH_5200_krige),
+                )
 
-            # Calculate signal to noise ratio
-            STN_4500_M = np.mean([result["STN"] for result in
-                                  OH_4500_results])
-            STN_5200_M = np.mean([result["STN"] for result in
-                                  H2Om_5200_results])
+                # Calculate signal to noise ratio
+                STN_4500_M = np.mean([result["STN"] for result in
+                                    OH_4500_results])
+                STN_5200_M = np.mean([result["STN"] for result in
+                                    H2Om_5200_results])
 
-            # Consider strength of signal
-            error_4500 = "-" if STN_4500_M >= 4.0 else "*"
-            error_5200 = "-" if STN_5200_M >= 4.0 else "*"
+                # Consider strength of signal
+                error_4500 = "-" if STN_4500_M >= 4.0 else "*"
+                error_5200 = "-" if STN_5200_M >= 4.0 else "*"
 
-            # Save NIR peak heights
-            NEAR_IR_PH.loc[files] = pd.Series(
-                {
-                    "PH_5200_M": PH_5200_krige_M,
-                    "PH_5200_STD": PH_5200_krige_STD,
-                    "PH_4500_M": PH_4500_krige_M,
-                    "PH_4500_STD": PH_4500_krige_STD,
-                    "STN_P5200": STN_5200_M,
-                    "ERR_5200": error_5200,
-                    "STN_P4500": STN_4500_M,
-                    "ERR_4500": error_4500,
-                }
-            )
+                # Save NIR peak heights
+                NEAR_IR_PH.loc[files] = pd.Series(
+                    {
+                        "PH_5200_M": PH_5200_krige_M,
+                        "PH_5200_STD": PH_5200_krige_STD,
+                        "PH_4500_M": PH_4500_krige_M,
+                        "PH_4500_STD": PH_4500_krige_STD,
+                        "STN_P5200": STN_5200_M,
+                        "ERR_5200": error_5200,
+                        "STN_P4500": STN_4500_M,
+                        "ERR_4500": error_4500,
+                    }
+                )
+            else: 
+                NEAR_IR_PH.loc[files] = pd.Series(
+                    {
+                        "PH_5200_M": np.nan,
+                        "PH_5200_STD": np.nan,
+                        "PH_4500_M": np.nan,
+                        "PH_4500_STD": np.nan,
+                        "STN_P5200": np.nan,
+                        "ERR_5200": np.nan,
+                        "STN_P4500": np.nan,
+                        "ERR_4500": np.nan,
+                    }
+                )
 
             # Three repeat baselines for the H2Ot_{3550}
             H2Ot_3550_peak_ranges = [(1900, 4400), (2100, 4200), (2300, 4000)]
@@ -953,11 +974,10 @@ def calculate_baselines(dfs_dict, export_path):
             if export_path is not None:
                 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-                als_bls = {
-                    "OH_4500_results": OH_4500_results,
-                    "H2Om_5200_results": H2Om_5200_results,
-                    "H2Ot_3550_results": H2Ot_3550_results,
-                }
+                als_bls = {"H2Ot_3550_results": H2Ot_3550_results}
+                if not ignore_NIR:
+                    als_bls["OH_4500_results"]  = OH_4500_results
+                    als_bls["H2Om_5200_results"] = H2Om_5200_results
 
                 with open(os.path.join(paths["PKLFILES"], 
                                        f"{files}.pkl"), "wb") as handle:
@@ -1041,21 +1061,33 @@ def calculate_baselines(dfs_dict, export_path):
             # baselines and peak fits
             if export_path is not None:
                 warnings.filterwarnings("ignore", module="matplotlib\\..*")
-                fig = plt.figure(figsize=(26, 8))
-                ax1 = plt.subplot2grid((2, 3), (0, 0), fig=fig)
-                ax2 = plt.subplot2grid((2, 3), (1, 0), fig=fig)
-                ax3 = plt.subplot2grid((2, 3), (0, 1), rowspan=2, fig=fig)
-                ax4 = plt.subplot2grid((2, 3), (0, 2), rowspan=2, fig=fig)
 
-                # Create subplot of H2Om_{5200}, OH_{4500} baselines/peak fits
-                plot_H2Om_OH(data, files, als_bls, ax_top=ax1, ax_bot=ax2)
-                # Create subplot of H2Ot_{3550} baselines/peak fits
-                plot_H2Ot_3550(data, files, als_bls, ax=ax3)
-                # Create subplot of CO_3^{2-} baselines/peak fits
-                plot_carbonate(data, files, mc3_output, export_path, ax=ax4)
-                plt.tight_layout()
-                plt.savefig(os.path.join(paths["FIGURES"], f"{files}.pdf"),)
-                plt.close("all")
+                if not ignore_NIR:
+                    fig = plt.figure(figsize=(26, 8))
+                    ax1 = plt.subplot2grid((2, 3), (0, 0), fig=fig)
+                    ax2 = plt.subplot2grid((2, 3), (1, 0), fig=fig)
+                    ax3 = plt.subplot2grid((2, 3), (0, 1), rowspan=2, fig=fig)
+                    ax4 = plt.subplot2grid((2, 3), (0, 2), rowspan=2, fig=fig)
+
+                    # Create subplot of H2Om_{5200}, OH_{4500} baselines/peak fits
+                    plot_H2Om_OH(data, files, als_bls, ax_top=ax1, ax_bot=ax2)
+                    # Create subplot of H2Ot_{3550} baselines/peak fits
+                    plot_H2Ot_3550(data, files, als_bls, ax=ax3)
+                    # Create subplot of CO_3^{2-} baselines/peak fits
+                    plot_carbonate(data, files, mc3_output, export_path, ax=ax4)
+                    plt.tight_layout()
+                    plt.savefig(os.path.join(paths["FIGURES"], f"{files}.pdf"),)
+                    plt.close("all")
+                else: 
+                    fig, ax = plt.subplots(1, 2, figsize=(16, 8))
+                    ax = ax.flatten()
+                    # Create subplot of H2Om_{5200}, OH_{4500} baselines/peak fits
+                    plot_H2Ot_3550(data, files, als_bls, ax=ax[0])
+                    # Create subplot of CO_3^{2-} baselines/peak fits
+                    plot_carbonate(data, files, mc3_output, export_path, ax=ax[1])
+                    plt.tight_layout()
+                    plt.savefig(os.path.join(paths["FIGURES"], f"{files}.pdf"),)
+                    plt.close("all")
 
         except Exception as e:
             failures.append(files)
@@ -1498,7 +1530,7 @@ def calculate_epsilon(chemistry, T, P):
 
 def calculate_concentrations(Volatile_PH, chemistry, thickness,
                              export_path, N=500000, T=25, P=1,
-                             model="LS"):
+                             model="LS", ignore_NIR=False):
 
     """
     The calculate_concentrations function calculates the concentrations
@@ -1527,6 +1559,7 @@ def calculate_concentrations(Volatile_PH, chemistry, thickness,
             Default is 1 bar.
         model (str): Choice of density model. "LS" for Lesher and Spera (2015),
             "IT" for Iacovino and Till (2019). Default is "LS".
+        ignore_NIR (bool): If True, skips calculations for near-infrared. 
 
     Returns:
         concentrations_df (pd.DataFrame): DataFrame containing calculated
@@ -1809,26 +1842,30 @@ def calculate_concentrations(Volatile_PH, chemistry, thickness,
             density_sat = density_df["Density"][ll]
 
         elif Volatile_PH["H2Ot_3550_SAT"][ll] == "*":
-            sat_chemistry = chemistry.copy()
-            for m in range(20):
-                H2Om_1635_BP = beer_lambert(
-                    molar_mass["H2O"],
-                    Volatile_PH["PH_1635_BP"][ll],
-                    density[ll],
-                    thickness["Thickness"][ll],
-                    epsilon["epsilon_H2Om_1635"][ll],
-                )
-                OH_4500_M = beer_lambert(
-                    molar_mass["H2O"],
-                    Volatile_PH["PH_4500_M"][ll],
-                    density[ll],
-                    thickness["Thickness"][ll],
-                    epsilon["epsilon_OH_4500"][ll],
-                )
-                sat_chemistry.loc[ll, "H2O"] = H2Om_1635_BP + OH_4500_M
-                mol_sat, density_sat = calculate_density(sat_chemistry,
-                                                         T, P, model)
-            density_sat = density_sat[ll]
+            if ignore_NIR or pd.isna(Volatile_PH.loc[ll, "PH_4500_M"]): 
+                density_sat = density_df["Density"][ll]
+            else: 
+                sat_chemistry = chemistry.copy()
+                density_curr = density.copy()
+                for m in range(20):
+                    H2Om_1635_BP = beer_lambert(
+                        molar_mass["H2O"],
+                        Volatile_PH["PH_1635_BP"][ll],
+                        density_curr[ll],
+                        thickness["Thickness"][ll],
+                        epsilon["epsilon_H2Om_1635"][ll],
+                    )
+                    OH_4500_M = beer_lambert(
+                        molar_mass["H2O"],
+                        Volatile_PH["PH_4500_M"][ll],
+                        density_curr[ll],
+                        thickness["Thickness"][ll],
+                        epsilon["epsilon_OH_4500"][ll],
+                    )
+                    sat_chemistry.loc[ll, "H2O"] = H2Om_1635_BP + OH_4500_M
+                    mol_sat, density_curr = calculate_density(sat_chemistry,
+                                                             T, P, model)
+                density_sat = density_curr[ll]
 
             H2Ot_3550_M = beer_lambert(
                 molar_mass["H2O"],
@@ -1951,6 +1988,9 @@ def calculate_concentrations(Volatile_PH, chemistry, thickness,
             CO2_1430_BP_STD *= 10000
 
         density_sat_df.loc[ll] = pd.Series({"Density_Sat": density_sat})
+        # contains both saturated and unsaturated values
+        # despite being called concentrations_sat, pulls correct values
+        # from both calculation instances
         concentrations_sat.loc[ll] = pd.Series(
             {
                 "H2Ot_3550_M": H2Ot_3550_M,
@@ -1987,23 +2027,28 @@ def calculate_concentrations(Volatile_PH, chemistry, thickness,
     # Output different values depending on saturation.
     for m in concentrations.index:
         if concentrations["H2Ot_3550_SAT"][m] == "*":
-            H2O_mean = (concentrations["H2Om_1635_BP"][m] +
-                        concentrations["OH_4500_M"][m])
-            H2O_std = (
-                (concentrations["H2Om_1635_STD"][m] ** 2)
-                + (concentrations["OH_4500_STD"][m] ** 2)
-            ) ** (1 / 2) / 2
+            if not ignore_NIR: 
+                H2O_mean = (concentrations_sat["H2Om_1635_BP"][m] +
+                            concentrations_sat["OH_4500_M"][m])
+                H2O_std = (
+                    (concentrations_sat["H2Om_1635_STD"][m] ** 2)
+                    + (concentrations_sat["OH_4500_STD"][m] ** 2)
+                ) ** (1 / 2) / 2
+            else: 
+                H2O_mean = concentrations_sat["H2Ot_3550_M"][m]
+                H2O_std = concentrations_sat["H2Ot_3550_STD"][m]
 
         elif concentrations["H2Ot_3550_SAT"][m] == "-":
-            H2O_mean = concentrations["H2Ot_3550_M"][m]
-            H2O_std = concentrations["H2Ot_3550_STD"][m]
+            H2O_mean = concentrations_sat["H2Ot_3550_M"][m]
+            H2O_std = concentrations_sat["H2Ot_3550_STD"][m]
         mean_vol.loc[m] = pd.Series({"H2Ot_MEAN": H2O_mean,
                                      "H2Ot_STD": H2O_std})
-    mean_vol["CO2_MEAN"] = (concentrations["CO2_1515_BP"] +
-                            concentrations["CO2_1430_BP"]) / 2
+
+    mean_vol["CO2_MEAN"] = (concentrations_sat["CO2_1515_BP"] +
+                            concentrations_sat["CO2_1430_BP"]) / 2
     mean_vol["CO2_STD"] = (
-        (concentrations["CO2_1515_STD"] ** 2) +
-        (concentrations["CO2_1430_STD"] ** 2)
+        (concentrations_sat["CO2_1515_STD"] ** 2) +
+        (concentrations_sat["CO2_1430_STD"] ** 2)
     ) ** (1 / 2) / 2
 
     concentrations_df["H2Ot_MEAN"] = mean_vol["H2Ot_MEAN"]
