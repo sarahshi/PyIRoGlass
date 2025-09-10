@@ -3,6 +3,12 @@ Change Log
 ==========
 
 
+Version 0.6.5
+=============
+Update for numpy 2 compatibility. Provide option to ignore NIR peaks in :func:`pig.calculate_baselines` and :func:`pig.calculate_concentrations`, for datasets without NIR data. Thanks to Prof. Jackie Dixon for suggesting this feature. 
+
+
+
 Version 0.6.4
 =============
 Update output directory generation, correct density model implementation. Updated `ReadtheDocs <https://pyiroglass.readthedocs.io/en/latest/>`_ to account for these new functions and warnings. Rename ``composition`` parameters as ``chemistry`` for consistency.
@@ -10,7 +16,7 @@ Update output directory generation, correct density model implementation. Update
 
 Version 0.6.3
 =============
-Return ``UserWarning`` for compositions outside of the calibration ranges for the epsilon (molar absorptivities) in function :func:`pig.calculate_concentrations` and :func:`pig.calculate_epsilon`, ``UserWarning`` for when data do not span the full wavenumber range of 1000-5500 cm\ :sup:`-1` whilst using class :class:`pig.SampleDataLoader`. Thanks to Dr. Shuo Ding and Emilia Pelegano-Titmuss for identifying common errors during test usage, which contributed to these improvements.
+Return ``UserWarning`` for compositions outside of the calibration ranges for the epsilon (molar absorptivities) in function :func:`pig.calculate_concentrations` and :func:`pig.calculate_epsilon`, ``UserWarning`` for when data do not span the full wavenumber range of 1000-5500 cm\ :sup:`-1` whilst using class :class:`pig.SampleDataLoader`. Thanks to Prof. Shuo Ding and Emilia Pelegano-Titmuss for identifying common errors during test usage, which contributed to these improvements.
 
 
 Version 0.6.2
