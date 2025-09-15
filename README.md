@@ -35,9 +35,15 @@ Shi, S., Towbin, W. H., Plank, T., Barth, A., Rasmussen, D., Moussallam, Y., Lee
 Read the [documentation](https://pyiroglass.readthedocs.io/en/latest/) for a run-through of the PyIRoGlass code. 
 
 ## Run on the Cloud 
-If you do not have Python installed locally or if you use a Windows computer (without Linux), please run PyIRoGlass on [VICTOR (Volcanology Infrastructure for Computational Tools and Resources)](https://hub.victorproject.org/hub/login?next=%2Fhub%2F) or on [Google Colab](https://colab.research.google.com/github/SarahShi/PyIRoGlass/blob/main/PyIRoGlass_RUN_colab.ipynb).
+If you do not have Python installed locally or if you use a Windows computer (without Linux), please run PyIRoGlass on [VICTOR (Volcanology Infrastructure for Computational Tools and Resources)](https://hub.victorproject.org/hub/login?next=%2Fhub%2F) or on [Google Colab](https://colab.research.google.com/github/SarahShi/PyIRoGlass/blob/main/PyIRoGlass_RUN_colab.ipynb). We **strongly** recommend the use of VICTOR, for significantly faster processing. 
 
-To run PyIRoGlass on VICTOR, use the ```victor setup``` command in the command line and select option 15 for PyIRoGlass. This will create an instance of PyIRoGlass in your local working directory. The VICTOR option will allow for more rapid processing than Google Colab. 
+To run PyIRoGlass on VICTOR, run the following commands in the VICTOR terminal:
+```
+victor setup
+15 
+``` 
+This will create an instance of PyIRoGlass in your local working directory. 
+
 
 ## Run and Install Locally
 Obtain a version of Python between 3.8 and 3.12 if you do not already have it installed. PyIRoGlass can be installed with one line on Mac and Linux. Open terminal and type the following:
