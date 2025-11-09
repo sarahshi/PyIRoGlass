@@ -5,7 +5,7 @@ Change Log
 
 Version 0.6.6
 =============
-Rename reflectance index calculator from :func:`pig.reflectance_index` to :func:`pig.reflectance_index_ol`. Add :func:`pig.reflectance_index_cpx` and :func:`pig.reflectance_index_opx` for other mineral phases.
+Rename reflectance index calculator from :func:`pig.reflectance_index` to :func:`pig.reflectance_index_ol`. Add :func:`pig.reflectance_index_cpx` and :func:`pig.reflectance_index_opx` for other mineral phases. Remove support for python3.8. 
 .. Create :func:`pig.calculate_baselines_carbon` for where all C is dissolved as carbon dioxide. WAIT TO RELEASE LATER. 
 
 Version 0.6.5
