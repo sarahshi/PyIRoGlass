@@ -34,7 +34,7 @@ ref_ol_loader = pig.SampleDataLoader(spectrum_path=path_input+'ReflectanceSpectr
 ref_ol_dfs_dict = ref_ol_loader.load_spectrum_directory(wn_high=2800, wn_low=2000)
 
 # Use DHZ parameterization of olivine reflectance index. 
-n_ol = pig.reflectance_index(0.72)
+n_ol = pig.reflectance_index_ol(0.72)
 ref_fuego = pig.calculate_mean_thickness(ref_ol_dfs_dict, n=n_ol, wn_high=2700, wn_low=2100, plotting=False, phaseol=True)
 ref_fuego
 # ref_fuego.to_csv('FuegoOlThickness.csv')

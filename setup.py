@@ -12,7 +12,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name="PyIRoGlass",
+    name="pyIRoGlass",
     version=__version__,
     author="Sarah Shi",
     author_email="sarah.c.shi@gmail.com",
@@ -41,5 +41,5 @@ setup(
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.8',
+    python_requires='>=3.9',
 )

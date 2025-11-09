@@ -84,7 +84,11 @@ Functions for determining thickness from reflectance FTIR spectra
 
 .. autofunction:: PyIRoGlass.calculate_mean_thickness
 
-.. autofunction:: PyIRoGlass.reflectance_index
+.. autofunction:: PyIRoGlass.reflectance_index_ol
+
+.. autofunction:: PyIRoGlass.reflectance_index_cpx
+
+.. autofunction:: PyIRoGlass.reflectance_index_opx
 
 
 Functions for molar absorptivity inversions

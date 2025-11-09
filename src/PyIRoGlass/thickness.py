@@ -419,10 +419,10 @@ def calculate_mean_thickness(
     return ThickDF
 
 
-def reflectance_index(XFo):
+def reflectance_index_ol(XFo):
 
     """
-    Calculates the reflectance index for a given forsterite composition.
+    Calculates the reflectance index of olivine for a given XFo composition.
     The reflectance index is calculated based on values from Deer, Howie,
     and Zussman, 3rd Edition.
 
@@ -439,5 +439,50 @@ def reflectance_index(XFo):
     n = (n_alpha + n_beta + n_gamma) / 3
 
     return n
+
+
+def reflectance_index_opx(XMg):
+
+    """
+    Calculates the reflectance index of orthopyroxene for a given XMg composition.
+    The reflectance index is calculated based on enstatite-ferrosilite 
+    values from Deer, Howie, and Zussman, 3rd Edition.
+
+    Parameters:
+        XMg (float): The mole fraction of Mg/(Mg+Fe+Mn) in the sample.
+
+    Returns:
+        n (float): The calculated reflectance index.
+    """
+
+    n_alpha = 1.768 - 0.118 * XMg
+    n_beta = 1.770 - 0.117 * XMg
+    n_gamma = 1.788 - 0.130 * XMg
+    n = (n_alpha + n_beta + n_gamma) / 3
+
+    return n
+
+
+def reflectance_index_cpx(XMg):
+
+    """
+    Calculates the reflectance index of crthopyroxene for a given XMg composition.
+    The reflectance index is calculated based on diopside-hedenbergite
+    values from Deer, Howie, and Zussman, 3rd Edition. 
+
+    Parameters:
+        XMg (float): The mole fraction of Mg/(Mg+Fe+Mn) in the sample.
+
+    Returns:
+        n (float): The calculated reflectance index.
+    """
+
+    n_alpha = 1.732 - 0.068 * XMg
+    n_beta = 1.730 - 0.058 * XMg
+    n_gamma = 1.755 - 0.061 * XMg
+    n = (n_alpha + n_beta + n_gamma) / 3
+
+    return n
+
 
 # %%

@@ -3,10 +3,14 @@ Change Log
 ==========
 
 
+Version 0.6.6
+=============
+Rename reflectance index calculator from :func:`pig.reflectance_index` to :func:`pig.reflectance_index_ol`. Add :func:`pig.reflectance_index_cpx` and :func:`pig.reflectance_index_opx` for other mineral phases.
+.. Create :func:`pig.calculate_baselines_carbon` for where all C is dissolved as carbon dioxide. WAIT TO RELEASE LATER. 
+
 Version 0.6.5
 =============
 Update for numpy 2 compatibility. Provide option to ignore NIR peaks in :func:`pig.calculate_baselines` and :func:`pig.calculate_concentrations`, for datasets without NIR data. Thanks to Prof. Jackie Dixon for suggesting this feature. 
-
 
 
 Version 0.6.4
