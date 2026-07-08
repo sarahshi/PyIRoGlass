@@ -11,227 +11,151 @@ from matplotlib import pyplot as plt
 # %% Reflectance FTIR - Interference Fringe Processing for Thicknesses
 
 
-def datacheck_peakdetect(x_axis, y_axis):
-
-    """
-    Check and prepare data for peak detection analysis.
-
-    This function ensures that the input data for peak detection is in the
-    correct format and that the x- and y-axis data are of equal lengths. If
-    the x-axis data is not provided, it generates an x-axis as a range of
-    integers with the same length as the y-axis data.
-
-    Parameters:
-        x_axis (np.ndarray or None): A 1D array containing the x-axis data or
-            None if an x-axis is to be generated.
-        y_axis (np.ndarray): A 1D array containing the y-axis data.
-
-    Returns:
-        Tuple containing two numpy arrays:
-            x_axis (np.ndarray): The checked or generated x-axis data.
-            y_axis (np.ndarray): The checked y-axis data.
-
-    Raises:
-        ValueError: If the lengths of the x-axis and y-axis data do not match.
-
-    Notes:
-        This function comes from https://github.com/avhn/peakdetect. I pulled
-        this for peak fitting, as the repository is no longer maintained and
-        installation no longer works.
-    """
-
-    if x_axis is None:
-        x_axis = range(len(y_axis))
-
-    if len(y_axis) != len(x_axis):
-        raise ValueError(
-            "Input vectors y_axis and x_axis must have same length")
-
-    # needs to be a numpy array
-    y_axis = np.array(y_axis)
-    x_axis = np.array(x_axis)
-    return x_axis, y_axis
-
-
-def peakdetect(y_axis, x_axis=None, lookahead=200, delta=0):
-
-    """
-    Detect local maxima and minima in a signal based on a MATLAB script
-    (http://billauer.co.il/peakdet.html).
-
-    This function identifies peaks by searching for values which are surrounded
-    by lower or higher values for maxima and minima, respectively.
-
-    Parameters:
-        y_axis (list or np.ndarray): A list or 1D numpy array containing the
-            signal over which to find peaks.
-        x_axis (list or np.ndarray, optional): A list or 1D numpy array whose
-            values correspond to the y_axis list and is used in the return to
-            specify the position of the peaks. If omitted, an index of the
-            y_axis is used. Defaults to None.
-        lookahead (int, optional): Distance to look ahead from a peak candidate
-            to determine if it is the actual peak. Defaults to 200. A good
-            value might be '(samples / period) / f' where '4 >= f >= 1.25'.
-        delta (float, optional): Specifies a minimum difference between a peak
-            and the following points, before a peak may be considered a peak.
-            Useful to hinder the function from picking up false peaks towards
-            the end of the signal. To work well, delta should be set to
-            delta >= RMSnoise x 5. Defaults to 0. When omitted, it can decrease
-            the speed by 20%, but when used correctly, it can double the speed
-            of the function.
-
-    Returns:
-        A tuple of two lists ([max_peaks, min_peaks]) containing the positive
-        and negative peaks, respectively. Each element of the lists is a
-        tuple of (position, peak_value). To get the average peak value,
-        use: np.mean(max_peaks, 0)[1]. To unpack one of the lists into x, y
-        coordinates, use: x, y = zip(max_peaks).
-
-    Notes:
-        This function comes from https://github.com/avhn/peakdetect. I pulled
-        this for peak fitting, as the repository is no longer maintained and
-        installation no longer works.
-    """
-
-    max_peaks = []
-    min_peaks = []
-    dump = []
-
-    # Check input data
-    x_axis, y_axis = datacheck_peakdetect(x_axis, y_axis)
-    # Store data length for later use
-    length = len(y_axis)
-
-    # Perform some checks
-    if lookahead < 1:
-        raise ValueError("Lookahead must be '1' or above in value")
-    if not (np.isscalar(delta) and delta >= 0):
-        raise ValueError("delta must be a positive number")
-
-    # Maxima (mx) and minima (mn) candidates are temporarily stored
-    mn, mx = np.inf, -np.inf
-
-    # Only detect peak if there is 'lookahead' amount of points after it
-    for index, (x, y) in enumerate(zip(x_axis[:-lookahead],
-                                       y_axis[:-lookahead])):
-        if y > mx:
-            mx = y
-            mxpos = x
-        if y < mn:
-            mn = y
-            mnpos = x
-
-        # Look for max
-        if y < mx - delta and mx != np.inf:
-            # Maxima peak candidate found
-            # Look ahead in signal to ensure that this is a peak and not jitter
-            if y_axis[index : index + lookahead].max() < mx:
-                max_peaks.append([mxpos, mx])
-                dump.append(True)
-                # Set algorithm to only find minima now
-                mx = np.inf
-                mn = np.inf
-                if index + lookahead >= length:
-                    # End is within lookahead no more peaks can be found
-                    break
-                continue
-
-        # Look for min
-        if y > mn + delta and mn != -np.inf:
-            # Minima peak candidate found
-            # Look ahead in signal to ensure that this is a peak and not jitter
-            if y_axis[index : index + lookahead].min() > mn:
-                min_peaks.append([mnpos, mn])
-                dump.append(False)
-                # Set algorithm to only find maxima now
-                mn = -np.inf
-                mx = -np.inf
-                if index + lookahead >= length:
-                    break
-
-    # Remove the false hit on the first value of the y_axis
-    try:
-        if dump[0]:
-            max_peaks.pop(0)
-        else:
-            min_peaks.pop(0)
-        del dump
-    except IndexError:
-        pass
-
-    return [max_peaks, min_peaks]
-
-
 def peakID(
     ref_spec,
     wn_high,
     wn_low,
-    peak_heigh_min_delta,
     peak_search_width,
     savgol_filter_width,
     smoothing_wn_width=None,
+    auto_smoothing_width=True,
+    auto_savgol_width=True,
+    auto_search_width=True,
+    n_sigma=1.5,
     plotting=False,
     filename=None,
 ):
+
     """
-    Identifies peaks based on the peakdetect package which
-    identifies local maxima and minima in noisy signals.
-    Based on: https://github.com/avhn/peakdetect
+    Identifies peaks using scipy.signal.find_peaks with a single
+    per-file threshold, n_sigma * std(whole baseline-subtracted signal).
+    A single global delta matched manually-verified reference peak
+    counts across every test file, while still adapting the threshold
+    to each file's own amplitude scale.
+
+    Fringe period varies severalfold across samples (e.g. ~7-8 points
+    for a thick wafer vs. ~180 points for a thin one). Fixed
+    savgol_filter_width/smoothing_wn_width/peak_search_width values
+    tuned for one fringe density don't transfer: a savgol_filter_width
+    comparable to or narrower than the true fringe period makes the
+    baseline fit track the real oscillation instead of just the slow
+    background, and a too-narrow peak_search_width lets find_peaks
+    count small ripples between real fringes as separate peaks (roughly
+    doubling the count). With auto_savgol_width/auto_smoothing_width/
+    auto_search_width=True (default), a fringe period is first
+    estimated via a deliberately wide bootstrap baseline (see
+    bootstrap_fringe_period), then used to scale all three widths for
+    this sample specifically.
 
     Parameters:
         ref_spec (pd.DataFrame): A Pandas DataFrame indexed by wavenumber
             and containing absorbance values.
         wn_high (int): The upper wavenumber limit for the analysis.
         wn_low (int): The lower wavenumber limit for the analysis.
-        smoothing_wn_width (int): The window size for the Savitzky-Golay
-            smoothing filter. Default is None.
-        peak_heigh_min_delta (float): Minimum difference between a peak and
-            its neighboring points for it to be considered a peak.
-            Default is 0.008.
         peak_search_width (int): The size of the region around each point
-            to search for a peak. Default is 50.
+            to search for a peak.
+        savgol_filter_width (int): The window size for the baseline
+            Savitzky-Golay filter.
+        smoothing_wn_width (int): The window size for the second
+            Savitzky-Golay smoothing filter. Default is None.
+        auto_smoothing_width (bool): If True (default), smoothing_wn_width
+            is capped based on this sample's own estimated fringe period
+            rather than used as a fixed value.
+        auto_savgol_width (bool): If True (default), savgol_filter_width
+            is raised toward this sample's own estimated fringe period if
+            the requested value is too narrow for it.
+        auto_search_width (bool): If True (default), peak_search_width
+            is raised toward this sample's own estimated fringe period if
+            the requested value is too narrow for it.
+        n_sigma (float): Multiplier on std(whole signal) used as the
+            find_peaks prominence threshold. Default is 1.5.
         plotting (bool): Whether to create a plot of the spectrum with
             identified peaks and troughs. Default is False.
-        filename (str): The name of the plot file. If None, the plot is not
-            saved. Default is None.
+        filename (str): The name of the plot title. Default is None.
 
     Returns:
         Tuple containing the following elements:
             Peaks and troughs identified as local maxima and minima.
     """
 
-    spec = ref_spec.loc[wn_low:wn_high].copy()  # df indexed by wavenumber
-    spec_filt = pd.DataFrame(columns=["Wavenumber", "Absorbance"])
-    baseline = 0
+    spec = ref_spec.loc[wn_low:wn_high].copy()
+    n_points = len(spec)
 
-    spec_filter = signal.medfilt(spec.Absorbance, 3)
-    baseline = signal.savgol_filter(spec_filter, savgol_filter_width, 3)
-    spec_filter = spec_filter - baseline
+    medfilt_absorbance = signal.medfilt(spec.Absorbance, 3)
+
+    bootstrap_period = None
+    if auto_savgol_width or auto_search_width:
+        bootstrap_period = bootstrap_fringe_period(medfilt_absorbance, n_points)
+
+    if auto_savgol_width and bootstrap_period is not None:
+        savgol_filter_width = safe_savgol_width(
+            n_points, max(savgol_filter_width, int(bootstrap_period * 2.5))
+        )
+    if auto_search_width and bootstrap_period is not None:
+        peak_search_width = max(peak_search_width, int(bootstrap_period * 0.6))
+
+    baseline = signal.savgol_filter(medfilt_absorbance, savgol_filter_width, 3)
+    spec_filter = medfilt_absorbance - baseline
+    subtracted = spec_filter.copy()  # pre-second-smoothing, for refinement
 
     if smoothing_wn_width is not None:
+        if auto_smoothing_width:
+            smoothing_wn_width = safe_smoothing_width(
+                subtracted, smoothing_wn_width
+            )
         spec_filter = signal.savgol_filter(spec_filter, smoothing_wn_width, 3)
 
-    spec_filt["Absorbance"] = spec_filter
-    spec_filt.index = spec.index
-    spec["Subtracted"] = spec["Absorbance"] - baseline
+    spec_filt = pd.DataFrame({"Absorbance": spec_filter}, index=spec.index)
+    spec["Subtracted"] = subtracted
 
-    pandt = peakdetect(
-        spec_filt.Absorbance,
-        spec_filt.index,
-        lookahead=peak_search_width,
-        delta=peak_heigh_min_delta,
+    delta = n_sigma * np.std(spec_filter)
+    wn_arr = spec_filt.index.values
+
+    pk, _ = signal.find_peaks(
+        spec_filter, distance=peak_search_width, prominence=delta
     )
-    peaks = np.array(pandt[0])
-    troughs = np.array(pandt[1])
+    tr, _ = signal.find_peaks(
+        -spec_filter, distance=peak_search_width, prominence=delta
+    )
+
+    def refine(idx_arr, find_max):
+        # Second smoothing pass is used to decide locations of
+        # candidate peaks/troughs; attenuates and can shift extrema.
+        # Candidates are snapped to the true local extrema on the
+        # less-smoothed 'subtracted' signal within one
+        # peak_search_width. Report that position and value.
+        refined_idx = []
+        for i in idx_arr:
+            lo = max(0, i - peak_search_width)
+            hi = min(len(subtracted), i + peak_search_width + 1)
+            window = subtracted[lo:hi]
+            refined_idx.append(lo + (np.argmax(window) if find_max
+                                      else np.argmin(window)))
+        return np.array(refined_idx, dtype=int)
+
+    pk = refine(pk, find_max=True)
+    tr = refine(tr, find_max=False)
+
+    peaks = (np.column_stack([wn_arr[pk], subtracted[pk]])
+             if len(pk) else np.empty((0, 2)))
+    troughs = (np.column_stack([wn_arr[tr], subtracted[tr]])
+               if len(tr) else np.empty((0, 2)))
 
     if plotting is False:
         pass
     else:
+        # Only the less-smoothed subtracted signal is shown: peak/trough
+        # values and positions are read from it, so the smoothed curve
+        # used only to decide candidate locations would undersell the
+        # true peak amplitude without adding information.
         fig, ax = plt.subplots(1, 1, figsize=(8, 6))
-        ax.plot(spec.index, spec["Subtracted"], linewidth=1)
-        ax.plot(spec_filt.index, spec_filt.Absorbance)
-        ax.plot(peaks[:, 0], peaks[:, 1], "ro")
-        ax.plot(troughs[:, 0], troughs[:, 1], "ko")
+        ax.plot(spec.index, spec["Subtracted"], color='#0C7BDC', linewidth=1)
+        if len(peaks):
+            ax.scatter(peaks[:, 0], peaks[:, 1], marker='^', color='white',
+                       ec='k', lw=1.5, zorder=30)
+        if len(troughs):
+            ax.scatter(troughs[:, 0], troughs[:, 1], marker='v', color='white',
+                       ec='k', lw=1.5, zorder=30)
         ax.set_title(filename)
         ax.set_xlabel("Wavenumber")
         ax.set_ylabel("Absorbance")
@@ -240,14 +164,221 @@ def peakID(
     return peaks, troughs
 
 
+def safe_savgol_width(n_points, requested_width, min_width=5):
+
+    """
+    Clamps a Savitzky-Golay window length to fit within available data.
+
+    Parameters:
+        n_points (int): Number of points available to filter.
+        requested_width (int): Desired window length.
+        min_width (int): Minimum window length to fall back to.
+            Default is 5.
+
+    Returns:
+        int: A valid, odd window length no larger than n_points.
+    """
+
+    max_width = n_points - 1 if n_points % 2 == 0 else n_points
+    width = min(requested_width, max_width)
+    if width % 2 == 0:
+        width -= 1
+    return max(width, min_width)
+
+
+def estimate_fringe_period_points(subtracted, min_period=3, n_sigma=1.2):
+
+    """
+    Roughly estimates the fringe period, in points, from a
+    baseline-subtracted signal, using true extrema filtered by a
+    prominence threshold relative to the signal's own amplitude.
+
+    A distance-only constraint (no prominence) undercounts the fringe
+    period whenever noise amplitude is comparable to real fringe
+    amplitude at short lags: small noise wiggles between real fringes
+    get counted as extrema too, badly underestimating the period (e.g.
+    16 points instead of ~178 for a widely-spaced fringe pattern with a
+    similar-scale noise floor, or worse if there's a real secondary
+    ripple superimposed on the main fringe). Filtering by prominence
+    rejects those small wiggles and recovers the true spacing between
+    the dominant real extrema.
+
+    Parameters:
+        subtracted (array-like): Baseline-subtracted signal.
+        min_period (int): Minimum spacing, in points, enforced between
+            extrema. Default is 3.
+        n_sigma (float): Multiplier on std(subtracted) used as the
+            find_peaks prominence threshold. Default is 1.2.
+
+    Returns:
+        float or None: Estimated fringe period in points, or None if
+            fewer than 2 extrema are found.
+    """
+
+    prominence = n_sigma * np.std(subtracted)
+    pk, _ = signal.find_peaks(subtracted, distance=min_period,
+                               prominence=prominence)
+    tr, _ = signal.find_peaks(-subtracted, distance=min_period,
+                               prominence=prominence)
+    extrema = np.sort(np.concatenate([pk, tr]))
+    if len(extrema) < 2:
+        return None
+    # consecutive extrema (peak-to-trough) are ~half a fringe period apart
+    return 2 * np.median(np.diff(extrema))
+
+
+def bootstrap_fringe_period(medfilt_absorbance, n_points,
+                             n_widths=16, plateau_len=4, tol=0.15):
+
+    """
+    Estimates the fringe period from a medfilt'd absorbance array by
+    scanning a range of Savitzky-Golay baseline widths (geometrically
+    spaced from narrow up to 90% of the window) and returning the
+    period from the longest run of consecutive widths whose estimates
+    agree within tol, so the estimate itself doesn't depend on already
+    having chosen the right savgol_filter_width.
+
+    A single fixed bootstrap width doesn't work across very different
+    fringe densities: a width comparable to or narrower than the true
+    fringe period lets the baseline track the real oscillation itself
+    (destroying the signal a period estimate needs), while a width
+    that's a large fraction of a SHORT window can be nearly as wide as
+    the whole window, over-smoothing away real narrow fringes and
+    leaving only one dominant broad envelope (which looks like a valid
+    but spurious "fringe" of its own). Scanning widths and requiring a
+    multi-width plateau finds the width range where the true fringe
+    period genuinely dominates the residual, for either regime.
+
+    Parameters:
+        medfilt_absorbance (array-like): Median-filtered absorbance
+            (signal.medfilt(spec.Absorbance, 3), before any real
+            baseline subtraction).
+        n_points (int): Number of points in the window.
+        n_widths (int): Number of candidate baseline widths to scan,
+            geometrically spaced. Default is 16.
+        plateau_len (int): Minimum number of consecutive candidate
+            widths whose period estimates must agree (within tol) to be
+            accepted as the true period. Default is 4.
+        tol (float): Relative tolerance for two period estimates to be
+            considered part of the same plateau. Default is 0.15.
+
+    Returns:
+        float or None: Estimated fringe period in points, or None if a
+            period can't be estimated.
+    """
+
+    max_width = max(int(n_points * 0.9), 9)
+    candidate_widths = sorted(set(
+        safe_savgol_width(n_points, w)
+        for w in np.unique(np.geomspace(9, max_width, n_widths).astype(int))
+    ))
+
+    periods = []
+    for w in candidate_widths:
+        baseline = signal.savgol_filter(medfilt_absorbance, w, 3)
+        residual = medfilt_absorbance - baseline
+        periods.append(estimate_fringe_period_points(residual))
+
+    best_len, best_val = 0, None
+    i = 0
+    while i < len(periods):
+        if periods[i] is None:
+            i += 1
+            continue
+        j = i
+        while (j + 1 < len(periods) and periods[j + 1] is not None and
+               abs(periods[j + 1] - periods[i]) /
+               max(periods[i], periods[j + 1]) < tol):
+            j += 1
+        run_len = j - i + 1
+        # >= (not >): on a tie, prefer the run found at a WIDER baseline
+        # width, scanned later. Coincidental agreement between a few
+        # narrow-width noise-driven estimates is common; a plateau that
+        # holds at wide scales is the more reliable signal of the true
+        # period.
+        if run_len >= best_len:
+            best_len = run_len
+            best_val = np.mean(periods[i:j + 1])
+        i = j + 1
+
+    if best_len >= plateau_len:
+        return best_val
+    valid = [p for p in periods if p is not None]
+    return valid[-1] if valid else None
+
+
+def safe_smoothing_width(subtracted, requested_width, min_width=5,
+                          max_fraction_of_period=0.5):
+
+    """
+    Caps smoothing_wn_width at a fraction of the sample's own estimated
+    fringe period, so the second Savitzky-Golay smoothing pass denoises
+    without averaging together adjacent real fringes.
+
+    Parameters:
+        subtracted (array-like): Baseline-subtracted signal.
+        requested_width (int): Desired smoothing window length.
+        min_width (int): Minimum window length to fall back to. Default
+            is 5, the floor for savgol_filter's polyorder=3.
+        max_fraction_of_period (float): Fraction of the estimated fringe
+            period the smoothing window is capped at. Default is 0.5.
+
+    Returns:
+        int: A valid, odd smoothing window length. Falls back to
+            requested_width if a fringe period can't be estimated.
+    """
+
+    period = estimate_fringe_period_points(subtracted)
+    if period is None:
+        return requested_width
+    width = min(requested_width, int(period * max_fraction_of_period))
+    if width % 2 == 0:
+        width -= 1
+    return max(width, min_width)
+
+
+def safe_search_width(subtracted, requested_width,
+                       min_fraction_of_period=0.6):
+
+    """
+    Raises peak_search_width toward the sample's own estimated fringe
+    period if the requested value is too small relative to it.
+
+    find_peaks' distance parameter (passed as peak_search_width) has to
+    be comparable to the true spacing between same-type extrema, or
+    find_peaks accepts small ripples/noise between real fringes as
+    separate peaks. A fixed peak_search_width tuned for a
+    narrow-fringed sample (e.g. ~7-30 points) is far too small for a
+    sample with a much wider fringe period (e.g. ~90 points), and can
+    roughly double the peak count with spurious detections.
+
+    Parameters:
+        subtracted (array-like): Baseline-subtracted signal.
+        requested_width (int): Desired peak_search_width.
+        min_fraction_of_period (float): Minimum fraction of the
+            estimated fringe period peak_search_width is raised to.
+            Default is 0.6.
+
+    Returns:
+        int: requested_width, or the estimated fringe period scaled by
+            min_fraction_of_period if that's larger. Falls back to
+            requested_width if a fringe period can't be estimated.
+    """
+
+    period = estimate_fringe_period_points(subtracted)
+    if period is None:
+        return requested_width
+    return max(requested_width, int(period * min_fraction_of_period))
+
+
 def calculate_thickness(n, positions):
 
     """
-    Calculates thicknesses of glass wafers based on the refractive index of the
-    glass and the positions of the peaks or troughs in the FTIR spectrum.
+    Calculates thicknesses of the wafer(s) based on the refractive index of the
+    wafer and the positions of the peaks or troughs in the FTIR spectrum.
 
     Parameters:
-        n (float): Refractive index of the glass.
+        n (float): Refractive index of the wafer.
         positions (np.ndarray): Array of positions of the peaks or troughs in
             the FTIR spectrum.
 
@@ -259,36 +390,51 @@ def calculate_thickness(n, positions):
 
 
 def calculate_mean_thickness(
-    dfs_dict, n, wn_high, wn_low, plotting=False, phaseol=True
+    dfs_dict, n, wn_high, wn_low,
+    savgol_filter_width=99, smoothing_wn_width=15, peak_search_width=5,
+    n_sigma=1.5,
+    plotting=False,
 ):
 
     """
-    Calculates thickness of glass wafers based on the refractive index of
-    the glass and the positions of the peaks or troughs in the FTIR spectrum.
+    Calculates thickness of the wafer(s) based on the refractive index of
+    the wafer and the positions of the peaks or troughs in the FTIR spectrum.
     Thicknesses for each interference fringe, starting at both the peaks
     and troughs of the fringes are determined. These thicknesses are then
     averaged over the interval of interest.
 
+    savgol_filter_width/smoothing_wn_width/peak_search_width previously
+    were chosen from a phaseol flag (olivine vs. glass defaults).
+    smoothing_wn_width is made adaptive here via auto_smoothing_width in
+    peakID, and the former glass-phase savgol_filter_width/
+    peak_search_width defaults (449/50) were tuned for a much wider,
+    coarser-fringed acquisition window than typical narrow-window
+    samples -- they clamp down to nearly the entire window and can drop
+    most real peaks. Pass the olivine-style values that work across the
+    datasets tested directly, and override them if a specific sample
+    needs something different.
+
     Parameters:
         dfs_dict (dictionary): dictionary containing FTIR data for each
             file
-        n (float): refractive index of the glass
+        n (float): refractive index of the wafer
         wn_high (float): the high wavenumber cutoff for the analysis
         wn_low (float): the low wavenumber cutoff for the analysis
+        savgol_filter_width (int): The window size for the baseline
+            Savitzky-Golay filter. Default is 99.
+        smoothing_wn_width (int): The window size for the second
+            Savitzky-Golay smoothing filter, before being capped by
+            auto_smoothing_width. Default is 15.
+        peak_search_width (int): The size of the region around each
+            point to search for a peak. Default is 5.
+        n_sigma (float): adaptive peak height threshold multiplier.
+            Default is 1.5.
         plotting (bool): whether or not to plot the data and detected
             peaks and troughs
 
     Returns:
         ThickDF (pd.DataFrame): a dataframe containing the thickness
         calculations for each file.
-
-    Notes:
-        smoothing_wn_width (float): Width of the Savitzky-Golay smoothing
-        window, if not used, set to None.
-        peak_heigh_min_delta (float): Minimum height difference between a
-        peak and its surrounding points.
-        peak_search_width (float): Distance (in wavenumbers) to look on
-        either side of a peak to find the corresponding trough.
     """
 
     ThickDF = pd.DataFrame(
@@ -306,31 +452,22 @@ def calculate_mean_thickness(
 
     failures = []
 
-    # If phase is olivine, set these parameters.
-    if phaseol is True:
-        savgol_filter_width = 99
-        smoothing_wn_width = 15
-        peak_heigh_min_delta = 0.002
-        peak_search_width = 10
-    # If phase glass, set other parameters.
-    else:
-        savgol_filter_width = 449
-        smoothing_wn_width = 71
-        peak_heigh_min_delta = 0.008
-        peak_search_width = 50
-
     for filename, data in dfs_dict.items():
         try:
+            n_points = len(data.loc[wn_low:wn_high])
+            safe_width = safe_savgol_width(n_points, savgol_filter_width)
+            safe_smooth = safe_savgol_width(n_points, smoothing_wn_width)
+
             peaks, troughs = peakID(
                 data,
                 wn_high,
                 wn_low,
                 filename=filename,
                 plotting=plotting,
-                savgol_filter_width=savgol_filter_width,
-                smoothing_wn_width=smoothing_wn_width,
-                peak_heigh_min_delta=peak_heigh_min_delta,
+                savgol_filter_width=safe_width,
+                smoothing_wn_width=safe_smooth,
                 peak_search_width=peak_search_width,
+                n_sigma=n_sigma,
             )
             peaks_loc = peaks[:, 0].round(2)
             troughs_loc = troughs[:, 0].round(2)
@@ -341,7 +478,7 @@ def calculate_mean_thickness(
                 [
                     x
                     for x in peaks_loc
-                    if (abs(x - np.mean(peaks_loc)) <
+                    if (abs(x - np.mean(peaks_loc)) <=
                         2 * np.std(peaks_loc))
                 ]
             )
@@ -349,7 +486,7 @@ def calculate_mean_thickness(
                 [
                     x
                     for x in troughs_loc
-                    if (abs(x - np.mean(troughs_loc)) <
+                    if (abs(x - np.mean(troughs_loc)) <=
                         2 * np.std(troughs_loc))
                 ]
             )
@@ -357,7 +494,7 @@ def calculate_mean_thickness(
                 [
                     x
                     for x in peaks_diff
-                    if (abs(x - np.mean(peaks_diff)) <
+                    if (abs(x - np.mean(peaks_diff)) <=
                         2 * np.std(peaks_diff))
                 ]
             )
@@ -365,14 +502,14 @@ def calculate_mean_thickness(
                 [
                     x
                     for x in troughs_diff
-                    if (abs(x - np.mean(troughs_diff)) <
+                    if (abs(x - np.mean(troughs_diff)) <=
                         2 * np.std(troughs_diff))
                 ]
             )
 
             t_peaks = (calculate_thickness(n, peaks[:, 0]) * 1e4).round(2)
             t_peaks_filt = np.array(
-                [x for x in t_peaks if (abs(x - np.mean(t_peaks)) <
+                [x for x in t_peaks if (abs(x - np.mean(t_peaks)) <=
                                         np.std(t_peaks))]
             )
             mean_t_peaks_filt = np.mean(t_peaks_filt).round(2)
@@ -380,7 +517,7 @@ def calculate_mean_thickness(
 
             t_troughs = (calculate_thickness(n, troughs[:, 0]) * 1e4).round(2)
             t_troughs_filt = np.array(
-                [x for x in t_troughs if (abs(x - np.mean(t_troughs)) <
+                [x for x in t_troughs if (abs(x - np.mean(t_troughs)) <=
                                           np.std(t_troughs))]
             )
             mean_t_troughs_filt = np.mean(t_troughs_filt).round(2)

@@ -1,5 +1,5 @@
 # PyIRoGlass
-[![PyPI](https://badgen.net/pypi/v/PyIRoGlass)](https://pypi.org/project/PyIRoGlass/)
+[![PyPI](https://badgen.net/pypi/v/pyIRoGlass)](https://pypi.org/project/pyIRoGlass/)
 [![Build Status](https://github.com/SarahShi/PyIRoGlass/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/SarahShi/PyIRoGlass/actions/workflows/main.yml)
 [![Documentation Status](https://readthedocs.org/projects/pyiroglass/badge/?version=latest)](https://pyiroglass.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/SarahShi/PyIRoGlass/branch/main/graph/badge.svg)](https://codecov.io/gh/SarahShi/PyIRoGlass/branch/main)

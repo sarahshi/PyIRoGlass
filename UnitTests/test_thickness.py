@@ -55,16 +55,16 @@ class test_thickness(unittest.TestCase):
 
         savgol_filter_width_ol = 99
         smoothing_wn_width_ol = 15
-        peak_heigh_min_delta_ol = 0.002
         peak_search_width_ol = 10
+        n_sigma_ol = 1.5
         peaks, _ = pig.peakID(self.df_ol, self.wn_high_ol, self.wn_low_ol,
                               filename=self.file_ol,
                               plotting=True,
                               savgol_filter_width=savgol_filter_width_ol,
                               smoothing_wn_width=smoothing_wn_width_ol,
-                              peak_heigh_min_delta=peak_heigh_min_delta_ol,
-                              peak_search_width=peak_search_width_ol)
-        expected_peak_loc = 2138.76
+                              peak_search_width=peak_search_width_ol,
+                              n_sigma=n_sigma_ol)
+        expected_peak_loc = 2140.689
         self.assertAlmostEqual(float(peaks[0, 0]),
                                expected_peak_loc,
                                self.decimalPlace - 2,
@@ -80,21 +80,19 @@ class test_thickness(unittest.TestCase):
                 result,
                 self.wn_high_ol,
                 self.wn_low_ol,
-                plotting=False,
-                phaseol=True)
+                plotting=False)
 
             thickness_results_gl = pig.calculate_mean_thickness(
                 self.dfs_dict_gl,
                 1.546,
                 self.wn_high_gl,
                 self.wn_low_gl,
-                plotting=False,
-                phaseol=False)
+                plotting=False)
 
             result_ol = float(thickness_results_ol['Thickness_M'].iloc[0])
             expected_ol = 79.81
             result_gl = float(thickness_results_gl['Thickness_M'].iloc[0])
-            expected_gl = 37.01
+            expected_gl = 37.44
             self.assertAlmostEqual(
                 result_ol,
                 expected_ol,
