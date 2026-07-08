@@ -74,11 +74,17 @@ Functions for plotting MCMC results
 Functions for determining thickness from reflectance FTIR spectra
 =================================================================
 
-.. autofunction:: PyIRoGlass.datacheck_peakdetect
-
-.. autofunction:: PyIRoGlass.peakdetect
-
 .. autofunction:: PyIRoGlass.peakID
+
+.. autofunction:: PyIRoGlass.safe_savgol_width
+
+.. autofunction:: PyIRoGlass.estimate_fringe_period_points
+
+.. autofunction:: PyIRoGlass.bootstrap_fringe_period
+
+.. autofunction:: PyIRoGlass.safe_smoothing_width
+
+.. autofunction:: PyIRoGlass.safe_search_width
 
 .. autofunction:: PyIRoGlass.calculate_thickness
 
