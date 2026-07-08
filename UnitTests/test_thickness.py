@@ -39,6 +39,26 @@ class test_thickness(unittest.TestCase):
             msg="Reflectance index test and expected values from "
             "the reflectance_index_ol function do not agree")
 
+    def test_reflectance_index_opx_cpx(self):
+
+        result_opx = pig.reflectance_index_opx(0.8)
+        expected_opx = 1.678
+        self.assertAlmostEqual(
+            result_opx,
+            expected_opx,
+            self.decimalPlace,
+            msg="Reflectance index test and expected values from "
+            "the reflectance_index_opx function do not agree")
+
+        result_cpx = pig.reflectance_index_cpx(0.8)
+        expected_cpx = 1.6891333333333334
+        self.assertAlmostEqual(
+            result_cpx,
+            expected_cpx,
+            self.decimalPlace,
+            msg="Reflectance index test and expected values from "
+            "the reflectance_index_cpx function do not agree")
+
     def test_calc_thickness(self):
 
         thickness = float(pig.calculate_thickness(
@@ -50,6 +70,81 @@ class test_thickness(unittest.TestCase):
             self.decimalPlace,
             msg="Reflectance thickness test and expected values from "
             "the calculate_thickness function do not agree")
+
+    def test_safe_savgol_width(self):
+
+        self.assertEqual(
+            pig.safe_savgol_width(100, 49), 49,
+            msg="safe_savgol_width should return the requested width "
+            "unchanged when it already fits and is odd")
+        self.assertEqual(
+            pig.safe_savgol_width(100, 200), 99,
+            msg="safe_savgol_width should clamp a too-large request down "
+            "to the largest valid odd width for n_points")
+        self.assertEqual(
+            pig.safe_savgol_width(50, 50), 49,
+            msg="safe_savgol_width should return an odd width even when "
+            "n_points is even")
+        self.assertEqual(
+            pig.safe_savgol_width(100, 3), 5,
+            msg="safe_savgol_width should not return less than min_width")
+
+    def test_estimate_fringe_period_points(self):
+
+        n = 1000
+        x = np.arange(n)
+        true_period = 50
+        sine = np.sin(2 * np.pi * x / true_period)
+
+        period_est = pig.estimate_fringe_period_points(sine)
+        self.assertAlmostEqual(
+            period_est,
+            float(true_period),
+            self.decimalPlace - 4,
+            msg="estimate_fringe_period_points should recover the true "
+            "period of a clean sinusoidal signal")
+
+        flat = np.zeros(n)
+        self.assertIsNone(
+            pig.estimate_fringe_period_points(flat),
+            msg="estimate_fringe_period_points should return None when "
+            "fewer than 2 extrema are found")
+
+    def test_bootstrap_fringe_period(self):
+
+        n = 1000
+        x = np.arange(n)
+        true_period = 50
+        sine = np.sin(2 * np.pi * x / true_period)
+        noisy_sine = sine + 0.01 * np.random.RandomState(0).randn(n)
+
+        period_est = pig.bootstrap_fringe_period(noisy_sine, n)
+        self.assertAlmostEqual(
+            period_est,
+            float(true_period),
+            self.decimalPlace - 4,
+            msg="bootstrap_fringe_period should recover the true period "
+            "of a noisy sinusoidal signal via its multi-scale plateau "
+            "search")
+
+    def test_safe_smoothing_and_search_width(self):
+
+        n = 1000
+        x = np.arange(n)
+        sine = np.sin(2 * np.pi * x / 50)
+
+        smoothing_width = pig.safe_smoothing_width(sine, 15)
+        self.assertEqual(
+            smoothing_width, 15,
+            msg="safe_smoothing_width should leave a requested width "
+            "unchanged when it is already well under the estimated "
+            "fringe period")
+
+        search_width = pig.safe_search_width(sine, 5)
+        self.assertEqual(
+            search_width, 30,
+            msg="safe_search_width should raise a too-small requested "
+            "width toward the estimated fringe period")
 
     def test_peak_identification(self):
 
