@@ -417,7 +417,14 @@ def calculate_mean_thickness(
     Parameters:
         dfs_dict (dictionary): dictionary containing FTIR data for each
             file
-        n (float): refractive index of the wafer
+        n (float, pd.Series, or pd.DataFrame): refractive index of the
+            wafer. A single float is used for every file in dfs_dict. A
+            pd.Series (indexed by filename) or a pd.DataFrame (indexed
+            by filename, with a single "n" column, e.g. the output of
+            create_reflectance_template) instead looks up a per-file
+            refractive index, for batches mixing phases (olivine,
+            pyroxene, glass, etc.) that don't share one value. Raises
+            KeyError if a filename in dfs_dict has no matching entry.
         wn_high (float): the high wavenumber cutoff for the analysis
         wn_low (float): the low wavenumber cutoff for the analysis
         savgol_filter_width (int): The window size for the baseline
@@ -437,6 +444,11 @@ def calculate_mean_thickness(
         calculations for each file.
     """
 
+    if isinstance(n, pd.DataFrame):
+        n_lookup = n["n"]
+    else:
+        n_lookup = n
+
     ThickDF = pd.DataFrame(
         columns=[
             "Thickness_M",
@@ -454,6 +466,9 @@ def calculate_mean_thickness(
 
     for filename, data in dfs_dict.items():
         try:
+            n_sample = (n_lookup[filename]
+                        if isinstance(n_lookup, pd.Series) else n_lookup)
+
             n_points = len(data.loc[wn_low:wn_high])
             safe_width = safe_savgol_width(n_points, savgol_filter_width)
             safe_smooth = safe_savgol_width(n_points, smoothing_wn_width)
@@ -507,7 +522,7 @@ def calculate_mean_thickness(
                 ]
             )
 
-            t_peaks = (calculate_thickness(n, peaks[:, 0]) * 1e4).round(2)
+            t_peaks = (calculate_thickness(n_sample, peaks[:, 0]) * 1e4).round(2)
             t_peaks_filt = np.array(
                 [x for x in t_peaks if (abs(x - np.mean(t_peaks)) <=
                                         np.std(t_peaks))]
@@ -515,7 +530,7 @@ def calculate_mean_thickness(
             mean_t_peaks_filt = np.mean(t_peaks_filt).round(2)
             std_t_peaks_filt = np.std(t_peaks_filt).round(2)
 
-            t_troughs = (calculate_thickness(n, troughs[:, 0]) * 1e4).round(2)
+            t_troughs = (calculate_thickness(n_sample, troughs[:, 0]) * 1e4).round(2)
             t_troughs_filt = np.array(
                 [x for x in t_troughs if (abs(x - np.mean(t_troughs)) <=
                                           np.std(t_troughs))]
@@ -554,6 +569,92 @@ def calculate_mean_thickness(
             )
 
     return ThickDF
+
+
+def propagate_thickness_uncertainty(dfs_thick, replicate_suffix=r"_REF_[a-z]+$",
+                                     exclude_pattern=r"bad"):
+
+    """
+    Averages replicate measurements (e.g. _REF_a, _REF_b, _REF_c) of the
+    same sample into one row per sample, combining each replicate's own
+    Thickness_STD (its within-measurement uncertainty) with the
+    spread of Thickness_M across replicates (real sample-to-sample
+    variability that a single replicate's own uncertainty can't see).
+
+    Parameters:
+        dfs_thick (pd.DataFrame): Output of calculate_mean_thickness, with
+            one row per replicate and a "Thickness_M"/"Thickness_STD"
+            column. Index entries carry a replicate suffix identifying
+            which rows belong to the same sample.
+        replicate_suffix (str): Regular expression matching the
+            replicate suffix to strip from the index to recover the
+            sample name. Default is "_REF_[a-z]+$".
+        exclude_pattern (str or None): Regular expression (case
+            insensitive); any row whose index matches is dropped before
+            averaging, e.g. to discard replicates flagged with "_bad"
+            in their filename as failed analyses. Set to None to
+            include every row. Default is "bad".
+
+    Returns:
+        pd.DataFrame: One row per sample (index = sample name with the
+            replicate suffix removed), with columns:
+                Thickness_M (float): Mean of Thickness_M across
+                    replicates.
+                Thickness_STD_analytical (float): Uncertainty of the
+                    mean from propagating each replicate's own
+                    Thickness_STD in quadrature,
+                    sqrt(sum(Thickness_STD**2)) / n_replicates.
+                Thickness_STD_replicates (float): Standard deviation of
+                    Thickness_M across replicates, i.e. how much the
+                    replicates disagree with each other.
+                Thickness_STD (float): sqrt(Thickness_STD_analytical**2
+                    + Thickness_STD_replicates**2) -- within-replicate
+                    precision and between-replicate disagreement treated
+                    as two independent sources of uncertainty and
+                    combined in quadrature. Unlike taking the max of the
+                    two, this never discards either number: it is always
+                    at least as large as either individual term.
+                n (int): Number of replicates averaged.
+    """
+
+    if exclude_pattern is not None:
+        is_bad = dfs_thick.index.str.contains(exclude_pattern, case=False,
+                                              regex=True)
+        dfs_thick = dfs_thick.loc[~is_bad]
+
+    sample_name = dfs_thick.index.str.replace(replicate_suffix, "",
+                                            regex=True)
+
+    grouped = dfs_thick.groupby(sample_name)["Thickness_M"]
+    thickness_mean = grouped.mean()
+    thickness_std_replicates = grouped.std(ddof=0).fillna(0)
+    n_replicates = grouped.count()
+
+    def analytical_se(stds):
+        return np.sqrt(np.sum(np.square(stds))) / len(stds)
+
+    thickness_std_analytical = (
+        dfs_thick.groupby(sample_name)["Thickness_STD"].apply(analytical_se)
+    )
+
+    AvgThickDF = pd.DataFrame({
+        "Thickness_M": thickness_mean,
+        "Thickness_STD_analytical": thickness_std_analytical,
+        "Thickness_STD_replicates": thickness_std_replicates,
+        "n": n_replicates,
+    })
+    AvgThickDF["Thickness_STD"] = np.sqrt(
+        AvgThickDF["Thickness_STD_analytical"] ** 2
+        + AvgThickDF["Thickness_STD_replicates"] ** 2
+    )
+
+    return AvgThickDF[[
+        "Thickness_M", "Thickness_STD", "Thickness_STD_analytical",
+        "Thickness_STD_replicates", "n",
+    ]]
+
+
+# %% 
 
 
 def reflectance_index_ol(XFo):
