@@ -8,6 +8,10 @@ Data Imports
 .. autoclass:: PyIRoGlass.SampleDataLoader
    :members:
 
+.. autofunction:: PyIRoGlass.create_reflectance_template
+
+.. autofunction:: PyIRoGlass.create_transmission_template
+
 .. autoclass:: PyIRoGlass.VectorLoader
    :members:
 
@@ -90,11 +94,14 @@ Functions for determining thickness from reflectance FTIR spectra
 
 .. autofunction:: PyIRoGlass.calculate_mean_thickness
 
+.. autofunction:: PyIRoGlass.propagate_thickness_uncertainty
+
 .. autofunction:: PyIRoGlass.reflectance_index_ol
 
 .. autofunction:: PyIRoGlass.reflectance_index_cpx
 
 .. autofunction:: PyIRoGlass.reflectance_index_opx
+
 
 
 Functions for molar absorptivity inversions
