@@ -598,23 +598,21 @@ def propagate_thickness_uncertainty(dfs_thick, replicate_suffix=r"_REF_[a-z]+$",
     Returns:
         pd.DataFrame: One row per sample (index = sample name with the
             replicate suffix removed), with columns:
-                Thickness_M (float): Mean of Thickness_M across
-                    replicates.
-                Thickness_STD_analytical (float): Uncertainty of the
-                    mean from propagating each replicate's own
-                    Thickness_STD in quadrature,
-                    sqrt(sum(Thickness_STD**2)) / n_replicates.
-                Thickness_STD_replicates (float): Standard deviation of
-                    Thickness_M across replicates, i.e. how much the
-                    replicates disagree with each other.
-                Thickness_STD (float): sqrt(Thickness_STD_analytical**2
-                    + Thickness_STD_replicates**2) -- within-replicate
-                    precision and between-replicate disagreement treated
-                    as two independent sources of uncertainty and
-                    combined in quadrature. Unlike taking the max of the
-                    two, this never discards either number: it is always
-                    at least as large as either individual term.
-                n (int): Number of replicates averaged.
+            - Thickness_M (float): Mean of Thickness_M across
+              replicates.
+            - Thickness_STD_analytical (float): Uncertainty of the
+              mean from propagating each replicate's own
+              Thickness_STD in quadrature,
+              sqrt(sum(Thickness_STD**2)) / n_replicates.
+            - Thickness_STD_replicates (float): Standard deviation of
+              Thickness_M across replicates, i.e. how much the
+              replicates disagree with each other.
+            - Thickness_STD (float): sqrt(Thickness_STD_analytical**2 +
+              Thickness_STD_replicates**2) -- within-replicate
+              precision and between-replicate disagreement treated
+              as two independent sources of uncertainty and
+              combined in quadrature.
+            - n (int): Number of replicates averaged.
     """
 
     if exclude_pattern is not None:
