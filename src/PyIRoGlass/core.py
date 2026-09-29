@@ -191,6 +191,129 @@ class SampleDataLoader:
         )
 
 
+def create_reflectance_template(spectrum_source, export_path=None,
+                                default_n=np.nan):
+
+    """
+    Writes a blank template with one row per reflectance FTIR spectrum
+    and a "n" column to fill in, for batches that mix phases (olivine,
+    pyroxene, glass, etc.) with different refractive indices rather
+    than sharing one value across the whole directory.
+
+    This is a standalone lookup keyed by spectrum filename, separate
+    from ChemThick.csv: spectrum files and ChemThick "Sample" rows often
+    use different naming conventions (e.g. one row per replicate
+    spectrum vs. one row per averaged sample), so the two aren't
+    combined into a single template.
+
+    Parameters:
+        spectrum_source (str or dict): Either a directory path
+            containing the reflectance FTIR spectrum CSV files (the
+            same path passed to SampleDataLoader.load_spectrum_directory),
+            or an already-loaded dfs_dict (e.g. the dict returned by
+            SampleDataLoader.load_spectrum_directory) -- reusing an
+            existing dfs_dict avoids re-scanning the directory and
+            guarantees the template matches exactly the files already
+            loaded for analysis.
+        export_path (str): Path to write the template to. Supports .csv
+            or .xlsx (requires openpyxl). If None, defaults to
+            "RefractiveIndex_Template.csv" in the current directory.
+        default_n (float): Value to pre-fill the "n" column with, as a
+            starting point to edit. Default is NaN.
+
+    Returns:
+        pd.DataFrame: The generated template, indexed by "Sample" (the
+            spectrum filename with its extension removed), with a
+            single "n" column.
+    """
+
+    if isinstance(spectrum_source, dict):
+        samples = list(spectrum_source.keys())
+    else:
+        paths = sorted(glob.glob(os.path.join(spectrum_source, "*")))
+        samples = [os.path.splitext(os.path.split(path)[1])[0]
+                   for path in paths]
+
+    if not samples:
+        raise ValueError(f"No files found in {spectrum_source}.")
+
+    template = pd.DataFrame(
+        {"Sample": samples, "n": default_n}
+    ).set_index("Sample")
+
+    if export_path is None:
+        export_path = "RefractiveIndex_Template.csv"
+
+    if export_path.lower().endswith(".xlsx"):
+        template.to_excel(export_path)
+    else:
+        template.to_csv(export_path)
+
+    return template
+
+
+def create_transmission_template(spectrum_source, export_path=None):
+
+    """
+    Writes a blank ChemThick-style template with one row per
+    transmission FTIR spectrum, ready to fill in with oxide chemistry
+    and wafer thickness for load_chemistry_thickness.
+
+    Column format matches ChemThick_Template.csv exactly: Sample,
+    followed by the 11 major oxides, then Thickness and
+    Sigma_Thickness.
+
+    Parameters:
+        spectrum_source (str or dict): Either a directory path
+            containing the transmission FTIR spectrum CSV files (the
+            same path passed to SampleDataLoader.load_spectrum_directory),
+            or an already-loaded dfs_dict (e.g. the dict returned by
+            SampleDataLoader.load_spectrum_directory) -- reusing an
+            existing dfs_dict avoids re-scanning the directory and
+            guarantees the template matches exactly the files already
+            loaded for analysis.
+        export_path (str): Path to write the template to. Supports .csv
+            or .xlsx (requires openpyxl). If None, defaults to
+            "ChemThick_Template.csv" in the current directory.
+
+    Returns:
+        pd.DataFrame: The generated template, indexed by "Sample" (the
+            spectrum filename with its extension removed), with columns
+            for the 11 major oxides, Thickness, and Sigma_Thickness, all
+            blank (NaN).
+    """
+
+    if isinstance(spectrum_source, dict):
+        samples = list(spectrum_source.keys())
+    else:
+        paths = sorted(glob.glob(os.path.join(spectrum_source, "*")))
+        samples = [os.path.splitext(os.path.split(path)[1])[0]
+                   for path in paths]
+
+    if not samples:
+        raise ValueError(f"No files found in {spectrum_source}.")
+
+    columns = [
+        "SiO2", "TiO2", "Al2O3", "Fe2O3", "FeO", "MnO",
+        "MgO", "CaO", "Na2O", "K2O", "P2O5",
+        "Thickness", "Sigma_Thickness",
+    ]
+
+    template = pd.DataFrame(
+        np.nan, index=pd.Index(samples, name="Sample"), columns=columns
+    )
+
+    if export_path is None:
+        export_path = "ChemThick_Template.csv"
+
+    if export_path.lower().endswith(".xlsx"):
+        template.to_excel(export_path)
+    else:
+        template.to_csv(export_path)
+
+    return template
+
+
 class VectorLoader:
 
     """
@@ -1157,9 +1280,9 @@ def beer_lambert(molar_mass, absorbance, density, thickness, epsilon):
         molar_mass (float): The molar mass of the substance in grams per mole.
         absorbance (float): The absorbance of the substance, measured in
             optical density units.
-        density (float): The density of the substance in grams per cubic
-            centimeter.
-        thickness (float): The thickness of the sample in centimeters.
+        density (float): The density of the substance in kg/m^3
+            (equivalently g/L), as returned by calculate_density.
+        thickness (float): The thickness of the sample in microns.
         epsilon (float): The molar extinction coefficient, measured in liters
             per mole per centimeter.
 
@@ -1201,11 +1324,11 @@ def beer_lambert_error(N, molar_mass,
             in optical density units.
         sigma_absorbance (float): The uncertainty associated with the
             absorbance measurement.
-        density (float): The density of the substance in grams per
-            cubic centimeter.
+        density (float): The density of the substance in kg/m^3
+            (equivalently g/L), as returned by calculate_density.
         sigma_density (float): The uncertainty associated with the
             density measurement.
-        thickness (float): The thickness of the sample in centimeters.
+        thickness (float): The thickness of the sample in microns.
         sigma_thickness (float): The uncertainty associated with the
             sample thickness measurement.
         epsilon (float): The molar extinction coefficient, measured
@@ -1388,12 +1511,15 @@ def calculate_epsilon(chemistry, T, P):
             "sigma_epsilon_H2Ot_3550",
             "epsilon_H2Om_1635",
             "sigma_epsilon_H2Om_1635",
+            "epsilon_carbonate",
+            "sigma_epsilon_carbonate",
             "epsilon_CO2",
             "sigma_epsilon_CO2",
             "epsilon_H2Om_5200",
             "sigma_epsilon_H2Om_5200",
             "epsilon_OH_4500",
             "sigma_epsilon_OH_4500",
+            "Notes",
         ]
     )
 
@@ -1415,8 +1541,8 @@ def calculate_epsilon(chemistry, T, P):
     covm_est_3550 = np.diag([38.05316054, 77.3885357])
     mest_1635 = np.array([-50.3975642, 124.2505339])
     covm_est_1635 = np.diag([20.85034888, 39.38749563])
-    mest_CO2 = np.array([417.17390625, -318.09377591])
-    covm_est_CO2 = np.diag([84.84230954, 339.64346778])
+    mest_carbonate = np.array([417.17390625, -318.09377591])
+    covm_est_carbonate = np.diag([84.84230954, 339.64346778])
 
     # Set up matrices for calculating uncertainties on extinction coefficients
     G_SiAl = np.ones((2, 1))
@@ -1438,7 +1564,7 @@ def calculate_epsilon(chemistry, T, P):
         # Calculate extinction coefficients with best-fit parameters
         epsilon_H2Ot_3550 = mest_3550[0] + (mest_3550[1] * SiAl_tot[i])
         epsilon_H2Om_1635 = mest_1635[0] + (mest_1635[1] * SiAl_tot[i])
-        epsilon_CO2 = mest_CO2[0] + (mest_CO2[1] * Na_NaCa[i])
+        epsilon_carbonate = mest_carbonate[0] + (mest_carbonate[1] * Na_NaCa[i])
         epsilon_H2Om_5200 = mest_5200[0] + (mest_5200[1] * SiAl_tot[i])
         epsilon_OH_4500 = mest_4500[0] + (mest_4500[1] * SiAl_tot[i])
 
@@ -1458,10 +1584,10 @@ def calculate_epsilon(chemistry, T, P):
         )
         CT68_1635 = (np.mean(np.diag(CT_int_1635))) ** (1 / 2)
 
-        CT_int_CO2 = (G_NaCa * covm_est_CO2 * np.transpose(G_NaCa)) + (
-            mest_CO2 * covz_error_NaCa * np.transpose(mest_CO2)
+        CT_int_carbonate = (G_NaCa * covm_est_carbonate * np.transpose(G_NaCa)) + (
+            mest_carbonate * covz_error_NaCa * np.transpose(mest_carbonate)
         )
-        CT68_CO2 = (np.mean(np.diag(CT_int_CO2))) ** (1 / 2)
+        CT68_carbonate = (np.mean(np.diag(CT_int_carbonate))) ** (1 / 2)
 
         CT_int_5200 = (G_SiAl * covm_est_5200 * np.transpose(G_SiAl)) + (
             mest_5200 * covz_error_SiAl * np.transpose(mest_5200)
@@ -1473,6 +1599,49 @@ def calculate_epsilon(chemistry, T, P):
         )
         CT68_4500 = (np.mean(np.diag(CT_int_4500))) ** (1 / 2)
 
+        epsilon_CO2 = 830
+        CT68_CO2 = epsilon_CO2 * 0.05
+
+        # Check whether Tau and Eta are in calibration ranges, warn if not,
+        # and record any out-of-range calibration parameters in Notes.
+        out_of_range = []
+
+        # Same ranges for epsilon_H2Om_5200 and epsilon_OH_4500, simplify
+        if not (tau_ranges["epsilon_H2Om_5200"][0]
+                <= SiAl_tot[i] <= tau_ranges["epsilon_H2Om_5200"][1]):
+            warnings.warn(f"Tau ({round(SiAl_tot[i], 4)}) for {i} "
+                          f"is outside the calibration range for "
+                          f"epsilon_H2Om_5200 and epsilon_OH_4500. "
+                          f"Use caution.",
+                          UserWarning, stacklevel=2)
+            out_of_range.append("Tau outside range (epsilon_H2Om_5200, "
+                                 "epsilon_OH_4500)")
+
+        if not (tau_ranges["epsilon_H2Ot_3550"][0]
+                <= SiAl_tot[i] <= tau_ranges["epsilon_H2Ot_3550"][1]):
+            warnings.warn(f"Tau ({round(SiAl_tot[i], 4)}) for {i} "
+                          f"is outside the calibration range for "
+                          f"epsilon_H2Ot_3550. Use caution.",
+                          UserWarning, stacklevel=2)
+            out_of_range.append("Tau outside range (epsilon_H2Ot_3550)")
+
+        if not (tau_ranges["epsilon_H2Om_1635"][0]
+                <= SiAl_tot[i] <= tau_ranges["epsilon_H2Om_1635"][1]):
+            warnings.warn(f"Tau ({round(SiAl_tot[i], 4)}) for {i} "
+                          f"is outside the calibration range for "
+                          f"epsilon_H2Om_1635. Use caution.",
+                          UserWarning, stacklevel=2)
+            out_of_range.append("Tau outside range (epsilon_H2Om_1635)")
+
+        if not (eta_range[0] <= Na_NaCa[i] <= eta_range[1]):
+            warnings.warn(f"Eta ({round(Na_NaCa[i], 4)}) for {i} "
+                          f"is outside the calibration range for "
+                          f"epsilon_carbonate. Use caution.",
+                          UserWarning, stacklevel=2)
+            out_of_range.append("Eta outside range (epsilon_carbonate)")
+
+        notes = "; ".join(out_of_range)
+
         # Save outputs of extinction coefficients to DataFrame epsilon
         epsilon.loc[i] = pd.Series(
             {
@@ -1482,48 +1651,17 @@ def calculate_epsilon(chemistry, T, P):
                 "sigma_epsilon_H2Ot_3550": CT68_3550,
                 "epsilon_H2Om_1635": epsilon_H2Om_1635,
                 "sigma_epsilon_H2Om_1635": CT68_1635,
+                "epsilon_carbonate": epsilon_carbonate,
+                "sigma_epsilon_carbonate": CT68_carbonate,
                 "epsilon_CO2": epsilon_CO2,
                 "sigma_epsilon_CO2": CT68_CO2,
                 "epsilon_H2Om_5200": epsilon_H2Om_5200,
                 "sigma_epsilon_H2Om_5200": CT68_5200,
                 "epsilon_OH_4500": epsilon_OH_4500,
                 "sigma_epsilon_OH_4500": CT68_4500,
+                "Notes": notes,
             }
         )
-
-        # Check whether Tau and Eta are in calibration ranges, warn if not
-        # Same ranges for epsilon_H2Om_5200 and epsilon_OH_4500, simplify
-        if not (tau_ranges["epsilon_H2Om_5200"][0] 
-                <= SiAl_tot[i] <= tau_ranges["epsilon_H2Om_5200"][1]):
-            warnings.warn(f"Tau ({round(SiAl_tot[i], 4)}) for {i} "
-                        f"is outside the calibration range for "
-                        f"epsilon_H2Om_5200 and epsilon_OH_4500. "
-                        f"Use caution.", 
-                        UserWarning,
-                        stacklevel=2)
-
-        if not (tau_ranges["epsilon_H2Ot_3550"][0] 
-                <= SiAl_tot[i] <= tau_ranges["epsilon_H2Ot_3550"][1]):
-            warnings.warn(f"Tau ({round(SiAl_tot[i], 4)}) for {i} "
-                        f"is outside the calibration range for "
-                        f"epsilon_H2Ot_3550. Use caution.",
-                        UserWarning,
-                        stacklevel=2)
-
-        if not (tau_ranges["epsilon_H2Om_1635"][0] 
-                <= SiAl_tot[i] <= tau_ranges["epsilon_H2Om_1635"][1]):
-            warnings.warn(f"Tau ({round(SiAl_tot[i], 4)}) for {i} "
-                        f"is outside the calibration range for "
-                        f"epsilon_H2Om_1635. Use caution.",
-                        UserWarning,
-                        stacklevel=2)
-
-        if not (eta_range[0] <= Na_NaCa[i] <= eta_range[1]):
-            warnings.warn(f"Eta ({round(Na_NaCa[i], 4)}) for {i} "
-                        f"is outside the calibration range for "
-                        f"epsilon_CO2. Use caution.",
-                        UserWarning,
-                        stacklevel=2)
 
     return epsilon
 
@@ -1696,14 +1834,14 @@ def calculate_concentrations(Volatile_PH, chemistry, thickness,
             Volatile_PH["PH_1515_BP"][kk],
             density[kk],
             thickness["Thickness"][kk],
-            epsilon["epsilon_CO2"][kk],
+            epsilon["epsilon_carbonate"][kk],
         )
         CO2_1430_BP = beer_lambert(
             molar_mass["CO2"],
             Volatile_PH["PH_1430_BP"][kk],
             density[kk],
             thickness["Thickness"][kk],
-            epsilon["epsilon_CO2"][kk],
+            epsilon["epsilon_carbonate"][kk],
         )
         H2Om_5200_M = beer_lambert(
             molar_mass["H2O"],
@@ -1757,8 +1895,8 @@ def calculate_concentrations(Volatile_PH, chemistry, thickness,
             density[kk] * 0.025,
             thickness["Thickness"][kk],
             thickness["Sigma_Thickness"][kk],
-            epsilon["epsilon_CO2"][kk],
-            epsilon["sigma_epsilon_CO2"][kk],
+            epsilon["epsilon_carbonate"][kk],
+            epsilon["sigma_epsilon_carbonate"][kk],
         )
         CO2_1430_BP_STD = beer_lambert_error(
             N,
@@ -1769,8 +1907,8 @@ def calculate_concentrations(Volatile_PH, chemistry, thickness,
             density[kk] * 0.025,
             thickness["Thickness"][kk],
             thickness["Sigma_Thickness"][kk],
-            epsilon["epsilon_CO2"][kk],
-            epsilon["sigma_epsilon_CO2"][kk],
+            epsilon["epsilon_carbonate"][kk],
+            epsilon["sigma_epsilon_carbonate"][kk],
         )
         H2Om_5200_M_STD = beer_lambert_error(
             N,
@@ -1886,14 +2024,14 @@ def calculate_concentrations(Volatile_PH, chemistry, thickness,
                 Volatile_PH["PH_1515_BP"][ll],
                 density_sat,
                 thickness["Thickness"][ll],
-                epsilon["epsilon_CO2"][ll],
+                epsilon["epsilon_carbonate"][ll],
             )
             CO2_1430_BP = beer_lambert(
                 molar_mass["CO2"],
                 Volatile_PH["PH_1430_BP"][ll],
                 density_sat,
                 thickness["Thickness"][ll],
-                epsilon["epsilon_CO2"][ll],
+                epsilon["epsilon_carbonate"][ll],
             )
             H2Om_5200_M = beer_lambert(
                 molar_mass["H2O"],
@@ -1945,8 +2083,8 @@ def calculate_concentrations(Volatile_PH, chemistry, thickness,
                 density_sat * 0.025,
                 thickness["Thickness"][ll],
                 thickness["Sigma_Thickness"][ll],
-                epsilon["epsilon_CO2"][ll],
-                epsilon["sigma_epsilon_CO2"][ll],
+                epsilon["epsilon_carbonate"][ll],
+                epsilon["sigma_epsilon_carbonate"][ll],
             )
             CO2_1430_BP_STD = beer_lambert_error(
                 N,
@@ -1957,8 +2095,8 @@ def calculate_concentrations(Volatile_PH, chemistry, thickness,
                 density_sat * 0.025,
                 thickness["Thickness"][ll],
                 thickness["Sigma_Thickness"][ll],
-                epsilon["epsilon_CO2"][ll],
-                epsilon["sigma_epsilon_CO2"][ll],
+                epsilon["epsilon_carbonate"][ll],
+                epsilon["sigma_epsilon_carbonate"][ll],
             )
             H2Om_5200_M_STD = beer_lambert_error(
                 N,
@@ -2767,3 +2905,5 @@ def plot_modelfit(data, uncert, indparams, model, title, nbins=75,
 
     return ax, rax
 
+
+# %% 

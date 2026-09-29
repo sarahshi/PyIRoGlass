@@ -239,5 +239,28 @@ class test_inversion(unittest.TestCase):
         )
 
 
+
+class test_inversion_metrics(unittest.TestCase):
+    def test_calculate_RRMSE(self):
+        true_y = np.array([1.0, 2.0, 3.0])
+        pred_y = np.array([1.0, 2.0, 4.0])
+        expected = np.sqrt(1.0 / (1.0 + 4.0 + 16.0))
+        self.assertAlmostEqual(pig.calculate_RRMSE(true_y, pred_y), expected)
+        self.assertEqual(pig.calculate_RRMSE(pred_y, pred_y), 0.0)
+
+    def test_calculate_CCC(self):
+        y = np.array([1.0, 2.0, 3.0, 4.0])
+        self.assertAlmostEqual(pig.calculate_CCC(y, y), 1.0)
+        # A constant offset keeps correlation at 1 but lowers concordance.
+        shifted = y + 1.0
+        expected = (2 * np.std(y) ** 2) / (2 * np.var(y) + 1.0)
+        self.assertAlmostEqual(pig.calculate_CCC(y, shifted), expected)
+        self.assertLess(pig.calculate_CCC(y, shifted), 1.0)
+
+    def test_calculate_CCC_drops_nan(self):
+        true_y = np.array([1.0, 2.0, np.nan, 4.0])
+        pred_y = np.array([1.0, 2.0, 3.0, 4.0])
+        self.assertAlmostEqual(pig.calculate_CCC(true_y, pred_y), 1.0)
+
 if __name__ == "__main__":
     unittest.main()

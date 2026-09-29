@@ -207,5 +207,44 @@ class test_thickness(unittest.TestCase):
             self.fail(f"Unexpected exception occurred: {e}")
 
 
+
+class test_propagate_thickness_uncertainty(unittest.TestCase):
+    def setUp(self):
+        self.dfs_thick = pd.DataFrame(
+            {"Thickness_M": [40.0, 42.0, 44.0, 90.0, 60.0],
+             "Thickness_STD": [1.0, 2.0, 2.0, 3.0, 5.0]},
+            index=["OL1_REF_a", "OL1_REF_b", "OL1_REF_c", "OL2_REF_a",
+                   "OL1_REF_d_bad"],
+        )
+
+    def test_replicates_combined(self):
+        out = pig.propagate_thickness_uncertainty(self.dfs_thick)
+        self.assertListEqual(sorted(out.index), ["OL1", "OL2"])
+        ol1 = out.loc["OL1"]
+        self.assertEqual(int(ol1["n"]), 3, msg="_bad replicate should be dropped")
+        self.assertAlmostEqual(ol1["Thickness_M"], 42.0)
+        analytical = np.sqrt(1.0 ** 2 + 2.0 ** 2 + 2.0 ** 2) / 3
+        replicates = np.std([40.0, 42.0, 44.0], ddof=0)
+        self.assertAlmostEqual(ol1["Thickness_STD_analytical"], analytical)
+        self.assertAlmostEqual(ol1["Thickness_STD_replicates"], replicates)
+        self.assertAlmostEqual(ol1["Thickness_STD"],
+                               np.sqrt(analytical ** 2 + replicates ** 2))
+        self.assertGreaterEqual(ol1["Thickness_STD"],
+                                max(analytical, replicates))
+
+    def test_single_replicate(self):
+        ol2 = pig.propagate_thickness_uncertainty(self.dfs_thick).loc["OL2"]
+        self.assertEqual(int(ol2["n"]), 1)
+        self.assertEqual(ol2["Thickness_STD_replicates"], 0)
+        self.assertAlmostEqual(ol2["Thickness_STD"], 3.0)
+
+    def test_no_exclusion(self):
+        out = pig.propagate_thickness_uncertainty(self.dfs_thick,
+                                                  exclude_pattern=None)
+        # The flagged replicate is kept; its name has no trailing _REF_x
+        # suffix, so it stays a separate sample.
+        self.assertIn("OL1_REF_d_bad", out.index)
+        self.assertEqual(int(out.loc["OL1", "n"]), 3)
+
 if __name__ == '__main__':
     unittest.main()

@@ -1,4 +1,6 @@
 import unittest
+import warnings
+import numpy as np
 import pandas as pd
 import PyIRoGlass as pig
 
@@ -107,6 +109,87 @@ class test_density_epsilon_calculation(unittest.TestCase):
             msg="sigma_epsilon_H2Ot test and expected values from the "
             "calculate_epsilon function do not agree",
         )
+
+
+class test_epsilon_carbonate_co2(unittest.TestCase):
+    """epsilon_carbonate (Na/(Na+Ca) regression, for the 1515 and 1430 cm^-1
+    carbonate peaks) and epsilon_CO2 (fixed, molecular CO2) are separate."""
+
+    def setUp(self):
+        self.oxides = ["SiO2", "TiO2", "Al2O3", "Fe2O3", "FeO", "MnO",
+                       "MgO", "CaO", "Na2O", "K2O", "P2O5", "H2O"]
+        # AC4_OL53 basaltic andesite, within all calibration ranges.
+        self.in_range = pd.DataFrame(
+            [[47.95, 1.00, 18.88, 2.04, 7.45, 0.19, 4.34, 9.84, 3.47, 0.67,
+              0.11, 0]],
+            columns=self.oxides, index=["AC4_OL53_101220_256s_30x30_a"],
+        )
+        # Na-rich, Ca-poor glass: Eta (Na/(Na+Ca)) above the carbonate
+        # calibration range.
+        self.high_eta = pd.DataFrame(
+            [[60.0, 0.5, 18.0, 1.0, 3.0, 0.1, 1.0, 1.0, 8.0, 3.0, 0.1, 0]],
+            columns=self.oxides, index=["high_eta"],
+        )
+        self.T_room = 25
+        self.P_room = 1
+
+    def test_columns(self):
+        epsilon = pig.calculate_epsilon(self.in_range, self.T_room,
+                                        self.P_room)
+        for col in ["epsilon_carbonate", "sigma_epsilon_carbonate",
+                    "epsilon_CO2", "sigma_epsilon_CO2", "Notes"]:
+            self.assertIn(col, epsilon.columns,
+                          msg=f"{col} missing from calculate_epsilon output")
+
+    def test_epsilon_carbonate_regression(self):
+        epsilon = pig.calculate_epsilon(self.in_range, self.T_room,
+                                        self.P_room)
+        eta = float(epsilon["Eta"].iloc[0])
+        expected = 417.17390625 - 318.09377591 * eta
+        self.assertAlmostEqual(
+            float(epsilon["epsilon_carbonate"].iloc[0]), expected, 6,
+            msg="epsilon_carbonate does not follow the Na/(Na+Ca) regression",
+        )
+        # Same values as the former epsilon_CO2 and sigma_epsilon_CO2 (v0.6.7).
+        self.assertAlmostEqual(
+            float(epsilon["epsilon_carbonate"].iloc[0]), 293.26130023322935, 6,
+            msg="epsilon_carbonate test and expected values do not agree",
+        )
+        self.assertAlmostEqual(
+            float(epsilon["sigma_epsilon_carbonate"].iloc[0]),
+            16.28711970278645, 6,
+            msg="sigma_epsilon_carbonate test and expected values do not agree",
+        )
+
+    def test_epsilon_co2_fixed(self):
+        epsilon = pig.calculate_epsilon(
+            pd.concat([self.in_range, self.high_eta]), self.T_room,
+            self.P_room)
+        self.assertTrue((epsilon["epsilon_CO2"].astype(float) == 830).all(),
+                        msg="epsilon_CO2 should be fixed at 830")
+        self.assertTrue(np.allclose(epsilon["sigma_epsilon_CO2"].astype(float), 41.5),
+                        msg="sigma_epsilon_CO2 should be 5% of 830")
+        self.assertFalse(
+            np.isclose(float(epsilon["epsilon_carbonate"].iloc[0]), 830),
+            msg="epsilon_carbonate should not equal the fixed epsilon_CO2",
+        )
+
+    def test_notes_in_range(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")  # no calibration-range warnings
+            epsilon = pig.calculate_epsilon(self.in_range, self.T_room,
+                                            self.P_room)
+        self.assertEqual(epsilon["Notes"].iloc[0], "",
+                         msg="Notes should be empty within calibration ranges")
+
+    def test_notes_out_of_range(self):
+        with self.assertWarns(UserWarning):
+            epsilon = pig.calculate_epsilon(self.high_eta, self.T_room,
+                                            self.P_room)
+        self.assertGreater(float(epsilon["Eta"].iloc[0]), 0.8406489374848108)
+        self.assertIn("Eta outside range (epsilon_carbonate)",
+                      epsilon["Notes"].iloc[0],
+                      msg="Notes should record the out-of-range Eta")
 
 
 if __name__ == "__main__":

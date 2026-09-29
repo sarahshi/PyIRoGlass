@@ -3,6 +3,20 @@ Change Log
 ==========
 
 
+Version 0.6.8
+=============
+Separate the molar absorptivity of the carbonate peaks from that of molecular CO\ :sub:`2`. :func:`pig.calculate_epsilon` now returns ``epsilon_carbonate`` (and ``sigma_epsilon_carbonate``), the Na/(Na+Ca) regression previously called ``epsilon_CO2``, which :func:`pig.calculate_concentrations` uses for the CO\ :sub:`3`\ :sup:`2-` peaks at 1515 and 1430 cm\ :sup:`-1`. ``epsilon_CO2`` is now the molar absorptivity of molecular CO\ :sub:`2` (830 ± 5% L/mol·cm). CO\ :sub:`2` concentrations are unchanged. :func:`pig.calculate_epsilon` also records any composition outside the calibration ranges in a new ``Notes`` column, in addition to the ``UserWarning``.
+
+Add :func:`pig.create_transmission_template` and :func:`pig.create_reflectance_template`, which write a blank ChemThick or refractive index template with one row per spectrum, named to match the spectrum files. Add :func:`pig.propagate_thickness_uncertainty`, which averages replicate reflectance thickness measurements and combines their analytical and replicate uncertainties.
+
+Correct the units in the :func:`pig.beer_lambert` and :func:`pig.beer_lambert_error` docstrings: density in kg/m\ :sup:`3` and thickness in µm. Expand the unit tests, and run each test in a temporary directory so that running the suite never writes to or deletes a local ``FINALDATA`` folder.
+
+
+Version 0.6.7
+=============
+Replace the fixed-parameter peak detection in :func:`pig.calculate_mean_thickness` with adaptive, fringe period-aware detection, so that one set of defaults works across thick and thin wafers. The ``phaseol`` argument is removed; the filter and search widths now adapt to each spectrum.
+
+
 Version 0.6.6
 =============
 Rename reflectance index calculator from :func:`pig.reflectance_index` to :func:`pig.reflectance_index_ol`. Add :func:`pig.reflectance_index_cpx` and :func:`pig.reflectance_index_opx` for other mineral phases. Remove support for python3.8. 

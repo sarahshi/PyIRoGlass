@@ -214,6 +214,26 @@ class test_conc_outputs(unittest.TestCase):
         )
 
 
+    def test_carbonate_uses_epsilon_carbonate(self):
+        concentrations = pig.calculate_concentrations(
+            self.PH, self.MI_Composition, self.thickness, None
+        )
+        sample = self.PH.index[0]
+        row = concentrations.loc[sample]
+        for peak in ["1515", "1430"]:
+            expected = 1e4 * pig.beer_lambert(
+                44.01,
+                self.PH[f"PH_{peak}_BP"][sample],
+                row["Density"],
+                self.thickness["Thickness"][sample],
+                row["epsilon_carbonate"],
+            )
+            self.assertAlmostEqual(
+                float(row[f"CO2_{peak}_BP"]), float(expected), 6,
+                msg=f"CO2_{peak}_BP should use epsilon_carbonate, not "
+                "epsilon_CO2",
+            )
+
 class test_conc_outputs_saturated(unittest.TestCase):  # OL49
     def setUp(self):
         self.MI_Composition = pd.DataFrame(
@@ -284,6 +304,26 @@ class test_conc_outputs_saturated(unittest.TestCase):  # OL49
             "function do not agree",
         )
 
+
+    def test_carbonate_uses_epsilon_carbonate(self):
+        concentrations = pig.calculate_concentrations(
+            self.PH, self.MI_Composition, self.thickness, None
+        )
+        sample = self.PH.index[0]
+        row = concentrations.loc[sample]
+        for peak in ["1515", "1430"]:
+            expected = 1e4 * pig.beer_lambert(
+                44.01,
+                self.PH[f"PH_{peak}_BP"][sample],
+                row["Density_Sat"],
+                self.thickness["Thickness"][sample],
+                row["epsilon_carbonate"],
+            )
+            self.assertAlmostEqual(
+                float(row[f"CO2_{peak}_BP"]), float(expected), 6,
+                msg=f"CO2_{peak}_BP should use epsilon_carbonate, not "
+                "epsilon_CO2",
+            )
 
 if __name__ == "__main__":
     unittest.main()
