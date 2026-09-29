@@ -66,9 +66,13 @@ Functions for plotting MCMC results
 
 .. autofunction:: PyIRoGlass.plot_H2Ot_3550
 
+.. autofunction:: PyIRoGlass.posterior_draws
+
 .. autofunction:: PyIRoGlass.derive_carbonate
 
 .. autofunction:: PyIRoGlass.plot_carbonate
+
+.. autofunction:: PyIRoGlass.plot_carbonate_subtracted
 
 .. autofunction:: PyIRoGlass.plot_trace
 

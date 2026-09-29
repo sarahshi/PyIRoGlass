@@ -254,6 +254,81 @@ class test_plot_pyiroglass(unittest.TestCase):
         self.assertTrue(mock_ax.plot.called)
         plt.close("all")
 
+    @patch("matplotlib.pyplot.subplots")
+    def test_plot_carbonate_subtracted(self, mock_subplots):
+        mock_fig = MagicMock()
+        mock_ax = MagicMock()
+        mock_subplots.return_value = (mock_fig, mock_ax)
+
+        pig.plot_carbonate_subtracted(
+            self.df, self.file, self.mcmc_npz, ax=mock_ax
+        )
+        self.assertTrue(mock_ax.plot.called)
+        self.assertTrue(mock_ax.axhline.called)
+        plt.close("all")
+
+    def test_plot_carbonate_subtracted_zeroed(self):
+        # Gaussians are plotted at 0, sum to the doublet fit, and peak at
+        # the best-fit peak heights
+        fig, ax = plt.subplots()
+        pig.plot_carbonate_subtracted(
+            self.df, self.file, self.mcmc_npz, ax=ax
+        )
+        lines = {line.get_label(): line.get_ydata() for line in ax.lines}
+        G1515 = lines[r"$\mathregular{CO_{3, 1515}^{2-}}$ Gaussian"]
+        G1430 = lines[r"$\mathregular{CO_{3, 1430}^{2-}}$ Gaussian"]
+        doublet = lines[r"$\mathregular{CO_3^{2-}}$ Doublet"]
+        both = ~np.isnan(G1515) & ~np.isnan(G1430)
+        np.testing.assert_allclose(G1515[both] + G1430[both], doublet[both])
+        self.assertAlmostEqual(np.nanmax(G1515), self.mcmc_npz["bestp"][10], 3)
+        self.assertAlmostEqual(np.nanmax(G1430), self.mcmc_npz["bestp"][7], 3)
+        self.assertAlmostEqual(np.nanmin(G1515), 0, 2)
+        self.assertAlmostEqual(np.nanmin(G1430), 0, 2)
+        plt.close("all")
+
+    def test_plot_carbonate_with_subtracted(self):
+        # The subtracted axis is split off below the carbonate axis and
+        # shares its wavenumber axis
+        fig, ax = plt.subplots()
+        pig.plot_carbonate(
+            self.df, self.file, self.mcmc_npz, export_path=None, ax=ax,
+            plot_subtracted=True
+        )
+        self.assertEqual(len(fig.axes), 2)
+        ax_sub = fig.axes[1]
+        self.assertIn(ax_sub, ax.get_shared_x_axes().get_siblings(ax))
+        self.assertEqual(ax.get_xlim(), ax_sub.get_xlim())
+        self.assertTrue(ax_sub.xaxis_inverted())
+        plt.close("all")
+
+    def test_plot_carbonate_draws_match_baselines(self):
+        # Each plotted baseline has a doublet from the same posterior sample
+        fig, ax = plt.subplots()
+        pig.plot_carbonate(
+            self.df, self.file, self.mcmc_npz, export_path=None, ax=ax,
+            plot_subtracted=True
+        )
+        n_baselines = sum(line.get_linewidth() == 0.25
+                          for line in fig.axes[0].lines)
+        n_doublets = sum(line.get_alpha() == 0.15
+                         for line in fig.axes[1].lines)
+        _, baselines = pig.derive_carbonate(
+            self.df, self.file, self.mcmc_npz, export_path=None
+        )
+        draws = pig.posterior_draws(self.mcmc_npz)
+        self.assertEqual(n_baselines, n_doublets)
+        self.assertEqual(n_baselines, baselines.shape[1])
+        self.assertEqual(n_baselines, len(draws))
+        plt.close("all")
+
+    def test_plot_carbonate_default_single_axis(self):
+        fig, ax = plt.subplots()
+        pig.plot_carbonate(
+            self.df, self.file, self.mcmc_npz, export_path=None, ax=ax
+        )
+        self.assertEqual(len(fig.axes), 1)
+        plt.close("all")
+
     def test_derive_carbonate_interp(self):
         first_index = self.df.index > 1255
         if any(first_index):

@@ -11,7 +11,9 @@ import pandas as pd
 import mc3
 
 import matplotlib as mpl
+import matplotlib.transforms as mtransforms
 from matplotlib import pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 import mc3.plots as mp
 import mc3.stats as ms
 import mc3.utils as mu
@@ -853,7 +855,8 @@ def create_output_dirs(base_path, export_path):
     return paths
 
 
-def calculate_baselines(dfs_dict, export_path, ignore_NIR=False):
+def calculate_baselines(dfs_dict, export_path, ignore_NIR=False,
+                        plot_subtracted=False):
 
     """
     The calculate_baselines function processes a collection of spectral data
@@ -876,6 +879,10 @@ def calculate_baselines(dfs_dict, export_path, ignore_NIR=False):
             (CSVs, figures, logs, etc.) should be saved. If None, no
             files will be saved.
         ignore_NIR (bool, optional): If True, skips the Near-IR peaks
+        plot_subtracted (bool, optional): If True, adds a short axis below
+            the carbonate plot in each sample's figure, showing the modeled
+            CO_3^{2-} doublet Gaussians at zero absorbance (see
+            plot_carbonate_subtracted). Default is False.
 
     Returns:
         Volatile_PH (pd.DataFrame): A DataFrame of absorbance data,
@@ -1197,7 +1204,8 @@ def calculate_baselines(dfs_dict, export_path, ignore_NIR=False):
                     # Create subplot of H2Ot_{3550} baselines/peak fits
                     plot_H2Ot_3550(data, files, als_bls, ax=ax3)
                     # Create subplot of CO_3^{2-} baselines/peak fits
-                    plot_carbonate(data, files, mc3_output, export_path, ax=ax4)
+                    plot_carbonate(data, files, mc3_output, export_path, ax=ax4,
+                                   plot_subtracted=plot_subtracted)
                     plt.tight_layout()
                     plt.savefig(os.path.join(paths["FIGURES"], f"{files}.pdf"),)
                     plt.close("all")
@@ -1207,7 +1215,8 @@ def calculate_baselines(dfs_dict, export_path, ignore_NIR=False):
                     # Create subplot of H2Om_{5200}, OH_{4500} baselines/peak fits
                     plot_H2Ot_3550(data, files, als_bls, ax=ax[0])
                     # Create subplot of CO_3^{2-} baselines/peak fits
-                    plot_carbonate(data, files, mc3_output, export_path, ax=ax[1])
+                    plot_carbonate(data, files, mc3_output, export_path, ax=ax[1],
+                                   plot_subtracted=plot_subtracted)
                     plt.tight_layout()
                     plt.savefig(os.path.join(paths["FIGURES"], f"{files}.pdf"),)
                     plt.close("all")
@@ -2490,6 +2499,32 @@ def plot_H2Ot_3550(data, files, als_bls, ax=None):
     ax.invert_xaxis()
 
 
+def posterior_draws(mc3_output, n_draws=100):
+
+    """
+    Selects evenly spaced draws from the post burn-in posterior
+    distribution. derive_carbonate and plot_carbonate_subtracted both use
+    it, so each plotted baseline has a matching CO_3^{2-} doublet drawn
+    from the same posterior sample.
+
+    Parameters:
+        mc3_output (dict): Dictionary containing results from PyIRoGlass
+            fitting, including the "posterior" samples and "zmask".
+        n_draws (int, optional): Approximate number of draws to select.
+            Default is 100.
+
+    Returns:
+        draws (np.ndarray): Posterior samples, one row per draw.
+
+    """
+
+    masked_posterior = mc3_output["posterior"][mc3_output["zmask"]]
+    step = max(1, int(np.shape(masked_posterior)[0] / n_draws))
+    draws = masked_posterior[::step]
+
+    return draws
+
+
 def derive_carbonate(data, files, mc3_output, export_path):
 
     """
@@ -2573,23 +2608,9 @@ def derive_carbonate(data, files, mc3_output, export_path):
     CO2P1515_SOLVE = CO2P1515_BP + Baseline_Solve_BP
     CO2P1430_SOLVE = CO2P1430_BP + Baseline_Solve_BP
 
-    posterior = mc3_output["posterior"]
-    mask = mc3_output["zmask"]
-    masked_posterior = posterior[mask]
-    samplingerror = masked_posterior[:, 0:5]
-    samplingerror = samplingerror[
-        0: np.shape(masked_posterior[:, :])[0]: int(
-            np.shape(masked_posterior[:, :])[0] / 100
-        ),
-        :,
-    ]
-    lineerror = masked_posterior[:, -2:None]
-    lineerror = lineerror[
-        0: np.shape(masked_posterior[:, :])[0]: int(
-            np.shape(masked_posterior[:, :])[0] / 100
-        ),
-        :,
-    ]
+    draws = posterior_draws(mc3_output)
+    samplingerror = draws[:, 0:5]
+    lineerror = draws[:, -2:None]
     Baseline_Array = np.array(samplingerror @ PCmatrix[:, :].T)
 
     for i in range(np.shape(Baseline_Array)[0]):
@@ -2624,7 +2645,8 @@ def derive_carbonate(data, files, mc3_output, export_path):
     return bestfits, baselines
 
 
-def plot_carbonate(data, files, mc3_output, export_path, ax=None):
+def plot_carbonate(data, files, mc3_output, export_path, ax=None,
+                   plot_subtracted=False):
 
     """
     Plots the FTIR spectrum along with baseline fits, and model fits for
@@ -2643,6 +2665,9 @@ def plot_carbonate(data, files, mc3_output, export_path, ax=None):
             posterior distributions, and other model outputs.
         ax (matplotlib.axes.Axes, optional): Matplotlib axis object where the
             plot will be drawn. If None, a new figure and axis will be created.
+        plot_subtracted (bool, optional): If True, splits a short axis off
+            the bottom of "ax", sharing its wavenumber axis, and draws
+            plot_carbonate_subtracted there. Default is False.
 
     Returns:
         None: This function does not return any value. It generates a plot
@@ -2731,6 +2756,148 @@ def plot_carbonate(data, files, mc3_output, export_path, ax=None):
     ax.tick_params(axis="x", direction="in", length=5, pad=6.5)
     ax.tick_params(axis="y", direction="in", length=5, pad=6.5)
     ax.invert_xaxis()
+
+    if plot_subtracted:
+        ax.set_xlabel("")
+        ax.tick_params(axis="x", labelbottom=False)
+        ax_sub = make_axes_locatable(ax).append_axes(
+            "bottom", size="45%", pad=0.1, sharex=ax
+        )
+        plot_carbonate_subtracted(data, files, mc3_output, ax=ax_sub,
+                                  xlim=None, annotate=False)
+
+        # fig.align_ylabels skips axes added with make_axes_locatable, so
+        # both labels are set the same distance left of their axes, clear
+        # of the wider set of tick labels (6.5 pt tick pad, 4 pt label pad)
+        fig = ax.figure
+        renderer = fig.canvas.get_renderer()
+        tick_width = max(
+            label.get_window_extent(renderer).width
+            for a in (ax, ax_sub) for label in a.get_yticklabels()
+        ) * 72 / fig.dpi
+        offset = mtransforms.ScaledTranslation(
+            -(6.5 + tick_width + 4) / 72, 0, fig.dpi_scale_trans
+        )
+        for a in (ax, ax_sub):
+            a.yaxis.set_label_coords(0, 0.5, transform=a.transAxes + offset)
+
+
+def plot_carbonate_subtracted(data, files, mc3_output, ax=None,
+                              xlim=(1300, 1800), annotate=True):
+
+    """
+    Plots the modeled CO_3^{2-} doublet Gaussians at 1430 and 1515 cm^-1
+    with the baseline removed, so that the peaks are referenced to zero
+    absorbance. Draws from the posterior distribution are shown to
+    visualize uncertainty in peak position, width, and height. They are
+    the same posterior samples as the baselines drawn by plot_carbonate.
+
+    Parameters:
+        data (pd.DataFrame): DataFrame containing FTIR spectral data with
+            "Absorbance" values indexed by wavenumber. Expected to cover
+            the range relevant for carbonate and water peak analysis.
+        files (str): Identifier for the current sample set being processed,
+            used for titling the plot.
+        mc3_output (dict): Dictionary containing results from PyIRoGlass
+            fitting, including best fit parameters, standard deviations,
+            posterior distributions, and other model outputs.
+        ax (matplotlib.axes.Axes, optional): Matplotlib axis object where the
+            plot will be drawn. If None, a new figure and axis will be created.
+        xlim (tuple or None, optional): Wavenumber range to show. None
+            leaves the axis limits unchanged, e.g. for an axis that shares
+            its wavenumber axis with plot_carbonate. Default is
+            (1300, 1800).
+        annotate (bool, optional): If True, prints the CO_3^{2-} peak
+            heights on the plot. Default is True.
+
+    Returns:
+        None: This function does not return any value. It generates a plot
+            visualizing the modeled CO_3^{2-} doublet Gaussians.
+
+    """
+
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(8, 8))
+        ax.set_title(files)
+
+    bestfits, _ = derive_carbonate(data, files, mc3_output, export_path=None)
+    wavenumber = bestfits.index.to_numpy()
+
+    # CO2 columns are stored with the baseline added back in
+    G1515 = (bestfits.CO2_1515 - bestfits.Baseline).to_numpy()
+    G1430 = (bestfits.CO2_1430 - bestfits.Baseline).to_numpy()
+
+    G_draws = np.array([gauss(wavenumber, P[5], P[6], A=P[7]) +
+                        gauss(wavenumber, P[8], P[9], A=P[10])
+                        for P in posterior_draws(mc3_output)])
+
+    # Gaussian tails are ~0 away from the doublet and would hide the zero
+    # reference line, so they are only drawn above a small fraction of the
+    # doublet height.
+    G_top = max((G1515 + G1430).max(), G_draws.max())
+    G_floor = 0.005 * G_top
+
+    def above_floor(G):
+        return np.where(G > G_floor, G, np.nan)
+
+    ax.plot(wavenumber, above_floor(G_draws).T, color="tab:purple",
+            alpha=0.15, linewidth=0.75)
+    ax.axhline(0, color="0.4", linestyle="--", linewidth=1.0,
+               label="Zero Absorbance")
+    ax.plot(
+        wavenumber,
+        above_floor(G1515),
+        "tab:green",
+        linewidth=2.0,
+        label=r"$\mathregular{CO_{3, 1515}^{2-}}$ Gaussian",
+    )
+    ax.plot(
+        wavenumber,
+        above_floor(G1430),
+        "tab:red",
+        linewidth=2.0,
+        label=r"$\mathregular{CO_{3, 1430}^{2-}}$ Gaussian",
+    )
+    ax.plot(
+        wavenumber,
+        above_floor(G1515 + G1430),
+        "tab:purple",
+        linewidth=1.5,
+        label=r"$\mathregular{CO_3^{2-}}$ Doublet",
+    )
+    # Proxy entry so the faint draws are explained once in the legend
+    ax.plot([], [], color="tab:purple", alpha=0.4, linewidth=0.75,
+            label="Posterior Draws")
+
+    if annotate:
+        ax.annotate(
+            r"$\mathregular{CO_{3, 1515}^{2-}}$ Peak Height: "
+            + f"{mc3_output['bestp'][10]:.3f} ± {mc3_output['stdp'][10]:.3f}",
+            (0.025, 0.95),
+            xycoords="axes fraction",
+        )
+        ax.annotate(
+            r"$\mathregular{CO_{3, 1430}^{2-}}$ Peak Height: "
+            + f"{mc3_output['bestp'][7]:.3f} ± {mc3_output['stdp'][7]:.3f}",
+            (0.025, 0.90),
+            xycoords="axes fraction",
+        )
+
+    # Headroom above the peaks keeps the legend clear of the data
+    G_top = G_top if G_top > 0 else 1e-3
+    headroom = 0.45 if annotate else 0.25
+    ax.set_ylim([-0.05 * G_top, (1 + headroom) * G_top])
+    if xlim is not None:
+        ax.set_xlim(xlim)
+    ax.set_xlabel(r"Wavenumber $(\mathregular{cm^{-1}})$")
+    ax.set_ylabel("Baseline-Subtracted\nAbsorbance")
+    # Below plot_carbonate the peaks sit on the right, so the legend goes left
+    ax.legend(loc="upper right" if annotate else "upper left",
+              prop={"size": 10})
+    ax.tick_params(axis="x", direction="in", length=5, pad=6.5)
+    ax.tick_params(axis="y", direction="in", length=5, pad=6.5)
+    if not ax.xaxis_inverted():
+        ax.invert_xaxis()
 
 
 def plot_trace(posterior, title, zchain=None, pnames=None, thinning=50,
