@@ -598,6 +598,7 @@ def propagate_thickness_uncertainty(dfs_thick, replicate_suffix=r"_REF_[a-z]+$",
     Returns:
         pd.DataFrame: One row per sample (index = sample name with the
             replicate suffix removed), with columns:
+
             - Thickness_M (float): Mean of Thickness_M across
               replicates.
             - Thickness_STD_analytical (float): Uncertainty of the
