@@ -3,6 +3,7 @@
 [![Build Status](https://github.com/SarahShi/PyIRoGlass/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/SarahShi/PyIRoGlass/actions/workflows/main.yml)
 [![Documentation Status](https://readthedocs.org/projects/pyiroglass/badge/?version=latest)](https://pyiroglass.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/SarahShi/PyIRoGlass/branch/main/graph/badge.svg)](https://codecov.io/gh/SarahShi/PyIRoGlass/branch/main)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://pyiroglass.streamlit.app)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SarahShi/PyIRoGlass/blob/main/PyIRoGlass_RUN_colab.ipynb)
 [![Python 3.9](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/release/python-390/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
@@ -11,8 +12,11 @@
 
 PyIRoGlass is a Bayesian MCMC-founded Python algorithm, written in the open-source language Python3, for determining $\mathrm{H_2O}$ and $\mathrm{CO_2}$ species concentrations in the transmission FTIR spectra of basaltic to andesitic glasses. We leverage a database of naturally degassed melt inclusions and back-arc basin basalts to delineate the fundamental shape and variability of the baseline underlying the $\mathrm{CO_{3}^{2-}}$ and $\mathrm{H_2O_{m, 1635}}$ peaks, in the mid-infrared region. PyIRoGlass employs Bayesian inference and Markov Chain Monte Carlo sampling to fit all probable baselines and peaks, solving for best-fit parameters and capturing covariance to offer robust uncertainty estimates.
 
-## Manuscript
-Find the [PyIRoGlass manuscript](https://doi.org/10.30909/vol.07.02.471501) published at Volcanica on for a more detailed description of the development and validation of the method. If you use this package in your work, please cite: 
+## Documentation
+Read the [documentation](https://pyiroglass.readthedocs.io/en/latest/) for a run-through of the PyIRoGlass code. 
+
+## Citation
+If you use this package in your work, please cite this manuscript. Find the [PyIRoGlass manuscript](https://doi.org/10.30909/vol.07.02.471501) published at Volcanica on for a more detailed description of the development and validation of the method. This package represents a significant time investment. Proper citation helps support continued development and academic recognition.
 
 ```console
 Shi, S., Towbin, W. H., Plank, T., Barth, A., Rasmussen, D., Moussallam, Y., Lee, H. J. and Menke, W. (2024) “PyIRoGlass: An open-source, Bayesian MCMC algorithm for fitting baselines to FTIR spectra of basaltic-andesitic glasses”, Volcanica, 7(2), pp. 471–501. doi: 10.30909/vol.07.02.471501.
@@ -26,16 +30,20 @@ Shi, S., Towbin, W. H., Plank, T., Barth, A., Rasmussen, D., Moussallam, Y., Lee
     volume    = {7},
     number    = {2},
     pages     = {471-501},
-    author    = {Shi, Sarah C. and Towbin, W. Henry and Plank, Terry and Barth, Anna and Rasmussen, Daniel and Moussallam, Yves and Lee, Hyun Joo and Menke, William},
+    author    = {Shi, Sarah C and Towbin, W Henry and Plank, Terry and Barth, Anna and Rasmussen, Daniel and Moussallam, Yves and Lee, Hyun Joo and Menke, William},
     title     = {PyIRoGlass: An open-source, Bayesian MCMC algorithm for fitting baselines to FTIR spectra of basaltic-andesitic glasses},
     journal   = {Volcanica}
 }
 ```
 
-## Documentation
-Read the [documentation](https://pyiroglass.readthedocs.io/en/latest/) for a run-through of the PyIRoGlass code. 
-
 ## Run on the Cloud 
+
+### Web app (no Python needed)
+Open the pyIRoGlass web app at **[pyiroglass.streamlit.app](https://pyiroglass.streamlit.app)**. Upload a CSV of spectra with their thickness and chemistry, and receive concentrations as output. The app sleeps after 12 hours without visitors; if you see a wake-up button, click it and wait ~30 seconds.
+
+To run the app locally, see [webapp/README.md](webapp/README.md).
+
+### VICTOR and Google Colab
 If you do not have Python installed locally or if you use a Windows computer (without Linux), please run PyIRoGlass on [VICTOR (Volcanology Infrastructure for Computational Tools and Resources)](https://hub.victorproject.org/hub/login?next=%2Fhub%2F) or on [Google Colab](https://colab.research.google.com/github/SarahShi/PyIRoGlass/blob/main/PyIRoGlass_RUN_colab.ipynb). We **strongly** recommend the use of VICTOR, for significantly faster processing. 
 
 To run PyIRoGlass on VICTOR, run the following commands in the VICTOR terminal:
