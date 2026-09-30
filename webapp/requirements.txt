@@ -1,0 +1,4 @@
+PyIRoGlass>=0.6.8
+numpy<2
+streamlit>=1.64
+pymupdf
