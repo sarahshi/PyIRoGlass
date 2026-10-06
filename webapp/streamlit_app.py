@@ -4,6 +4,7 @@ import io
 import sys
 import inspect
 import shutil
+import warnings
 import zipfile
 import tempfile
 import threading
@@ -28,7 +29,8 @@ EXAMPLES = HERE.parent / "Inputs" / "COLAB_BINDER"
 OXIDES = ["SiO2", "TiO2", "Al2O3", "Fe2O3", "FeO", "MnO", "MgO", "CaO", "Na2O", "K2O", "P2O5"]
 MAX_SPECTRA = 5
 N_EXAMPLES = 2  # example transmission spectra the H2O-CO2 tool runs
-TOOLS = ["H₂O and CO₂ (transmission FTIR)", "Wafer thickness (reflectance FTIR)"]
+TOOLS = ["H₂O and CO₂ (transmission FTIR)", "Wafer thickness (reflectance FTIR)",
+         "Glass density (composition)", "Molar absorptivity (composition)"]
 SKIP_IN_ZIP = {"NPZTXTFILES", "PKLFILES"}  # MCMC chains and pickles: ~18 MB per spectrum
 # plot_subtracted is new in PyIRoGlass 0.6.8; hide the option on older pinned versions.
 HAS_PLOT_SUBTRACTED = "plot_subtracted" in inspect.signature(pig.calculate_baselines).parameters
@@ -42,6 +44,15 @@ PHASES = {
     "Clinopyroxene": dict(index=pig.reflectance_index_cpx, comp="Mg/(Mg+Fe+Mn), XMg", default=0.80, wn=(2100, 2700)),
     "Basaltic glass": dict(n=1.546, wn=(1700, 2850)),
     "Other (enter refractive index)": dict(n=1.60, wn=(2100, 2700)),
+}
+
+# Density calibrations (oxide partial molar volumes) in calculate_density; the H2O-CO2 tool uses LS.
+DENSITY_MODELS = {"Lesher and Spera (2015)": "LS", "Iacovino and Till (2019)": "IT"}
+DENSITY_SIGMA = 0.025  # relative 1σ on density that calculate_concentrations propagates
+# Display labels for calculate_epsilon's columns; downloads keep PyIRoGlass's names.
+EPSILON_LABELS = {
+    "H2Ot_3550": "H₂Oₜ 3550", "H2Om_1635": "H₂Oₘ 1635", "carbonate": "CO₃²⁻ 1515, 1430",
+    "CO2": "CO₂ 2350", "H2Om_5200": "H₂Oₘ 5200", "OH_4500": "OH⁻ 4500",
 }
 
 CITATION = (
@@ -223,6 +234,68 @@ def chemthick_table(names, source, report_unmatched=True):
     )
 
 
+def composition_table(source, key, extra=()):
+    """Editable glass composition table, one row per glass, prefilled from a CSV if given. Rows can be added."""
+    cols = ["Sample"] + OXIDES + list(extra)
+    if source is None:
+        base = pd.DataFrame({"Sample": [f"Glass_{i}" for i in range(1, 4)]})
+    else:
+        base = pd.read_csv(source, encoding="utf-8-sig")
+        if "Sample" not in base.columns:
+            st.error("Your composition file needs a `Sample` column.")
+            st.stop()
+    base = base.reindex(columns=cols)
+    base[cols[1:]] = base[cols[1:]].apply(pd.to_numeric, errors="coerce")
+    return st.data_editor(
+        base, hide_index=True, num_rows="dynamic", key=key,
+        column_config={"Sample": st.column_config.TextColumn(),
+                       "H2O": st.column_config.NumberColumn("H2O (wt%)") if "H2O" in extra else None,},
+    )
+
+
+def compositions(table):
+    """The filled-in rows of a composition table, indexed by Sample, blanks as 0. None if there are none."""
+    comp = table.dropna(subset=table.columns.drop("Sample"), how="all").copy()
+    if comp.empty:
+        return None
+    blank = comp["Sample"].isna() | (comp["Sample"].astype(str).str.strip() == "")
+    comp.loc[blank, "Sample"] = [f"Row_{i + 1}" for i in comp.index[blank]]
+    comp = comp.set_index("Sample")
+    dupes = comp.index[comp.index.duplicated()].unique().tolist()
+    if dupes:
+        st.error(f"Sample names must be unique: {dupes}")
+        st.stop()
+    return comp.fillna(0.0)
+
+
+def calculate_densities(comp, T, P, models):
+    """Density (kg/m³) at T and P for each glass and its 1σ, two columns per calibration, e.g. Density_LS."""
+    density = pd.DataFrame()
+    for m in models:
+        code = DENSITY_MODELS[m]
+        density[f"Density_{code}"] = pig.calculate_density(comp, T, P, model=code)[1]
+        density[f"Sigma_Density_{code}"] = density[f"Density_{code}"] * DENSITY_SIGMA
+    density.index.name = "Sample"
+    return density
+
+
+def calculate_epsilons(comp):
+    """Molar absorptivities (L/mol·cm) for each glass. T and P don't enter calculate_epsilon's result."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")  # out-of-range compositions are listed in the Notes column
+        epsilon = pig.calculate_epsilon(comp[OXIDES], 25, 1)
+    epsilon.index.name = "Sample"
+    return epsilon
+
+
+def composition_source(use_example, uploaded, tool_key):
+    """CSV source and data editor key for the composition tools. The examples are one row per glass."""
+    if use_example:
+        examples = pd.read_csv(EXAMPLES / "Colab_Binder_ChemThick.csv", encoding="utf-8-sig")
+        return io.StringIO(examples.drop_duplicates(subset=OXIDES).to_csv(index=False)), f"{tool_key}_example"
+    return uploaded, f"{tool_key}_{uploaded.file_id}" if uploaded else f"{tool_key}_blank"
+
+
 # %% ----------------------------------------------------------------
 # sidebar
 
@@ -250,6 +323,24 @@ with st.sidebar:
         else:
             n = st.number_input("Refractive index, n", 1.0, 3.0, spec["n"], step=0.001, format="%.3f")
         wn_low, wn_high = st.slider("Wavenumber window (cm⁻¹)", 1000, 5000, spec["wn"], step=50)
+    elif tool in TOOLS[2:]:
+        st.header("Compositions")
+        use_example = st.checkbox("Use example compositions", value=False)
+        composition_file = None if use_example else st.file_uploader(
+            "Composition file (optional CSV)", type=["csv"],
+            help="Columns: Sample and oxides (wt%)"
+                 + (", and optionally H2O (wt%)" if tool == TOOLS[2] else "")
+                 + ". A ChemThick file works too; other columns are ignored. Or type or paste the values into "
+                   "the table on the page.",
+        )
+        if tool == TOOLS[2]:
+            st.header("Options")
+            T = st.number_input("Temperature of analysis (°C)", value=25)
+            P = st.number_input("Pressure of analysis (bar)", value=1)
+            density_models = st.multiselect(
+                "Density calibrations", list(DENSITY_MODELS), default=list(DENSITY_MODELS),
+                help="Oxide partial molar volumes. Each calibration you pick gets its own column.",
+            )
     else:
         st.header("Spectra")
         use_example = st.checkbox(f"Use example spectra ({N_EXAMPLES})", value=False)
@@ -310,7 +401,8 @@ with st.sidebar:
 st.title("PyIRoGlass")
 st.markdown(
     "Bayesian MCMC baselines for determining H₂O and CO₂ species concentrations in transmission FTIR "
-    "spectra of basaltic to andesitic glasses, plus wafer thicknesses from reflectance FTIR spectra."
+    "spectra of basaltic to andesitic glasses, plus wafer thicknesses from reflectance FTIR spectra and "
+    "glass densities and molar absorptivities from composition."
 )
 
 with st.expander("How to cite"):
@@ -359,6 +451,85 @@ if tool.startswith("Wafer"):
     cols = st.columns(2)
     for i, (title, png) in enumerate(pngs):
         cols[i % 2].image(png, caption=title)
+
+elif tool == TOOLS[2]:
+    st.header("Glass density")
+    st.markdown(
+        "Glass density at the temperature and pressure of analysis, from the oxide partial molar volumes. Pick one "
+        "or more calibrations in the menu at left to compare them. The H₂O and CO₂ tool uses Lesher and Spera (2015)."
+    )
+    st.markdown(
+        "Enter one glass per row in wt%, or upload a CSV in the menu at left. Add rows at the bottom of the table, "
+        "or paste from a spreadsheet. Blank oxides count as 0."
+    )
+    st.button("Need molar absorptivities? Use the Molar absorptivity tool", type="tertiary",
+              icon=":material/arrow_forward:", on_click=switch_tool, args=(TOOLS[3],))
+    comp = compositions(composition_table(*composition_source(use_example, composition_file, "density"),
+                                          extra=["H2O"]))
+    if comp is None:
+        st.info("Enter a composition in the table above, upload a composition file, or tick **Use example compositions**.")
+        st.stop()
+    if not density_models:
+        st.info("Pick at least one density calibration in the menu at left.")
+        st.stop()
+
+    density = calculate_densities(comp, T, P, density_models)
+    st.subheader("Results")
+    density_cols = {}
+    for m in density_models:
+        density_cols[f"Density_{DENSITY_MODELS[m]}"] = st.column_config.NumberColumn(f"{m} (kg/m³)", format="%.1f")
+        density_cols[f"Sigma_Density_{DENSITY_MODELS[m]}"] = st.column_config.NumberColumn(f"σ {m}", format="%.1f")
+    st.dataframe(density, column_config=density_cols)
+    st.caption(
+        f"Density in kg/m³ at {T} °C and {P} bar. σ is the {DENSITY_SIGMA:.1%} (1σ) density uncertainty that the H₂O "
+        "and CO₂ tool propagates into concentrations, not an error calculated from the composition. For basaltic "
+        "glasses the two calibrations differ by about 2%, a larger effect than analytical errors in the composition."
+    )
+    st.download_button("Download CSV", density.to_csv().encode(), file_name="PyIRoGlass_density.csv",
+                       mime="text/csv")
+
+elif tool == TOOLS[3]:
+    st.header("Molar absorptivity")
+    st.markdown(
+        "Molar absorptivities (ε) of each H₂O and CO₂ species from the glass composition, using the compositional "
+        "regressions of Shi et al. (2024). These are the values the H₂O and CO₂ tool uses in the Beer-Lambert law, "
+        "so you can check them."
+    )
+    st.markdown(
+        "Enter one glass per row in wt% (anhydrous), or upload a CSV in the menu at left. Add rows at the bottom of "
+        "the table, or paste from a spreadsheet. Blank oxides count as 0."
+    )
+    st.button("Need glass densities? Use the Glass density tool", type="tertiary",
+              icon=":material/arrow_forward:", on_click=switch_tool, args=(TOOLS[2],))
+    comp = compositions(composition_table(*composition_source(use_example, composition_file, "epsilon")))
+    if comp is None:
+        st.info("Enter a composition in the table above, upload a composition file, or tick **Use example compositions**.")
+        st.stop()
+
+    epsilon = calculate_epsilons(comp)
+    st.subheader("Results")
+    eps_cols = {}
+    for name, label in EPSILON_LABELS.items():
+        eps_cols[f"epsilon_{name}"] = st.column_config.NumberColumn(f"ε {label}", format="%.2f")
+        eps_cols[f"sigma_epsilon_{name}"] = st.column_config.NumberColumn(f"σ ε {label}", format="%.2f")
+    st.dataframe(epsilon, column_config={
+        "Tau": st.column_config.NumberColumn("τ", format="%.4f"),
+        "Eta": st.column_config.NumberColumn("η", format="%.4f"),
+        **eps_cols,
+    })
+    st.caption(
+        "Molar absorptivities in L/mol·cm with 1σ uncertainties, at the peak wavenumbers in cm⁻¹. "
+        "τ = (Si⁴⁺ + Al³⁺)/total cations sets ε for the H₂O peaks; η = Na⁺/(Na⁺ + Ca²⁺) sets ε for the carbonate "
+        "peaks. Molecular CO₂ at 2350 cm⁻¹ uses a constant 830 ± 5%."
+    )
+    flagged = epsilon.loc[epsilon["Notes"].astype(bool), "Notes"]
+    if not flagged.empty:
+        st.warning(
+            "**Outside the calibration range; use these molar absorptivities with caution:**\n\n"
+            + "\n".join(f"- `{sample}`: {note}" for sample, note in flagged.items())
+        )
+    st.download_button("Download CSV", epsilon.to_csv().encode(), file_name="PyIRoGlass_epsilon.csv",
+                       mime="text/csv")
 
 else:
     st.header("H₂O and CO₂ from transmission FTIR")

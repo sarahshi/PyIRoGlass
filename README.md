@@ -39,7 +39,7 @@ Shi, S., Towbin, W. H., Plank, T., Barth, A., Rasmussen, D., Moussallam, Y., Lee
 ## Run on the Cloud 
 
 ### Web app (no Python needed)
-Open the pyIRoGlass web app at **[pyiroglass.streamlit.app](https://pyiroglass.streamlit.app)**. Upload a CSV of spectra with their thickness and chemistry, and receive concentrations as output. The app sleeps after 12 hours without visitors; if you see a wake-up button, click it and wait ~30 seconds.
+Open the PyIRoGlass web app at **[pyiroglass.streamlit.app](https://pyiroglass.streamlit.app)**. Upload a CSV of spectra with their thickness and chemistry, and receive concentrations as output. The app sleeps after 12 hours without visitors; if you see a wake-up button, click it and wait ~30 seconds.
 
 To run the app locally, see [webapp/README.md](webapp/README.md).
 
