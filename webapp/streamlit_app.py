@@ -20,7 +20,8 @@ import matplotlib.pyplot as plt
 import streamlit as st
 import PyIRoGlass as pig
 
-st.set_page_config(page_title="PyIRoGlass", page_icon="🌋", initial_sidebar_state=350)  # sidebar width, px
+st.set_page_config(page_title="PyIRoGlass", page_icon="🌋", initial_sidebar_state=350,  # sidebar width, px
+                   layout="wide")  # full browser width, so spectra, figures and tables render large
 st.set_page_config(initial_sidebar_state="expanded")  # additive: keeps the width, and opens the sidebar
 
 HERE = Path(__file__).resolve().parent
